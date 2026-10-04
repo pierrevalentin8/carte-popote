@@ -883,6 +883,11 @@ body {
     cursor: pointer;
 }
 
+.booster button:disabled {
+    opacity: .7;
+    cursor: not-allowed;
+}
+
 
 /* ==================================================
    JOURNAL
@@ -1020,6 +1025,11 @@ body {
     font-weight: 700;
 }
 
+.nav-item:disabled {
+    opacity: .55;
+    cursor: not-allowed;
+}
+
 
 /* ==================================================
    DESKTOP
@@ -1062,8 +1072,21 @@ body {
 .admin-card-row small { margin-top: 4px; color: #7895a6; }
 .admin-actions { display: flex; gap: 6px; }
 .admin-actions button, .admin-back { padding: 9px 12px; border: 0; border-radius: 9px; background: #eefaff; color: #1687b9; font-weight: 700; cursor: pointer; }
+.player-token-controls { display: flex; align-items: center; gap: 6px; }
+.player-token-input { width: 100px; padding: 9px; border: 1px solid #cce5ef; border-radius: 9px; font: inherit; }
+.player-token-controls .primary-button { width: auto; padding: 10px 12px; white-space: nowrap; }
 .admin-danger { color: #c0392b !important; background: #fff0f0 !important; }
 .admin-submit { margin-top: 8px; }
+.player-collection { width: 100%; max-width: 900px; margin: auto; padding: 20px 16px 100px; }
+.player-collection h2 { margin-bottom: 8px; color: #173b52; }
+.player-card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; margin-top: 16px; }
+.player-card { overflow: hidden; background: #fff; border: 3px solid #9e9e9e; border-radius: 16px; box-shadow: 0 6px 18px rgba(30,90,120,.1); }
+.player-card-image { display: block; width: 100%; aspect-ratio: 2 / 3; object-fit: cover; background: #eefaff; }
+.player-card-placeholder { display: grid; place-items: center; width: 100%; aspect-ratio: 2 / 3; background: #eefaff; font-size: 42px; }
+.player-card-copy { padding: 10px; }
+.player-card-copy h3 { font-size: 15px; margin-bottom: 5px; color: #173b52; }
+.player-card-copy p { font-size: 12px; color: #68899b; line-height: 1.4; margin-top: 4px; }
+.rarity-label { display: inline-block; padding: 3px 7px; border-radius: 999px; background: #f3f6f8; font-size: 11px; font-weight: 700; }
 </style>
 
 </head>
@@ -1098,11 +1121,11 @@ body {
 
     <div class="login-card">
 
-        <h2>
+        <h2 id="loginTitle">
             Connexion
         </h2>
 
-        <p class="login-subtitle">
+        <p class="login-subtitle" id="loginSubtitle">
             Heureux de vous revoir !
         </p>
 
@@ -1115,6 +1138,19 @@ body {
 
         <form id="loginForm">
 
+
+            <div class="field hidden" id="registerPseudoField">
+
+                <label for="registerPseudo">Pseudonyme</label>
+
+                <input
+                    type="text"
+                    id="registerPseudo"
+                    maxlength="24"
+                    placeholder="Ton pseudonyme"
+                >
+
+            </div>
 
             <div class="field">
 
@@ -1162,6 +1198,7 @@ body {
         <button
             class="secondary-button"
             id="registerButton"
+            type="button"
         >
             Créer un compte
         </button>
@@ -1375,27 +1412,50 @@ body {
         <section class="boosters">
 
 
-           <article class="booster">
-    <img
-        class="booster-image"
-        src="./Booster%20Journalier.png"
-        alt="Illustration du booster journalier Cartes & Popote"
-    >
-    <h4>Booster Journalier</h4>
-    <p>3 cartes gratuites</p>
-    <button>Bientôt disponible</button>
-</article>
+            <article class="booster">
 
-<article class="booster">
-    <img
-        class="booster-image"
-        src="./Booster%20normal.png"
-        alt="Illustration du booster classique Cartes & Popote"
-    >
-    <h4>Booster classique</h4>
-    <p>5 cartes</p>
-    <button>Bientôt disponible</button>
-</article>
+                <img
+                    class="booster-image"
+                    src="assets/booster-journalier.png"
+                    alt="Illustration du booster journalier Cartes & Popote"
+                >
+
+                <h4>
+                    Booster quotidien
+                </h4>
+
+                <p>
+                    3 cartes gratuites
+                </p>
+
+                <button disabled>
+                    Bientôt disponible
+                </button>
+
+            </article>
+
+
+            <article class="booster">
+
+                <img
+                    class="booster-image"
+                    src="assets/booster-normal.png"
+                    alt="Illustration du booster classique Cartes & Popote"
+                >
+
+                <h4>
+                    Booster classique
+                </h4>
+
+                <p>
+                    5 cartes
+                </p>
+
+                <button disabled>
+                    Bientôt disponible
+                </button>
+
+            </article>
 
 
         </section>
@@ -1459,10 +1519,23 @@ body {
 
 
 
+    <section id="collectionPage" class="player-collection hidden">
+        <h2>🃏 Cartes disponibles</h2>
+        <p class="admin-note">Parcours les cartes du jeu. Elles seront ajoutées à ta collection au fil des tirages.</p>
+        <p id="collectionStatus" class="admin-status" role="status"></p>
+        <div id="playerCardGrid" class="player-card-grid"></div>
+    </section>
+
     <section id="adminPage" class="admin-page hidden">
         <button id="adminBackButton" class="admin-back" type="button">← Retour à l’accueil</button>
-        <h2>🛡️ Administration des cartes</h2>
-        <p class="admin-note">Les cartes sont enregistrées dans Firestore. Seul le compte Admin peut les modifier.</p>
+        <h2>🛡️ Administration</h2>
+        <p class="admin-note">Gestion des joueurs, des raretés et des cartes. Les accès sont protégés par les règles Firestore.</p>
+        <div class="admin-panel" style="margin-bottom:16px">
+            <h3>👥 Joueurs</h3>
+            <p class="admin-note">Ajoute des jetons au solde d’un joueur. Les joueurs ne peuvent pas modifier eux-mêmes leur solde.</p>
+            <p id="playersStatus" class="admin-status" role="status"></p>
+            <div id="playersList"></div>
+        </div>
         <div class="admin-panel" style="margin-bottom:16px">
             <h3>Catégories de rareté et apparition</h3>
             <p class="admin-note">Les pourcentages définissent la chance d’apparition. Leur total ne peut pas dépasser 100 %.</p>
@@ -1500,9 +1573,7 @@ body {
     <nav class="bottom-nav">
 
 
-        <button
-            class="nav-item active"
-        >
+        <button id="homeNavButton" class="nav-item active" type="button">
 
             <span class="nav-icon">
                 🏠
@@ -1513,22 +1584,18 @@ body {
         </button>
 
 
-        <button
-            class="nav-item"
-        >
+        <button id="collectionNavButton" class="nav-item" type="button">
 
             <span class="nav-icon">
                 🃏
             </span>
 
-            Ma collection
+            Cartes
 
         </button>
 
 
-        <button
-            class="nav-item"
-        >
+        <button class="nav-item" type="button" disabled title="Bientôt disponible">
 
             <span class="nav-icon">
                 🔄
@@ -1539,9 +1606,7 @@ body {
         </button>
 
 
-        <button
-            class="nav-item"
-        >
+        <button class="nav-item" type="button" disabled title="Bientôt disponible">
 
             <span class="nav-icon">
                 📖
@@ -1585,6 +1650,7 @@ import {
     onAuthStateChanged,
 
     signInWithEmailAndPassword,
+    createUserWithEmailAndPassword,
 
     signOut
 
@@ -1597,11 +1663,13 @@ import {
     getFirestore,
     doc,
     getDoc,
+    setDoc,
     collection,
     getDocs,
     addDoc,
     updateDoc,
-    deleteDoc
+    deleteDoc,
+    runTransaction
 
 } from
 "https://www.gstatic.com/firebasejs/12.3.0/firebase-firestore.js";
@@ -1702,6 +1770,13 @@ const loginMessage =
         "loginMessage"
     );
 
+const loginTitle = document.getElementById("loginTitle");
+const loginSubtitle = document.getElementById("loginSubtitle");
+const registerPseudoField = document.getElementById("registerPseudoField");
+const registerPseudo = document.getElementById("registerPseudo");
+let isRegisterMode = false;
+let pendingSignupPseudo = "";
+
 
 const registerButton =
     document.getElementById(
@@ -1729,7 +1804,14 @@ const logoutButton =
 const adminButton = document.getElementById("adminButton");
 const ADMIN_EMAIL = "pierre.valentin8@gmail.com";
 const adminPage = document.getElementById("adminPage");
+const collectionPage = document.getElementById("collectionPage");
+const collectionStatus = document.getElementById("collectionStatus");
+const playerCardGrid = document.getElementById("playerCardGrid");
+const homeNavButton = document.getElementById("homeNavButton");
+const collectionNavButton = document.getElementById("collectionNavButton");
 const adminBackButton = document.getElementById("adminBackButton");
+const playersStatus = document.getElementById("playersStatus");
+const playersList = document.getElementById("playersList");
 const rarityForm = document.getElementById("rarityForm");
 const rarityName = document.getElementById("rarityName");
 const rarityPercentage = document.getElementById("rarityPercentage");
@@ -1813,31 +1895,32 @@ loginForm.addEventListener(
 
 
         try {
-
-            await signInWithEmailAndPassword(
-
-                auth,
-
-                email,
-
-                password
-
-            );
-
+            if (isRegisterMode) {
+                const pseudo = registerPseudo.value.trim();
+                if (pseudo.length < 3) {
+                    throw new Error("Choisis un pseudonyme d’au moins 3 caractères.");
+                }
+                if (password.length < 6) {
+                    throw new Error("Le mot de passe doit contenir au moins 6 caractères.");
+                }
+                pendingSignupPseudo = pseudo;
+                await createUserWithEmailAndPassword(auth, email, password);
+            } else {
+                await signInWithEmailAndPassword(auth, email, password);
+            }
         }
 
         catch (error) {
-
             console.error(error);
-
-
-            loginMessage.textContent =
-                "Adresse e-mail ou mot de passe incorrect.";
-
-
-            loginMessage.className =
-                "message error";
-
+            const messages = {
+                "auth/email-already-in-use": "Cette adresse e-mail possède déjà un compte.",
+                "auth/invalid-email": "Cette adresse e-mail n’est pas valide.",
+                "auth/weak-password": "Choisis un mot de passe plus solide (6 caractères minimum).",
+                "auth/operation-not-allowed": "L’inscription par e-mail doit être activée dans Firebase Authentication."
+            };
+            loginMessage.textContent = error.message || messages[error.code] || "Connexion ou inscription impossible. Vérifie tes identifiants.";
+            loginMessage.className = "message error";
+            pendingSignupPseudo = "";
         }
 
 
@@ -1846,8 +1929,7 @@ loginForm.addEventListener(
             loginButton.disabled =
                 false;
 
-            loginButton.textContent =
-                "Se connecter";
+            loginButton.textContent = isRegisterMode ? "Créer mon compte" : "Se connecter";
 
         }
 
@@ -1863,11 +1945,15 @@ loginForm.addEventListener(
 registerButton.addEventListener(
     "click",
     function() {
-
-        alert(
-            "Nous avons déjà créé le système d'inscription. Nous améliorerons cet écran ensuite."
-        );
-
+        isRegisterMode = !isRegisterMode;
+        registerPseudoField.classList.toggle("hidden", !isRegisterMode);
+        registerPseudo.required = isRegisterMode;
+        loginTitle.textContent = isRegisterMode ? "Créer un compte" : "Connexion";
+        loginSubtitle.textContent = isRegisterMode ? "Rejoins Cartes & Popote !" : "Heureux de vous revoir !";
+        loginButton.textContent = isRegisterMode ? "Créer mon compte" : "Se connecter";
+        registerButton.textContent = isRegisterMode ? "Déjà un compte ? Se connecter" : "Créer un compte";
+        loginMessage.textContent = "";
+        loginMessage.className = "message";
     }
 );
 
@@ -1890,6 +1976,8 @@ onAuthStateChanged(
 
         if (!user) {
             adminButton.classList.add("hidden");
+            collectionPage.classList.add("hidden");
+            adminPage.classList.add("hidden");
 
             loginPage.classList.remove(
                 "hidden"
@@ -2040,6 +2128,23 @@ onAuthStateChanged(
                         xpProgress + "%";
 
             }
+            else {
+                const pseudo = pendingSignupPseudo
+                    || (user.email || "joueur").split("@")[0];
+                const newPlayer = {
+                    pseudo,
+                    email: user.email || "",
+                    niveau: 1,
+                    xp: 0,
+                    tokens: 0,
+                    cartesTirees: 0,
+                    boostersAchetes: 0,
+                    createdAt: new Date().toISOString()
+                };
+                await setDoc(playerRef, newPlayer);
+                document.getElementById("playerPseudo").textContent = pseudo;
+                pendingSignupPseudo = "";
+            }
 
 
         }
@@ -2058,6 +2163,95 @@ onAuthStateChanged(
 );
 
 
+
+async function loadPlayerCards() {
+    playerCardGrid.replaceChildren();
+    collectionStatus.textContent = "Chargement des cartes...";
+    try {
+        const snapshot = await getDocs(collection(db, "cards"));
+        const cards = snapshot.docs
+            .map((cardDoc) => ({ id: cardDoc.id, ...cardDoc.data() }))
+            .sort((a, b) => (a.name || "").localeCompare(b.name || "", "fr"));
+
+        if (!cards.length) {
+            collectionStatus.textContent = "Les cartes arrivent bientôt.";
+            return;
+        }
+
+        collectionStatus.textContent = cards.length + (cards.length === 1 ? " carte disponible" : " cartes disponibles");
+        cards.forEach((card) => {
+            const cardElement = document.createElement("article");
+            cardElement.className = "player-card";
+            cardElement.style.borderColor = card.rarityColor || getRarityColor(card.rarity);
+
+            const visualUrl = card.imageUrl || card.imageURL || card.image || card.visuel || card.urlImage || "";
+            if (/^https?:\/\//i.test(visualUrl)) {
+                const image = document.createElement("img");
+                image.className = "player-card-image";
+                image.src = visualUrl;
+                image.alt = card.name ? "Illustration de " + card.name : "Illustration de la carte";
+                image.loading = "lazy";
+                image.onerror = () => {
+                    const placeholder = document.createElement("div");
+                    placeholder.className = "player-card-placeholder";
+                    placeholder.textContent = "🃏";
+                    image.replaceWith(placeholder);
+                };
+                cardElement.append(image);
+            } else {
+                const placeholder = document.createElement("div");
+                placeholder.className = "player-card-placeholder";
+                placeholder.textContent = "🃏";
+                cardElement.append(placeholder);
+            }
+
+            const copy = document.createElement("div");
+            copy.className = "player-card-copy";
+            const title = document.createElement("h3");
+            title.textContent = card.name || card.nom || card.titre || "Carte sans nom";
+            const rarity = document.createElement("span");
+            rarity.className = "rarity-label";
+            const rarityName = card.rarity || card.rarete || card.rareté || "";
+            rarity.textContent = rarityName || "Sans rareté";
+            rarity.style.color = card.rarityColor || getRarityColor(rarityName);
+            const category = document.createElement("p");
+            category.textContent = card.category || card.categorie || card.type || "";
+            copy.append(title, rarity, category);
+            const descriptionText = card.description || card.desc || "";
+            if (descriptionText) {
+                const description = document.createElement("p");
+                description.textContent = descriptionText;
+                copy.append(description);
+            }
+            cardElement.append(copy);
+            playerCardGrid.append(cardElement);
+        });
+    } catch (error) {
+        console.error("Erreur de chargement de la collection :", error);
+        collectionStatus.textContent = "Impossible de charger les cartes. Vérifie les règles Firestore.";
+    }
+}
+
+function showHomePage() {
+    document.querySelector(".app-content").classList.remove("hidden");
+    collectionPage.classList.add("hidden");
+    adminPage.classList.add("hidden");
+    bottomNav.classList.remove("hidden");
+    homeNavButton.classList.add("active");
+    collectionNavButton.classList.remove("active");
+}
+
+homeNavButton.addEventListener("click", showHomePage);
+
+collectionNavButton.addEventListener("click", async () => {
+    document.querySelector(".app-content").classList.add("hidden");
+    adminPage.classList.add("hidden");
+    collectionPage.classList.remove("hidden");
+    bottomNav.classList.remove("hidden");
+    homeNavButton.classList.remove("active");
+    collectionNavButton.classList.add("active");
+    await loadPlayerCards();
+});
 
 async function loadRarities() {
     try {
@@ -2308,17 +2502,103 @@ async function loadCards() {
 }
 
 function closeAdminPage() {
-    adminPage.classList.add("hidden");
-    document.querySelector(".app-content").classList.remove("hidden");
-    bottomNav.classList.remove("hidden");
+    showHomePage();
+}
+
+async function loadPlayers() {
+    playersList.replaceChildren();
+    playersStatus.textContent = "Chargement des joueurs...";
+
+    if (!auth.currentUser || (auth.currentUser.email || "").toLowerCase() !== ADMIN_EMAIL) {
+        playersStatus.textContent = "Accès réservé au compte Admin.";
+        return;
+    }
+
+    try {
+        const snapshot = await getDocs(collection(db, "players"));
+        const players = snapshot.docs
+            .map((playerDoc) => ({ id: playerDoc.id, ...playerDoc.data() }))
+            .sort((a, b) => (a.pseudo || a.email || "").localeCompare(b.pseudo || b.email || "", "fr"));
+
+        if (players.length === 0) {
+            playersStatus.textContent = "Aucun joueur inscrit pour le moment.";
+            return;
+        }
+
+        playersStatus.textContent = "";
+        players.forEach((player) => {
+            const row = document.createElement("div");
+            row.className = "admin-card-row";
+            const details = document.createElement("div");
+            const name = document.createElement("strong");
+            name.textContent = player.pseudo || "Joueur sans pseudo";
+            const meta = document.createElement("small");
+            meta.textContent = (player.email || "Adresse e-mail inconnue") + " • " + (Number(player.tokens) || 0) + " jetons";
+            details.append(name, meta);
+
+            const controls = document.createElement("div");
+            controls.className = "player-token-controls";
+            const amountInput = document.createElement("input");
+            amountInput.className = "player-token-input";
+            amountInput.type = "number";
+            amountInput.min = "1";
+            amountInput.step = "1";
+            amountInput.max = "1000000";
+            amountInput.placeholder = "+ jetons";
+            amountInput.setAttribute("aria-label", "Nombre de jetons à attribuer à " + (player.pseudo || player.email || "ce joueur"));
+
+            const grantButton = document.createElement("button");
+            grantButton.type = "button";
+            grantButton.className = "primary-button";
+            grantButton.textContent = "Ajouter";
+            grantButton.addEventListener("click", async () => {
+                const amount = Number(amountInput.value);
+                if (!Number.isSafeInteger(amount) || amount < 1 || amount > 1000000) {
+                    playersStatus.textContent = "Saisis un nombre entier entre 1 et 1 000 000.";
+                    amountInput.focus();
+                    return;
+                }
+
+                grantButton.disabled = true;
+                playersStatus.textContent = "Attribution des jetons...";
+                try {
+                    const playerRef = doc(db, "players", player.id);
+                    await runTransaction(db, async (transaction) => {
+                        const playerSnapshot = await transaction.get(playerRef);
+                        if (!playerSnapshot.exists()) throw new Error("Joueur introuvable.");
+                        const currentTokens = Number(playerSnapshot.data().tokens) || 0;
+                        if (!Number.isSafeInteger(currentTokens) || currentTokens < 0 || currentTokens + amount > 1000000000) {
+                            throw new Error("Le solde de jetons dépasse la limite autorisée.");
+                        }
+                        transaction.update(playerRef, { tokens: currentTokens + amount });
+                    });
+                    await loadPlayers();
+                    playersStatus.textContent = amount + " jeton(s) attribué(s) à " + (player.pseudo || player.email || "ce joueur") + ".";
+                } catch (error) {
+                    console.error("Erreur d’attribution des jetons :", error);
+                    playersStatus.textContent = "Impossible d’attribuer les jetons. Vérifie les règles Firestore publiées.";
+                    grantButton.disabled = false;
+                }
+            });
+
+            controls.append(amountInput, grantButton);
+            row.append(details, controls);
+            playersList.append(row);
+        });
+    } catch (error) {
+        console.error("Erreur de chargement des joueurs :", error);
+        playersStatus.textContent = "Impossible de charger les joueurs. Vérifie les règles Firestore publiées.";
+    }
 }
 
 adminButton.addEventListener("click", async () => {
     if (!auth.currentUser || (auth.currentUser.email || "").toLowerCase() !== ADMIN_EMAIL) return;
     dropdownMenu.classList.add("hidden");
     document.querySelector(".app-content").classList.add("hidden");
+    collectionPage.classList.add("hidden");
     bottomNav.classList.add("hidden");
     adminPage.classList.remove("hidden");
+    await loadPlayers();
     await loadRarities();
     await loadCards();
 });
