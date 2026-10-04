@@ -1081,7 +1081,8 @@ body {
 .player-collection { width: 100%; max-width: 900px; margin: auto; padding: 20px 16px 100px; }
 .player-collection h2 { margin-bottom: 8px; color: #173b52; }
 .player-card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; margin-top: 16px; }
-.player-card { overflow: hidden; background: #fff; border: 3px solid #9e9e9e; border-radius: 16px; box-shadow: 0 6px 18px rgba(30,90,120,.1); }
+.player-card { position: relative; overflow: hidden; background: #fff; border: 3px solid #9e9e9e; border-radius: 16px; box-shadow: 0 6px 18px rgba(30,90,120,.1); }
+.card-quantity-badge { position: absolute; z-index: 2; top: 8px; right: 8px; min-width: 38px; padding: 6px 9px; border: 2px solid #fff; border-radius: 999px; background: #173b52; color: #fff; text-align: center; font-size: 13px; font-weight: 800; box-shadow: 0 2px 8px rgba(0,0,0,.25); }
 .player-card-image { display: block; width: 100%; aspect-ratio: 2 / 3; object-fit: cover; background: #eefaff; }
 .player-card-placeholder { display: grid; place-items: center; width: 100%; aspect-ratio: 2 / 3; background: #eefaff; font-size: 42px; }
 .player-card-copy { padding: 10px; }
@@ -1536,7 +1537,6 @@ body {
         <p class="admin-note">Les cartes obtenues en ouvrant tes boosters apparaissent ici.</p>
         <p id="ownedCardsStatus" class="admin-status" role="status"></p>
         <div id="ownedPlayerCardGrid" class="player-card-grid owned-card-grid"></div>
-        
     </section>
 
     <section id="boosterResultModal" class="booster-modal hidden" role="dialog" aria-modal="true" aria-labelledby="boosterResultTitle">
@@ -1845,8 +1845,6 @@ const ownedCardsStatus = document.getElementById("ownedCardsStatus");
 const ownedPlayerCardGrid = document.getElementById("ownedPlayerCardGrid");
 const adminPage = document.getElementById("adminPage");
 const collectionPage = document.getElementById("collectionPage");
-const collectionStatus = document.getElementById("collectionStatus");
-const playerCardGrid = document.getElementById("playerCardGrid");
 const homeNavButton = document.getElementById("homeNavButton");
 const collectionNavButton = document.getElementById("collectionNavButton");
 const adminBackButton = document.getElementById("adminBackButton");
@@ -2209,74 +2207,6 @@ onAuthStateChanged(
 
 
 
-async function loadPlayerCards() {
-    playerCardGrid.replaceChildren();
-    collectionStatus.textContent = "Chargement des cartes...";
-    try {
-        const snapshot = await getDocs(collection(db, "cards"));
-        const cards = snapshot.docs
-            .map((cardDoc) => ({ id: cardDoc.id, ...cardDoc.data() }))
-            .sort((a, b) => (a.name || "").localeCompare(b.name || "", "fr"));
-
-        if (!cards.length) {
-            collectionStatus.textContent = "Les cartes arrivent bientôt.";
-            return;
-        }
-
-        collectionStatus.textContent = cards.length + (cards.length === 1 ? " carte disponible" : " cartes disponibles");
-        cards.forEach((card) => {
-            const cardElement = document.createElement("article");
-            cardElement.className = "player-card";
-            cardElement.style.borderColor = card.rarityColor || getRarityColor(card.rarity);
-
-            const visualUrl = card.imageUrl || card.imageURL || card.image || card.visuel || card.urlImage || "";
-            if (/^https?:\/\//i.test(visualUrl)) {
-                const image = document.createElement("img");
-                image.className = "player-card-image";
-                image.src = visualUrl;
-                image.alt = card.name ? "Illustration de " + card.name : "Illustration de la carte";
-                image.loading = "lazy";
-                image.onerror = () => {
-                    const placeholder = document.createElement("div");
-                    placeholder.className = "player-card-placeholder";
-                    placeholder.textContent = "🃏";
-                    image.replaceWith(placeholder);
-                };
-                cardElement.append(image);
-            } else {
-                const placeholder = document.createElement("div");
-                placeholder.className = "player-card-placeholder";
-                placeholder.textContent = "🃏";
-                cardElement.append(placeholder);
-            }
-
-            const copy = document.createElement("div");
-            copy.className = "player-card-copy";
-            const title = document.createElement("h3");
-            title.textContent = card.name || card.nom || card.titre || "Carte sans nom";
-            const rarity = document.createElement("span");
-            rarity.className = "rarity-label";
-            const rarityName = card.rarity || card.rarete || card.rareté || "";
-            rarity.textContent = rarityName || "Sans rareté";
-            rarity.style.color = card.rarityColor || getRarityColor(rarityName);
-            const category = document.createElement("p");
-            category.textContent = card.category || card.categorie || card.type || "";
-            copy.append(title, rarity, category);
-            const descriptionText = card.description || card.desc || "";
-            if (descriptionText) {
-                const description = document.createElement("p");
-                description.textContent = descriptionText;
-                copy.append(description);
-            }
-            cardElement.append(copy);
-            playerCardGrid.append(cardElement);
-        });
-    } catch (error) {
-        console.error("Erreur de chargement de la collection :", error);
-        collectionStatus.textContent = "Impossible de charger les cartes. Vérifie les règles Firestore.";
-    }
-}
-
 buyNormalBoosterButton.addEventListener("click", async () => {
     if (!auth.currentUser) return;
 
@@ -2354,18 +2284,41 @@ async function loadOwnedPlayerCards() {
             ownedCardsStatus.textContent = "Ta collection est vide. Ouvre un booster pour obtenir tes premières cartes !";
             return;
         }
-        ownedCardsStatus.textContent = cards.length + (cards.length === 1 ? " carte obtenue" : " cartes obtenues");
-        cards.forEach((card) => ownedPlayerCardGrid.append(createPlayerCardElement(card)));
+        const groupedCards = groupCardCopies(cards);
+        ownedCardsStatus.textContent = cards.length + (cards.length === 1 ? " exemplaire obtenu" : " exemplaires obtenus")
+            + " • " + groupedCards.length + (groupedCards.length === 1 ? " carte différente" : " cartes différentes");
+        groupedCards.forEach((card) => ownedPlayerCardGrid.append(createPlayerCardElement(card, card.quantity)));
     } catch (error) {
         console.error("Erreur de chargement de la collection du joueur :", error);
         ownedCardsStatus.textContent = "Impossible de charger ta collection. Vérifie les règles Firestore.";
     }
 }
 
-function createPlayerCardElement(card) {
+function groupCardCopies(cards) {
+    const grouped = new Map();
+    cards.forEach((card) => {
+        const identity = card.cardId
+            ? "card:" + card.cardId
+            : "fallback:" + [card.name || "", card.rarity || "", card.category || "", card.imageUrl || ""].join("\u001f");
+        const existing = grouped.get(identity);
+        if (existing) {
+            existing.quantity += 1;
+        } else {
+            grouped.set(identity, { ...card, quantity: 1 });
+        }
+    });
+    return Array.from(grouped.values());
+}
+
+function createPlayerCardElement(card, quantity = 1) {
     const cardElement = document.createElement("article");
     cardElement.className = "player-card";
     cardElement.style.borderColor = card.rarityColor || getRarityColor(card.rarity);
+    const quantityBadge = document.createElement("span");
+    quantityBadge.className = "card-quantity-badge";
+    quantityBadge.textContent = "×" + quantity;
+    quantityBadge.setAttribute("aria-label", quantity + (quantity === 1 ? " exemplaire" : " exemplaires"));
+    cardElement.append(quantityBadge);
     if (/^https?:\/\//i.test(card.imageUrl || "")) {
         const image = document.createElement("img");
         image.className = "player-card-image";
@@ -2413,7 +2366,7 @@ function setOpenBoosterButton(count) {
 
 function showBoosterResults(cards) {
     boosterResultGrid.replaceChildren();
-    cards.forEach((card) => boosterResultGrid.append(createPlayerCardElement(card)));
+    groupCardCopies(cards).forEach((card) => boosterResultGrid.append(createPlayerCardElement(card, card.quantity)));
     boosterResultModal.classList.remove("hidden");
 }
 
@@ -2431,7 +2384,7 @@ document.getElementById("viewOwnedCardsButton").addEventListener("click", async 
     bottomNav.classList.remove("hidden");
     homeNavButton.classList.remove("active");
     collectionNavButton.classList.add("active");
-    await Promise.all([loadOwnedPlayerCards(), loadPlayerCards()]);
+    await loadOwnedPlayerCards();
 });
 
 openNormalBoosterButton.addEventListener("click", async () => {
@@ -2479,7 +2432,7 @@ collectionNavButton.addEventListener("click", async () => {
     bottomNav.classList.remove("hidden");
     homeNavButton.classList.remove("active");
     collectionNavButton.classList.add("active");
-    await Promise.all([loadOwnedPlayerCards(), loadPlayerCards()]);
+    await loadOwnedPlayerCards();
 });
 
 async function loadRarities() {
