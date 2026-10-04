@@ -1088,6 +1088,12 @@ body {
 .player-card-copy h3 { font-size: 15px; margin-bottom: 5px; color: #173b52; }
 .player-card-copy p { font-size: 12px; color: #68899b; line-height: 1.4; margin-top: 4px; }
 .rarity-label { display: inline-block; padding: 3px 7px; border-radius: 999px; background: #f3f6f8; font-size: 11px; font-weight: 700; }
+.booster-modal { position: fixed; inset: 0; z-index: 500; display: grid; place-items: center; padding: 16px; background: rgba(15, 42, 58, .68); }
+.booster-modal-content { width: min(100%, 760px); max-height: 92vh; overflow: auto; padding: 20px; border-radius: 20px; background: #fff; box-shadow: 0 16px 48px rgba(0,0,0,.25); }
+.booster-modal-content h2 { color: #173b52; margin-bottom: 6px; }
+.booster-modal-actions { display: flex; gap: 10px; margin-top: 16px; }
+.booster-modal-actions button { flex: 1; }
+.owned-card-grid { margin-bottom: 24px; }
 </style>
 
 </head>
@@ -1455,6 +1461,9 @@ body {
                 <button id="buyNormalBoosterButton" type="button">
                     Acheter pour 3 jetons
                 </button>
+                <button id="openNormalBoosterButton" type="button" disabled>
+                    Ouvrir un booster (0)
+                </button>
 
             </article>
 
@@ -1523,10 +1532,26 @@ body {
 
 
     <section id="collectionPage" class="player-collection hidden">
-        <h2>🃏 Cartes disponibles</h2>
-        <p class="admin-note">Parcours les cartes du jeu. Elles seront ajoutées à ta collection au fil des tirages.</p>
+        <h2>🃏 Mes cartes</h2>
+        <p class="admin-note">Les cartes obtenues en ouvrant tes boosters apparaissent ici.</p>
+        <p id="ownedCardsStatus" class="admin-status" role="status"></p>
+        <div id="ownedPlayerCardGrid" class="player-card-grid owned-card-grid"></div>
+        <h3>📚 Catalogue</h3>
+        <p class="admin-note">Toutes les cartes présentes dans le jeu.</p>
         <p id="collectionStatus" class="admin-status" role="status"></p>
         <div id="playerCardGrid" class="player-card-grid"></div>
+    </section>
+
+    <section id="boosterResultModal" class="booster-modal hidden" role="dialog" aria-modal="true" aria-labelledby="boosterResultTitle">
+        <div class="booster-modal-content">
+            <h2 id="boosterResultTitle">🎉 Booster ouvert !</h2>
+            <p class="admin-note">Ces cinq cartes ont été ajoutées à ta collection.</p>
+            <div id="boosterResultGrid" class="player-card-grid"></div>
+            <div class="booster-modal-actions">
+                <button id="closeBoosterResultButton" class="secondary-button" type="button">Fermer</button>
+                <button id="viewOwnedCardsButton" class="primary-button" type="button">Voir ma collection</button>
+            </div>
+        </div>
     </section>
 
     <section id="adminPage" class="admin-page hidden">
@@ -1686,6 +1711,12 @@ import {
 } from
 "https://www.gstatic.com/firebasejs/12.3.0/firebase-storage.js";
 
+import {
+    getFunctions,
+    httpsCallable
+} from
+"https://www.gstatic.com/firebasejs/12.3.0/firebase-functions.js";
+
 
 
 /* ==================================================
@@ -1737,6 +1768,8 @@ const db =
     getFirestore(app);
 
 const storage = getStorage(app);
+const functions = getFunctions(app, "europe-west1");
+const callOpenClassicBooster = httpsCallable(functions, "openClassicBooster");
 
 
 
@@ -1807,7 +1840,12 @@ const logoutButton =
 const adminButton = document.getElementById("adminButton");
 const ADMIN_EMAIL = "pierre.valentin8@gmail.com";
 const buyNormalBoosterButton = document.getElementById("buyNormalBoosterButton");
+const openNormalBoosterButton = document.getElementById("openNormalBoosterButton");
 const boosterPurchaseStatus = document.getElementById("boosterPurchaseStatus");
+const boosterResultModal = document.getElementById("boosterResultModal");
+const boosterResultGrid = document.getElementById("boosterResultGrid");
+const ownedCardsStatus = document.getElementById("ownedCardsStatus");
+const ownedPlayerCardGrid = document.getElementById("ownedPlayerCardGrid");
 const adminPage = document.getElementById("adminPage");
 const collectionPage = document.getElementById("collectionPage");
 const collectionStatus = document.getElementById("collectionStatus");
@@ -2111,8 +2149,8 @@ onAuthStateChanged(
                         "playerBoosters"
                     )
                     .textContent =
-                        player.boostersDisponibles
-                        || 0;
+                        player.boostersDisponibles || 0;
+                setOpenBoosterButton(player.boostersDisponibles || 0);
 
 
 
@@ -2149,6 +2187,10 @@ onAuthStateChanged(
                 };
                 await setDoc(playerRef, newPlayer);
                 document.getElementById("playerPseudo").textContent = pseudo;
+                document.getElementById("playerTokens").textContent = "0";
+                document.getElementById("playerCards").textContent = "0";
+                document.getElementById("playerBoosters").textContent = "0";
+                setOpenBoosterButton(0);
                 pendingSignupPseudo = "";
             }
 
@@ -2273,6 +2315,7 @@ buyNormalBoosterButton.addEventListener("click", async () => {
 
         document.getElementById("playerTokens").textContent = newTokens;
         document.getElementById("playerBoosters").textContent = newBoosterCount;
+        setOpenBoosterButton(newBoosterCount);
         boosterPurchaseStatus.textContent = "Booster classique acheté ! Il est ajouté à ton stock.";
     } catch (error) {
         console.error("Erreur pendant l’achat du booster :", error);
@@ -2297,6 +2340,139 @@ function showHomePage() {
     collectionNavButton.classList.remove("active");
 }
 
+async function loadOwnedPlayerCards() {
+    ownedPlayerCardGrid.replaceChildren();
+    ownedCardsStatus.textContent = "Chargement de ta collection...";
+    if (!auth.currentUser) {
+        ownedCardsStatus.textContent = "Connecte-toi pour consulter ta collection.";
+        return;
+    }
+
+    try {
+        const snapshot = await getDocs(collection(db, "players", auth.currentUser.uid, "collection"));
+        const cards = snapshot.docs
+            .map((item) => ({ id: item.id, ...item.data() }))
+            .sort((a, b) => (b.openedAt || "").localeCompare(a.openedAt || ""));
+        if (!cards.length) {
+            ownedCardsStatus.textContent = "Ta collection est vide. Ouvre un booster pour obtenir tes premières cartes !";
+            return;
+        }
+        ownedCardsStatus.textContent = cards.length + (cards.length === 1 ? " carte obtenue" : " cartes obtenues");
+        cards.forEach((card) => ownedPlayerCardGrid.append(createPlayerCardElement(card)));
+    } catch (error) {
+        console.error("Erreur de chargement de la collection du joueur :", error);
+        ownedCardsStatus.textContent = "Impossible de charger ta collection. Vérifie les règles Firestore.";
+    }
+}
+
+function createPlayerCardElement(card) {
+    const cardElement = document.createElement("article");
+    cardElement.className = "player-card";
+    cardElement.style.borderColor = card.rarityColor || getRarityColor(card.rarity);
+    if (/^https?:\/\//i.test(card.imageUrl || "")) {
+        const image = document.createElement("img");
+        image.className = "player-card-image";
+        image.src = card.imageUrl;
+        image.alt = card.name ? "Illustration de " + card.name : "Illustration de la carte";
+        image.loading = "lazy";
+        image.onerror = () => {
+            const placeholder = document.createElement("div");
+            placeholder.className = "player-card-placeholder";
+            placeholder.textContent = "🃏";
+            image.replaceWith(placeholder);
+        };
+        cardElement.append(image);
+    } else {
+        const placeholder = document.createElement("div");
+        placeholder.className = "player-card-placeholder";
+        placeholder.textContent = "🃏";
+        cardElement.append(placeholder);
+    }
+    const copy = document.createElement("div");
+    copy.className = "player-card-copy";
+    const title = document.createElement("h3");
+    title.textContent = card.name || "Carte sans nom";
+    const rarity = document.createElement("span");
+    rarity.className = "rarity-label";
+    rarity.textContent = card.rarity || "Sans rareté";
+    rarity.style.color = card.rarityColor || getRarityColor(card.rarity);
+    const category = document.createElement("p");
+    category.textContent = card.category || "";
+    copy.append(title, rarity, category);
+    if (card.description) {
+        const description = document.createElement("p");
+        description.textContent = card.description;
+        copy.append(description);
+    }
+    cardElement.append(copy);
+    return cardElement;
+}
+
+function setOpenBoosterButton(count) {
+    const available = Number(count) || 0;
+    openNormalBoosterButton.textContent = "Ouvrir un booster (" + available + ")";
+    openNormalBoosterButton.disabled = available < 1;
+}
+
+function showBoosterResults(cards) {
+    boosterResultGrid.replaceChildren();
+    cards.forEach((card) => boosterResultGrid.append(createPlayerCardElement(card)));
+    boosterResultModal.classList.remove("hidden");
+}
+
+document.getElementById("closeBoosterResultButton").addEventListener("click", () => {
+    boosterResultModal.classList.add("hidden");
+});
+boosterResultModal.addEventListener("click", (event) => {
+    if (event.target === boosterResultModal) boosterResultModal.classList.add("hidden");
+});
+document.getElementById("viewOwnedCardsButton").addEventListener("click", async () => {
+    boosterResultModal.classList.add("hidden");
+    document.querySelector(".app-content").classList.add("hidden");
+    adminPage.classList.add("hidden");
+    collectionPage.classList.remove("hidden");
+    bottomNav.classList.remove("hidden");
+    homeNavButton.classList.remove("active");
+    collectionNavButton.classList.add("active");
+    await Promise.all([loadOwnedPlayerCards(), loadPlayerCards()]);
+});
+
+openNormalBoosterButton.addEventListener("click", async () => {
+    if (!auth.currentUser || openNormalBoosterButton.disabled) return;
+    openNormalBoosterButton.disabled = true;
+    boosterPurchaseStatus.textContent = "Ouverture du booster...";
+    try {
+        const response = await callOpenClassicBooster();
+        const result = response.data;
+        const count = Number(result.boostersDisponibles) || 0;
+        setOpenBoosterButton(count);
+        document.getElementById("playerCards").textContent = Number(result.cartesTirees) || 0;
+        boosterPurchaseStatus.textContent = "Booster ouvert : 5 cartes ajoutées à ta collection.";
+        showBoosterResults(result.cards || []);
+    } catch (error) {
+        console.error("Erreur pendant l’ouverture du booster :", error);
+        if (error.code === "functions/unauthenticated") {
+            boosterPurchaseStatus.textContent = "Connecte-toi pour ouvrir un booster.";
+        } else if (error.code === "functions/not-found") {
+            boosterPurchaseStatus.textContent = "Tu n’as aucun booster classique dans ton stock.";
+        } else if (error.code === "functions/failed-precondition") {
+            boosterPurchaseStatus.textContent = error.message || "Aucune carte n’est disponible pour le tirage.";
+        } else {
+            boosterPurchaseStatus.textContent = "Impossible d’ouvrir le booster. Vérifie le déploiement de la fonction Firebase.";
+        }
+    } finally {
+        if (auth.currentUser) {
+            try {
+                const snapshot = await getDoc(doc(db, "players", auth.currentUser.uid));
+                if (snapshot.exists()) setOpenBoosterButton(snapshot.data().boostersDisponibles || 0);
+            } catch (error) {
+                console.error("Impossible d’actualiser le stock de boosters :", error);
+                openNormalBoosterButton.disabled = false;
+            }
+        }
+    }
+});
+
 homeNavButton.addEventListener("click", showHomePage);
 
 collectionNavButton.addEventListener("click", async () => {
@@ -2306,7 +2482,7 @@ collectionNavButton.addEventListener("click", async () => {
     bottomNav.classList.remove("hidden");
     homeNavButton.classList.remove("active");
     collectionNavButton.classList.add("active");
-    await loadPlayerCards();
+    await Promise.all([loadOwnedPlayerCards(), loadPlayerCards()]);
 });
 
 async function loadRarities() {
