@@ -1367,7 +1367,7 @@ body {
                 </div>
 
                 <div class="stat-label">
-                    🎁 Boosters
+                    🎁 Boosters en stock
                 </div>
 
             </div>
@@ -1452,14 +1452,16 @@ body {
                     5 cartes
                 </p>
 
-                <button disabled>
-                    Bientôt disponible
+                <button id="buyNormalBoosterButton" type="button">
+                    Acheter pour 3 jetons
                 </button>
 
             </article>
 
 
         </section>
+
+        <p id="boosterPurchaseStatus" class="admin-status" role="status" aria-live="polite"></p>
 
 
 
@@ -1533,7 +1535,7 @@ body {
         <p class="admin-note">Gestion des joueurs, des raretés et des cartes. Les accès sont protégés par les règles Firestore.</p>
         <div class="admin-panel" style="margin-bottom:16px">
             <h3>👥 Joueurs</h3>
-            <p class="admin-note">Ajoute des jetons au solde d’un joueur. Les joueurs ne peuvent pas modifier eux-mêmes leur solde.</p>
+            <p class="admin-note">Tu peux ajouter ou retirer des jetons. Un achat de booster débite uniquement le prix prévu par les règles du jeu.</p>
             <p id="playersStatus" class="admin-status" role="status"></p>
             <div id="playersList"></div>
         </div>
@@ -1804,6 +1806,8 @@ const logoutButton =
 
 const adminButton = document.getElementById("adminButton");
 const ADMIN_EMAIL = "pierre.valentin8@gmail.com";
+const buyNormalBoosterButton = document.getElementById("buyNormalBoosterButton");
+const boosterPurchaseStatus = document.getElementById("boosterPurchaseStatus");
 const adminPage = document.getElementById("adminPage");
 const collectionPage = document.getElementById("collectionPage");
 const collectionStatus = document.getElementById("collectionStatus");
@@ -2107,7 +2111,7 @@ onAuthStateChanged(
                         "playerBoosters"
                     )
                     .textContent =
-                        player.boostersAchetes
+                        player.boostersDisponibles
                         || 0;
 
 
@@ -2140,6 +2144,7 @@ onAuthStateChanged(
                     tokens: 0,
                     cartesTirees: 0,
                     boostersAchetes: 0,
+                    boostersDisponibles: 0,
                     createdAt: new Date().toISOString()
                 };
                 await setDoc(playerRef, newPlayer);
@@ -2232,6 +2237,56 @@ async function loadPlayerCards() {
         collectionStatus.textContent = "Impossible de charger les cartes. Vérifie les règles Firestore.";
     }
 }
+
+buyNormalBoosterButton.addEventListener("click", async () => {
+    if (!auth.currentUser) return;
+
+    buyNormalBoosterButton.disabled = true;
+    boosterPurchaseStatus.textContent = "Achat en cours...";
+
+    try {
+        const playerRef = doc(db, "players", auth.currentUser.uid);
+        let newTokens = 0;
+        let newBoosterCount = 0;
+
+        await runTransaction(db, async (transaction) => {
+            const playerSnapshot = await transaction.get(playerRef);
+            if (!playerSnapshot.exists()) throw new Error("PLAYER_NOT_FOUND");
+
+            const player = playerSnapshot.data();
+            const currentTokens = Number(player.tokens);
+            const currentBoosters = Number(player.boostersDisponibles || 0);
+
+            if (!Number.isSafeInteger(currentTokens) || currentTokens < 0 || !Number.isSafeInteger(currentBoosters) || currentBoosters < 0) {
+                throw new Error("PLAYER_DATA_INVALID");
+            }
+            if (currentTokens < 3) throw new Error("NOT_ENOUGH_TOKENS");
+            if (currentBoosters >= 1000000000) throw new Error("BOOSTER_LIMIT_REACHED");
+
+            newTokens = currentTokens - 3;
+            newBoosterCount = currentBoosters + 1;
+            transaction.update(playerRef, {
+                tokens: newTokens,
+                boostersDisponibles: newBoosterCount
+            });
+        });
+
+        document.getElementById("playerTokens").textContent = newTokens;
+        document.getElementById("playerBoosters").textContent = newBoosterCount;
+        boosterPurchaseStatus.textContent = "Booster classique acheté ! Il est ajouté à ton stock.";
+    } catch (error) {
+        console.error("Erreur pendant l’achat du booster :", error);
+        if (error.message === "NOT_ENOUGH_TOKENS") {
+            boosterPurchaseStatus.textContent = "Il te faut au moins 3 jetons pour acheter ce booster.";
+        } else if (error.message === "PLAYER_NOT_FOUND") {
+            boosterPurchaseStatus.textContent = "Profil joueur introuvable. Déconnecte-toi puis reconnecte-toi.";
+        } else {
+            boosterPurchaseStatus.textContent = "Achat refusé. Vérifie les règles Firestore publiées.";
+        }
+    } finally {
+        buyNormalBoosterButton.disabled = false;
+    }
+});
 
 function showHomePage() {
     document.querySelector(".app-content").classList.remove("hidden");
