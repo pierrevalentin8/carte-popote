@@ -1072,9 +1072,10 @@ body {
 .admin-card-row small { margin-top: 4px; color: #7895a6; }
 .admin-actions { display: flex; gap: 6px; }
 .admin-actions button, .admin-back { padding: 9px 12px; border: 0; border-radius: 9px; background: #eefaff; color: #1687b9; font-weight: 700; cursor: pointer; }
-.player-token-controls { display: flex; align-items: center; gap: 6px; }
+.player-token-controls { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; justify-content: flex-end; }
 .player-token-input { width: 100px; padding: 9px; border: 1px solid #cce5ef; border-radius: 9px; font: inherit; }
 .player-token-controls .primary-button { width: auto; padding: 10px 12px; white-space: nowrap; }
+.player-token-controls .admin-danger { padding: 10px 12px; border: 0; border-radius: 9px; font-weight: 700; white-space: nowrap; cursor: pointer; }
 .admin-danger { color: #c0392b !important; background: #fff0f0 !important; }
 .admin-submit { margin-top: 8px; }
 .player-collection { width: 100%; max-width: 900px; margin: auto; padding: 20px 16px 100px; }
@@ -1421,7 +1422,7 @@ body {
                 >
 
                 <h4>
-                    Booster journalier
+                    Booster quotidien
                 </h4>
 
                 <p>
@@ -1437,36 +1438,25 @@ body {
 
             <article class="booster">
 
-    <img
-        class="booster-image"
-        src="./Booster%20Journalier.png"
-        alt="Illustration du booster journalier Cartes & Popote"
-    >
+                <img
+                    class="booster-image"
+                    src="./Booster%20normal.png"
+                    alt="Illustration du booster classique Cartes & Popote"
+                >
 
-    <h4>Booster Journalier</h4>
+                <h4>
+                    Booster classique
+                </h4>
 
-    <p>3 cartes gratuites</p>
+                <p>
+                    5 cartes
+                </p>
 
-    <button>Bientôt disponible</button>
+                <button disabled>
+                    Bientôt disponible
+                </button>
 
-</article>
-
-
-<article class="booster">
-
-    <img
-        class="booster-image"
-        src="./Booster%20normal.png"
-        alt="Illustration du booster classique Cartes & Popote"
-    >
-
-    <h4>Booster classique</h4>
-
-    <p>5 cartes</p>
-
-    <button>Bientôt disponible</button>
-
-</article>
+            </article>
 
 
         </section>
@@ -2562,7 +2552,12 @@ async function loadPlayers() {
             grantButton.type = "button";
             grantButton.className = "primary-button";
             grantButton.textContent = "Ajouter";
-            grantButton.addEventListener("click", async () => {
+            const removeButton = document.createElement("button");
+            removeButton.type = "button";
+            removeButton.className = "admin-danger";
+            removeButton.textContent = "Retirer";
+
+            const changeTokens = async (direction) => {
                 const amount = Number(amountInput.value);
                 if (!Number.isSafeInteger(amount) || amount < 1 || amount > 1000000) {
                     playersStatus.textContent = "Saisis un nombre entier entre 1 et 1 000 000.";
@@ -2571,28 +2566,42 @@ async function loadPlayers() {
                 }
 
                 grantButton.disabled = true;
-                playersStatus.textContent = "Attribution des jetons...";
+                removeButton.disabled = true;
+                playersStatus.textContent = direction > 0 ? "Attribution des jetons..." : "Retrait des jetons...";
                 try {
                     const playerRef = doc(db, "players", player.id);
                     await runTransaction(db, async (transaction) => {
                         const playerSnapshot = await transaction.get(playerRef);
                         if (!playerSnapshot.exists()) throw new Error("Joueur introuvable.");
                         const currentTokens = Number(playerSnapshot.data().tokens) || 0;
-                        if (!Number.isSafeInteger(currentTokens) || currentTokens < 0 || currentTokens + amount > 1000000000) {
+                        const updatedTokens = currentTokens + direction * amount;
+                        if (!Number.isSafeInteger(currentTokens) || !Number.isSafeInteger(updatedTokens) || currentTokens < 0 || updatedTokens < 0) {
+                            throw new Error("INSUFFICIENT_TOKENS");
+                        }
+                        if (updatedTokens > 1000000000) {
                             throw new Error("Le solde de jetons dépasse la limite autorisée.");
                         }
-                        transaction.update(playerRef, { tokens: currentTokens + amount });
+                        transaction.update(playerRef, { tokens: updatedTokens });
                     });
                     await loadPlayers();
-                    playersStatus.textContent = amount + " jeton(s) attribué(s) à " + (player.pseudo || player.email || "ce joueur") + ".";
+                    playersStatus.textContent = direction > 0
+                        ? amount + " jeton(s) attribué(s) à " + (player.pseudo || player.email || "ce joueur") + "."
+                        : amount + " jeton(s) retiré(s) à " + (player.pseudo || player.email || "ce joueur") + ".";
                 } catch (error) {
-                    console.error("Erreur d’attribution des jetons :", error);
-                    playersStatus.textContent = "Impossible d’attribuer les jetons. Vérifie les règles Firestore publiées.";
+                    if (error.message === "INSUFFICIENT_TOKENS") {
+                        playersStatus.textContent = "Retrait impossible : le joueur n’a pas assez de jetons.";
+                    } else {
+                        console.error("Erreur de modification des jetons :", error);
+                        playersStatus.textContent = "Impossible de modifier les jetons. Vérifie les règles Firestore publiées.";
+                    }
                     grantButton.disabled = false;
+                    removeButton.disabled = false;
                 }
-            });
+            };
+            grantButton.addEventListener("click", () => changeTokens(1));
+            removeButton.addEventListener("click", () => changeTokens(-1));
 
-            controls.append(amountInput, grantButton);
+            controls.append(amountInput, grantButton, removeButton);
             row.append(details, controls);
             playersList.append(row);
         });
