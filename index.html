@@ -1,0 +1,2482 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+>
+
+<title>Cartes & Popote</title>
+
+
+<style>
+
+/* ==================================================
+   CARTES & POPOTE
+   V1 - CONNEXION + ACCUEIL
+   ================================================== */
+
+
+/* =========================
+   RESET
+   ========================= */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+
+html,
+body {
+    width: 100%;
+    min-height: 100%;
+}
+
+
+body {
+
+    font-family:
+        Arial,
+        Helvetica,
+        sans-serif;
+
+    background:
+        linear-gradient(
+            180deg,
+            #e4f7ff 0%,
+            #f7fcff 35%,
+            #ffffff 100%
+        );
+
+    color: #173b52;
+}
+
+
+/* =========================
+   UTILITAIRE
+   ========================= */
+
+.hidden {
+    display: none !important;
+}
+
+
+/* ==================================================
+   ÉCRAN CONNEXION
+   ================================================== */
+
+#loginPage {
+
+    min-height: 100vh;
+    min-height: 100dvh;
+
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: center;
+
+    padding: 30px 18px 20px;
+}
+
+
+/* =========================
+   LOGO
+   ========================= */
+
+.login-logo {
+
+    text-align: center;
+
+    margin-bottom: 25px;
+}
+
+
+.login-logo-icon {
+
+    width: 70px;
+    height: 70px;
+
+    margin: 0 auto 12px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    background: #ffffff;
+
+    border-radius: 22px;
+
+    font-size: 35px;
+
+    box-shadow:
+        0 8px 25px
+        rgba(
+            65,
+            170,
+            215,
+            0.18
+        );
+}
+
+
+.login-logo h1 {
+
+    font-size: 30px;
+
+    color: #1687b9;
+
+    font-weight: 800;
+}
+
+
+.login-logo h1 span {
+
+    color: #58c0e8;
+}
+
+
+.login-logo p {
+
+    margin-top: 7px;
+
+    color: #7192a4;
+
+    font-size: 13px;
+}
+
+
+/* =========================
+   CARTE CONNEXION
+   ========================= */
+
+.login-card {
+
+    width: 100%;
+
+    max-width: 430px;
+
+    background: #ffffff;
+
+    border-radius: 24px;
+
+    padding: 28px 21px;
+
+    box-shadow:
+        0 12px 35px
+        rgba(
+            45,
+            155,
+            200,
+            0.14
+        );
+}
+
+
+.login-card h2 {
+
+    text-align: center;
+
+    font-size: 24px;
+
+    margin-bottom: 7px;
+}
+
+
+.login-subtitle {
+
+    text-align: center;
+
+    color: #7895a6;
+
+    font-size: 14px;
+
+    margin-bottom: 25px;
+}
+
+
+/* =========================
+   CHAMPS
+   ========================= */
+
+.field {
+
+    margin-bottom: 17px;
+}
+
+
+.field label {
+
+    display: block;
+
+    margin-bottom: 7px;
+
+    font-size: 14px;
+
+    font-weight: 700;
+}
+
+
+.field input {
+
+    width: 100%;
+
+    height: 52px;
+
+    padding: 0 15px;
+
+    border:
+        1px solid
+        #cce5ef;
+
+    border-radius: 14px;
+
+    background: #f8fcfe;
+
+    font-size: 16px;
+
+    outline: none;
+}
+
+
+.field input:focus {
+
+    border-color: #55bde8;
+
+    box-shadow:
+        0 0 0 3px
+        rgba(
+            85,
+            189,
+            232,
+            0.14
+        );
+}
+
+
+/* =========================
+   MESSAGE
+   ========================= */
+
+.message {
+
+    display: none;
+
+    padding: 12px;
+
+    margin-bottom: 17px;
+
+    border-radius: 12px;
+
+    text-align: center;
+
+    font-size: 14px;
+}
+
+
+.message.error {
+
+    display: block;
+
+    background: #fff0f0;
+
+    color: #c0392b;
+}
+
+
+.message.success {
+
+    display: block;
+
+    background: #effaf4;
+
+    color: #21834b;
+}
+
+
+/* =========================
+   BOUTONS
+   ========================= */
+
+.primary-button {
+
+    width: 100%;
+
+    height: 53px;
+
+    border: none;
+
+    border-radius: 15px;
+
+    background: #45b5df;
+
+    color: #ffffff;
+
+    font-size: 16px;
+
+    font-weight: 700;
+
+    cursor: pointer;
+}
+
+
+.primary-button:disabled {
+
+    opacity: 0.65;
+
+    cursor: wait;
+}
+
+
+.secondary-button {
+
+    width: 100%;
+
+    height: 50px;
+
+    margin-top: 13px;
+
+    border:
+        2px solid
+        #6fc5e6;
+
+    border-radius: 14px;
+
+    background: #ffffff;
+
+    color: #218bb6;
+
+    font-size: 15px;
+
+    font-weight: 700;
+
+    cursor: pointer;
+}
+
+
+/* ==================================================
+   APPLICATION
+   ================================================== */
+
+#appPage {
+
+    min-height: 100vh;
+
+    background:
+        #f5fbfe;
+}
+
+
+/* =========================
+   HEADER
+   ========================= */
+
+.app-header {
+
+    position: sticky;
+
+    top: 0;
+
+    z-index: 100;
+
+    height: 64px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    padding:
+        0
+        17px;
+
+    background: #ffffff;
+
+    border-bottom:
+        1px solid
+        #e2f0f5;
+
+    box-shadow:
+        0 3px 12px
+        rgba(
+            30,
+            130,
+            165,
+            0.06
+        );
+}
+
+
+.header-logo {
+
+    font-size: 20px;
+
+    font-weight: 800;
+
+    color: #1687b9;
+}
+
+
+.header-logo span {
+
+    color: #58c0e8;
+}
+
+
+/* =========================
+   MENU
+   ========================= */
+
+.menu-button {
+
+    width: 44px;
+    height: 44px;
+
+    border: none;
+
+    border-radius: 12px;
+
+    background: #eefaff;
+
+    color: #1687b9;
+
+    font-size: 23px;
+
+    cursor: pointer;
+}
+
+
+/* =========================
+   MENU DÉROULANT
+   ========================= */
+
+.dropdown-menu {
+
+    position: absolute;
+
+    top: 58px;
+
+    right: 12px;
+
+    width: 190px;
+
+    background: #ffffff;
+
+    border-radius: 16px;
+
+    padding: 8px;
+
+    box-shadow:
+        0 10px 30px
+        rgba(
+            30,
+            120,
+            160,
+            0.18
+        );
+
+    border:
+        1px solid
+        #e1f0f5;
+}
+
+
+.dropdown-menu button {
+
+    width: 100%;
+
+    padding: 13px;
+
+    border: none;
+
+    background: transparent;
+
+    text-align: left;
+
+    border-radius: 10px;
+
+    color: #31596d;
+
+    font-size: 14px;
+
+    cursor: pointer;
+}
+
+
+.dropdown-menu button:hover {
+
+    background: #eefaff;
+}
+
+
+.dropdown-menu .logout {
+
+    color: #d14b4b;
+}
+
+
+/* ==================================================
+   CONTENU
+   ================================================== */
+
+.app-content {
+
+    width: 100%;
+
+    max-width: 700px;
+
+    margin: auto;
+
+    padding:
+        20px
+        16px
+        100px;
+}
+
+
+/* =========================
+   PROFIL
+   ========================= */
+
+.profile-card {
+
+    background: #ffffff;
+
+    border-radius: 20px;
+
+    padding: 18px;
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 15px;
+
+    box-shadow:
+        0 7px 25px
+        rgba(
+            45,
+            155,
+            200,
+            0.09
+        );
+}
+
+
+.avatar {
+
+    width: 60px;
+    height: 60px;
+
+    border-radius: 50%;
+
+    background:
+        #dff5ff;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    font-size: 30px;
+
+    flex-shrink: 0;
+}
+
+
+.profile-info {
+
+    flex: 1;
+
+    min-width: 0;
+}
+
+
+.profile-name {
+
+    font-size: 18px;
+
+    font-weight: 800;
+
+    color: #173b52;
+
+    white-space: nowrap;
+
+    overflow: hidden;
+
+    text-overflow: ellipsis;
+}
+
+
+.level {
+
+    margin-top: 4px;
+
+    color: #68899b;
+
+    font-size: 13px;
+}
+
+
+/* =========================
+   XP
+   ========================= */
+
+.xp-bar {
+
+    height: 8px;
+
+    margin-top: 9px;
+
+    background: #e5f3f8;
+
+    border-radius: 20px;
+
+    overflow: hidden;
+}
+
+
+.xp-progress {
+
+    height: 100%;
+
+    width: 0%;
+
+    background: #45b5df;
+
+    border-radius: 20px;
+
+    transition:
+        width 0.5s ease;
+}
+
+
+/* =========================
+   STATS
+   ========================= */
+
+.stats {
+
+    display: flex;
+
+    gap: 8px;
+
+    margin-top: 12px;
+}
+
+
+.stat {
+
+    flex: 1;
+
+    text-align: center;
+
+    background: #eefaff;
+
+    border-radius: 13px;
+
+    padding: 11px 5px;
+}
+
+
+.stat-value {
+
+    font-size: 17px;
+
+    font-weight: 800;
+
+    color: #1687b9;
+}
+
+
+.stat-label {
+
+    margin-top: 3px;
+
+    font-size: 10px;
+
+    color: #7192a4;
+}
+
+
+/* ==================================================
+   BIENVENUE
+   ================================================== */
+
+.welcome {
+
+    margin-top: 18px;
+
+    padding: 22px;
+
+    border-radius: 20px;
+
+    background:
+        linear-gradient(
+            135deg,
+            #45b5df,
+            #73c9e8
+        );
+
+    color: #ffffff;
+
+    box-shadow:
+        0 8px 22px
+        rgba(
+            69,
+            181,
+            223,
+            0.22
+        );
+}
+
+
+.welcome h2 {
+
+    font-size: 22px;
+
+    margin-bottom: 7px;
+}
+
+
+.welcome p {
+
+    font-size: 13px;
+
+    line-height: 1.5;
+
+    opacity: 0.95;
+}
+
+
+/* ==================================================
+   TITRES
+   ================================================== */
+
+.section-title {
+
+    margin-top: 25px;
+
+    margin-bottom: 12px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+}
+
+
+.section-title h3 {
+
+    font-size: 18px;
+
+    color: #173b52;
+}
+
+
+.section-title span {
+
+    font-size: 12px;
+
+    color: #7895a6;
+}
+
+
+/* ==================================================
+   BOOSTERS
+   ================================================== */
+
+.boosters {
+
+    display: grid;
+
+    grid-template-columns:
+        1fr 1fr;
+
+    gap: 10px;
+}
+
+
+.booster {
+
+    background: #ffffff;
+
+    border-radius: 18px;
+
+    padding: 18px 12px;
+
+    text-align: center;
+
+    box-shadow:
+        0 6px 20px
+        rgba(
+            45,
+            155,
+            200,
+            0.08
+        );
+}
+
+
+.booster-icon {
+
+    font-size: 38px;
+
+    margin-bottom: 8px;
+}
+
+.booster-image {
+    display: block;
+    width: 100%;
+    aspect-ratio: 2 / 3;
+    object-fit: contain;
+    margin-bottom: 10px;
+    border-radius: 12px;
+}
+
+
+.booster h4 {
+
+    font-size: 15px;
+
+    color: #173b52;
+}
+
+
+.booster p {
+
+    margin-top: 5px;
+
+    font-size: 11px;
+
+    color: #7895a6;
+}
+
+
+.booster button {
+
+    width: 100%;
+
+    margin-top: 13px;
+
+    height: 38px;
+
+    border: none;
+
+    border-radius: 10px;
+
+    background: #45b5df;
+
+    color: #ffffff;
+
+    font-weight: 700;
+
+    cursor: pointer;
+}
+
+
+/* ==================================================
+   JOURNAL
+   ================================================== */
+
+.journal {
+
+    background: #ffffff;
+
+    border-radius: 18px;
+
+    padding: 5px 15px;
+
+    box-shadow:
+        0 6px 20px
+        rgba(
+            45,
+            155,
+            200,
+            0.08
+        );
+}
+
+
+.journal-item {
+
+    padding: 15px 0;
+
+    border-bottom:
+        1px solid
+        #edf4f7;
+}
+
+
+.journal-item:last-child {
+
+    border-bottom: none;
+}
+
+
+.journal-title {
+
+    font-size: 13px;
+
+    font-weight: 700;
+
+    color: #31596d;
+}
+
+
+.journal-date {
+
+    margin-top: 4px;
+
+    font-size: 11px;
+
+    color: #9aafb9;
+}
+
+
+/* ==================================================
+   NAVIGATION BAS
+   ================================================== */
+
+.bottom-nav {
+
+    position: fixed;
+
+    bottom: 0;
+
+    left: 0;
+
+    right: 0;
+
+    z-index: 100;
+
+    height: 70px;
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(4, 1fr);
+
+    background: #ffffff;
+
+    border-top:
+        1px solid
+        #e2f0f5;
+
+    box-shadow:
+        0 -4px 18px
+        rgba(
+            30,
+            120,
+            160,
+            0.08
+        );
+}
+
+
+.nav-item {
+
+    border: none;
+
+    background: transparent;
+
+    color: #8aa1ad;
+
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: center;
+
+    justify-content: center;
+
+    gap: 4px;
+
+    font-size: 10px;
+
+    cursor: pointer;
+}
+
+
+.nav-icon {
+
+    font-size: 20px;
+}
+
+
+.nav-item.active {
+
+    color: #1687b9;
+
+    font-weight: 700;
+}
+
+
+/* ==================================================
+   DESKTOP
+   ================================================== */
+
+@media (min-width: 700px) {
+
+    .app-content {
+
+        padding-left: 25px;
+        padding-right: 25px;
+    }
+
+
+    .bottom-nav {
+
+        max-width: 700px;
+
+        left: 50%;
+
+        transform:
+            translateX(-50%);
+
+        border-radius:
+            18px 18px 0 0;
+    }
+
+}
+
+.admin-page { width: 100%; max-width: 700px; margin: auto; padding: 20px 16px 100px; }
+.admin-panel { background: #fff; border-radius: 18px; padding: 18px; box-shadow: 0 6px 20px rgba(45,155,200,.08); }
+.admin-page h2 { margin-bottom: 8px; color: #173b52; }
+.admin-note, .admin-status { color: #68899b; font-size: 13px; line-height: 1.5; margin: 8px 0 14px; }
+.admin-field { display: block; width: 100%; margin: 10px 0; padding: 12px; border: 1px solid #cce5ef; border-radius: 10px; font: inherit; }
+.admin-card-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 12px 0; border-top: 1px solid #edf4f7; }
+.admin-card-row strong, .admin-card-row small { display: block; }
+.admin-card-thumb { width: 64px; height: 86px; flex: 0 0 64px; object-fit: cover; border-radius: 8px; background: #dff5ff; border: 1px solid #cce5ef; }
+.admin-card-preview { display: block; max-width: 180px; max-height: 240px; margin: 8px 0; object-fit: contain; border-radius: 10px; background: #eefaff; }
+.admin-card-placeholder { width: 64px; height: 86px; flex: 0 0 64px; display: grid; place-items: center; border-radius: 8px; background: linear-gradient(145deg, #e4f7ff, #bdeaff); font-size: 30px; }
+.admin-card-row small { margin-top: 4px; color: #7895a6; }
+.admin-actions { display: flex; gap: 6px; }
+.admin-actions button, .admin-back { padding: 9px 12px; border: 0; border-radius: 9px; background: #eefaff; color: #1687b9; font-weight: 700; cursor: pointer; }
+.admin-danger { color: #c0392b !important; background: #fff0f0 !important; }
+.admin-submit { margin-top: 8px; }
+</style>
+
+</head>
+
+
+<body>
+
+
+<!-- ==================================================
+     PAGE CONNEXION
+     ================================================== -->
+
+<section id="loginPage">
+
+
+    <div class="login-logo">
+
+        <div class="login-logo-icon">
+            🃏
+        </div>
+
+        <h1>
+            Cartes <span>&</span> Popote
+        </h1>
+
+        <p>
+            Collectionne-les toutes !
+        </p>
+
+    </div>
+
+
+    <div class="login-card">
+
+        <h2>
+            Connexion
+        </h2>
+
+        <p class="login-subtitle">
+            Heureux de vous revoir !
+        </p>
+
+
+        <div
+            id="loginMessage"
+            class="message"
+        ></div>
+
+
+        <form id="loginForm">
+
+
+            <div class="field">
+
+                <label>
+                    Adresse e-mail
+                </label>
+
+                <input
+                    type="email"
+                    id="loginEmail"
+                    placeholder="votre@email.com"
+                    required
+                >
+
+            </div>
+
+
+            <div class="field">
+
+                <label>
+                    Mot de passe
+                </label>
+
+                <input
+                    type="password"
+                    id="loginPassword"
+                    placeholder="Votre mot de passe"
+                    required
+                >
+
+            </div>
+
+
+            <button
+                type="submit"
+                class="primary-button"
+                id="loginButton"
+            >
+                Se connecter
+            </button>
+
+        </form>
+
+
+        <button
+            class="secondary-button"
+            id="registerButton"
+        >
+            Créer un compte
+        </button>
+
+    </div>
+
+</section>
+
+
+
+<!-- ==================================================
+     PAGE APPLICATION
+     ================================================== -->
+
+<section
+    id="appPage"
+    class="hidden"
+>
+
+
+    <!-- HEADER -->
+
+    <header class="app-header">
+
+
+        <div class="header-logo">
+
+            Cartes <span>&</span> Popote
+
+        </div>
+
+
+        <button
+            class="menu-button"
+            id="menuButton"
+        >
+            ☰
+        </button>
+
+
+        <div
+            id="dropdownMenu"
+            class="dropdown-menu hidden"
+        >
+            <button id="adminButton" class="hidden" type="button">
+                🛡️ Administration
+            </button>
+
+
+            <button>
+                👤 Mon profil
+            </button>
+
+            <button>
+                ⚙️ Paramètres
+            </button>
+
+            <button
+                class="logout"
+                id="logoutButton"
+            >
+                🚪 Déconnexion
+            </button>
+
+        </div>
+
+
+    </header>
+
+
+
+    <!-- CONTENU -->
+
+    <main class="app-content">
+
+
+        <!-- PROFIL -->
+
+        <section class="profile-card">
+
+
+            <div class="avatar">
+                👤
+            </div>
+
+
+            <div class="profile-info">
+
+                <div
+                    class="profile-name"
+                    id="playerPseudo"
+                >
+                    Joueur
+                </div>
+
+
+                <div
+                    class="level"
+                    id="playerLevel"
+                >
+                    Niveau 1 • 0 XP
+                </div>
+
+
+                <div class="xp-bar">
+
+                    <div
+                        class="xp-progress"
+                        id="xpProgress"
+                    ></div>
+
+                </div>
+
+            </div>
+
+
+        </section>
+
+
+
+        <!-- STATS -->
+
+        <div class="stats">
+
+
+            <div class="stat">
+
+                <div
+                    class="stat-value"
+                    id="playerTokens"
+                >
+                    0
+                </div>
+
+                <div class="stat-label">
+                    🪙 Tokens
+                </div>
+
+            </div>
+
+
+            <div class="stat">
+
+                <div
+                    class="stat-value"
+                    id="playerCards"
+                >
+                    0
+                </div>
+
+                <div class="stat-label">
+                    🃏 Cartes
+                </div>
+
+            </div>
+
+
+            <div class="stat">
+
+                <div
+                    class="stat-value"
+                    id="playerBoosters"
+                >
+                    0
+                </div>
+
+                <div class="stat-label">
+                    🎁 Boosters
+                </div>
+
+            </div>
+
+
+        </div>
+
+
+
+        <!-- BIENVENUE -->
+
+        <section class="welcome">
+
+            <h2>
+                Bienvenue ! 👋
+            </h2>
+
+            <p>
+                Prépare-toi à découvrir,
+                collectionner et échanger
+                tes cartes.
+            </p>
+
+        </section>
+
+
+
+        <!-- BOOSTERS -->
+
+        <div class="section-title">
+
+            <h3>
+                🎁 Boosters
+            </h3>
+
+            <span>
+                À découvrir
+            </span>
+
+        </div>
+
+
+        <section class="boosters">
+
+
+            <article class="booster">
+
+                <img
+                    class="booster-image"
+                    src="assets/booster journalier.png"
+                    alt="Illustration du booster journalier Cartes & Popote"
+                >
+
+                <h4>
+                    Booster quotidien
+                </h4>
+
+                <p>
+                    3 cartes gratuites
+                </p>
+
+                <button>
+                    Bientôt disponible
+                </button>
+
+            </article>
+
+
+            <article class="booster">
+
+                <img
+                    class="booster-image"
+                    src="assets/booster normal.png"
+                    alt="Illustration du booster classique Cartes & Popote"
+                >
+
+                <h4>
+                    Booster classique
+                </h4>
+
+                <p>
+                    5 cartes
+                </p>
+
+                <button>
+                    Bientôt disponible
+                </button>
+
+            </article>
+
+
+        </section>
+
+
+
+        <!-- JOURNAL -->
+
+        <div class="section-title">
+
+            <h3>
+                📰 Journal
+            </h3>
+
+        </div>
+
+
+        <section class="journal">
+
+
+            <article class="journal-item">
+
+                <div class="journal-title">
+
+                    🎉 Bienvenue sur
+                    Cartes & Popote !
+
+                </div>
+
+                <div class="journal-date">
+
+                    Aujourd'hui
+
+                </div>
+
+            </article>
+
+
+            <article class="journal-item">
+
+                <div class="journal-title">
+
+                    🚧 Le jeu est actuellement
+                    en construction.
+
+                </div>
+
+                <div class="journal-date">
+
+                    Bientôt disponible
+
+                </div>
+
+            </article>
+
+
+        </section>
+
+
+    </main>
+
+
+
+    <section id="adminPage" class="admin-page hidden">
+        <button id="adminBackButton" class="admin-back" type="button">← Retour à l’accueil</button>
+        <h2>🛡️ Administration des cartes</h2>
+        <p class="admin-note">Les cartes sont enregistrées dans Firestore. Seul le compte Admin peut les modifier.</p>
+        <div class="admin-panel" style="margin-bottom:16px">
+            <h3>Catégories de rareté et apparition</h3>
+            <p class="admin-note">Les pourcentages définissent la chance d’apparition. Leur total ne peut pas dépasser 100 %.</p>
+            <form id="rarityForm">
+                <input id="rarityName" class="admin-field" type="text" maxlength="40" placeholder="Nom de la rareté (ex. Mythique)" required>
+                <input id="rarityPercentage" class="admin-field" type="number" min="0.01" max="100" step="0.01" placeholder="Pourcentage d’apparition" required>
+                <button id="raritySubmit" class="primary-button admin-submit" type="submit">Ajouter la rareté</button>
+                <button id="rarityCancelEdit" class="secondary-button hidden" type="button">Annuler</button>
+            </form>
+            <p id="rarityStatus" class="admin-status" role="status"></p>
+            <div id="raritiesList"></div>
+        </div>
+        <div class="admin-panel">
+            <form id="cardForm">
+                <input id="cardName" class="admin-field" type="text" maxlength="80" placeholder="Nom de la carte" required>
+                <input id="cardCategory" class="admin-field" type="text" maxlength="50" placeholder="Catégorie" required>
+                <select id="cardRarity" class="admin-field" required>
+                    <option value="">Choisir une rareté</option>
+                </select>
+                <label for="cardImageFile">Visuel de la carte (JPG, PNG ou WebP, 5 Mo maximum)</label>
+                <input id="cardImageFile" class="admin-field" type="file" accept="image/jpeg,image/png,image/webp">
+                <img id="cardImagePreview" class="admin-card-preview hidden" alt="Aperçu du visuel">
+                <input id="cardImage" class="admin-field" type="url" maxlength="500" placeholder="Ou URL directe d’image (facultatif)">
+                <textarea id="cardDescription" class="admin-field" maxlength="500" rows="3" placeholder="Description (facultatif)"></textarea>
+                <button id="cardSubmit" class="primary-button admin-submit" type="submit">Ajouter la carte</button>
+                <button id="cardCancelEdit" class="secondary-button hidden" type="button">Annuler la modification</button>
+            </form>
+            <p id="adminStatus" class="admin-status" role="status"></p>
+            <h3>Cartes enregistrées</h3>
+            <div id="cardsList"></div>
+        </div>
+    </section>
+    <!-- NAVIGATION -->
+
+    <nav class="bottom-nav">
+
+
+        <button
+            class="nav-item active"
+        >
+
+            <span class="nav-icon">
+                🏠
+            </span>
+
+            Accueil
+
+        </button>
+
+
+        <button
+            class="nav-item"
+        >
+
+            <span class="nav-icon">
+                🃏
+            </span>
+
+            Ma collection
+
+        </button>
+
+
+        <button
+            class="nav-item"
+        >
+
+            <span class="nav-icon">
+                🔄
+            </span>
+
+            Échanges
+
+        </button>
+
+
+        <button
+            class="nav-item"
+        >
+
+            <span class="nav-icon">
+                📖
+            </span>
+
+            Règles
+
+        </button>
+
+
+    </nav>
+
+
+</section>
+
+
+
+<!-- ==================================================
+     FIREBASE
+     ================================================== -->
+
+<script type="module">
+
+
+/* ==================================================
+   IMPORTS
+   ================================================== */
+
+import {
+
+    initializeApp
+
+} from
+"https://www.gstatic.com/firebasejs/12.3.0/firebase-app.js";
+
+
+import {
+
+    getAuth,
+
+    onAuthStateChanged,
+
+    signInWithEmailAndPassword,
+
+    signOut
+
+} from
+"https://www.gstatic.com/firebasejs/12.3.0/firebase-auth.js";
+
+
+import {
+
+    getFirestore,
+    doc,
+    getDoc,
+    collection,
+    getDocs,
+    addDoc,
+    updateDoc,
+    deleteDoc
+
+} from
+"https://www.gstatic.com/firebasejs/12.3.0/firebase-firestore.js";
+
+
+import {
+    getStorage,
+    ref,
+    uploadBytes,
+    getDownloadURL
+} from
+"https://www.gstatic.com/firebasejs/12.3.0/firebase-storage.js";
+
+
+
+/* ==================================================
+   CONFIGURATION
+   ================================================== */
+
+const firebaseConfig = {
+
+    apiKey:
+        "AIzaSyCbm2aLX62NjJmO5nc__vaDiAt43arpfGY",
+
+    authDomain:
+        "cartes-et-popote.firebaseapp.com",
+
+    projectId:
+        "cartes-et-popote",
+
+    storageBucket:
+        "cartes-et-popote.firebasestorage.app",
+
+    messagingSenderId:
+        "1060360191291",
+
+    appId:
+        "1:1060360191291:web:96e35d7177d5d511220b1e",
+
+    measurementId:
+        "G-G50YHH4VHN"
+
+};
+
+
+
+/* ==================================================
+   FIREBASE
+   ================================================== */
+
+const app =
+    initializeApp(
+        firebaseConfig
+    );
+
+
+const auth =
+    getAuth(app);
+
+
+const db =
+    getFirestore(app);
+
+const storage = getStorage(app);
+
+
+
+/* ==================================================
+   ÉLÉMENTS
+   ================================================== */
+
+const loginPage =
+    document.getElementById(
+        "loginPage"
+    );
+
+
+const appPage =
+    document.getElementById(
+        "appPage"
+    );
+
+
+const loginForm =
+    document.getElementById(
+        "loginForm"
+    );
+
+
+const loginButton =
+    document.getElementById(
+        "loginButton"
+    );
+
+
+const loginMessage =
+    document.getElementById(
+        "loginMessage"
+    );
+
+
+const registerButton =
+    document.getElementById(
+        "registerButton"
+    );
+
+
+const menuButton =
+    document.getElementById(
+        "menuButton"
+    );
+
+
+const dropdownMenu =
+    document.getElementById(
+        "dropdownMenu"
+    );
+
+
+const logoutButton =
+    document.getElementById(
+        "logoutButton"
+    );
+
+const adminButton = document.getElementById("adminButton");
+const ADMIN_EMAIL = "pierre.valentin8@gmail.com";
+const adminPage = document.getElementById("adminPage");
+const adminBackButton = document.getElementById("adminBackButton");
+const rarityForm = document.getElementById("rarityForm");
+const rarityName = document.getElementById("rarityName");
+const rarityPercentage = document.getElementById("rarityPercentage");
+const raritySubmit = document.getElementById("raritySubmit");
+const rarityCancelEdit = document.getElementById("rarityCancelEdit");
+const rarityStatus = document.getElementById("rarityStatus");
+const raritiesList = document.getElementById("raritiesList");
+const cardForm = document.getElementById("cardForm");
+const cardName = document.getElementById("cardName");
+const cardCategory = document.getElementById("cardCategory");
+const cardRarity = document.getElementById("cardRarity");
+const cardImage = document.getElementById("cardImage");
+const cardImageFile = document.getElementById("cardImageFile");
+const cardImagePreview = document.getElementById("cardImagePreview");
+let previewObjectUrl = null;
+const cardDescription = document.getElementById("cardDescription");
+const cardSubmit = document.getElementById("cardSubmit");
+const cardCancelEdit = document.getElementById("cardCancelEdit");
+const adminStatus = document.getElementById("adminStatus");
+const cardsList = document.getElementById("cardsList");
+const bottomNav = document.querySelector(".bottom-nav");
+let editingCardId = null;
+let editingRarityId = null;
+const RARITY_COLORS = {
+    "commune": "#9E9E9E",
+    "rare": "#2878D0",
+    "légendaire": "#7DD3FC",
+    "mystique": "#C4A1E8"
+};
+
+function getRarityColor(name) {
+    return RARITY_COLORS[(name || "").trim().toLocaleLowerCase("fr")] || "#9E9E9E";
+}
+
+cardRarity.addEventListener("change", () => {
+    const color = getRarityColor(cardRarity.value);
+    cardRarity.style.borderColor = color;
+    cardRarity.style.boxShadow = "0 0 0 2px " + color + "33";
+});
+
+
+
+/* ==================================================
+   CONNEXION
+   ================================================== */
+
+loginForm.addEventListener(
+    "submit",
+    async function(event) {
+
+        event.preventDefault();
+
+
+        loginMessage.className =
+            "message";
+
+
+        const email =
+            document
+                .getElementById(
+                    "loginEmail"
+                )
+                .value
+                .trim();
+
+
+        const password =
+            document
+                .getElementById(
+                    "loginPassword"
+                )
+                .value;
+
+
+        loginButton.disabled =
+            true;
+
+
+        loginButton.textContent =
+            "Connexion...";
+
+
+        try {
+
+            await signInWithEmailAndPassword(
+
+                auth,
+
+                email,
+
+                password
+
+            );
+
+        }
+
+        catch (error) {
+
+            console.error(error);
+
+
+            loginMessage.textContent =
+                "Adresse e-mail ou mot de passe incorrect.";
+
+
+            loginMessage.className =
+                "message error";
+
+        }
+
+
+        finally {
+
+            loginButton.disabled =
+                false;
+
+            loginButton.textContent =
+                "Se connecter";
+
+        }
+
+    }
+);
+
+
+
+/* ==================================================
+   INSCRIPTION
+   ================================================== */
+
+registerButton.addEventListener(
+    "click",
+    function() {
+
+        alert(
+            "Nous avons déjà créé le système d'inscription. Nous améliorerons cet écran ensuite."
+        );
+
+    }
+);
+
+
+
+/* ==================================================
+   SURVEILLER L'UTILISATEUR
+   ================================================== */
+
+onAuthStateChanged(
+
+    auth,
+
+    async function(user) {
+
+
+        /* ==========================================
+           PAS CONNECTÉ
+           ========================================== */
+
+        if (!user) {
+            adminButton.classList.add("hidden");
+
+            loginPage.classList.remove(
+                "hidden"
+            );
+
+            appPage.classList.add(
+                "hidden"
+            );
+
+            return;
+
+        }
+
+
+
+        /* ==========================================
+           CONNECTÉ
+           ========================================== */
+
+        loginPage.classList.add(
+            "hidden"
+        );
+
+        appPage.classList.remove(
+            "hidden"
+        );
+
+        // Affichage seulement : les règles Firestore protègent les données.
+        const isAdminAccount = (user.email || "").toLowerCase() === ADMIN_EMAIL;
+        adminButton.classList.toggle("hidden", !isAdminAccount);
+
+
+
+        /* ==========================================
+           RÉCUPÉRER LE PROFIL
+           ========================================== */
+
+        try {
+
+
+            const playerRef =
+                doc(
+                    db,
+                    "players",
+                    user.uid
+                );
+
+
+            const playerSnapshot =
+                await getDoc(
+                    playerRef
+                );
+
+
+            if (
+                playerSnapshot.exists()
+            ) {
+
+
+                const player =
+                    playerSnapshot.data();
+
+
+
+                /* PSEUDO */
+
+                document
+                    .getElementById(
+                        "playerPseudo"
+                    )
+                    .textContent =
+                        player.pseudo
+                        || "Joueur";
+
+
+
+                /* NIVEAU */
+
+                const niveau =
+                    player.niveau
+                    || 1;
+
+
+                const xp =
+                    player.xp
+                    || 0;
+
+
+                document
+                    .getElementById(
+                        "playerLevel"
+                    )
+                    .textContent =
+                        `Niveau ${niveau} • ${xp} XP`;
+
+
+
+                /* TOKENS */
+
+                document
+                    .getElementById(
+                        "playerTokens"
+                    )
+                    .textContent =
+                        player.tokens
+                        || 0;
+
+
+
+                /* CARTES */
+
+                document
+                    .getElementById(
+                        "playerCards"
+                    )
+                    .textContent =
+                        player.cartesTirees
+                        || 0;
+
+
+
+                /* BOOSTERS */
+
+                document
+                    .getElementById(
+                        "playerBoosters"
+                    )
+                    .textContent =
+                        player.boostersAchetes
+                        || 0;
+
+
+
+                /* XP */
+
+                const xpProgress =
+                    Math.min(
+                        (xp / 100) * 100,
+                        100
+                    );
+
+
+                document
+                    .getElementById(
+                        "xpProgress"
+                    )
+                    .style.width =
+                        xpProgress + "%";
+
+            }
+
+
+        }
+
+        catch (error) {
+
+            console.error(
+                "Erreur profil :",
+                error
+            );
+
+        }
+
+    }
+
+);
+
+
+
+async function loadRarities() {
+    try {
+        const snapshot = await getDocs(collection(db, "rarities"));
+        const rarities = snapshot.docs
+            .map((item) => ({ id: item.id, ...item.data() }))
+            .sort((a, b) => (a.name || "").localeCompare(b.name || "", "fr"));
+
+        const usedPercentage = rarities.reduce((sum, item) => sum + Number(item.percentage || 0), 0);
+        const remaining = Math.max(0, 100 - usedPercentage);
+        rarityStatus.textContent = usedPercentage.toFixed(2) + "% attribué • " + remaining.toFixed(2) + "% restant";
+
+        cardRarity.replaceChildren();
+        const placeholder = document.createElement("option");
+        placeholder.value = "";
+        placeholder.textContent = rarities.length ? "Choisir une rareté" : "Crée d’abord une catégorie de rareté";
+        cardRarity.append(placeholder);
+        rarities.forEach((item) => {
+            const option = document.createElement("option");
+            option.value = item.name;
+            option.textContent = item.name + " (" + Number(item.percentage || 0) + " %)";
+            cardRarity.append(option);
+        });
+
+        raritiesList.replaceChildren();
+        if (!rarities.length) {
+            const empty = document.createElement("p");
+            empty.className = "admin-note";
+            empty.textContent = "Aucune rareté créée pour le moment.";
+            raritiesList.append(empty);
+            return;
+        }
+
+        rarities.forEach((item) => {
+            const row = document.createElement("div");
+            row.className = "admin-card-row";
+            const details = document.createElement("div");
+            const label = document.createElement("strong");
+            label.textContent = item.name || "Sans nom";
+            const percent = document.createElement("small");
+            percent.textContent = Number(item.percentage || 0) + " % d’apparition";
+            details.append(label, percent);
+
+            const actions = document.createElement("div");
+            actions.className = "admin-actions";
+            const edit = document.createElement("button");
+            edit.type = "button";
+            edit.textContent = "Modifier %";
+            edit.addEventListener("click", () => {
+                editingRarityId = item.id;
+                rarityName.value = item.name || "";
+                rarityName.disabled = true;
+                rarityPercentage.value = Number(item.percentage || 0);
+                raritySubmit.textContent = "Enregistrer le pourcentage";
+                rarityCancelEdit.classList.remove("hidden");
+                rarityName.scrollIntoView({ behavior: "smooth", block: "center" });
+            });
+
+            const remove = document.createElement("button");
+            remove.type = "button";
+            remove.textContent = "Supprimer";
+            remove.className = "admin-danger";
+            remove.addEventListener("click", async () => {
+                const cards = await getDocs(collection(db, "cards"));
+                const isUsed = cards.docs.some((cardDoc) => cardDoc.data().rarity === item.name);
+                if (isUsed) {
+                    rarityStatus.textContent = "Cette rareté est utilisée par une carte. Modifie d’abord sa rareté.";
+                    return;
+                }
+                if (!confirm("Supprimer la rareté « " + item.name + " » ?")) return;
+                try {
+                    await deleteDoc(doc(db, "rarities", item.id));
+                    rarityStatus.textContent = "Rareté supprimée.";
+                    await loadRarities();
+                } catch (error) {
+                    console.error(error);
+                    rarityStatus.textContent = "Suppression refusée. Vérifie les règles Firestore.";
+                }
+            });
+            actions.append(edit, remove);
+            row.append(details, actions);
+            raritiesList.append(row);
+        });
+    } catch (error) {
+        console.error("Erreur de chargement des raretés :", error);
+        rarityStatus.textContent = "Impossible de charger les raretés. Vérifie les règles Firestore.";
+    }
+}
+
+function resetRarityForm() {
+    editingRarityId = null;
+    rarityForm.reset();
+    rarityName.disabled = false;
+    raritySubmit.textContent = "Ajouter la rareté";
+    rarityCancelEdit.classList.add("hidden");
+}
+
+rarityCancelEdit.addEventListener("click", resetRarityForm);
+
+rarityForm.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    if (!auth.currentUser || (auth.currentUser.email || "").toLowerCase() !== ADMIN_EMAIL) {
+        rarityStatus.textContent = "Accès réservé au compte Admin.";
+        return;
+    }
+
+    const name = rarityName.value.trim();
+    const percentage = Number(rarityPercentage.value);
+    if (!name || !Number.isFinite(percentage) || percentage <= 0 || percentage > 100) {
+        rarityStatus.textContent = "Entre un nom et un pourcentage supérieur à 0, jusqu’à 100.";
+        return;
+    }
+
+    try {
+        const snapshot = await getDocs(collection(db, "rarities"));
+        const existing = snapshot.docs.find((item) => item.id === editingRarityId);
+        const usedByOthers = snapshot.docs.reduce((sum, item) => {
+            if (item.id === editingRarityId) return sum;
+            return sum + Number(item.data().percentage || 0);
+        }, 0);
+        if (usedByOthers + percentage > 100.0001) {
+            rarityStatus.textContent = "Le total dépasserait 100 %. Il reste " + Math.max(0, 100 - usedByOthers).toFixed(2) + " %.";
+            return;
+        }
+
+        const duplicate = snapshot.docs.some((item) =>
+            item.id !== editingRarityId && (item.data().name || "").toLowerCase() === name.toLowerCase()
+        );
+        if (!editingRarityId && duplicate) {
+            rarityStatus.textContent = "Cette catégorie existe déjà.";
+            return;
+        }
+
+        if (editingRarityId && existing) {
+            await updateDoc(doc(db, "rarities", editingRarityId), {
+                percentage,
+                updatedAt: new Date().toISOString()
+            });
+            rarityStatus.textContent = "Pourcentage modifié.";
+        } else {
+            await addDoc(collection(db, "rarities"), {
+                name,
+                percentage,
+                createdAt: new Date().toISOString()
+            });
+            rarityStatus.textContent = "Catégorie de rareté ajoutée.";
+        }
+        resetRarityForm();
+        await loadRarities();
+    } catch (error) {
+        console.error("Erreur d’enregistrement de la rareté :", error);
+        rarityStatus.textContent = "Enregistrement refusé. Vérifie les règles Firestore.";
+    }
+});
+
+async function loadCards() {
+    cardsList.replaceChildren();
+    adminStatus.textContent = "Chargement des cartes...";
+    try {
+        const snapshot = await getDocs(collection(db, "cards"));
+        if (snapshot.empty) {
+            adminStatus.textContent = "Aucune carte pour le moment.";
+            return;
+        }
+        adminStatus.textContent = "";
+        snapshot.forEach((cardDoc) => {
+            const card = cardDoc.data();
+            const row = document.createElement("div");
+            row.className = "admin-card-row";
+            const visualUrl = card.imageUrl || card.image || card.visuel || "";
+            let visual;
+            if (/^https?:\/\//i.test(visualUrl)) {
+                visual = document.createElement("img");
+                visual.className = "admin-card-thumb";
+                visual.style.border = "4px solid " + (card.rarityColor || getRarityColor(card.rarity));
+                visual.src = visualUrl;
+                visual.alt = card.name ? "Visuel de " + card.name : "Visuel de la carte";
+                visual.loading = "lazy";
+                visual.referrerPolicy = "no-referrer";
+                visual.onerror = () => {
+                    const placeholder = document.createElement("div");
+                    placeholder.className = "admin-card-placeholder";
+                    placeholder.style.border = "4px solid " + (card.rarityColor || getRarityColor(card.rarity));
+                    placeholder.textContent = "🃏";
+                    visual.replaceWith(placeholder);
+                };
+            } else {
+                visual = document.createElement("div");
+                visual.className = "admin-card-placeholder";
+                visual.style.border = "4px solid " + getRarityColor(card.rarity);
+                visual.textContent = "🃏";
+            }
+            const details = document.createElement("div");
+            const name = document.createElement("strong");
+            name.textContent = card.name || "Carte sans nom";
+            const meta = document.createElement("small");
+            meta.textContent = (card.category || "Sans catégorie") + " • " + (card.rarity || "Sans rareté");
+            details.append(name, meta);
+            const actions = document.createElement("div");
+            actions.className = "admin-actions";
+            const edit = document.createElement("button");
+            edit.type = "button";
+            edit.textContent = "Modifier";
+            edit.addEventListener("click", () => {
+                editingCardId = cardDoc.id;
+                cardName.value = card.name || "";
+                cardCategory.value = card.category || "";
+                cardRarity.value = card.rarity || "";
+                cardImage.value = card.imageUrl || "";
+                cardImageFile.value = "";
+                if (previewObjectUrl) URL.revokeObjectURL(previewObjectUrl);
+                previewObjectUrl = null;
+                if (card.imageUrl) {
+                    cardImagePreview.src = card.imageUrl;
+                    cardImagePreview.classList.remove("hidden");
+                } else {
+                    cardImagePreview.removeAttribute("src");
+                    cardImagePreview.classList.add("hidden");
+                }
+                cardDescription.value = card.description || "";
+                cardSubmit.textContent = "Enregistrer";
+                cardCancelEdit.classList.remove("hidden");
+                window.scrollTo({ top: 0, behavior: "smooth" });
+            });
+            const remove = document.createElement("button");
+            remove.type = "button";
+            remove.textContent = "Supprimer";
+            remove.className = "admin-danger";
+            remove.addEventListener("click", async () => {
+                if (!confirm("Supprimer la carte « " + (card.name || "sans nom") + " » ?")) return;
+                try {
+                    await deleteDoc(doc(db, "cards", cardDoc.id));
+                    adminStatus.textContent = "Carte supprimée.";
+                    await loadCards();
+                } catch (error) {
+                    console.error(error);
+                    adminStatus.textContent = "Suppression refusée. Vérifie les règles Firestore.";
+                }
+            });
+            actions.append(edit, remove);
+            row.append(visual, details, actions);
+            cardsList.append(row);
+        });
+    } catch (error) {
+        console.error("Erreur de chargement des cartes :", error);
+        adminStatus.textContent = "Impossible de charger les cartes. Vérifie les règles Firestore.";
+    }
+}
+
+function closeAdminPage() {
+    adminPage.classList.add("hidden");
+    document.querySelector(".app-content").classList.remove("hidden");
+    bottomNav.classList.remove("hidden");
+}
+
+adminButton.addEventListener("click", async () => {
+    if (!auth.currentUser || (auth.currentUser.email || "").toLowerCase() !== ADMIN_EMAIL) return;
+    dropdownMenu.classList.add("hidden");
+    document.querySelector(".app-content").classList.add("hidden");
+    bottomNav.classList.add("hidden");
+    adminPage.classList.remove("hidden");
+    await loadRarities();
+    await loadCards();
+});
+
+adminBackButton.addEventListener("click", closeAdminPage);
+
+cardImageFile.addEventListener("change", () => {
+    const file = cardImageFile.files && cardImageFile.files[0];
+    if (previewObjectUrl) URL.revokeObjectURL(previewObjectUrl);
+    previewObjectUrl = null;
+    if (!file) return;
+    previewObjectUrl = URL.createObjectURL(file);
+    cardImagePreview.src = previewObjectUrl;
+    cardImagePreview.classList.remove("hidden");
+});
+
+cardCancelEdit.addEventListener("click", () => {
+    editingCardId = null;
+    cardForm.reset();
+    cardImagePreview.removeAttribute("src");
+    cardImagePreview.classList.add("hidden");
+    if (previewObjectUrl) URL.revokeObjectURL(previewObjectUrl);
+    previewObjectUrl = null;
+    cardSubmit.textContent = "Ajouter la carte";
+    cardCancelEdit.classList.add("hidden");
+    adminStatus.textContent = "";
+});
+
+cardForm.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    if (!auth.currentUser || (auth.currentUser.email || "").toLowerCase() !== ADMIN_EMAIL) {
+        adminStatus.textContent = "Accès réservé au compte Admin.";
+        return;
+    }
+    const card = {
+        name: cardName.value.trim(),
+        category: cardCategory.value.trim(),
+        rarity: cardRarity.value,
+        rarityColor: getRarityColor(cardRarity.value),
+        imageUrl: cardImage.value.trim(),
+        description: cardDescription.value.trim(),
+        updatedAt: new Date().toISOString()
+    };
+    if (!card.name || !card.category) return;
+    const selectedImage = cardImageFile.files && cardImageFile.files[0];
+    if (selectedImage) {
+        const allowedTypes = ["image/jpeg", "image/png", "image/webp"];
+        if (!allowedTypes.includes(selectedImage.type) || selectedImage.size > 5 * 1024 * 1024) {
+            adminStatus.textContent = "Choisis une image JPG, PNG ou WebP de 5 Mo maximum.";
+            return;
+        }
+    }
+    cardSubmit.disabled = true;
+    adminStatus.textContent = "Enregistrement...";
+    try {
+        if (selectedImage) {
+            const safeName = selectedImage.name.replace(/[^a-zA-Z0-9._-]/g, "_");
+            const imagePath = "cards/" + auth.currentUser.uid + "/" + Date.now() + "-" + safeName;
+            const imageRef = ref(storage, imagePath);
+            await uploadBytes(imageRef, selectedImage, { contentType: selectedImage.type });
+            card.imageUrl = await getDownloadURL(imageRef);
+            card.storagePath = imagePath;
+        }
+
+        if (editingCardId) {
+            await updateDoc(doc(db, "cards", editingCardId), card);
+            adminStatus.textContent = "Carte modifiée.";
+        } else {
+            card.createdAt = new Date().toISOString();
+            await addDoc(collection(db, "cards"), card);
+            adminStatus.textContent = "Carte ajoutée.";
+        }
+        editingCardId = null;
+        cardForm.reset();
+        cardImagePreview.removeAttribute("src");
+        cardImagePreview.classList.add("hidden");
+        if (previewObjectUrl) URL.revokeObjectURL(previewObjectUrl);
+        previewObjectUrl = null;
+        cardSubmit.textContent = "Ajouter la carte";
+        cardCancelEdit.classList.add("hidden");
+        await loadCards();
+    } catch (error) {
+        console.error("Erreur d’enregistrement :", error);
+        adminStatus.textContent = "Enregistrement refusé. Publie les règles Firestore indiquées.";
+    } finally {
+        cardSubmit.disabled = false;
+    }
+});
+/* ==================================================
+   MENU
+   ================================================== */
+
+menuButton.addEventListener(
+    "click",
+    function() {
+
+        dropdownMenu.classList.toggle(
+            "hidden"
+        );
+
+    }
+);
+
+
+
+/* ==================================================
+   DÉCONNEXION
+   ================================================== */
+
+logoutButton.addEventListener(
+    "click",
+    async function() {
+
+        try {
+
+            await signOut(
+                auth
+            );
+
+        }
+
+        catch (error) {
+
+            console.error(
+                error
+            );
+
+        }
+
+    }
+);
+
+</script>
+
+
+</body>
+
+</html>
