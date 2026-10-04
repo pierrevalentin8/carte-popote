@@ -1083,6 +1083,7 @@ body {
 .player-card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; margin-top: 16px; }
 .player-card { position: relative; overflow: hidden; background: #fff; border: 3px solid #9e9e9e; border-radius: 16px; box-shadow: 0 6px 18px rgba(30,90,120,.1); }
 .card-quantity-badge { position: absolute; z-index: 2; top: 8px; right: 8px; min-width: 38px; padding: 6px 9px; border: 2px solid #fff; border-radius: 999px; background: #173b52; color: #fff; text-align: center; font-size: 13px; font-weight: 800; box-shadow: 0 2px 8px rgba(0,0,0,.25); }
+.card-number-badge { position: absolute; z-index: 2; top: 8px; left: 8px; padding: 6px 9px; border: 2px solid #fff; border-radius: 999px; background: #2878D0; color: #fff; font-size: 12px; font-weight: 800; box-shadow: 0 2px 8px rgba(0,0,0,.25); }
 .player-card-image { display: block; width: 100%; aspect-ratio: 2 / 3; object-fit: cover; background: #eefaff; }
 .player-card-placeholder { display: grid; place-items: center; width: 100%; aspect-ratio: 2 / 3; background: #eefaff; font-size: 42px; }
 .player-card-copy { padding: 10px; }
@@ -1767,6 +1768,7 @@ const db =
 const storage = getStorage(app);
 const functions = getFunctions(app, "europe-west1");
 const callOpenClassicBooster = httpsCallable(functions, "openClassicBooster");
+const callGetOwnedCardNumbers = httpsCallable(functions, "getOwnedCardNumbers");
 
 
 
@@ -2276,15 +2278,24 @@ async function loadOwnedPlayerCards() {
     }
 
     try {
-        const snapshot = await getDocs(collection(db, "players", auth.currentUser.uid, "collection"));
+        const [snapshot, numberResponse] = await Promise.all([
+            getDocs(collection(db, "players", auth.currentUser.uid, "collection")),
+            callGetOwnedCardNumbers(),
+        ]);
+        const cardNumbers = numberResponse.data.cardNumbers || {};
         const cards = snapshot.docs
-            .map((item) => ({ id: item.id, ...item.data() }))
-            .sort((a, b) => (b.openedAt || "").localeCompare(a.openedAt || ""));
+            .map((item) => {
+                const card = { id: item.id, ...item.data() };
+                card.cardNumber = Number(cardNumbers[card.cardId]) || Number(card.cardNumber) || null;
+                return card;
+            })
+            .sort((a, b) => (a.cardNumber || Number.MAX_SAFE_INTEGER) - (b.cardNumber || Number.MAX_SAFE_INTEGER));
         if (!cards.length) {
             ownedCardsStatus.textContent = "Ta collection est vide. Ouvre un booster pour obtenir tes premières cartes !";
             return;
         }
         const groupedCards = groupCardCopies(cards);
+        groupedCards.sort((a, b) => (a.cardNumber || Number.MAX_SAFE_INTEGER) - (b.cardNumber || Number.MAX_SAFE_INTEGER));
         ownedCardsStatus.textContent = cards.length + (cards.length === 1 ? " exemplaire obtenu" : " exemplaires obtenus")
             + " • " + groupedCards.length + (groupedCards.length === 1 ? " carte différente" : " cartes différentes");
         groupedCards.forEach((card) => ownedPlayerCardGrid.append(createPlayerCardElement(card, card.quantity)));
@@ -2319,6 +2330,13 @@ function createPlayerCardElement(card, quantity = 1) {
     quantityBadge.textContent = "×" + quantity;
     quantityBadge.setAttribute("aria-label", quantity + (quantity === 1 ? " exemplaire" : " exemplaires"));
     cardElement.append(quantityBadge);
+    if (Number.isSafeInteger(Number(card.cardNumber)) && Number(card.cardNumber) > 0) {
+        const numberBadge = document.createElement("span");
+        numberBadge.className = "card-number-badge";
+        numberBadge.textContent = "N° " + String(card.cardNumber).padStart(3, "0");
+        numberBadge.setAttribute("aria-label", "Carte numéro " + card.cardNumber);
+        cardElement.append(numberBadge);
+    }
     if (/^https?:\/\//i.test(card.imageUrl || "")) {
         const image = document.createElement("img");
         image.className = "player-card-image";
