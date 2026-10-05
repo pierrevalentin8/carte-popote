@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="fr">
 
@@ -2318,22 +2317,10 @@ onAuthStateChanged(
 
                 /* NIVEAU */
 
-                const niveau =
-                    player.niveau
-                    || 1;
-
-
                 const xp =
                     player.xp
                     || 0;
-
-
-                document
-                    .getElementById(
-                        "playerLevel"
-                    )
-                    .textContent =
-                        `Niveau ${niveau} • ${xp} XP`;
+                updatePlayerXpDisplay(xp);
 
 
 
@@ -2372,22 +2359,6 @@ onAuthStateChanged(
                 setOpenBoosterButton(player.boostersDisponibles || 0);
 
 
-
-                /* XP */
-
-                const xpProgress =
-                    Math.min(
-                        (xp / 100) * 100,
-                        100
-                    );
-
-
-                document
-                    .getElementById(
-                        "xpProgress"
-                    )
-                    .style.width =
-                        xpProgress + "%";
 
             }
             else {
@@ -2627,6 +2598,25 @@ function setDailyBoosterButton(lastOpenedDate) {
         : "Ouvrir le booster journalier";
 }
 
+function getLevelProgress(totalXp) {
+    let level = 1;
+    let remainingXp = Number(totalXp) || 0;
+    let xpForNextLevel = 100;
+    while (remainingXp >= xpForNextLevel) {
+        remainingXp -= xpForNextLevel;
+        level += 1;
+        xpForNextLevel = 100 + (level - 1) * 50;
+    }
+    return { level, remainingXp, xpForNextLevel };
+}
+
+function updatePlayerXpDisplay(totalXp) {
+    const xp = Number(totalXp) || 0;
+    const progress = getLevelProgress(xp);
+    document.getElementById("playerLevel").textContent = `Niveau ${progress.level} • ${xp} XP`;
+    document.getElementById("xpProgress").style.width = `${Math.min((progress.remainingXp / progress.xpForNextLevel) * 100, 100)}%`;
+}
+
 function showBoosterResults(cards) {
     boosterResultGrid.replaceChildren();
     groupCardCopies(cards).forEach((card) => boosterResultGrid.append(createPlayerCardElement(card, card.quantity)));
@@ -2660,6 +2650,7 @@ openNormalBoosterButton.addEventListener("click", async () => {
         const count = Number(result.boostersDisponibles) || 0;
         setOpenBoosterButton(count);
         document.getElementById("playerCards").textContent = Number(result.cartesTirees) || 0;
+        updatePlayerXpDisplay(result.xp);
         boosterPurchaseStatus.textContent = "Booster ouvert : 5 cartes ajoutées à ta collection.";
         showBoosterResults(result.cards || []);
     } catch (error) {
@@ -2695,6 +2686,7 @@ openDailyBoosterButton.addEventListener("click", async () => {
         const response = await callOpenDailyBooster();
         const result = response.data;
         document.getElementById("playerCards").textContent = Number(result.cartesTirees) || 0;
+        updatePlayerXpDisplay(result.xp);
         setDailyBoosterButton(result.boosterJournalierDate);
         boosterPurchaseStatus.textContent = "Booster journalier ouvert : 3 cartes ajoutées à ta collection.";
         showBoosterResults(result.cards || []);
