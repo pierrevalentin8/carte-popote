@@ -591,6 +591,14 @@ body {
     flex-shrink: 0;
 }
 
+.avatar img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
 
 .profile-info {
 
@@ -1222,6 +1230,41 @@ body {
     .login-card-back-image { width: 66px; }
     #loginPage .login-card { padding-top: 17px; padding-bottom: 17px; }
 }
+.register-avatar-label { display: block; margin-bottom: 9px; color: #102544; font-size: 14px; font-weight: 700; }
+.avatar-picker { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: clamp(6px, 2vw, 11px); }
+.avatar-choice {
+    position: relative;
+    display: block;
+    width: 100%;
+    aspect-ratio: 1;
+    padding: 2px;
+    overflow: hidden;
+    border: 2px solid #c6d2e0;
+    border-radius: 50%;
+    background: #e7eef8;
+    cursor: pointer;
+    transition: transform .16s ease, border-color .16s ease, box-shadow .16s ease;
+}
+.avatar-choice img { display: block; width: 100%; height: 100%; border-radius: 50%; object-fit: cover; }
+.avatar-choice:hover { transform: translateY(-2px); }
+.avatar-choice:focus-visible { outline: 3px solid #183c72; outline-offset: 2px; }
+.avatar-choice.is-selected { border-color: #f0bd36; box-shadow: 0 0 0 3px rgba(240, 189, 54, .28); }
+.avatar-choice.is-selected::after {
+    content: "✓";
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    display: grid;
+    place-items: center;
+    width: 21px;
+    height: 21px;
+    border: 2px solid #fbfaf5;
+    border-radius: 50%;
+    background: #10264a;
+    color: #ffdb62;
+    font-size: 12px;
+    font-weight: 900;
+}
 </style>
 
 </head>
@@ -1281,6 +1324,17 @@ body {
                     placeholder="Ton pseudonyme"
                 >
 
+            </div>
+
+            <div class="field hidden" id="registerAvatarField">
+                <span class="register-avatar-label">Choisis ton avatar</span>
+                <div class="avatar-picker" role="group" aria-label="Choix de l’avatar">
+                    <button class="avatar-choice is-selected" type="button" data-avatar="femme-blonde" aria-label="Avatar 1" aria-pressed="true"><img src="./avatar-femme-blonde.png" alt="" aria-hidden="true"></button>
+                    <button class="avatar-choice" type="button" data-avatar="femme-brune" aria-label="Avatar 2" aria-pressed="false"><img src="./avatar-femme-brune.png" alt="" aria-hidden="true"></button>
+                    <button class="avatar-choice" type="button" data-avatar="homme-blanc" aria-label="Avatar 3" aria-pressed="false"><img src="./avatar-homme-blanc.png" alt="" aria-hidden="true"></button>
+                    <button class="avatar-choice" type="button" data-avatar="homme-noir" aria-label="Avatar 4" aria-pressed="false"><img src="./avatar-homme-noir.png" alt="" aria-hidden="true"></button>
+                    <button class="avatar-choice" type="button" data-avatar="vieil-homme" aria-label="Avatar 5" aria-pressed="false"><img src="./avatar-vieil-homme.png" alt="" aria-hidden="true"></button>
+                </div>
             </div>
 
             <div class="field">
@@ -1411,7 +1465,7 @@ body {
         <section class="profile-card">
 
 
-            <div class="avatar">
+            <div class="avatar" id="playerAvatar">
                 👤
             </div>
 
@@ -1931,8 +1985,45 @@ const loginTitle = document.getElementById("loginTitle");
 const loginSubtitle = document.getElementById("loginSubtitle");
 const registerPseudoField = document.getElementById("registerPseudoField");
 const registerPseudo = document.getElementById("registerPseudo");
+const registerAvatarField = document.getElementById("registerAvatarField");
+const avatarChoices = Array.from(document.querySelectorAll(".avatar-choice"));
+const playerAvatar = document.getElementById("playerAvatar");
+const PLAYER_AVATARS = {
+    "femme-blonde": "./avatar-femme-blonde.png",
+    "femme-brune": "./avatar-femme-brune.png",
+    "homme-blanc": "./avatar-homme-blanc.png",
+    "homme-noir": "./avatar-homme-noir.png",
+    "vieil-homme": "./avatar-vieil-homme.png"
+};
 let isRegisterMode = false;
 let pendingSignupPseudo = "";
+let pendingSignupAvatar = "";
+let selectedSignupAvatar = "femme-blonde";
+
+function renderPlayerAvatar(avatarId) {
+    playerAvatar.replaceChildren();
+    const imagePath = PLAYER_AVATARS[avatarId];
+    if (!imagePath) {
+        playerAvatar.textContent = "👤";
+        return;
+    }
+    const image = document.createElement("img");
+    image.src = imagePath;
+    image.alt = "";
+    image.onerror = () => { playerAvatar.textContent = "👤"; };
+    playerAvatar.append(image);
+}
+
+avatarChoices.forEach((choice) => {
+    choice.addEventListener("click", () => {
+        selectedSignupAvatar = choice.dataset.avatar;
+        avatarChoices.forEach((option) => {
+            const selected = option === choice;
+            option.classList.toggle("is-selected", selected);
+            option.setAttribute("aria-pressed", String(selected));
+        });
+    });
+});
 
 
 const registerButton =
@@ -2066,6 +2157,7 @@ loginForm.addEventListener(
                     throw new Error("Le mot de passe doit contenir au moins 6 caractères.");
                 }
                 pendingSignupPseudo = pseudo;
+                pendingSignupAvatar = selectedSignupAvatar;
                 await createUserWithEmailAndPassword(auth, email, password);
             } else {
                 await signInWithEmailAndPassword(auth, email, password);
@@ -2083,6 +2175,7 @@ loginForm.addEventListener(
             loginMessage.textContent = error.message || messages[error.code] || "Connexion ou inscription impossible. Vérifie tes identifiants.";
             loginMessage.className = "message error";
             pendingSignupPseudo = "";
+            pendingSignupAvatar = "";
         }
 
 
@@ -2109,6 +2202,7 @@ registerButton.addEventListener(
     function() {
         isRegisterMode = !isRegisterMode;
         registerPseudoField.classList.toggle("hidden", !isRegisterMode);
+        registerAvatarField.classList.toggle("hidden", !isRegisterMode);
         registerPseudo.required = isRegisterMode;
         loginTitle.textContent = isRegisterMode ? "Créer un compte" : "Connexion";
         loginSubtitle.textContent = isRegisterMode ? "Rejoins Cartes & Popote !" : "Heureux de vous revoir !";
@@ -2201,6 +2295,8 @@ onAuthStateChanged(
 
                 const player =
                     playerSnapshot.data();
+
+                renderPlayerAvatar(player.avatar);
 
 
 
@@ -2295,6 +2391,7 @@ onAuthStateChanged(
                     || (user.email || "joueur").split("@")[0];
                 const newPlayer = {
                     pseudo,
+                    avatar: pendingSignupAvatar || selectedSignupAvatar || "femme-blonde",
                     email: user.email || "",
                     niveau: 1,
                     xp: 0,
@@ -2305,12 +2402,14 @@ onAuthStateChanged(
                     createdAt: new Date().toISOString()
                 };
                 await setDoc(playerRef, newPlayer);
+                renderPlayerAvatar(newPlayer.avatar);
                 document.getElementById("playerPseudo").textContent = pseudo;
                 document.getElementById("playerTokens").textContent = "0";
                 document.getElementById("playerCards").textContent = "0";
                 document.getElementById("playerBoosters").textContent = "0";
                 setOpenBoosterButton(0);
                 pendingSignupPseudo = "";
+                pendingSignupAvatar = "";
             }
 
 
