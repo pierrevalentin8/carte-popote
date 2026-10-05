@@ -1613,8 +1613,8 @@ body {
                     3 cartes gratuites
                 </p>
 
-                <button disabled>
-                    Bientôt disponible
+                <button id="openDailyBoosterButton" type="button">
+                    Ouvrir le booster journalier
                 </button>
 
             </article>
@@ -1944,6 +1944,7 @@ const db =
 const storage = getStorage(app);
 const functions = getFunctions(app, "europe-west1");
 const callOpenClassicBooster = httpsCallable(functions, "openClassicBooster");
+const callOpenDailyBooster = httpsCallable(functions, "openDailyBooster");
 const callGetOwnedCardNumbers = httpsCallable(functions, "getOwnedCardNumbers");
 
 
@@ -2053,6 +2054,7 @@ const adminButton = document.getElementById("adminButton");
 const ADMIN_EMAIL = "pierre.valentin8@gmail.com";
 const buyNormalBoosterButton = document.getElementById("buyNormalBoosterButton");
 const openNormalBoosterButton = document.getElementById("openNormalBoosterButton");
+const openDailyBoosterButton = document.getElementById("openDailyBoosterButton");
 const boosterPurchaseStatus = document.getElementById("boosterPurchaseStatus");
 const boosterResultModal = document.getElementById("boosterResultModal");
 const boosterResultGrid = document.getElementById("boosterResultGrid");
@@ -2297,6 +2299,7 @@ onAuthStateChanged(
                     playerSnapshot.data();
 
                 renderPlayerAvatar(player.avatar);
+                setDailyBoosterButton(player.boosterJournalierDate);
 
 
 
@@ -2403,6 +2406,7 @@ onAuthStateChanged(
                 };
                 await setDoc(playerRef, newPlayer);
                 renderPlayerAvatar(newPlayer.avatar);
+                setDailyBoosterButton(newPlayer.boosterJournalierDate);
                 document.getElementById("playerPseudo").textContent = pseudo;
                 document.getElementById("playerTokens").textContent = "0";
                 document.getElementById("playerCards").textContent = "0";
@@ -2603,6 +2607,25 @@ function setOpenBoosterButton(count) {
     openNormalBoosterButton.disabled = available < 1;
 }
 
+function getParisDateKey() {
+    const parts = new Intl.DateTimeFormat("en-CA", {
+        timeZone: "Europe/Paris",
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit"
+    }).formatToParts(new Date());
+    const part = (type) => parts.find((item) => item.type === type)?.value;
+    return `${part("year")}-${part("month")}-${part("day")}`;
+}
+
+function setDailyBoosterButton(lastOpenedDate) {
+    const alreadyOpened = lastOpenedDate === getParisDateKey();
+    openDailyBoosterButton.disabled = alreadyOpened;
+    openDailyBoosterButton.textContent = alreadyOpened
+        ? "Déjà ouvert aujourd’hui"
+        : "Ouvrir le booster journalier";
+}
+
 function showBoosterResults(cards) {
     boosterResultGrid.replaceChildren();
     groupCardCopies(cards).forEach((card) => boosterResultGrid.append(createPlayerCardElement(card, card.quantity)));
@@ -2658,6 +2681,34 @@ openNormalBoosterButton.addEventListener("click", async () => {
                 console.error("Impossible d’actualiser le stock de boosters :", error);
                 openNormalBoosterButton.disabled = false;
             }
+        }
+    }
+});
+
+openDailyBoosterButton.addEventListener("click", async () => {
+    if (!auth.currentUser || openDailyBoosterButton.disabled) return;
+    openDailyBoosterButton.disabled = true;
+    openDailyBoosterButton.textContent = "Ouverture...";
+    boosterPurchaseStatus.textContent = "Ouverture du booster journalier...";
+    try {
+        const response = await callOpenDailyBooster();
+        const result = response.data;
+        document.getElementById("playerCards").textContent = Number(result.cartesTirees) || 0;
+        setDailyBoosterButton(result.boosterJournalierDate);
+        boosterPurchaseStatus.textContent = "Booster journalier ouvert : 3 cartes ajoutées à ta collection.";
+        showBoosterResults(result.cards || []);
+    } catch (error) {
+        console.error("Erreur pendant l’ouverture du booster journalier :", error);
+        if (error.code === "functions/failed-precondition" && /déjà ouvert/i.test(error.message || "")) {
+            setDailyBoosterButton(getParisDateKey());
+            boosterPurchaseStatus.textContent = "Tu as déjà ouvert ton booster journalier aujourd’hui. Reviens demain !";
+        } else if (error.code === "functions/unauthenticated") {
+            openDailyBoosterButton.disabled = false;
+            boosterPurchaseStatus.textContent = "Connecte-toi pour ouvrir le booster journalier.";
+        } else {
+            openDailyBoosterButton.disabled = false;
+            openDailyBoosterButton.textContent = "Réessayer le booster journalier";
+            boosterPurchaseStatus.textContent = error.message || "Impossible d’ouvrir le booster journalier. Vérifie le déploiement de la fonction Firebase.";
         }
     }
 });
