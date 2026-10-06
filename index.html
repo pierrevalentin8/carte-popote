@@ -1371,8 +1371,24 @@ body {
 .profile-streak-stat { border-color: #ffc044; background: linear-gradient(145deg, #fffaf0, #f5e6c5); }
 .profile-flames { min-height: 36px; color: #d94812; font-size: 27px; letter-spacing: 2px; text-shadow: 0 3px 12px rgba(232, 102, 24, .35); animation: flame-glow 1.4s ease-in-out infinite alternate; }
 .profile-streak-message { color: #59677b; font-size: 11px; line-height: 1.35; }
+.leaderboard-page { width: 100%; max-width: 900px; min-height: calc(100dvh - 70px); margin: auto; padding: 24px 16px 100px; color: var(--theme-cream); }
+.leaderboard-page h2 { margin-top: 20px; color: var(--theme-gold-light); font-size: 24px; }
+.leaderboard-intro, .leaderboard-status { margin-top: 8px; color: #c6d2e5; font-size: 13px; line-height: 1.5; }
+.leaderboard-list { display: grid; gap: 11px; margin-top: 18px; }
+.leaderboard-row { display: grid; grid-template-columns: 42px minmax(135px, 1fr) minmax(280px, 2fr); align-items: center; gap: 12px; padding: 14px; border: 1px solid rgba(243, 191, 56, .65); border-radius: 16px; background: var(--theme-cream); color: var(--theme-ink); box-shadow: 0 9px 24px rgba(0, 0, 0, .23); }
+.leaderboard-rank { display: grid; place-items: center; width: 38px; height: 38px; border-radius: 50%; background: #10264a; color: var(--theme-gold-light); font-size: 14px; font-weight: 900; }
+.leaderboard-player { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.leaderboard-name { overflow: hidden; color: var(--theme-ink); font-size: 15px; font-weight: 800; text-overflow: ellipsis; }
+.leaderboard-total { color: #8b650d; font-size: 12px; font-weight: 700; }
+.leaderboard-rarity-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; }
+.leaderboard-rarity { padding: 7px 5px; border-radius: 9px; text-align: center; font-size: 10px; font-weight: 700; line-height: 1.25; }
+.leaderboard-common { background: #e8e8e8; color: #4d4d4d; }
+.leaderboard-rare { background: #dceaff; color: #18549d; }
+.leaderboard-legendary { background: #d9f3ff; color: #14779e; }
+.leaderboard-mystic { background: #efe1ff; color: #7045a3; }
 @keyframes flame-glow { from { filter: drop-shadow(0 0 1px rgba(241, 151, 25, .2)); transform: scale(1); } to { filter: drop-shadow(0 0 8px rgba(241, 111, 20, .48)); transform: scale(1.04); } }
 @media (max-width: 390px) { .player-profile { padding-left: 11px; padding-right: 11px; } .profile-stats-grid { gap: 9px; } .profile-stat { min-height: 136px; padding: 14px 8px; } .profile-stat-label { font-size: 11px; } }
+@media (max-width: 600px) { .leaderboard-page { padding-left: 11px; padding-right: 11px; } .leaderboard-row { grid-template-columns: 38px minmax(0, 1fr); gap: 10px; padding: 11px; } .leaderboard-rarity-grid { grid-column: 1 / -1; grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 @media (prefers-reduced-motion: reduce) { .profile-flames { animation: none; } }
 .player-card { background: var(--theme-cream); box-shadow: 0 9px 22px rgba(0, 0, 0, .28); }
 .player-card-image, .player-card-placeholder { background: #efe8d7; }
@@ -1571,6 +1587,10 @@ body {
 
             <button id="profileMenuButton" type="button">
                 👤 Mon profil
+            </button>
+
+            <button id="leaderboardMenuButton" type="button">
+                🏆 Classement
             </button>
 
             <button>
@@ -1875,6 +1895,14 @@ body {
         <p class="profile-tracking-note">Les jetons attribués avant la mise en place de ce suivi ne peuvent pas être reconstitués.</p>
     </section>
 
+    <section id="leaderboardPage" class="leaderboard-page hidden" aria-labelledby="leaderboardTitle">
+        <button id="leaderboardBackButton" class="admin-back" type="button">← Retour à l’accueil</button>
+        <h2 id="leaderboardTitle">🏆 Classement des joueurs</h2>
+        <p class="leaderboard-intro">Les joueurs sont classés selon le nombre de cartes uniques obtenues. Les doublons ne comptent pas.</p>
+        <p id="leaderboardStatus" class="leaderboard-status" role="status" aria-live="polite">Chargement du classement...</p>
+        <div id="leaderboardList" class="leaderboard-list"></div>
+    </section>
+
     <section id="collectionPage" class="player-collection hidden">
         <h2>🃏 Mes cartes</h2>
         <p class="admin-note">Les cartes obtenues en ouvrant tes boosters apparaissent ici.</p>
@@ -2122,6 +2150,7 @@ const callGetOwnedCardNumbers = httpsCallable(functions, "getOwnedCardNumbers");
 const callGetAdminPlayers = httpsCallable(functions, "getAdminPlayers");
 const callAdjustPlayerTokens = httpsCallable(functions, "adjustPlayerTokens");
 const callRecordDailyLogin = httpsCallable(functions, "recordDailyLogin");
+const callGetLeaderboard = httpsCallable(functions, "getLeaderboard");
 
 
 
@@ -2235,6 +2264,11 @@ const profileCardsCollected = document.getElementById("profileCardsCollected");
 const profileFlames = document.getElementById("profileFlames");
 const profileStreak = document.getElementById("profileStreak");
 const profileStreakMessage = document.getElementById("profileStreakMessage");
+const leaderboardMenuButton = document.getElementById("leaderboardMenuButton");
+const leaderboardPage = document.getElementById("leaderboardPage");
+const leaderboardBackButton = document.getElementById("leaderboardBackButton");
+const leaderboardStatus = document.getElementById("leaderboardStatus");
+const leaderboardList = document.getElementById("leaderboardList");
 
 const adminButton = document.getElementById("adminButton");
 const ADMIN_EMAIL = "pierre.valentin8@gmail.com";
@@ -2428,6 +2462,7 @@ onAuthStateChanged(
         if (!user) {
             adminButton.classList.add("hidden");
             profilePage.classList.add("hidden");
+            leaderboardPage.classList.add("hidden");
             collectionPage.classList.add("hidden");
             adminPage.classList.add("hidden");
 
@@ -2661,6 +2696,7 @@ buyNormalBoosterButton.addEventListener("click", async () => {
 function showHomePage() {
     document.querySelector(".app-content").classList.remove("hidden");
     profilePage.classList.add("hidden");
+    leaderboardPage.classList.add("hidden");
     collectionPage.classList.add("hidden");
     adminPage.classList.add("hidden");
     bottomNav.classList.remove("hidden");
@@ -2702,6 +2738,7 @@ async function loadPersonalProfile() {
 profileMenuButton.addEventListener("click", async () => {
     dropdownMenu.classList.add("hidden");
     document.querySelector(".app-content").classList.add("hidden");
+    leaderboardPage.classList.add("hidden");
     collectionPage.classList.add("hidden");
     adminPage.classList.add("hidden");
     bottomNav.classList.add("hidden");
@@ -2710,6 +2747,74 @@ profileMenuButton.addEventListener("click", async () => {
 });
 
 profileBackButton.addEventListener("click", showHomePage);
+
+async function loadLeaderboard() {
+    leaderboardList.replaceChildren();
+    leaderboardStatus.textContent = "Chargement du classement...";
+    if (!auth.currentUser) {
+        leaderboardStatus.textContent = "Connecte-toi pour consulter le classement.";
+        return;
+    }
+
+    try {
+        const response = await callGetLeaderboard();
+        const players = response.data.classement || [];
+        leaderboardStatus.textContent = players.length
+            ? players.length + (players.length > 1 ? " joueurs classés • classement par cartes uniques" : " joueur classé • classement par cartes uniques")
+            : "Aucun joueur inscrit pour le moment.";
+
+        players.forEach((player) => {
+            const row = document.createElement("article");
+            row.className = "leaderboard-row";
+            const rank = document.createElement("span");
+            rank.className = "leaderboard-rank";
+            rank.textContent = "#" + player.rang;
+            const playerInfo = document.createElement("div");
+            playerInfo.className = "leaderboard-player";
+            const name = document.createElement("strong");
+            name.className = "leaderboard-name";
+            name.textContent = player.pseudo || "Joueur";
+            const total = document.createElement("span");
+            total.className = "leaderboard-total";
+            total.textContent = player.cartesUniques + (player.cartesUniques > 1 ? " cartes uniques" : " carte unique");
+            playerInfo.append(name, total);
+
+            const rarityGrid = document.createElement("div");
+            rarityGrid.className = "leaderboard-rarity-grid";
+            [
+                ["Communes", player.communes, "leaderboard-common"],
+                ["Rares", player.rares, "leaderboard-rare"],
+                ["Légendaires", player.legendaires, "leaderboard-legendary"],
+                ["Mystiques", player.mystiques, "leaderboard-mystic"],
+            ].forEach(([label, count, className]) => {
+                const chip = document.createElement("span");
+                chip.className = "leaderboard-rarity " + className;
+                chip.textContent = label + " : " + count;
+                rarityGrid.append(chip);
+            });
+            row.append(rank, playerInfo, rarityGrid);
+            leaderboardList.append(row);
+        });
+    } catch (error) {
+        console.error("Erreur de chargement du classement :", error);
+        leaderboardStatus.textContent = error.code === "functions/unauthenticated"
+            ? "Connecte-toi pour consulter le classement."
+            : "Impossible de charger le classement. Vérifie que les fonctions Firebase sont déployées.";
+    }
+}
+
+leaderboardMenuButton.addEventListener("click", async () => {
+    dropdownMenu.classList.add("hidden");
+    document.querySelector(".app-content").classList.add("hidden");
+    profilePage.classList.add("hidden");
+    collectionPage.classList.add("hidden");
+    adminPage.classList.add("hidden");
+    bottomNav.classList.add("hidden");
+    leaderboardPage.classList.remove("hidden");
+    await loadLeaderboard();
+});
+
+leaderboardBackButton.addEventListener("click", showHomePage);
 
 async function loadOwnedPlayerCards() {
     ownedPlayerCardGrid.replaceChildren();
@@ -2956,6 +3061,8 @@ homeNavButton.addEventListener("click", showHomePage);
 
 collectionNavButton.addEventListener("click", async () => {
     document.querySelector(".app-content").classList.add("hidden");
+    profilePage.classList.add("hidden");
+    leaderboardPage.classList.add("hidden");
     adminPage.classList.add("hidden");
     collectionPage.classList.remove("hidden");
     bottomNav.classList.remove("hidden");
@@ -3340,6 +3447,8 @@ adminButton.addEventListener("click", async () => {
     if (!auth.currentUser || (auth.currentUser.email || "").toLowerCase() !== ADMIN_EMAIL) return;
     dropdownMenu.classList.add("hidden");
     document.querySelector(".app-content").classList.add("hidden");
+    profilePage.classList.add("hidden");
+    leaderboardPage.classList.add("hidden");
     collectionPage.classList.add("hidden");
     bottomNav.classList.add("hidden");
     adminPage.classList.remove("hidden");
