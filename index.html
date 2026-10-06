@@ -1368,21 +1368,21 @@ body {
 .player-profile { width: 100%; max-width: 760px; min-height: calc(100dvh - 70px); margin: auto; padding: 24px 16px 100px; color: var(--theme-cream); }
 .player-profile h2 { margin-top: 20px; color: var(--theme-gold-light); font-size: 24px; }
 .profile-page-intro { margin-top: 7px; color: #c6d2e5; font-size: 14px; }
-.profile-level-card { margin-top: 18px; padding: 17px; border: 1px solid rgba(243, 191, 56, .7); border-radius: 18px; background: var(--theme-cream); color: var(--theme-ink); box-shadow: 0 12px 28px rgba(0, 0, 0, .25); }
+.profile-level-card { margin-top: 12px; padding: 10px 13px; border: 1px solid rgba(243, 191, 56, .7); border-radius: 14px; background: var(--theme-cream); color: var(--theme-ink); box-shadow: 0 8px 18px rgba(0, 0, 0, .2); }
 .profile-level-heading { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
-.profile-level-heading strong { color: var(--theme-ink); font-size: 18px; }
-.profile-level-heading span, .profile-xp-caption { color: #69788e; font-size: 12px; }
-.profile-xp-track { height: 14px; overflow: hidden; margin-top: 12px; border: 1px solid #dfd2b5; border-radius: 999px; background: #e9e2d1; }
+.profile-level-heading strong { color: var(--theme-ink); font-size: 15px; }
+.profile-level-heading span, .profile-xp-caption { color: #69788e; font-size: 11px; }
+.profile-xp-track { height: 8px; overflow: hidden; margin-top: 7px; border: 1px solid #dfd2b5; border-radius: 999px; background: #e9e2d1; }
 .profile-xp-fill { width: 0; height: 100%; border-radius: inherit; background: linear-gradient(90deg, #e7ab1d, #ffdb65); transition: width .35s ease; }
-.profile-xp-caption { display: block; margin-top: 7px; }
-.profile-roadmap-title { margin-top: 24px; color: var(--theme-gold-light); font-size: 18px; }
-.profile-roadmap { display: grid; gap: 9px; margin-top: 12px; padding: 0; list-style: none; }
-.profile-roadmap-item { display: grid; grid-template-columns: 52px minmax(0, 1fr) auto; align-items: center; gap: 10px; padding: 11px 13px; border: 1px solid rgba(243, 191, 56, .5); border-radius: 13px; background: rgba(251, 250, 245, .97); color: var(--theme-ink); }
-.profile-roadmap-level { color: #805a05; font-size: 13px; font-weight: 900; }
-.profile-roadmap-reward { font-size: 13px; line-height: 1.35; }
-.profile-roadmap-state { color: #69788e; font-size: 10px; font-weight: 700; text-align: right; }
-.profile-roadmap-item.is-current { outline: 2px solid var(--theme-gold); }
-.profile-roadmap-item.is-reached .profile-roadmap-state { color: #267447; }
+.profile-xp-caption { display: block; margin-top: 4px; }
+.profile-roadmap-title { margin-top: 17px; color: #c6d2e5; font-size: 13px; font-weight: 700; }
+.profile-roadmap { display: grid; gap: 5px; margin-top: 7px; padding: 0; list-style: none; }
+.profile-roadmap-item { display: grid; grid-template-columns: 44px minmax(0, 1fr) auto; align-items: center; gap: 8px; padding: 7px 9px; border: 1px solid rgba(243, 191, 56, .22); border-radius: 10px; background: rgba(251, 250, 245, .07); color: var(--theme-cream); }
+.profile-roadmap-level { color: #e9c96d; font-size: 11px; font-weight: 800; }
+.profile-roadmap-reward { color: #e1e7f0; font-size: 11px; line-height: 1.3; }
+.profile-roadmap-state { color: #9eacc0; font-size: 9px; font-weight: 600; text-align: right; }
+.profile-roadmap-item.is-current { border-color: rgba(243, 191, 56, .55); }
+.profile-roadmap-item.is-reached .profile-roadmap-state { color: #9dd5af; }
 .profile-tracking-note { margin-top: 14px; color: #b8c7dc; font-size: 11px; line-height: 1.45; text-align: center; }
 .profile-stats-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 13px; margin-top: 20px; }
 .profile-stat { min-height: 150px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 7px; padding: 18px 12px; border: 1px solid rgba(243, 191, 56, .68); border-radius: 18px; background: var(--theme-cream); color: var(--theme-ink); text-align: center; box-shadow: 0 12px 28px rgba(0, 0, 0, .25); }
@@ -2785,13 +2785,13 @@ function renderProfileLevelProgress(totalXp) {
         profileXpTrack.setAttribute("aria-valuenow", String(Math.round(percentage)));
     }
 
-    const rewards = {
-        5: "🎁 Un booster classique offert",
-        10: "🤝 Déblocage prévu des échanges entre joueurs",
-        15: "🎁 Un booster classique offert"
-    };
+    const rewards = [
+        [5, "🎁 Booster classique offert"],
+        [10, "🤝 Échanges entre joueurs"],
+        [15, "🎁 Booster classique offert"]
+    ];
     profileLevelRoadmap.replaceChildren();
-    for (let level = 2; level <= 15; level += 1) {
+    rewards.forEach(([level, rewardText]) => {
         const item = document.createElement("li");
         item.className = "profile-roadmap-item";
         if (level === progress.level) item.classList.add("is-current");
@@ -2801,13 +2801,25 @@ function renderProfileLevelProgress(totalXp) {
         levelLabel.textContent = "Niveau " + level;
         const reward = document.createElement("span");
         reward.className = "profile-roadmap-reward";
-        reward.textContent = rewards[level] || "Aucun avantage prévu pour le moment";
+        reward.textContent = rewardText;
         const state = document.createElement("span");
         state.className = "profile-roadmap-state";
-        state.textContent = level < progress.level ? "Niveau atteint" : level === progress.level ? "Niveau actuel" : "À venir";
+        state.textContent = level < progress.level
+            ? "Niveau atteint"
+            : level === progress.level
+                ? "Niveau actuel"
+                : totalXpRequiredForLevel(level).toLocaleString("fr-FR") + " XP requis";
         item.append(levelLabel, reward, state);
         profileLevelRoadmap.append(item);
+    });
+}
+
+function totalXpRequiredForLevel(targetLevel) {
+    let total = 0;
+    for (let level = 1; level < targetLevel; level += 1) {
+        total += 100 + (level - 1) * 50;
     }
+    return total;
 }
 
 playerAvatar.addEventListener("click", async () => {
