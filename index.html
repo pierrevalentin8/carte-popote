@@ -1103,6 +1103,7 @@ body {
 .booster-modal-content h2 { color: #173b52; margin-bottom: 6px; }
 .booster-modal-actions { display: flex; gap: 10px; margin-top: 16px; }
 .booster-modal-actions button { flex: 1; }
+@media (max-width: 600px) { .booster-modal-actions { flex-direction: column; } }
 .owned-card-grid { margin-bottom: 24px; }
 
 /* Écran de connexion : thème bleu nuit et or, conçu d’abord pour mobile. */
@@ -1918,6 +1919,7 @@ body {
             <div class="booster-modal-actions">
                 <button id="closeBoosterResultButton" class="secondary-button" type="button">Fermer</button>
                 <button id="viewOwnedCardsButton" class="primary-button" type="button">Voir ma collection</button>
+                <button id="openNextBoosterButton" class="primary-button hidden" type="button">Ouvrir le booster suivant</button>
             </div>
         </div>
     </section>
@@ -2278,6 +2280,7 @@ const openDailyBoosterButton = document.getElementById("openDailyBoosterButton")
 const boosterPurchaseStatus = document.getElementById("boosterPurchaseStatus");
 const boosterResultModal = document.getElementById("boosterResultModal");
 const boosterResultGrid = document.getElementById("boosterResultGrid");
+const openNextBoosterButton = document.getElementById("openNextBoosterButton");
 const ownedCardsStatus = document.getElementById("ownedCardsStatus");
 const ownedPlayerCardGrid = document.getElementById("ownedPlayerCardGrid");
 const adminPage = document.getElementById("adminPage");
@@ -2927,6 +2930,7 @@ function setOpenBoosterButton(count) {
     const available = Number(count) || 0;
     openNormalBoosterButton.textContent = "Ouvrir un booster (" + available + ")";
     openNormalBoosterButton.disabled = available < 1;
+    openNextBoosterButton.classList.toggle("hidden", available < 1);
 }
 
 function getParisDateKey() {
@@ -2989,6 +2993,12 @@ document.getElementById("viewOwnedCardsButton").addEventListener("click", async 
     homeNavButton.classList.remove("active");
     collectionNavButton.classList.add("active");
     await loadOwnedPlayerCards();
+});
+
+openNextBoosterButton.addEventListener("click", () => {
+    if (openNextBoosterButton.classList.contains("hidden") || openNormalBoosterButton.disabled) return;
+    boosterResultModal.classList.add("hidden");
+    openNormalBoosterButton.click();
 });
 
 openNormalBoosterButton.addEventListener("click", async () => {
