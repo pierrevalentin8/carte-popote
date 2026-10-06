@@ -1427,6 +1427,7 @@ body {
 .nav-item { color: #b4c1d5; }
 .nav-item.active { color: var(--theme-gold-light); }
 .nav-item:disabled { color: #8290a4; }
+.nav-unlock-notice { position: fixed; z-index: 120; right: 16px; bottom: 82px; left: 16px; width: fit-content; max-width: 440px; margin: 0 auto; padding: 11px 16px; border: 1px solid rgba(243, 191, 56, .7); border-radius: 12px; background: #10264a; color: #fbfaf5; font-size: 13px; line-height: 1.4; text-align: center; box-shadow: 0 8px 24px rgba(0, 0, 0, .32); }
 @media (max-width: 380px) {
     .app-content { padding-left: 11px; padding-right: 11px; }
     .boosters { gap: 8px; }
@@ -2025,7 +2026,7 @@ body {
         </button>
 
 
-        <button class="nav-item" type="button" disabled title="Bientôt disponible">
+        <button id="exchangeNavButton" class="nav-item" type="button" aria-describedby="exchangeUnlockNotice">
 
             <span class="nav-icon">
                 🔄
@@ -2048,6 +2049,10 @@ body {
 
 
     </nav>
+
+    <div id="exchangeUnlockNotice" class="nav-unlock-notice hidden" role="status" aria-live="polite">
+        Les échanges entre joueurs se débloquent au niveau 10.
+    </div>
 
 
 </section>
@@ -2348,6 +2353,14 @@ const cardCancelEdit = document.getElementById("cardCancelEdit");
 const adminStatus = document.getElementById("adminStatus");
 const cardsList = document.getElementById("cardsList");
 const bottomNav = document.querySelector(".bottom-nav");
+const exchangeNavButton = document.getElementById("exchangeNavButton");
+const exchangeUnlockNotice = document.getElementById("exchangeUnlockNotice");
+let exchangeNoticeTimeout = null;
+exchangeNavButton.addEventListener("click", () => {
+    exchangeUnlockNotice.classList.remove("hidden");
+    if (exchangeNoticeTimeout) clearTimeout(exchangeNoticeTimeout);
+    exchangeNoticeTimeout = setTimeout(() => exchangeUnlockNotice.classList.add("hidden"), 4000);
+});
 let editingCardId = null;
 let editingRarityId = null;
 const RARITY_COLORS = {
