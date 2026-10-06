@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="fr">
 
@@ -1342,6 +1341,11 @@ body {
 .booster button:disabled { background: #d8d5cc; border-color: #c6c1b5; color: #696b70; opacity: 1; }
 .admin-page h2, .player-collection h2 { color: var(--theme-gold-light); }
 .admin-page .admin-panel { color: var(--theme-ink); }
+.admin-menu { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; margin: 18px 0 12px; }
+.admin-menu-button { min-height: 56px; padding: 11px 12px; border: 1px solid rgba(243, 191, 56, .72); border-radius: 13px; background: #10264a; color: var(--theme-cream); font: inherit; font-weight: 700; cursor: pointer; transition: background .16s ease, transform .16s ease, color .16s ease; }
+.admin-menu-button:hover { transform: translateY(-1px); background: #183966; }
+.admin-menu-button[aria-pressed="true"] { background: linear-gradient(135deg, var(--theme-gold-light), #edb52b); color: var(--theme-navy); }
+.admin-section { scroll-margin-top: 82px; }
 .admin-page > .admin-note, .player-collection .admin-note, .player-collection .admin-status { color: #c6d2e5; }
 .admin-panel h3 { color: var(--theme-ink); }
 .admin-panel .secondary-button, .booster-modal-actions .secondary-button, .admin-back {
@@ -1377,6 +1381,10 @@ body {
     .booster button { font-size: 12px; }
     .stats { gap: 6px; }
     .stat-label { font-size: 9px; }
+}
+@media (max-width: 520px) {
+    .admin-menu { grid-template-columns: 1fr; gap: 8px; }
+    .admin-menu-button { min-height: 48px; text-align: left; }
 }
 </style>
 
@@ -1845,13 +1853,20 @@ body {
         <button id="adminBackButton" class="admin-back" type="button">← Retour à l’accueil</button>
         <h2>🛡️ Administration</h2>
         <p class="admin-note">Gestion des joueurs, des raretés et des cartes. Les accès sont protégés par les règles Firestore.</p>
-        <div class="admin-panel" style="margin-bottom:16px">
+        <nav class="admin-menu" aria-label="Rubriques d’administration">
+            <button class="admin-menu-button" type="button" data-admin-section="players" aria-controls="adminPlayersSection" aria-pressed="false">👥 Joueurs</button>
+            <button class="admin-menu-button" type="button" data-admin-section="rarities" aria-controls="adminRaritiesSection" aria-pressed="false">⭐ Catégories de rareté</button>
+            <button class="admin-menu-button" type="button" data-admin-section="cards" aria-controls="adminCardsSection" aria-pressed="false">🃏 Création de cartes</button>
+        </nav>
+        <p id="adminSectionHint" class="admin-note">Choisis une rubrique pour afficher son contenu.</p>
+        <div id="adminPlayersSection" class="admin-panel admin-section hidden" style="margin-bottom:16px">
             <h3>👥 Joueurs</h3>
             <p class="admin-note">Tu peux ajouter ou retirer des jetons. Un achat de booster débite uniquement le prix prévu par les règles du jeu.</p>
+            <p id="playersCount" class="admin-note">Nombre de joueurs inscrits : —</p>
             <p id="playersStatus" class="admin-status" role="status"></p>
             <div id="playersList"></div>
         </div>
-        <div class="admin-panel" style="margin-bottom:16px">
+        <div id="adminRaritiesSection" class="admin-panel admin-section hidden" style="margin-bottom:16px">
             <h3>Catégories de rareté et apparition</h3>
             <p class="admin-note">Les pourcentages définissent la chance d’apparition. Leur total ne peut pas dépasser 100 %.</p>
             <form id="rarityForm">
@@ -1863,7 +1878,7 @@ body {
             <p id="rarityStatus" class="admin-status" role="status"></p>
             <div id="raritiesList"></div>
         </div>
-        <div class="admin-panel">
+        <div id="adminCardsSection" class="admin-panel admin-section hidden">
             <form id="cardForm">
                 <input id="cardName" class="admin-field" type="text" maxlength="80" placeholder="Nom de la carte" required>
                 <input id="cardCategory" class="admin-field" type="text" maxlength="50" placeholder="Catégorie" required>
@@ -2059,6 +2074,8 @@ const functions = getFunctions(app, "europe-west1");
 const callOpenClassicBooster = httpsCallable(functions, "openClassicBooster");
 const callOpenDailyBooster = httpsCallable(functions, "openDailyBooster");
 const callGetOwnedCardNumbers = httpsCallable(functions, "getOwnedCardNumbers");
+const callGetAdminPlayers = httpsCallable(functions, "getAdminPlayers");
+const callAdjustPlayerTokens = httpsCallable(functions, "adjustPlayerTokens");
 
 
 
@@ -2174,12 +2191,19 @@ const boosterResultGrid = document.getElementById("boosterResultGrid");
 const ownedCardsStatus = document.getElementById("ownedCardsStatus");
 const ownedPlayerCardGrid = document.getElementById("ownedPlayerCardGrid");
 const adminPage = document.getElementById("adminPage");
+const adminSectionHint = document.getElementById("adminSectionHint");
+const adminSections = {
+    players: document.getElementById("adminPlayersSection"),
+    rarities: document.getElementById("adminRaritiesSection"),
+    cards: document.getElementById("adminCardsSection")
+};
 const collectionPage = document.getElementById("collectionPage");
 const homeNavButton = document.getElementById("homeNavButton");
 const collectionNavButton = document.getElementById("collectionNavButton");
 const adminBackButton = document.getElementById("adminBackButton");
 const playersStatus = document.getElementById("playersStatus");
 const playersList = document.getElementById("playersList");
+const playersCount = document.getElementById("playersCount");
 const rarityForm = document.getElementById("rarityForm");
 const rarityName = document.getElementById("rarityName");
 const rarityPercentage = document.getElementById("rarityPercentage");
@@ -3083,9 +3107,27 @@ function closeAdminPage() {
     showHomePage();
 }
 
+async function showAdminSection(sectionName) {
+    Object.entries(adminSections).forEach(([name, section]) => {
+        section.classList.toggle("hidden", name !== sectionName);
+    });
+    adminSectionHint.classList.add("hidden");
+    document.querySelectorAll(".admin-menu-button").forEach((button) => {
+        button.setAttribute("aria-pressed", String(button.dataset.adminSection === sectionName));
+    });
+
+    if (sectionName === "players") await loadPlayers();
+    if (sectionName === "rarities") await loadRarities();
+    if (sectionName === "cards") {
+        await loadRarities();
+        await loadCards();
+    }
+}
+
 async function loadPlayers() {
     playersList.replaceChildren();
     playersStatus.textContent = "Chargement des joueurs...";
+    playersCount.textContent = "Nombre de joueurs inscrits : —";
 
     if (!auth.currentUser || (auth.currentUser.email || "").toLowerCase() !== ADMIN_EMAIL) {
         playersStatus.textContent = "Accès réservé au compte Admin.";
@@ -3093,18 +3135,20 @@ async function loadPlayers() {
     }
 
     try {
-        const snapshot = await getDocs(collection(db, "players"));
-        const players = snapshot.docs
-            .map((playerDoc) => ({ id: playerDoc.id, ...playerDoc.data() }))
+        const response = await callGetAdminPlayers();
+        const players = response.data.players || [];
+        const count = Number(response.data.count) || 0;
+        playersCount.textContent = count + (count > 1 ? " joueurs inscrits" : " joueur inscrit");
+        const sortedPlayers = players
             .sort((a, b) => (a.pseudo || a.email || "").localeCompare(b.pseudo || b.email || "", "fr"));
 
-        if (players.length === 0) {
+        if (sortedPlayers.length === 0) {
             playersStatus.textContent = "Aucun joueur inscrit pour le moment.";
             return;
         }
 
         playersStatus.textContent = "";
-        players.forEach((player) => {
+        sortedPlayers.forEach((player) => {
             const row = document.createElement("div");
             row.className = "admin-card-row";
             const details = document.createElement("div");
@@ -3146,30 +3190,23 @@ async function loadPlayers() {
                 removeButton.disabled = true;
                 playersStatus.textContent = direction > 0 ? "Attribution des jetons..." : "Retrait des jetons...";
                 try {
-                    const playerRef = doc(db, "players", player.id);
-                    await runTransaction(db, async (transaction) => {
-                        const playerSnapshot = await transaction.get(playerRef);
-                        if (!playerSnapshot.exists()) throw new Error("Joueur introuvable.");
-                        const currentTokens = Number(playerSnapshot.data().tokens) || 0;
-                        const updatedTokens = currentTokens + direction * amount;
-                        if (!Number.isSafeInteger(currentTokens) || !Number.isSafeInteger(updatedTokens) || currentTokens < 0 || updatedTokens < 0) {
-                            throw new Error("INSUFFICIENT_TOKENS");
-                        }
-                        if (updatedTokens > 1000000000) {
-                            throw new Error("Le solde de jetons dépasse la limite autorisée.");
-                        }
-                        transaction.update(playerRef, { tokens: updatedTokens });
+                    await callAdjustPlayerTokens({
+                        playerId: player.id,
+                        amount,
+                        direction: direction > 0 ? "add" : "remove"
                     });
                     await loadPlayers();
                     playersStatus.textContent = direction > 0
                         ? amount + " jeton(s) attribué(s) à " + (player.pseudo || player.email || "ce joueur") + "."
                         : amount + " jeton(s) retiré(s) à " + (player.pseudo || player.email || "ce joueur") + ".";
                 } catch (error) {
-                    if (error.message === "INSUFFICIENT_TOKENS") {
-                        playersStatus.textContent = "Retrait impossible : le joueur n’a pas assez de jetons.";
+                    if (error.code === "functions/failed-precondition") {
+                        playersStatus.textContent = error.message || "Le joueur n’a pas assez de jetons pour ce retrait.";
+                    } else if (error.code === "functions/permission-denied") {
+                        playersStatus.textContent = "Accès refusé. Vérifie que tu es connecté avec le compte Admin.";
                     } else {
                         console.error("Erreur de modification des jetons :", error);
-                        playersStatus.textContent = "Impossible de modifier les jetons. Vérifie les règles Firestore publiées.";
+                        playersStatus.textContent = "Impossible de modifier les jetons. Vérifie que les fonctions Firebase sont déployées.";
                     }
                     grantButton.disabled = false;
                     removeButton.disabled = false;
@@ -3184,7 +3221,9 @@ async function loadPlayers() {
         });
     } catch (error) {
         console.error("Erreur de chargement des joueurs :", error);
-        playersStatus.textContent = "Impossible de charger les joueurs. Vérifie les règles Firestore publiées.";
+        playersStatus.textContent = error.code === "functions/permission-denied"
+            ? "Accès refusé. Vérifie que tu es connecté avec le compte Admin."
+            : "Impossible de charger les joueurs. Déploie les fonctions Firebase mises à jour.";
     }
 }
 
@@ -3195,9 +3234,13 @@ adminButton.addEventListener("click", async () => {
     collectionPage.classList.add("hidden");
     bottomNav.classList.add("hidden");
     adminPage.classList.remove("hidden");
-    await loadPlayers();
-    await loadRarities();
-    await loadCards();
+    Object.values(adminSections).forEach((section) => section.classList.add("hidden"));
+    adminSectionHint.classList.remove("hidden");
+    document.querySelectorAll(".admin-menu-button").forEach((button) => button.setAttribute("aria-pressed", "false"));
+});
+
+document.querySelectorAll(".admin-menu-button").forEach((button) => {
+    button.addEventListener("click", () => showAdminSection(button.dataset.adminSection));
 });
 
 adminBackButton.addEventListener("click", closeAdminPage);
