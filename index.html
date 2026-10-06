@@ -1108,9 +1108,20 @@ body {
 .booster-modal { position: fixed; inset: 0; z-index: 500; display: grid; place-items: center; padding: 16px; background: rgba(15, 42, 58, .68); }
 .booster-modal-content { width: min(100%, 760px); max-height: 92vh; overflow: auto; padding: 20px; border-radius: 20px; background: #fff; box-shadow: 0 16px 48px rgba(0,0,0,.25); }
 .booster-modal-content h2 { color: #173b52; margin-bottom: 6px; }
+.booster-pack-reveal { position: relative; display: flex; min-height: 250px; flex-direction: column; align-items: center; justify-content: center; gap: 10px; overflow: hidden; margin-top: 10px; border-radius: 16px; background: radial-gradient(circle, #fff5cc 0%, #f8efd9 42%, #fff 78%); }
+.booster-pack-reveal img { position: relative; z-index: 1; display: block; width: clamp(105px, 30vw, 150px); max-height: 210px; object-fit: contain; filter: drop-shadow(0 10px 14px rgba(8, 24, 49, .35)); }
+.booster-pack-reveal p { position: relative; z-index: 1; margin: 0; color: #173b52; font-size: 13px; font-weight: 800; text-align: center; }
+.booster-pack-reveal.is-opening img { animation: booster-opening .95s ease-in-out both; }
+.booster-pack-reveal.is-opening::before { position: absolute; inset: 15%; border-radius: 50%; background: #ffd95a; content: ""; opacity: 0; animation: booster-flash .95s ease-out both; }
+.booster-result-grid { grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 9px; }
+.booster-card-reveal { opacity: 0; transform: rotateY(65deg) scale(.88); animation: booster-card-reveal .55s cubic-bezier(.2,.8,.2,1) both; animation-delay: var(--card-reveal-delay, 0ms); }
+@keyframes booster-opening { 0%, 100% { transform: rotate(0) scale(1); } 15% { transform: rotate(-7deg) translateX(-5px); } 30% { transform: rotate(7deg) translateX(5px); } 45% { transform: rotate(-5deg); } 60% { transform: rotate(5deg); } 78% { transform: translateY(-10px) scale(1.08); } }
+@keyframes booster-flash { 25% { opacity: .2; transform: scale(.65); } 68% { opacity: .9; transform: scale(1.25); } 100% { opacity: 0; transform: scale(1.8); } }
+@keyframes booster-card-reveal { to { opacity: 1; transform: rotateY(0) scale(1); } }
 .booster-modal-actions { display: flex; gap: 10px; margin-top: 16px; }
 .booster-modal-actions button { flex: 1; }
 @media (max-width: 600px) { .booster-modal-actions { flex-direction: column; } }
+@media (prefers-reduced-motion: reduce) { .booster-pack-reveal.is-opening img, .booster-pack-reveal.is-opening::before, .booster-card-reveal { animation-duration: .01ms; animation-delay: 0ms; } }
 .owned-card-grid { margin-bottom: 24px; }
 
 /* Écran de connexion : thème bleu nuit et or, conçu d’abord pour mobile. */
@@ -1933,7 +1944,11 @@ body {
         <div class="booster-modal-content">
             <h2 id="boosterResultTitle">🎉 Booster ouvert !</h2>
             <p id="boosterResultDescription" class="admin-note">Les cartes ont été ajoutées à ta collection.</p>
-            <div id="boosterResultGrid" class="player-card-grid"></div>
+            <div id="boosterPackReveal" class="booster-pack-reveal hidden" aria-live="polite">
+                <img id="boosterRevealImage" src="./Booster%20normal.png" alt="Booster en cours d’ouverture">
+                <p id="boosterRevealLabel">Le booster s’ouvre…</p>
+            </div>
+            <div id="boosterResultGrid" class="player-card-grid booster-result-grid hidden"></div>
             <div class="booster-modal-actions">
                 <button id="closeBoosterResultButton" class="secondary-button" type="button">Fermer</button>
                 <button id="viewOwnedCardsButton" class="primary-button" type="button">Voir ma collection</button>
@@ -2307,6 +2322,12 @@ const boosterPurchaseStatus = document.getElementById("boosterPurchaseStatus");
 const boosterResultModal = document.getElementById("boosterResultModal");
 const boosterResultGrid = document.getElementById("boosterResultGrid");
 const openNextBoosterButton = document.getElementById("openNextBoosterButton");
+const boosterPackReveal = document.getElementById("boosterPackReveal");
+const boosterRevealImage = document.getElementById("boosterRevealImage");
+const boosterRevealLabel = document.getElementById("boosterRevealLabel");
+const boosterResultTitle = document.getElementById("boosterResultTitle");
+const boosterResultDescription = document.getElementById("boosterResultDescription");
+const viewOwnedCardsButton = document.getElementById("viewOwnedCardsButton");
 const ownedCardsStatus = document.getElementById("ownedCardsStatus");
 const ownedPlayerCardGrid = document.getElementById("ownedPlayerCardGrid");
 const adminPage = document.getElementById("adminPage");
@@ -3044,15 +3065,52 @@ function updatePlayerXpDisplay(totalXp) {
     document.getElementById("xpProgress").style.width = `${Math.min((progress.remainingXp / progress.xpForNextLevel) * 100, 100)}%`;
 }
 
-function showBoosterResults(cards, boostersOfferts = 0) {
+function wait(milliseconds) {
+    return new Promise((resolve) => setTimeout(resolve, milliseconds));
+}
+
+async function showBoosterResults(cards, boostersOfferts = 0, boosterType = "classique") {
+    const groupedCards = groupCardCopies(cards);
     boosterResultGrid.replaceChildren();
-    groupCardCopies(cards).forEach((card) => boosterResultGrid.append(createPlayerCardElement(card, card.quantity)));
+    boosterResultTitle.textContent = "🎁 Ton booster arrive !";
+    boosterResultDescription.textContent = "Le booster s’ouvre…";
+    boosterRevealImage.src = boosterType === "journalier" ? "./Booster%20Journalier.png" : "./Booster%20normal.png";
+    boosterRevealImage.alt = boosterType === "journalier" ? "Booster journalier en cours d’ouverture" : "Booster classique en cours d’ouverture";
+    boosterRevealLabel.textContent = "Le booster s’ouvre…";
+    boosterPackReveal.classList.remove("hidden", "is-opening");
+    boosterResultGrid.classList.add("hidden");
+    viewOwnedCardsButton.disabled = true;
+    openNextBoosterButton.disabled = true;
+    boosterResultModal.classList.remove("hidden");
+
+    if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+        boosterPackReveal.classList.add("is-opening");
+        await wait(1000);
+    }
+
+    boosterPackReveal.classList.add("hidden");
+    boosterPackReveal.classList.remove("is-opening");
+    groupedCards.forEach((card, index) => {
+        const element = createPlayerCardElement(card, card.quantity);
+        element.classList.add("booster-card-reveal");
+        element.style.setProperty("--card-reveal-delay", (index * 160) + "ms");
+        boosterResultGrid.append(element);
+    });
+    boosterResultGrid.classList.remove("hidden");
+    boosterRevealLabel.textContent = "Cartes révélées !";
+    const revealDuration = window.matchMedia("(prefers-reduced-motion: reduce)").matches
+        ? 20
+        : Math.max(550, (groupedCards.length - 1) * 160 + 550);
+    await wait(revealDuration);
+
     const cardMessage = cards.length + (cards.length > 1 ? " cartes ont été ajoutées à ta collection." : " carte a été ajoutée à ta collection.");
     const rewardMessage = Number(boostersOfferts) > 0
         ? " 🎉 Nouveau palier atteint : " + boostersOfferts + (Number(boostersOfferts) > 1 ? " boosters classiques t’ont été offerts !" : " booster classique t’a été offert !")
         : "";
-    document.getElementById("boosterResultDescription").textContent = cardMessage + rewardMessage;
-    boosterResultModal.classList.remove("hidden");
+    boosterResultTitle.textContent = "🎉 Booster ouvert !";
+    boosterResultDescription.textContent = cardMessage + rewardMessage;
+    viewOwnedCardsButton.disabled = false;
+    openNextBoosterButton.disabled = false;
 }
 
 document.getElementById("closeBoosterResultButton").addEventListener("click", () => {
@@ -3090,7 +3148,7 @@ openNormalBoosterButton.addEventListener("click", async () => {
         document.getElementById("playerCards").textContent = Number(result.cartesTirees) || 0;
         updatePlayerXpDisplay(result.xp);
         boosterPurchaseStatus.textContent = "Booster ouvert : 5 cartes ajoutées à ta collection.";
-        showBoosterResults(result.cards || [], result.boostersOfferts);
+        await showBoosterResults(result.cards || [], result.boostersOfferts, "classique");
     } catch (error) {
         console.error("Erreur pendant l’ouverture du booster :", error);
         if (error.code === "functions/unauthenticated") {
@@ -3128,7 +3186,7 @@ openDailyBoosterButton.addEventListener("click", async () => {
         if (Number.isFinite(Number(result.boostersDisponibles))) setOpenBoosterButton(result.boostersDisponibles);
         setDailyBoosterButton(result.boosterJournalierDate);
         boosterPurchaseStatus.textContent = "Booster journalier ouvert : 3 cartes ajoutées à ta collection.";
-        showBoosterResults(result.cards || [], result.boostersOfferts);
+        await showBoosterResults(result.cards || [], result.boostersOfferts, "journalier");
     } catch (error) {
         console.error("Erreur pendant l’ouverture du booster journalier :", error);
         if (error.code === "functions/failed-precondition" && /déjà ouvert/i.test(error.message || "")) {
