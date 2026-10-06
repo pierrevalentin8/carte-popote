@@ -1388,12 +1388,10 @@ body {
 .profile-tracking-note { margin-top: 14px; color: #b8c7dc; font-size: 11px; line-height: 1.45; text-align: center; }
 .profile-stats-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 13px; margin-top: 20px; }
 .profile-stat { min-height: 150px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 7px; padding: 18px 12px; border: 1px solid rgba(243, 191, 56, .68); border-radius: 18px; background: var(--theme-cream); color: var(--theme-ink); text-align: center; box-shadow: 0 12px 28px rgba(0, 0, 0, .25); }
+.profile-stats-grid > .profile-stat:last-child:nth-child(odd) { grid-column: 1 / -1; }
 .profile-stat-icon { font-size: 26px; line-height: 1; }
 .profile-stat-value { color: #9a6b09; font-size: clamp(24px, 7vw, 32px); font-weight: 900; line-height: 1.1; }
 .profile-stat-label { max-width: 230px; color: #59677b; font-size: 12px; line-height: 1.4; }
-.profile-streak-stat { border-color: #ffc044; background: linear-gradient(145deg, #fffaf0, #f5e6c5); }
-.profile-flames { min-height: 36px; color: #d94812; font-size: 27px; letter-spacing: 2px; text-shadow: 0 3px 12px rgba(232, 102, 24, .35); animation: flame-glow 1.4s ease-in-out infinite alternate; }
-.profile-streak-message { color: #59677b; font-size: 11px; line-height: 1.35; }
 .leaderboard-page { width: 100%; max-width: 900px; min-height: calc(100dvh - 70px); margin: auto; padding: 24px 16px 100px; color: var(--theme-cream); }
 .leaderboard-page h2 { margin-top: 20px; color: var(--theme-gold-light); font-size: 24px; }
 .leaderboard-intro, .leaderboard-status { margin-top: 8px; color: #c6d2e5; font-size: 13px; line-height: 1.5; }
@@ -1409,11 +1407,9 @@ body {
 .leaderboard-rare { background: #dceaff; color: #18549d; }
 .leaderboard-legendary { background: #d9f3ff; color: #14779e; }
 .leaderboard-mystic { background: #efe1ff; color: #7045a3; }
-@keyframes flame-glow { from { filter: drop-shadow(0 0 1px rgba(241, 151, 25, .2)); transform: scale(1); } to { filter: drop-shadow(0 0 8px rgba(241, 111, 20, .48)); transform: scale(1.04); } }
 @media (max-width: 390px) { .player-profile { padding-left: 11px; padding-right: 11px; } .profile-stats-grid { gap: 9px; } .profile-stat { min-height: 136px; padding: 14px 8px; } .profile-stat-label { font-size: 11px; } }
 @media (max-width: 390px) { .profile-roadmap-item { grid-template-columns: 46px minmax(0, 1fr); } .profile-roadmap-state { grid-column: 2; text-align: left; } }
 @media (max-width: 600px) { .leaderboard-page { padding-left: 11px; padding-right: 11px; } .leaderboard-row { grid-template-columns: 38px minmax(0, 1fr); gap: 10px; padding: 11px; } .leaderboard-rarity-grid { grid-column: 1 / -1; grid-template-columns: repeat(2, minmax(0, 1fr)); } }
-@media (prefers-reduced-motion: reduce) { .profile-flames { animation: none; } }
 .player-card { background: var(--theme-cream); box-shadow: 0 9px 22px rgba(0, 0, 0, .28); }
 .player-card-image, .player-card-placeholder { background: #efe8d7; }
 .rarity-label { background: #f1ead9; }
@@ -1914,12 +1910,6 @@ body {
                 <span id="profileCardsCollected" class="profile-stat-value">0</span>
                 <span class="profile-stat-label">Cartes collectées au total</span>
             </article>
-            <article class="profile-stat profile-streak-stat">
-                <span id="profileFlames" class="profile-flames" aria-label="Série de connexion">🔥</span>
-                <span id="profileStreak" class="profile-stat-value">0 jour</span>
-                <span class="profile-stat-label">Connexion(s) quotidienne(s) consécutive(s)</span>
-                <span id="profileStreakMessage" class="profile-streak-message"></span>
-            </article>
         </div>
         <p class="profile-tracking-note">Les jetons attribués avant la mise en place de ce suivi ne peuvent pas être reconstitués.</p>
     </section>
@@ -2186,7 +2176,6 @@ const callOpenDailyBooster = httpsCallable(functions, "openDailyBooster");
 const callGetOwnedCardNumbers = httpsCallable(functions, "getOwnedCardNumbers");
 const callGetAdminPlayers = httpsCallable(functions, "getAdminPlayers");
 const callAdjustPlayerTokens = httpsCallable(functions, "adjustPlayerTokens");
-const callRecordDailyLogin = httpsCallable(functions, "recordDailyLogin");
 const callGetLeaderboard = httpsCallable(functions, "getLeaderboard");
 
 
@@ -2297,9 +2286,6 @@ const profileBackButton = document.getElementById("profileBackButton");
 const profileTokensEarned = document.getElementById("profileTokensEarned");
 const profileClassicBoostersOpened = document.getElementById("profileClassicBoostersOpened");
 const profileCardsCollected = document.getElementById("profileCardsCollected");
-const profileFlames = document.getElementById("profileFlames");
-const profileStreak = document.getElementById("profileStreak");
-const profileStreakMessage = document.getElementById("profileStreakMessage");
 const profileCurrentLevel = document.getElementById("profileCurrentLevel");
 const profileTotalXp = document.getElementById("profileTotalXp");
 const profileXpTrack = document.getElementById("profileXpTrack");
@@ -2669,13 +2655,6 @@ onAuthStateChanged(
                 pendingSignupAvatar = "";
             }
 
-            try {
-                await callRecordDailyLogin();
-            } catch (loginError) {
-                console.error("Impossible d’enregistrer la série de connexion :", loginError);
-            }
-
-
         }
 
         catch (error) {
@@ -2770,20 +2749,12 @@ async function loadPersonalProfile() {
         const classicCardInstances = collectionSnapshot.docs.filter((item) => item.data().boosterType === "classique").length;
         const openedClassics = Math.floor(classicCardInstances / 5);
         const cardsCollected = Number(player.cartesTirees) || 0;
-        const streak = Math.max(0, Number(player.joursConsecutifs) || 0);
 
         profileTokensEarned.textContent = earnedTokens.toLocaleString("fr-FR");
         profileClassicBoostersOpened.textContent = openedClassics.toLocaleString("fr-FR");
         profileCardsCollected.textContent = cardsCollected.toLocaleString("fr-FR");
-        profileStreak.textContent = streak + (streak > 1 ? " jours" : " jour");
-        profileFlames.textContent = streak > 0 ? "🔥".repeat(Math.min(streak, 7)) : "✨";
-        profileFlames.setAttribute("aria-label", streak + (streak > 1 ? " jours consécutifs" : " jour consécutif"));
-        profileStreakMessage.textContent = streak > 0
-            ? "Reviens demain pour garder ta série allumée !"
-            : "Connecte-toi chaque jour pour allumer une flamme.";
     } catch (error) {
         console.error("Erreur de chargement du profil personnel :", error);
-        profileStreakMessage.textContent = "Impossible de charger tes statistiques pour le moment.";
     }
 }
 
