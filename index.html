@@ -1030,6 +1030,8 @@ body {
     font-size: 20px;
 }
 
+.nav-icon svg { display: block; width: 22px; height: 22px; }
+
 
 .nav-item.active {
 
@@ -2017,11 +2019,14 @@ body {
 
         <button id="collectionNavButton" class="nav-item" type="button">
 
-            <span class="nav-icon">
-                🃏
+            <span class="nav-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M7 3.5h13.5v17H7A2.5 2.5 0 0 1 4.5 18V6A2.5 2.5 0 0 1 7 3.5Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+                    <path d="M7 3.5v17M2.8 7.2h3.5M2.8 12h3.5M2.8 16.8h3.5M10 8h7M10 12h7M10 16h5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+                </svg>
             </span>
 
-            Cartes
+            Collection
 
         </button>
 
