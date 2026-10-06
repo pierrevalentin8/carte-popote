@@ -589,7 +589,12 @@ body {
     font-size: 30px;
 
     flex-shrink: 0;
+    padding: 0;
+    border: 0;
+    cursor: pointer;
 }
+
+.avatar:focus-visible { outline: 3px solid #f0bd36; outline-offset: 3px; }
 
 .avatar img {
     display: block;
@@ -1586,10 +1591,6 @@ body {
             </button>
 
 
-            <button id="profileMenuButton" type="button">
-                👤 Mon profil
-            </button>
-
             <button id="leaderboardMenuButton" type="button">
                 🏆 Classement
             </button>
@@ -1622,9 +1623,9 @@ body {
         <section class="profile-card">
 
 
-            <div class="avatar" id="playerAvatar">
+            <button class="avatar" id="playerAvatar" type="button" aria-label="Ouvrir mon profil" title="Ouvrir mon profil">
                 👤
-            </div>
+            </button>
 
 
             <div class="profile-info">
@@ -2257,7 +2258,6 @@ const logoutButton =
         "logoutButton"
     );
 
-const profileMenuButton = document.getElementById("profileMenuButton");
 const profilePage = document.getElementById("profilePage");
 const profileBackButton = document.getElementById("profileBackButton");
 const profileTokensEarned = document.getElementById("profileTokensEarned");
@@ -2738,7 +2738,7 @@ async function loadPersonalProfile() {
     }
 }
 
-profileMenuButton.addEventListener("click", async () => {
+playerAvatar.addEventListener("click", async () => {
     dropdownMenu.classList.add("hidden");
     document.querySelector(".app-content").classList.add("hidden");
     leaderboardPage.classList.add("hidden");
