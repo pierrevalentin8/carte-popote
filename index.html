@@ -1359,6 +1359,21 @@ body {
 .admin-card-thumb, .admin-card-preview { border-color: #dfc879; background: #f3ead2; }
 .admin-card-placeholder { background: linear-gradient(145deg, #f4eddd, #e8d7a9); }
 .player-collection { color: var(--theme-cream); }
+.player-profile { width: 100%; max-width: 760px; min-height: calc(100dvh - 70px); margin: auto; padding: 24px 16px 100px; color: var(--theme-cream); }
+.player-profile h2 { margin-top: 20px; color: var(--theme-gold-light); font-size: 24px; }
+.profile-page-intro { margin-top: 7px; color: #c6d2e5; font-size: 14px; }
+.profile-tracking-note { margin-top: 14px; color: #b8c7dc; font-size: 11px; line-height: 1.45; text-align: center; }
+.profile-stats-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 13px; margin-top: 20px; }
+.profile-stat { min-height: 150px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 7px; padding: 18px 12px; border: 1px solid rgba(243, 191, 56, .68); border-radius: 18px; background: var(--theme-cream); color: var(--theme-ink); text-align: center; box-shadow: 0 12px 28px rgba(0, 0, 0, .25); }
+.profile-stat-icon { font-size: 26px; line-height: 1; }
+.profile-stat-value { color: #9a6b09; font-size: clamp(24px, 7vw, 32px); font-weight: 900; line-height: 1.1; }
+.profile-stat-label { max-width: 230px; color: #59677b; font-size: 12px; line-height: 1.4; }
+.profile-streak-stat { border-color: #ffc044; background: linear-gradient(145deg, #fffaf0, #f5e6c5); }
+.profile-flames { min-height: 36px; color: #d94812; font-size: 27px; letter-spacing: 2px; text-shadow: 0 3px 12px rgba(232, 102, 24, .35); animation: flame-glow 1.4s ease-in-out infinite alternate; }
+.profile-streak-message { color: #59677b; font-size: 11px; line-height: 1.35; }
+@keyframes flame-glow { from { filter: drop-shadow(0 0 1px rgba(241, 151, 25, .2)); transform: scale(1); } to { filter: drop-shadow(0 0 8px rgba(241, 111, 20, .48)); transform: scale(1.04); } }
+@media (max-width: 390px) { .player-profile { padding-left: 11px; padding-right: 11px; } .profile-stats-grid { gap: 9px; } .profile-stat { min-height: 136px; padding: 14px 8px; } .profile-stat-label { font-size: 11px; } }
+@media (prefers-reduced-motion: reduce) { .profile-flames { animation: none; } }
 .player-card { background: var(--theme-cream); box-shadow: 0 9px 22px rgba(0, 0, 0, .28); }
 .player-card-image, .player-card-placeholder { background: #efe8d7; }
 .rarity-label { background: #f1ead9; }
@@ -1554,7 +1569,7 @@ body {
             </button>
 
 
-            <button>
+            <button id="profileMenuButton" type="button">
                 👤 Mon profil
             </button>
 
@@ -1830,6 +1845,36 @@ body {
 
 
 
+    <section id="profilePage" class="player-profile hidden" aria-labelledby="profilePageTitle">
+        <button id="profileBackButton" class="admin-back" type="button">← Retour à l’accueil</button>
+        <h2 id="profilePageTitle">👤 Mon profil</h2>
+        <p class="profile-page-intro">Voici tes statistiques personnelles.</p>
+        <div class="profile-stats-grid">
+            <article class="profile-stat">
+                <span class="profile-stat-icon">🪙</span>
+                <span id="profileTokensEarned" class="profile-stat-value">0</span>
+                <span class="profile-stat-label">Jetons obtenus au total</span>
+            </article>
+            <article class="profile-stat">
+                <span class="profile-stat-icon">🎁</span>
+                <span id="profileClassicBoostersOpened" class="profile-stat-value">0</span>
+                <span class="profile-stat-label">Boosters classiques ouverts</span>
+            </article>
+            <article class="profile-stat">
+                <span class="profile-stat-icon">🃏</span>
+                <span id="profileCardsCollected" class="profile-stat-value">0</span>
+                <span class="profile-stat-label">Cartes collectées au total</span>
+            </article>
+            <article class="profile-stat profile-streak-stat">
+                <span id="profileFlames" class="profile-flames" aria-label="Série de connexion">🔥</span>
+                <span id="profileStreak" class="profile-stat-value">0 jour</span>
+                <span class="profile-stat-label">Connexion(s) quotidienne(s) consécutive(s)</span>
+                <span id="profileStreakMessage" class="profile-streak-message"></span>
+            </article>
+        </div>
+        <p class="profile-tracking-note">Les jetons attribués avant la mise en place de ce suivi ne peuvent pas être reconstitués.</p>
+    </section>
+
     <section id="collectionPage" class="player-collection hidden">
         <h2>🃏 Mes cartes</h2>
         <p class="admin-note">Les cartes obtenues en ouvrant tes boosters apparaissent ici.</p>
@@ -1840,7 +1885,7 @@ body {
     <section id="boosterResultModal" class="booster-modal hidden" role="dialog" aria-modal="true" aria-labelledby="boosterResultTitle">
         <div class="booster-modal-content">
             <h2 id="boosterResultTitle">🎉 Booster ouvert !</h2>
-            <p class="admin-note">Ces cinq cartes ont été ajoutées à ta collection.</p>
+            <p id="boosterResultDescription" class="admin-note">Les cartes ont été ajoutées à ta collection.</p>
             <div id="boosterResultGrid" class="player-card-grid"></div>
             <div class="booster-modal-actions">
                 <button id="closeBoosterResultButton" class="secondary-button" type="button">Fermer</button>
@@ -2076,6 +2121,7 @@ const callOpenDailyBooster = httpsCallable(functions, "openDailyBooster");
 const callGetOwnedCardNumbers = httpsCallable(functions, "getOwnedCardNumbers");
 const callGetAdminPlayers = httpsCallable(functions, "getAdminPlayers");
 const callAdjustPlayerTokens = httpsCallable(functions, "adjustPlayerTokens");
+const callRecordDailyLogin = httpsCallable(functions, "recordDailyLogin");
 
 
 
@@ -2179,6 +2225,16 @@ const logoutButton =
     document.getElementById(
         "logoutButton"
     );
+
+const profileMenuButton = document.getElementById("profileMenuButton");
+const profilePage = document.getElementById("profilePage");
+const profileBackButton = document.getElementById("profileBackButton");
+const profileTokensEarned = document.getElementById("profileTokensEarned");
+const profileClassicBoostersOpened = document.getElementById("profileClassicBoostersOpened");
+const profileCardsCollected = document.getElementById("profileCardsCollected");
+const profileFlames = document.getElementById("profileFlames");
+const profileStreak = document.getElementById("profileStreak");
+const profileStreakMessage = document.getElementById("profileStreakMessage");
 
 const adminButton = document.getElementById("adminButton");
 const ADMIN_EMAIL = "pierre.valentin8@gmail.com";
@@ -2371,6 +2427,7 @@ onAuthStateChanged(
 
         if (!user) {
             adminButton.classList.add("hidden");
+            profilePage.classList.add("hidden");
             collectionPage.classList.add("hidden");
             adminPage.classList.add("hidden");
 
@@ -2508,6 +2565,7 @@ onAuthStateChanged(
                     niveau: 1,
                     xp: 0,
                     tokens: 0,
+                    jetonsGagnes: 0,
                     cartesTirees: 0,
                     boostersAchetes: 0,
                     boostersDisponibles: 0,
@@ -2523,6 +2581,12 @@ onAuthStateChanged(
                 setOpenBoosterButton(0);
                 pendingSignupPseudo = "";
                 pendingSignupAvatar = "";
+            }
+
+            try {
+                await callRecordDailyLogin();
+            } catch (loginError) {
+                console.error("Impossible d’enregistrer la série de connexion :", loginError);
             }
 
 
@@ -2596,12 +2660,56 @@ buyNormalBoosterButton.addEventListener("click", async () => {
 
 function showHomePage() {
     document.querySelector(".app-content").classList.remove("hidden");
+    profilePage.classList.add("hidden");
     collectionPage.classList.add("hidden");
     adminPage.classList.add("hidden");
     bottomNav.classList.remove("hidden");
     homeNavButton.classList.add("active");
     collectionNavButton.classList.remove("active");
 }
+
+async function loadPersonalProfile() {
+    if (!auth.currentUser) return;
+    try {
+        const playerRef = doc(db, "players", auth.currentUser.uid);
+        const [snapshot, collectionSnapshot] = await Promise.all([
+            getDoc(playerRef),
+            getDocs(collection(db, "players", auth.currentUser.uid, "collection"))
+        ]);
+        if (!snapshot.exists()) throw new Error("PLAYER_PROFILE_MISSING");
+        const player = snapshot.data();
+        const earnedTokens = Number(player.jetonsGagnes) || 0;
+        const classicCardInstances = collectionSnapshot.docs.filter((item) => item.data().boosterType === "classique").length;
+        const openedClassics = Math.floor(classicCardInstances / 5);
+        const cardsCollected = Number(player.cartesTirees) || 0;
+        const streak = Math.max(0, Number(player.joursConsecutifs) || 0);
+
+        profileTokensEarned.textContent = earnedTokens.toLocaleString("fr-FR");
+        profileClassicBoostersOpened.textContent = openedClassics.toLocaleString("fr-FR");
+        profileCardsCollected.textContent = cardsCollected.toLocaleString("fr-FR");
+        profileStreak.textContent = streak + (streak > 1 ? " jours" : " jour");
+        profileFlames.textContent = streak > 0 ? "🔥".repeat(Math.min(streak, 7)) : "✨";
+        profileFlames.setAttribute("aria-label", streak + (streak > 1 ? " jours consécutifs" : " jour consécutif"));
+        profileStreakMessage.textContent = streak > 0
+            ? "Reviens demain pour garder ta série allumée !"
+            : "Connecte-toi chaque jour pour allumer une flamme.";
+    } catch (error) {
+        console.error("Erreur de chargement du profil personnel :", error);
+        profileStreakMessage.textContent = "Impossible de charger tes statistiques pour le moment.";
+    }
+}
+
+profileMenuButton.addEventListener("click", async () => {
+    dropdownMenu.classList.add("hidden");
+    document.querySelector(".app-content").classList.add("hidden");
+    collectionPage.classList.add("hidden");
+    adminPage.classList.add("hidden");
+    bottomNav.classList.add("hidden");
+    profilePage.classList.remove("hidden");
+    await loadPersonalProfile();
+});
+
+profileBackButton.addEventListener("click", showHomePage);
 
 async function loadOwnedPlayerCards() {
     ownedPlayerCardGrid.replaceChildren();
@@ -2757,6 +2865,7 @@ function updatePlayerXpDisplay(totalXp) {
 function showBoosterResults(cards) {
     boosterResultGrid.replaceChildren();
     groupCardCopies(cards).forEach((card) => boosterResultGrid.append(createPlayerCardElement(card, card.quantity)));
+    document.getElementById("boosterResultDescription").textContent = cards.length + (cards.length > 1 ? " cartes ont été ajoutées à ta collection." : " carte a été ajoutée à ta collection.");
     boosterResultModal.classList.remove("hidden");
 }
 
