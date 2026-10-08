@@ -1146,12 +1146,22 @@ body {
 .card-quantity-badge { position: absolute; z-index: 2; top: 8px; right: 8px; min-width: 38px; padding: 6px 9px; border: 2px solid #fff; border-radius: 999px; background: #173b52; color: #fff; text-align: center; font-size: 13px; font-weight: 800; box-shadow: 0 2px 8px rgba(0,0,0,.25); }
 .card-number-badge { position: absolute; z-index: 2; top: 8px; left: 8px; padding: 6px 9px; border: 2px solid #fff; border-radius: 999px; background: #2878D0; color: #fff; font-size: 12px; font-weight: 800; box-shadow: 0 2px 8px rgba(0,0,0,.25); }
 .player-card-image { display: block; width: 100%; aspect-ratio: 2 / 3; object-fit: cover; background: #eefaff; }
+.player-card.is-expandable { cursor: zoom-in; transition: transform .18s ease, box-shadow .18s ease; }
+.player-card.is-expandable:hover { transform: translateY(-2px); box-shadow: 0 10px 24px rgba(30,90,120,.2); }
+.player-card.is-expandable:focus-visible { outline: 3px solid #f0bd36; outline-offset: 3px; }
 .player-card-placeholder { display: grid; place-items: center; width: 100%; aspect-ratio: 2 / 3; background: #eefaff; font-size: 42px; }
 .player-card-copy { padding: 10px; }
 .player-card-copy h3 { font-size: 15px; margin-bottom: 5px; color: #173b52; }
 .player-card-copy p { font-size: 12px; color: #68899b; line-height: 1.4; margin-top: 4px; }
 .rarity-label { display: inline-block; padding: 3px 7px; border-radius: 999px; background: #f3f6f8; font-size: 11px; font-weight: 700; }
 .booster-modal { position: fixed; inset: 0; z-index: 500; display: grid; place-items: center; padding: 16px; background: rgba(15, 42, 58, .68); }
+.card-zoom-modal { position: fixed; inset: 0; z-index: 600; display: grid; place-items: center; padding: 18px; background: rgba(3, 11, 25, .86); }
+.card-zoom-content { position: relative; width: min(100%, 420px); max-height: 94dvh; overflow: auto; padding: 18px; border: 1px solid rgba(243,191,56,.8); border-radius: 20px; background: var(--theme-cream, #fff); text-align: center; box-shadow: 0 18px 55px rgba(0,0,0,.45); }
+.card-zoom-close { position: absolute; z-index: 2; top: 8px; right: 8px; width: 40px; height: 40px; border: 0; border-radius: 50%; background: #10264a; color: #fff; font-size: 25px; line-height: 1; cursor: pointer; }
+.card-zoom-image { display: block; width: min(100%, 360px); max-height: 76dvh; aspect-ratio: 2 / 3; object-fit: contain; margin: 12px auto; border-radius: 12px; }
+.card-zoom-placeholder { display: grid; place-items: center; width: min(100%, 360px); aspect-ratio: 2 / 3; margin: 12px auto; border-radius: 12px; background: #e8e1d2; font-size: 72px; }
+.card-zoom-title { margin: 8px 44px 4px; color: #10264a; font-size: 19px; }
+.card-zoom-rarity { color: #5b6472; font-weight: 700; }
 .booster-modal-content { width: min(100%, 760px); max-height: 92vh; overflow: auto; padding: 20px; border-radius: 20px; background: #fff; box-shadow: 0 16px 48px rgba(0,0,0,.25); }
 .booster-modal-content h2 { color: #173b52; margin-bottom: 6px; }
 .booster-pack-reveal { position: relative; display: flex; min-height: 250px; flex-direction: column; align-items: center; justify-content: center; gap: 10px; overflow: hidden; margin-top: 10px; border-radius: 16px; background: radial-gradient(circle, #fff5cc 0%, #f8efd9 42%, #fff 78%); }
@@ -1997,6 +2007,15 @@ body {
         <div id="ownedPlayerCardGrid" class="player-card-grid owned-card-grid"></div>
     </section>
 
+    <section id="cardZoomModal" class="card-zoom-modal hidden" role="dialog" aria-modal="true" aria-labelledby="cardZoomTitle" aria-hidden="true">
+        <div class="card-zoom-content">
+            <button id="cardZoomCloseButton" class="card-zoom-close" type="button" aria-label="Fermer l’aperçu">×</button>
+            <h2 id="cardZoomTitle" class="card-zoom-title"></h2>
+            <div id="cardZoomImageContainer"></div>
+            <p id="cardZoomRarity" class="card-zoom-rarity"></p>
+        </div>
+    </section>
+
     <section id="boosterResultModal" class="booster-modal hidden" role="dialog" aria-modal="true" aria-labelledby="boosterResultTitle">
         <div class="booster-modal-content">
             <h2 id="boosterResultTitle">🎉 Booster ouvert !</h2>
@@ -2422,6 +2441,11 @@ const boosterResultDescription = document.getElementById("boosterResultDescripti
 const viewOwnedCardsButton = document.getElementById("viewOwnedCardsButton");
 const ownedCardsStatus = document.getElementById("ownedCardsStatus");
 const ownedPlayerCardGrid = document.getElementById("ownedPlayerCardGrid");
+const cardZoomModal = document.getElementById("cardZoomModal");
+const cardZoomCloseButton = document.getElementById("cardZoomCloseButton");
+const cardZoomTitle = document.getElementById("cardZoomTitle");
+const cardZoomImageContainer = document.getElementById("cardZoomImageContainer");
+const cardZoomRarity = document.getElementById("cardZoomRarity");
 const adminPage = document.getElementById("adminPage");
 const adminSectionHint = document.getElementById("adminSectionHint");
 const adminSections = {
@@ -3099,6 +3123,10 @@ function groupCardCopies(cards) {
 function createPlayerCardElement(card, quantity = 1) {
     const cardElement = document.createElement("article");
     cardElement.className = "player-card";
+    cardElement.classList.add("is-expandable");
+    cardElement.setAttribute("role", "button");
+    cardElement.tabIndex = 0;
+    cardElement.setAttribute("aria-label", "Agrandir la carte " + (card.name || "sans nom"));
     cardElement.style.borderColor = card.rarityColor || getRarityColor(card.rarity);
     const quantityBadge = document.createElement("span");
     quantityBadge.className = "card-quantity-badge";
@@ -3148,8 +3176,55 @@ function createPlayerCardElement(card, quantity = 1) {
         copy.append(description);
     }
     cardElement.append(copy);
+    cardElement.addEventListener("click", () => openCardZoom(card));
+    cardElement.addEventListener("keydown", (event) => {
+        if (event.key === "Enter" || event.key === " ") {
+            event.preventDefault();
+            openCardZoom(card);
+        }
+    });
     return cardElement;
 }
+
+function openCardZoom(card) {
+    cardZoomTitle.textContent = card.name || "Carte sans nom";
+    cardZoomRarity.textContent = card.rarity || "Sans rareté";
+    cardZoomImageContainer.replaceChildren();
+    if (/^https?:\/\//i.test(card.imageUrl || "")) {
+        const image = document.createElement("img");
+        image.className = "card-zoom-image";
+        image.src = card.imageUrl;
+        image.alt = card.name ? "Illustration agrandie de " + card.name : "Illustration agrandie de la carte";
+        image.onerror = () => {
+            const placeholder = document.createElement("div");
+            placeholder.className = "card-zoom-placeholder";
+            placeholder.textContent = "🃏";
+            image.replaceWith(placeholder);
+        };
+        cardZoomImageContainer.append(image);
+    } else {
+        const placeholder = document.createElement("div");
+        placeholder.className = "card-zoom-placeholder";
+        placeholder.textContent = "🃏";
+        cardZoomImageContainer.append(placeholder);
+    }
+    cardZoomModal.classList.remove("hidden");
+    cardZoomModal.setAttribute("aria-hidden", "false");
+    cardZoomCloseButton.focus();
+}
+
+function closeCardZoom() {
+    cardZoomModal.classList.add("hidden");
+    cardZoomModal.setAttribute("aria-hidden", "true");
+}
+
+cardZoomCloseButton.addEventListener("click", closeCardZoom);
+cardZoomModal.addEventListener("click", (event) => {
+    if (event.target === cardZoomModal) closeCardZoom();
+});
+document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape" && !cardZoomModal.classList.contains("hidden")) closeCardZoom();
+});
 
 function setOpenBoosterButton(count) {
     const available = Number(count) || 0;
