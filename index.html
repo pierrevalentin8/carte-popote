@@ -1469,7 +1469,7 @@ body {
 .leaderboard-rarity { padding: 7px 5px; border-radius: 9px; text-align: center; font-size: 10px; font-weight: 700; line-height: 1.25; }
 .leaderboard-common { background: #e8e8e8; color: #4d4d4d; }
 .leaderboard-rare { background: #dceaff; color: #18549d; }
-.leaderboard-legendary { background: #d9f3ff; color: #14779e; }
+.leaderboard-legendary { background: #fff0bd; color: #805b08; }
 .leaderboard-mystic { background: #efe1ff; color: #7045a3; }
 @media (max-width: 390px) { .player-profile { padding-left: 11px; padding-right: 11px; } .profile-stats-grid { gap: 9px; } .profile-stat { min-height: 136px; padding: 14px 8px; } .profile-stat-label { font-size: 11px; } }
 @media (max-width: 390px) { .profile-roadmap-item { grid-template-columns: 46px minmax(0, 1fr); } .profile-roadmap-state { grid-column: 2; text-align: left; } }
@@ -2515,12 +2515,17 @@ let editingRarityId = null;
 const RARITY_COLORS = {
     "commune": "#9E9E9E",
     "rare": "#2878D0",
-    "légendaire": "#7DD3FC",
+    "légendaire": "#D4AF37",
     "mystique": "#C4A1E8"
 };
 
 function getRarityColor(name) {
     return RARITY_COLORS[(name || "").trim().toLocaleLowerCase("fr")] || "#9E9E9E";
+}
+
+function getCardRarityColor(card) {
+    const rarityKey = (card?.rarity || "").trim().toLocaleLowerCase("fr");
+    return RARITY_COLORS[rarityKey] || card?.rarityColor || getRarityColor(card?.rarity);
 }
 
 cardRarity.addEventListener("change", () => {
@@ -3127,7 +3132,7 @@ function createPlayerCardElement(card, quantity = 1) {
     cardElement.setAttribute("role", "button");
     cardElement.tabIndex = 0;
     cardElement.setAttribute("aria-label", "Agrandir la carte " + (card.name || "sans nom"));
-    cardElement.style.borderColor = card.rarityColor || getRarityColor(card.rarity);
+    cardElement.style.borderColor = getCardRarityColor(card);
     const quantityBadge = document.createElement("span");
     quantityBadge.className = "card-quantity-badge";
     quantityBadge.textContent = "×" + quantity;
@@ -3166,7 +3171,7 @@ function createPlayerCardElement(card, quantity = 1) {
     const rarity = document.createElement("span");
     rarity.className = "rarity-label";
     rarity.textContent = card.rarity || "Sans rareté";
-    rarity.style.color = card.rarityColor || getRarityColor(card.rarity);
+    rarity.style.color = getCardRarityColor(card);
     const category = document.createElement("p");
     category.textContent = card.category || "";
     copy.append(title, rarity, category);
@@ -3586,7 +3591,7 @@ function createAdminCardRow(cardDoc) {
     if (/^https?:\/\//i.test(visualUrl)) {
         visual = document.createElement("img");
         visual.className = "admin-card-thumb";
-        visual.style.border = "4px solid " + (card.rarityColor || getRarityColor(card.rarity));
+        visual.style.border = "4px solid " + getCardRarityColor(card);
         visual.src = visualUrl;
         visual.alt = card.name ? "Visuel de " + card.name : "Visuel de la carte";
         visual.loading = "lazy";
@@ -3594,7 +3599,7 @@ function createAdminCardRow(cardDoc) {
         visual.onerror = () => {
             const placeholder = document.createElement("div");
             placeholder.className = "admin-card-placeholder";
-            placeholder.style.border = "4px solid " + (card.rarityColor || getRarityColor(card.rarity));
+            placeholder.style.border = "4px solid " + getCardRarityColor(card);
             placeholder.textContent = "🃏";
             visual.replaceWith(placeholder);
         };
