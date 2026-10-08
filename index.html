@@ -1457,6 +1457,19 @@ body {
 .profile-stat-value { color: #9a6b09; font-size: clamp(24px, 7vw, 32px); font-weight: 900; line-height: 1.1; }
 .profile-stat-label { max-width: 230px; color: #59677b; font-size: 12px; line-height: 1.4; }
 .leaderboard-page { width: 100%; max-width: 900px; min-height: calc(100dvh - 70px); margin: auto; padding: 24px 16px 100px; color: var(--theme-cream); }
+.statistics-page { width: 100%; max-width: 1200px; min-height: calc(100dvh - 70px); margin: auto; padding: 24px 16px 100px; color: var(--theme-cream); }
+.statistics-page h2 { margin-top: 20px; color: var(--theme-gold-light); font-size: 24px; }
+.statistics-intro, .statistics-status { margin-top: 8px; color: #c6d2e5; font-size: 13px; line-height: 1.5; }
+.statistics-table-wrap { width: 100%; margin-top: 16px; overflow-x: auto; border: 1px solid rgba(243,191,56,.65); border-radius: 14px; background: var(--theme-cream); box-shadow: 0 9px 24px rgba(0,0,0,.23); -webkit-overflow-scrolling: touch; }
+.statistics-table { width: 100%; min-width: 980px; border-collapse: collapse; color: var(--theme-ink); font-size: 13px; }
+.statistics-table th, .statistics-table td { padding: 12px 10px; border-bottom: 1px solid #e7dfce; text-align: center; white-space: nowrap; }
+.statistics-table th { position: sticky; top: 0; background: #10264a; color: var(--theme-gold-light); font-size: 12px; }
+.statistics-table th:first-child, .statistics-table td:first-child { position: sticky; left: 0; text-align: left; font-weight: 800; }
+.statistics-table th:first-child { z-index: 2; }
+.statistics-table td:first-child { z-index: 1; }
+.statistics-table td:first-child { background: var(--theme-cream); }
+.statistics-table tbody tr:last-child td { border-bottom: 0; }
+.statistics-tracking-note { margin-top: 10px; color: #c6d2e5; font-size: 12px; line-height: 1.5; }
 .leaderboard-page h2 { margin-top: 20px; color: var(--theme-gold-light); font-size: 24px; }
 .leaderboard-intro, .leaderboard-status { margin-top: 8px; color: #c6d2e5; font-size: 13px; line-height: 1.5; }
 .leaderboard-list { display: grid; gap: 11px; margin-top: 18px; }
@@ -1672,6 +1685,10 @@ body {
 
             <button id="leaderboardMenuButton" type="button">
                 🏆 Classement
+            </button>
+
+            <button id="statisticsMenuButton" type="button">
+                📊 Statistiques
             </button>
 
             <button
@@ -1987,6 +2004,31 @@ body {
         <div id="leaderboardList" class="leaderboard-list"></div>
     </section>
 
+    <section id="statisticsPage" class="statistics-page hidden" aria-labelledby="statisticsTitle">
+        <button id="statisticsBackButton" class="admin-back" type="button">← Retour à l’accueil</button>
+        <h2 id="statisticsTitle">📊 Statistiques des joueurs</h2>
+        <p class="statistics-intro">Vue d’ensemble des joueurs et de leur activité dans Cartes & Popote.</p>
+        <p id="statisticsStatus" class="statistics-status" role="status" aria-live="polite">Chargement des statistiques…</p>
+        <div class="statistics-table-wrap">
+                <table class="statistics-table" aria-label="Statistiques de tous les joueurs">
+                <thead>
+                    <tr>
+                        <th scope="col">Joueur</th>
+                        <th scope="col">Jetons attribués</th>
+                        <th scope="col">Jetons dépensés</th>
+                        <th scope="col">Boosters achetés</th>
+                        <th scope="col">Boosters ouverts</th>
+                        <th scope="col">Cartes uniques</th>
+                        <th scope="col">Cartes tirées</th>
+                        <th scope="col">Échanges effectués</th>
+                    </tr>
+                </thead>
+                <tbody id="statisticsTableBody"></tbody>
+            </table>
+        </div>
+        <p class="statistics-tracking-note">Sur mobile, fais glisser le tableau horizontalement. Les anciens achats, dépenses et jetons attribués avant leur suivi ne peuvent pas être reconstitués. Les échanges ne sont pas encore disponibles ; leur compteur reste à zéro.</p>
+    </section>
+
     <section id="collectionPage" class="player-collection hidden">
         <h2>🃏 Mes cartes</h2>
         <p class="admin-note">Les cartes obtenues en ouvrant tes boosters apparaissent ici.</p>
@@ -2206,7 +2248,6 @@ import {
     addDoc,
     updateDoc,
     deleteDoc,
-    runTransaction,
     query,
     where,
     serverTimestamp
@@ -2287,6 +2328,7 @@ const callGetOwnedCardNumbers = httpsCallable(functions, "getOwnedCardNumbers");
 const callGetAdminPlayers = httpsCallable(functions, "getAdminPlayers");
 const callAdjustPlayerTokens = httpsCallable(functions, "adjustPlayerTokens");
 const callGetLeaderboard = httpsCallable(functions, "getLeaderboard");
+const callBuyClassicBooster = httpsCallable(functions, "buyClassicBooster");
 const callGetPublicCardCount = httpsCallable(functions, "getPublicCardCount");
 
 
@@ -2411,6 +2453,11 @@ const leaderboardPage = document.getElementById("leaderboardPage");
 const leaderboardBackButton = document.getElementById("leaderboardBackButton");
 const leaderboardStatus = document.getElementById("leaderboardStatus");
 const leaderboardList = document.getElementById("leaderboardList");
+const statisticsMenuButton = document.getElementById("statisticsMenuButton");
+const statisticsPage = document.getElementById("statisticsPage");
+const statisticsBackButton = document.getElementById("statisticsBackButton");
+const statisticsStatus = document.getElementById("statisticsStatus");
+const statisticsTableBody = document.getElementById("statisticsTableBody");
 
 const adminButton = document.getElementById("adminButton");
 const ADMIN_EMAIL = "pierre.valentin8@gmail.com";
@@ -2652,6 +2699,7 @@ onAuthStateChanged(
             adminButton.classList.add("hidden");
             profilePage.classList.add("hidden");
             leaderboardPage.classList.add("hidden");
+            statisticsPage.classList.add("hidden");
             collectionPage.classList.add("hidden");
             adminPage.classList.add("hidden");
 
@@ -2833,44 +2881,20 @@ buyNormalBoosterButton.addEventListener("click", async () => {
     boosterPurchaseStatus.textContent = "Achat en cours...";
 
     try {
-        const playerRef = doc(db, "players", auth.currentUser.uid);
-        let newTokens = 0;
-        let newBoosterCount = 0;
-
-        await runTransaction(db, async (transaction) => {
-            const playerSnapshot = await transaction.get(playerRef);
-            if (!playerSnapshot.exists()) throw new Error("PLAYER_NOT_FOUND");
-
-            const player = playerSnapshot.data();
-            const currentTokens = Number(player.tokens);
-            const currentBoosters = Number(player.boostersDisponibles || 0);
-
-            if (!Number.isSafeInteger(currentTokens) || currentTokens < 0 || !Number.isSafeInteger(currentBoosters) || currentBoosters < 0) {
-                throw new Error("PLAYER_DATA_INVALID");
-            }
-            if (currentTokens < 3) throw new Error("NOT_ENOUGH_TOKENS");
-            if (currentBoosters >= 1000000000) throw new Error("BOOSTER_LIMIT_REACHED");
-
-            newTokens = currentTokens - 3;
-            newBoosterCount = currentBoosters + 1;
-            transaction.update(playerRef, {
-                tokens: newTokens,
-                boostersDisponibles: newBoosterCount
-            });
-        });
-
-        document.getElementById("playerTokens").textContent = newTokens;
-        document.getElementById("playerBoosters").textContent = newBoosterCount;
-        setOpenBoosterButton(newBoosterCount);
+        const response = await callBuyClassicBooster();
+        const { tokens, boostersDisponibles } = response.data;
+        document.getElementById("playerTokens").textContent = tokens;
+        document.getElementById("playerBoosters").textContent = boostersDisponibles;
+        setOpenBoosterButton(boostersDisponibles);
         boosterPurchaseStatus.textContent = "Booster classique acheté ! Il est ajouté à ton stock.";
     } catch (error) {
         console.error("Erreur pendant l’achat du booster :", error);
-        if (error.message === "NOT_ENOUGH_TOKENS") {
+        if (error.code === "functions/failed-precondition" && /3 jetons/.test(error.message || "")) {
             boosterPurchaseStatus.textContent = "Il te faut au moins 3 jetons pour acheter ce booster.";
-        } else if (error.message === "PLAYER_NOT_FOUND") {
+        } else if (error.code === "functions/not-found") {
             boosterPurchaseStatus.textContent = "Profil joueur introuvable. Déconnecte-toi puis reconnecte-toi.";
         } else {
-            boosterPurchaseStatus.textContent = "Achat refusé. Vérifie les règles Firestore publiées.";
+            boosterPurchaseStatus.textContent = "Achat refusé. Vérifie que la fonction Firebase buyClassicBooster est déployée.";
         }
     } finally {
         buyNormalBoosterButton.disabled = false;
@@ -2881,6 +2905,7 @@ function showHomePage() {
     document.querySelector(".app-content").classList.remove("hidden");
     profilePage.classList.add("hidden");
     leaderboardPage.classList.add("hidden");
+    statisticsPage.classList.add("hidden");
     collectionPage.classList.add("hidden");
     adminPage.classList.add("hidden");
     bottomNav.classList.remove("hidden");
@@ -2985,6 +3010,7 @@ viewProfileFromStatsButton.addEventListener("click", async () => {
     dropdownMenu.classList.add("hidden");
     document.querySelector(".app-content").classList.add("hidden");
     leaderboardPage.classList.add("hidden");
+    statisticsPage.classList.add("hidden");
     collectionPage.classList.add("hidden");
     adminPage.classList.add("hidden");
     bottomNav.classList.add("hidden");
@@ -3049,10 +3075,61 @@ async function loadLeaderboard() {
     }
 }
 
+async function loadStatistics() {
+    statisticsTableBody.replaceChildren();
+    statisticsStatus.textContent = "Chargement des statistiques…";
+    if (!auth.currentUser) {
+        statisticsStatus.textContent = "Connecte-toi pour consulter les statistiques.";
+        return;
+    }
+    try {
+        const response = await callGetLeaderboard();
+        const players = response.data.statistiques || [];
+        if (!players.length) {
+            statisticsStatus.textContent = "Aucun joueur inscrit pour le moment.";
+            return;
+        }
+        const fields = [
+            "pseudo", "jetonsAttribues", "jetonsDepenses", "boostersAchetes",
+            "boostersOuverts", "cartesUniques", "cartesTirees", "echangesEffectues"
+        ];
+        players.forEach((player) => {
+            const row = document.createElement("tr");
+            fields.forEach((field, index) => {
+                const cell = document.createElement("td");
+                cell.textContent = index === 0
+                    ? (player.pseudo || "Joueur")
+                    : (Number(player[field]) || 0).toLocaleString("fr-FR");
+                row.append(cell);
+            });
+            statisticsTableBody.append(row);
+        });
+        statisticsStatus.textContent = players.length + (players.length > 1 ? " joueurs inscrits" : " joueur inscrit");
+    } catch (error) {
+        console.error("Erreur de chargement des statistiques :", error);
+        statisticsStatus.textContent = "Impossible de charger les statistiques. Déploie les fonctions Firebase mises à jour.";
+    }
+}
+
+statisticsMenuButton.addEventListener("click", async () => {
+    dropdownMenu.classList.add("hidden");
+    document.querySelector(".app-content").classList.add("hidden");
+    profilePage.classList.add("hidden");
+    leaderboardPage.classList.add("hidden");
+    collectionPage.classList.add("hidden");
+    adminPage.classList.add("hidden");
+    bottomNav.classList.add("hidden");
+    statisticsPage.classList.remove("hidden");
+    await loadStatistics();
+});
+
+statisticsBackButton.addEventListener("click", showHomePage);
+
 leaderboardMenuButton.addEventListener("click", async () => {
     dropdownMenu.classList.add("hidden");
     document.querySelector(".app-content").classList.add("hidden");
     profilePage.classList.add("hidden");
+    statisticsPage.classList.add("hidden");
     collectionPage.classList.add("hidden");
     adminPage.classList.add("hidden");
     bottomNav.classList.add("hidden");
@@ -3402,6 +3479,7 @@ collectionNavButton.addEventListener("click", async () => {
     document.querySelector(".app-content").classList.add("hidden");
     profilePage.classList.add("hidden");
     leaderboardPage.classList.add("hidden");
+    statisticsPage.classList.add("hidden");
     adminPage.classList.add("hidden");
     collectionPage.classList.remove("hidden");
     bottomNav.classList.remove("hidden");
@@ -4132,6 +4210,7 @@ adminButton.addEventListener("click", async () => {
     document.querySelector(".app-content").classList.add("hidden");
     profilePage.classList.add("hidden");
     leaderboardPage.classList.add("hidden");
+    statisticsPage.classList.add("hidden");
     collectionPage.classList.add("hidden");
     bottomNav.classList.add("hidden");
     adminPage.classList.remove("hidden");
