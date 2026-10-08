@@ -1094,6 +1094,7 @@ body {
 }
 
 .admin-page { width: 100%; max-width: 700px; margin: auto; padding: 20px 16px 100px; }
+.admin-page:has(#adminCardsSection) { max-width: 1600px; }
 .admin-panel { background: #fff; border-radius: 18px; padding: 18px; box-shadow: 0 6px 20px rgba(45,155,200,.08); }
 .admin-page h2 { margin-bottom: 8px; color: #173b52; }
 .admin-note, .admin-status { color: #68899b; font-size: 13px; line-height: 1.5; margin: 8px 0 14px; }
@@ -1118,6 +1119,17 @@ body {
 .player-token-controls .admin-danger { padding: 10px 12px; border: 0; border-radius: 9px; font-weight: 700; white-space: nowrap; cursor: pointer; }
 .admin-danger { color: #c0392b !important; background: #fff0f0 !important; }
 .admin-submit { margin-top: 8px; }
+.card-entry-grid { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 10px; align-items: start; }
+.card-entry { min-width: 0; padding: 10px; border: 1px solid #d8c99f; border-radius: 12px; background: #fffdf7; }
+.card-entry legend { padding: 0 6px; color: var(--theme-ink); font-size: 13px; font-weight: 800; }
+.card-entry label { display: block; margin-top: 6px; color: var(--theme-ink); font-size: 11px; line-height: 1.35; }
+.card-entry .admin-field { margin: 7px 0; padding: 9px 8px; font-size: 12px; }
+.card-entry textarea.admin-field { min-height: 62px; }
+.card-entry .admin-card-preview { width: 100%; max-width: 160px; max-height: 130px; margin: 6px auto; }
+.card-form-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+@media (max-width: 1100px) { .card-entry-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+@media (max-width: 700px) { .card-entry-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 480px) { .card-entry-grid { grid-template-columns: 1fr; } }
 .message-compose-card { display: flex; justify-content: flex-end; margin: 10px 0 4px; }
 .message-compose-toggle { display: inline-flex; align-items: center; gap: 7px; padding: 5px 9px; border: 1px solid rgba(243, 191, 56, .45); border-radius: 999px; background: rgba(16, 38, 74, .72); color: #fbfaf5; font: inherit; font-size: 12px; font-weight: 700; cursor: pointer; }
 .message-compose-toggle img { display: block; width: 34px; height: 30px; object-fit: contain; }
@@ -2134,19 +2146,26 @@ body {
         </div>
         <div id="adminCardsSection" class="admin-panel admin-section hidden">
             <form id="cardForm">
-                <input id="cardName" class="admin-field" type="text" maxlength="80" placeholder="Nom de la carte" required>
-                <input id="cardCategory" class="admin-field" type="text" maxlength="50" placeholder="Catégorie" required>
-                <input id="cardNumber" class="admin-field" type="number" min="1" max="1000000" step="1" inputmode="numeric" placeholder="Numéro de carte (facultatif, attribué automatiquement si vide)">
-                <select id="cardRarity" class="admin-field" required>
-                    <option value="">Choisir une rareté</option>
-                </select>
-                <label for="cardImageFile">Visuel de la carte (JPG, PNG ou WebP, 5 Mo maximum)</label>
-                <input id="cardImageFile" class="admin-field" type="file" accept="image/jpeg,image/png,image/webp">
-                <img id="cardImagePreview" class="admin-card-preview hidden" alt="Aperçu du visuel">
-                <input id="cardImage" class="admin-field" type="url" maxlength="500" placeholder="Ou URL directe d’image (facultatif)">
-                <textarea id="cardDescription" class="admin-field" maxlength="500" rows="3" placeholder="Description (facultatif)"></textarea>
-                <button id="cardSubmit" class="primary-button admin-submit" type="submit">Ajouter la carte</button>
-                <button id="cardCancelEdit" class="secondary-button hidden" type="button">Annuler la modification</button>
+                <div id="cardEntryGrid" class="card-entry-grid">
+                    <fieldset class="card-entry">
+                        <legend>Carte 1</legend>
+                        <input id="cardName" data-card-field="name" class="admin-field" type="text" maxlength="80" placeholder="Nom de la carte" required>
+                        <input id="cardCategory" data-card-field="category" class="admin-field" type="text" maxlength="50" placeholder="Catégorie" required>
+                        <input id="cardNumber" data-card-field="number" class="admin-field" type="number" min="1" max="1000000" step="1" inputmode="numeric" placeholder="Numéro (facultatif)">
+                        <select id="cardRarity" data-card-field="rarity" class="admin-field" required>
+                            <option value="">Choisir une rareté</option>
+                        </select>
+                        <label for="cardImageFile">Visuel (JPG, PNG ou WebP, 5 Mo maximum)</label>
+                        <input id="cardImageFile" data-card-field="file" class="admin-field" type="file" accept="image/jpeg,image/png,image/webp">
+                        <img id="cardImagePreview" class="admin-card-preview hidden" alt="Aperçu du visuel">
+                        <input id="cardImage" data-card-field="image" class="admin-field" type="url" maxlength="500" placeholder="Ou URL d’image (facultatif)">
+                        <textarea id="cardDescription" data-card-field="description" class="admin-field" maxlength="500" rows="3" placeholder="Description (facultatif)"></textarea>
+                    </fieldset>
+                </div>
+                <div class="card-form-actions">
+                    <button id="cardSubmit" class="primary-button admin-submit" type="submit">Ajouter les 5 cartes</button>
+                    <button id="cardCancelEdit" class="secondary-button hidden" type="button">Annuler la modification</button>
+                </div>
             </form>
             <p id="adminStatus" class="admin-status" role="status"></p>
             <h3>Cartes enregistrées</h3>
@@ -2270,6 +2289,7 @@ import {
     collection,
     getDocs,
     addDoc,
+    writeBatch,
     updateDoc,
     deleteDoc,
     query,
@@ -2554,6 +2574,7 @@ const rarityCancelEdit = document.getElementById("rarityCancelEdit");
 const rarityStatus = document.getElementById("rarityStatus");
 const raritiesList = document.getElementById("raritiesList");
 const cardForm = document.getElementById("cardForm");
+const cardEntryGrid = document.getElementById("cardEntryGrid");
 const cardName = document.getElementById("cardName");
 const cardCategory = document.getElementById("cardCategory");
 const cardNumber = document.getElementById("cardNumber");
@@ -2561,7 +2582,7 @@ const cardRarity = document.getElementById("cardRarity");
 const cardImage = document.getElementById("cardImage");
 const cardImageFile = document.getElementById("cardImageFile");
 const cardImagePreview = document.getElementById("cardImagePreview");
-let previewObjectUrl = null;
+const cardPreviewUrls = new Map();
 const cardDescription = document.getElementById("cardDescription");
 const cardSubmit = document.getElementById("cardSubmit");
 const cardCancelEdit = document.getElementById("cardCancelEdit");
@@ -2578,6 +2599,27 @@ exchangeNavButton.addEventListener("click", () => {
     exchangeNoticeTimeout = setTimeout(() => exchangeUnlockNotice.classList.add("hidden"), 4000);
 });
 let editingCardId = null;
+
+for (let index = 2; index <= 5; index += 1) {
+    const entry = cardEntryGrid.firstElementChild.cloneNode(true);
+    entry.querySelector("legend").textContent = "Carte " + index;
+    const idMap = new Map();
+    entry.querySelectorAll("[id]").forEach((element) => {
+        const oldId = element.id;
+        element.id = oldId + "-" + index;
+        idMap.set(oldId, element.id);
+    });
+    entry.querySelectorAll("label[for]").forEach((label) => {
+        if (idMap.has(label.htmlFor)) label.htmlFor = idMap.get(label.htmlFor);
+    });
+    entry.querySelectorAll("input, select, textarea").forEach((field) => {
+        if (field.type === "file") field.value = "";
+        else field.value = "";
+    });
+    entry.querySelector("img").classList.add("hidden");
+    entry.querySelector("img").removeAttribute("src");
+    cardEntryGrid.append(entry);
+}
 let editingRarityId = null;
 const RARITY_COLORS = {
     "commune": "#9E9E9E",
@@ -2595,10 +2637,11 @@ function getCardRarityColor(card) {
     return RARITY_COLORS[rarityKey] || card?.rarityColor || getRarityColor(card?.rarity);
 }
 
-cardRarity.addEventListener("change", () => {
-    const color = getRarityColor(cardRarity.value);
-    cardRarity.style.borderColor = color;
-    cardRarity.style.boxShadow = "0 0 0 2px " + color + "33";
+cardForm.addEventListener("change", (event) => {
+    if (!event.target.matches('[data-card-field="rarity"]')) return;
+    const color = getRarityColor(event.target.value);
+    event.target.style.borderColor = color;
+    event.target.style.boxShadow = "0 0 0 2px " + color + "33";
 });
 
 
@@ -3630,16 +3673,20 @@ async function loadRarities() {
         const remaining = Math.max(0, 100 - usedPercentage);
         rarityStatus.textContent = usedPercentage.toFixed(2) + "% attribué • " + remaining.toFixed(2) + "% restant";
 
-        cardRarity.replaceChildren();
-        const placeholder = document.createElement("option");
-        placeholder.value = "";
-        placeholder.textContent = rarities.length ? "Choisir une rareté" : "Crée d’abord une catégorie de rareté";
-        cardRarity.append(placeholder);
-        rarities.forEach((item) => {
-            const option = document.createElement("option");
-            option.value = item.name;
-            option.textContent = item.name + " (" + Number(item.percentage || 0) + " %)";
-            cardRarity.append(option);
+        cardForm.querySelectorAll('[data-card-field="rarity"]').forEach((select) => {
+            const previousValue = select.value;
+            select.replaceChildren();
+            const placeholder = document.createElement("option");
+            placeholder.value = "";
+            placeholder.textContent = rarities.length ? "Choisir une rareté" : "Crée d’abord une catégorie de rareté";
+            select.append(placeholder);
+            rarities.forEach((item) => {
+                const option = document.createElement("option");
+                option.value = item.name;
+                option.textContent = item.name + " (" + Number(item.percentage || 0) + " %)";
+                select.append(option);
+            });
+            select.value = previousValue;
         });
 
         raritiesList.replaceChildren();
@@ -3817,14 +3864,13 @@ function createAdminCardRow(cardDoc) {
     edit.textContent = "Modifier";
     edit.addEventListener("click", () => {
         editingCardId = cardDoc.id;
+        clearCardEntryPreview(cardEntryGrid.firstElementChild);
         cardName.value = card.name || "";
         cardCategory.value = card.category || "";
         cardNumber.value = Number.isSafeInteger(Number(card.cardNumber)) && Number(card.cardNumber) > 0 ? String(card.cardNumber) : "";
         cardRarity.value = card.rarity || "";
         cardImage.value = card.imageUrl || "";
         cardImageFile.value = "";
-        if (previewObjectUrl) URL.revokeObjectURL(previewObjectUrl);
-        previewObjectUrl = null;
         if (card.imageUrl) {
             cardImagePreview.src = card.imageUrl;
             cardImagePreview.classList.remove("hidden");
@@ -3833,6 +3879,12 @@ function createAdminCardRow(cardDoc) {
             cardImagePreview.classList.add("hidden");
         }
         cardDescription.value = card.description || "";
+        cardEntryGrid.querySelectorAll(".card-entry").forEach((entry, index) => {
+            entry.classList.toggle("hidden", index > 0);
+            entry.querySelectorAll("input, select, textarea").forEach((field) => {
+                field.disabled = index > 0;
+            });
+        });
         cardSubmit.textContent = "Enregistrer";
         cardCancelEdit.classList.remove("hidden");
         window.scrollTo({ top: 0, behavior: "smooth" });
@@ -4356,23 +4408,37 @@ document.querySelectorAll(".admin-menu-button").forEach((button) => {
 
 adminBackButton.addEventListener("click", closeAdminPage);
 
-cardImageFile.addEventListener("change", () => {
-    const file = cardImageFile.files && cardImageFile.files[0];
-    if (previewObjectUrl) URL.revokeObjectURL(previewObjectUrl);
-    previewObjectUrl = null;
+function clearCardEntryPreview(entry) {
+    const fileInput = entry.querySelector('[data-card-field="file"]');
+    const preview = entry.querySelector(".admin-card-preview");
+    const existingUrl = cardPreviewUrls.get(fileInput);
+    if (existingUrl) URL.revokeObjectURL(existingUrl);
+    cardPreviewUrls.delete(fileInput);
+    preview.removeAttribute("src");
+    preview.classList.add("hidden");
+}
+
+cardForm.addEventListener("change", (event) => {
+    if (!event.target.matches('[data-card-field="file"]')) return;
+    const entry = event.target.closest(".card-entry");
+    const preview = entry.querySelector(".admin-card-preview");
+    clearCardEntryPreview(entry);
+    const file = event.target.files && event.target.files[0];
     if (!file) return;
-    previewObjectUrl = URL.createObjectURL(file);
-    cardImagePreview.src = previewObjectUrl;
-    cardImagePreview.classList.remove("hidden");
+    const objectUrl = URL.createObjectURL(file);
+    cardPreviewUrls.set(event.target, objectUrl);
+    preview.src = objectUrl;
+    preview.classList.remove("hidden");
 });
 
 cardCancelEdit.addEventListener("click", () => {
     editingCardId = null;
     cardForm.reset();
-    cardImagePreview.removeAttribute("src");
-    cardImagePreview.classList.add("hidden");
-    if (previewObjectUrl) URL.revokeObjectURL(previewObjectUrl);
-    previewObjectUrl = null;
+    cardEntryGrid.querySelectorAll(".card-entry").forEach((entry) => {
+        entry.classList.remove("hidden");
+        entry.querySelectorAll("input, select, textarea").forEach((field) => { field.disabled = false; });
+        clearCardEntryPreview(entry);
+    });
     cardSubmit.textContent = "Ajouter la carte";
     cardCancelEdit.classList.add("hidden");
     adminStatus.textContent = "";
@@ -4384,68 +4450,88 @@ cardForm.addEventListener("submit", async (event) => {
         adminStatus.textContent = "Accès réservé au compte Admin.";
         return;
     }
-    const card = {
-        name: cardName.value.trim(),
-        category: cardCategory.value.trim(),
-        cardNumber: cardNumber.value.trim() ? Number(cardNumber.value) : null,
-        rarity: cardRarity.value,
-        rarityColor: getRarityColor(cardRarity.value),
-        imageUrl: cardImage.value.trim(),
-        description: cardDescription.value.trim(),
-        updatedAt: new Date().toISOString()
-    };
-    if (!card.name || !card.category) return;
-    if (cardNumber.value.trim() && (!Number.isSafeInteger(card.cardNumber) || card.cardNumber < 1)) {
-        adminStatus.textContent = "Le numéro doit être un nombre entier supérieur à zéro.";
+    const entries = editingCardId ? [cardEntryGrid.querySelector(".card-entry")] : Array.from(cardEntryGrid.querySelectorAll(".card-entry"));
+    const records = entries.map((entry) => {
+        const value = (field) => entry.querySelector('[data-card-field="' + field + '"]').value.trim();
+        const rarity = value("rarity");
+        const fileInput = entry.querySelector('[data-card-field="file"]');
+        return {
+            entry,
+            file: fileInput.files && fileInput.files[0],
+            card: {
+                name: value("name"),
+                category: value("category"),
+                cardNumber: value("number") ? Number(value("number")) : null,
+                rarity,
+                rarityColor: getRarityColor(rarity),
+                imageUrl: value("image"),
+                description: value("description"),
+                updatedAt: new Date().toISOString()
+            }
+        };
+    });
+    const requestedNumbers = records.map(({ card }) => card.cardNumber).filter((number) => number !== null);
+    if (requestedNumbers.some((number) => !Number.isSafeInteger(number) || number < 1)) {
+        adminStatus.textContent = "Chaque numéro renseigné doit être un entier supérieur à zéro.";
         return;
     }
-    const selectedImage = cardImageFile.files && cardImageFile.files[0];
-    if (selectedImage) {
-        const allowedTypes = ["image/jpeg", "image/png", "image/webp"];
-        if (!allowedTypes.includes(selectedImage.type) || selectedImage.size > 5 * 1024 * 1024) {
-            adminStatus.textContent = "Choisis une image JPG, PNG ou WebP de 5 Mo maximum.";
+    if (new Set(requestedNumbers).size !== requestedNumbers.length) {
+        adminStatus.textContent = "Deux cartes du lot ont le même numéro. Choisis un numéro différent pour chacune.";
+        return;
+    }
+    const allowedTypes = ["image/jpeg", "image/png", "image/webp"];
+    for (const { file } of records) {
+        if (file && (!allowedTypes.includes(file.type) || file.size > 5 * 1024 * 1024)) {
+            adminStatus.textContent = "Chaque image doit être au format JPG, PNG ou WebP et faire 5 Mo maximum.";
             return;
         }
     }
     cardSubmit.disabled = true;
-    adminStatus.textContent = "Enregistrement...";
+    adminStatus.textContent = editingCardId ? "Enregistrement de la modification..." : "Enregistrement des 5 cartes...";
     let cardSaveStage = "Firestore";
     try {
-        if (card.cardNumber !== null) {
+        if (requestedNumbers.length) {
             const existingCards = await getDocs(collection(db, "cards"));
-            const duplicate = existingCards.docs.some((item) =>
-                item.id !== editingCardId && Number(item.data().cardNumber) === card.cardNumber
-            );
-            if (duplicate) {
-                adminStatus.textContent = "Ce numéro est déjà utilisé. Choisis un autre numéro.";
+            const existingNumbers = new Set(existingCards.docs
+                .filter((item) => item.id !== editingCardId)
+                .map((item) => Number(item.data().cardNumber)));
+            if (requestedNumbers.some((number) => existingNumbers.has(number))) {
+                adminStatus.textContent = "Un des numéros saisis est déjà utilisé. Modifie les numéros en conflit.";
                 return;
             }
         }
-        if (selectedImage) {
-            cardSaveStage = "Storage";
-            const safeName = selectedImage.name.replace(/[^a-zA-Z0-9._-]/g, "_");
-            const imagePath = "cards/" + auth.currentUser.uid + "/" + Date.now() + "-" + safeName;
+        cardSaveStage = "Storage";
+        await Promise.all(records.map(async ({ card, file }, index) => {
+            if (!file) return;
+            const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, "_");
+            const imagePath = "cards/" + auth.currentUser.uid + "/" + Date.now() + "-" + (index + 1) + "-" + safeName;
             const imageRef = ref(storage, imagePath);
-            await uploadBytes(imageRef, selectedImage, { contentType: selectedImage.type });
+            await uploadBytes(imageRef, file, { contentType: file.type });
             card.imageUrl = await getDownloadURL(imageRef);
             card.storagePath = imagePath;
-        }
+        }));
 
         cardSaveStage = "Firestore";
         if (editingCardId) {
-            await updateDoc(doc(db, "cards", editingCardId), card);
+            await updateDoc(doc(db, "cards", editingCardId), records[0].card);
             adminStatus.textContent = "Carte modifiée.";
         } else {
-            card.createdAt = new Date().toISOString();
-            await addDoc(collection(db, "cards"), card);
-            adminStatus.textContent = "Carte ajoutée.";
+            const batch = writeBatch(db);
+            records.forEach(({ card }, index) => {
+                const cardRef = doc(collection(db, "cards"));
+                card.createdAt = new Date(Date.now() + index).toISOString();
+                batch.set(cardRef, card);
+            });
+            await batch.commit();
+            adminStatus.textContent = "Les 5 cartes ont été ajoutées.";
         }
         editingCardId = null;
         cardForm.reset();
-        cardImagePreview.removeAttribute("src");
-        cardImagePreview.classList.add("hidden");
-        if (previewObjectUrl) URL.revokeObjectURL(previewObjectUrl);
-        previewObjectUrl = null;
+        cardEntryGrid.querySelectorAll(".card-entry").forEach((entry) => {
+            entry.classList.remove("hidden");
+            entry.querySelectorAll("input, select, textarea").forEach((field) => { field.disabled = false; });
+            clearCardEntryPreview(entry);
+        });
         cardSubmit.textContent = "Ajouter la carte";
         cardCancelEdit.classList.add("hidden");
         await loadCards();
