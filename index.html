@@ -1095,7 +1095,12 @@ body {
 .admin-card-preview { display: block; max-width: 180px; max-height: 240px; margin: 8px 0; object-fit: contain; border-radius: 10px; background: #eefaff; }
 .admin-card-placeholder { width: 64px; height: 86px; flex: 0 0 64px; display: grid; place-items: center; border-radius: 8px; background: linear-gradient(145deg, #e4f7ff, #bdeaff); font-size: 30px; }
 .admin-card-row small { margin-top: 4px; color: #7895a6; }
-.admin-category-heading { margin: 18px 0 4px; padding: 9px 11px; border-radius: 10px; background: #10264a; color: #f7d46b; font-size: 14px; }
+.admin-card-category { margin: 18px 0 4px; border: 1px solid rgba(243, 191, 56, .45); border-radius: 11px; overflow: hidden; }
+.admin-category-heading { display: flex; align-items: center; gap: 8px; padding: 10px 12px; background: #10264a; color: #f7d46b; font-size: 14px; font-weight: 700; cursor: pointer; list-style: none; }
+.admin-category-heading::-webkit-details-marker { display: none; }
+.admin-category-heading::before { content: "▾"; color: #f7d46b; transition: transform .15s ease; }
+.admin-card-category:not([open]) .admin-category-heading::before { transform: rotate(-90deg); }
+.admin-category-cards { padding: 0 10px 8px; }
 .admin-actions { display: flex; gap: 6px; }
 .admin-actions button, .admin-back { padding: 9px 12px; border: 0; border-radius: 9px; background: #eefaff; color: #1687b9; font-weight: 700; cursor: pointer; }
 .player-token-controls { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; justify-content: flex-end; }
@@ -3588,17 +3593,23 @@ async function loadCards() {
         const sortedGroups = Array.from(groupedCards.values())
             .sort((left, right) => left.category.localeCompare(right.category, "fr", { sensitivity: "base" }));
         sortedGroups.forEach((group) => {
-            const heading = document.createElement("h4");
+            const categoryBlock = document.createElement("details");
+            categoryBlock.className = "admin-card-category";
+            categoryBlock.open = true;
+            const heading = document.createElement("summary");
             heading.className = "admin-category-heading";
             heading.textContent = group.category + " • " + group.cards.length + (group.cards.length > 1 ? " cartes" : " carte");
-            cardsList.append(heading);
+            const categoryCards = document.createElement("div");
+            categoryCards.className = "admin-category-cards";
+            categoryBlock.append(heading, categoryCards);
+            cardsList.append(categoryBlock);
 
             group.cards.sort((left, right) => {
                 const leftName = left.data().name || "";
                 const rightName = right.data().name || "";
                 return leftName.localeCompare(rightName, "fr", { sensitivity: "base" });
             });
-            group.cards.forEach((cardDoc) => cardsList.append(createAdminCardRow(cardDoc)));
+            group.cards.forEach((cardDoc) => categoryCards.append(createAdminCardRow(cardDoc)));
         });
     } catch (error) {
         console.error("Erreur de chargement des cartes :", error);
