@@ -2153,10 +2153,10 @@ body {
                 <div id="cardEntryGrid" class="card-entry-grid">
                     <fieldset class="card-entry">
                         <legend>Carte 1</legend>
-                        <input id="cardName" data-card-field="name" class="admin-field" type="text" maxlength="80" placeholder="Nom de la carte" required>
-                        <input id="cardCategory" data-card-field="category" class="admin-field" type="text" maxlength="50" placeholder="Catégorie" required>
+                        <input id="cardName" data-card-field="name" class="admin-field" type="text" maxlength="80" placeholder="Nom de la carte">
+                        <input id="cardCategory" data-card-field="category" class="admin-field" type="text" maxlength="50" placeholder="Catégorie">
                         <input id="cardNumber" data-card-field="number" class="admin-field" type="number" min="1" max="1000000" step="1" inputmode="numeric" placeholder="Numéro (facultatif)">
-                        <select id="cardRarity" data-card-field="rarity" class="admin-field" required>
+                        <select id="cardRarity" data-card-field="rarity" class="admin-field">
                             <option value="">Choisir une rareté</option>
                         </select>
                         <label for="cardImageFile">Visuel (JPG, PNG ou WebP, 5 Mo maximum)</label>
@@ -2167,7 +2167,7 @@ body {
                     </fieldset>
                 </div>
                 <div class="card-form-actions">
-                    <button id="cardSubmit" class="primary-button admin-submit" type="submit">Ajouter les 5 cartes</button>
+                    <button id="cardSubmit" class="primary-button admin-submit" type="submit">Ajouter les cartes saisies</button>
                     <button id="cardCancelEdit" class="secondary-button hidden" type="button">Annuler la modification</button>
                 </div>
             </form>
@@ -4459,7 +4459,7 @@ cardCancelEdit.addEventListener("click", () => {
         entry.querySelectorAll("input, select, textarea").forEach((field) => { field.disabled = false; });
         clearCardEntryPreview(entry);
     });
-    cardSubmit.textContent = "Ajouter la carte";
+    cardSubmit.textContent = "Ajouter les cartes saisies";
     cardCancelEdit.classList.add("hidden");
     adminStatus.textContent = "";
 });
@@ -4471,12 +4471,13 @@ cardForm.addEventListener("submit", async (event) => {
         return;
     }
     const entries = editingCardId ? [cardEntryGrid.querySelector(".card-entry")] : Array.from(cardEntryGrid.querySelectorAll(".card-entry"));
-    const records = entries.map((entry) => {
+    const enteredRecords = entries.map((entry, index) => {
         const value = (field) => entry.querySelector('[data-card-field="' + field + '"]').value.trim();
         const rarity = value("rarity");
         const fileInput = entry.querySelector('[data-card-field="file"]');
         return {
             entry,
+            index: index + 1,
             file: fileInput.files && fileInput.files[0],
             card: {
                 name: value("name"),
@@ -4490,6 +4491,20 @@ cardForm.addEventListener("submit", async (event) => {
             }
         };
     });
+    const records = enteredRecords.filter(({ card, file }) =>
+        Boolean(card.name || card.category || card.cardNumber !== null || card.rarity || card.imageUrl || card.description || file)
+    );
+    if (!records.length) {
+        adminStatus.textContent = "Renseigne au moins une fiche avant d’enregistrer.";
+        return;
+    }
+    const incomplete = records.find(({ card }) => !card.name || !card.category || !card.rarity);
+    if (incomplete) {
+        adminStatus.textContent = "Carte " + incomplete.index + " : renseigne son nom, sa catégorie et sa rareté.";
+        const missingField = !incomplete.card.name ? "name" : !incomplete.card.category ? "category" : "rarity";
+        incomplete.entry.querySelector('[data-card-field="' + missingField + '"]').focus();
+        return;
+    }
     const requestedNumbers = records.map(({ card }) => card.cardNumber).filter((number) => number !== null);
     if (requestedNumbers.some((number) => !Number.isSafeInteger(number) || number < 1)) {
         adminStatus.textContent = "Chaque numéro renseigné doit être un entier supérieur à zéro.";
@@ -4507,7 +4522,9 @@ cardForm.addEventListener("submit", async (event) => {
         }
     }
     cardSubmit.disabled = true;
-    adminStatus.textContent = editingCardId ? "Enregistrement de la modification..." : "Enregistrement des 5 cartes...";
+    adminStatus.textContent = editingCardId
+        ? "Enregistrement de la modification..."
+        : "Enregistrement de " + records.length + (records.length > 1 ? " cartes..." : " carte...");
     let cardSaveStage = "Firestore";
     try {
         if (requestedNumbers.length) {
@@ -4543,7 +4560,7 @@ cardForm.addEventListener("submit", async (event) => {
                 batch.set(cardRef, card);
             });
             await batch.commit();
-            adminStatus.textContent = "Les 5 cartes ont été ajoutées.";
+            adminStatus.textContent = records.length + (records.length > 1 ? " cartes ont été ajoutées." : " carte a été ajoutée.");
         }
         editingCardId = null;
         cardForm.reset();
@@ -4552,7 +4569,7 @@ cardForm.addEventListener("submit", async (event) => {
             entry.querySelectorAll("input, select, textarea").forEach((field) => { field.disabled = false; });
             clearCardEntryPreview(entry);
         });
-        cardSubmit.textContent = "Ajouter la carte";
+        cardSubmit.textContent = "Ajouter les cartes saisies";
         cardCancelEdit.classList.add("hidden");
         await loadCards();
         await loadPublicCardCount();
