@@ -1100,11 +1100,15 @@ body {
 .player-token-controls .admin-danger { padding: 10px 12px; border: 0; border-radius: 9px; font-weight: 700; white-space: nowrap; cursor: pointer; }
 .admin-danger { color: #c0392b !important; background: #fff0f0 !important; }
 .admin-submit { margin-top: 8px; }
-.message-compose-card { margin-top: 20px; padding: 16px; border: 1px solid rgba(243, 191, 56, .65); border-radius: 16px; background: #10264a; color: #fbfaf5; }
-.message-compose-card h3 { margin-bottom: 6px; color: var(--theme-gold-light); }
-.message-compose-card p { margin: 6px 0 12px; color: #c6d2e5; font-size: 13px; line-height: 1.5; }
-.message-compose-toggle { padding: 10px 14px; border: 1px solid #d7a51e; border-radius: 10px; background: linear-gradient(135deg, var(--theme-gold-light), #edb52b); color: var(--theme-navy); font: inherit; font-weight: 800; cursor: pointer; }
-.message-compose-form { margin-top: 14px; }
+.message-compose-card { display: flex; justify-content: flex-end; margin: 10px 0 4px; }
+.message-compose-toggle { display: inline-flex; align-items: center; gap: 7px; padding: 5px 9px; border: 1px solid rgba(243, 191, 56, .45); border-radius: 999px; background: rgba(16, 38, 74, .72); color: #fbfaf5; font: inherit; font-size: 12px; font-weight: 700; cursor: pointer; }
+.message-compose-toggle img { display: block; width: 34px; height: 30px; object-fit: contain; }
+.feedback-form-panel { margin: 0 0 14px auto; max-width: 470px; padding: 14px; border: 1px solid rgba(243, 191, 56, .65); border-radius: 14px; background: #10264a; color: #fbfaf5; }
+.feedback-form-panel label { color: #fbfaf5; font-size: 13px; }
+.feedback-form-panel .admin-field { margin: 6px 0 12px; }
+.feedback-form-panel .message-compose-toggle { border-color: #d7a51e; background: linear-gradient(135deg, var(--theme-gold-light), #edb52b); color: var(--theme-navy); }
+.feedback-form-panel #feedbackStatus { margin: 8px 0 0; color: #fbfaf5; font-size: 13px; }
+.message-compose-form { margin-top: 4px; }
 .message-category-tabs { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0; }
 .message-category-button { flex: 1 1 150px; min-height: 44px; padding: 9px 12px; border: 1px solid #d7a51e; border-radius: 10px; background: #10264a; color: var(--theme-cream); font: inherit; font-weight: 700; cursor: pointer; }
 .message-category-button[aria-pressed="true"] { background: linear-gradient(135deg, var(--theme-gold-light), #edb52b); color: var(--theme-navy); }
@@ -1912,11 +1916,13 @@ body {
 
         </section>
 
-        <section class="message-compose-card" aria-labelledby="feedbackTitle">
-            <h3 id="feedbackTitle">💬 Un mot pour l’équipe ?</h3>
-            <p>Partage une idée ou signale un problème rencontré dans le jeu.</p>
-            <button id="feedbackToggleButton" class="message-compose-toggle" type="button" aria-expanded="false" aria-controls="feedbackFormPanel">Écrire un message</button>
-            <div id="feedbackFormPanel" class="hidden">
+        <div class="message-compose-card">
+            <button id="feedbackToggleButton" class="message-compose-toggle" type="button" aria-expanded="false" aria-controls="feedbackFormPanel" aria-label="Envoyer un message à l’Admin">
+                <img src="./enveloppe.png" alt="">
+                <span>Envoyer un message</span>
+            </button>
+        </div>
+            <div id="feedbackFormPanel" class="feedback-form-panel hidden">
                 <form id="feedbackForm" class="message-compose-form">
                     <label for="feedbackCategory">Sujet du message</label>
                     <select id="feedbackCategory" class="admin-field" required>
@@ -1929,7 +1935,6 @@ body {
                 </form>
                 <p id="feedbackStatus" role="status" aria-live="polite"></p>
             </div>
-        </section>
 
 
     </main>
