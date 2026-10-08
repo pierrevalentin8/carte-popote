@@ -3184,7 +3184,20 @@ async function loadOwnedPlayerCards() {
             callGetOwnedCardNumbers(),
         ]);
         const cardNumbers = numberResponse.data.cardNumbers || {};
-        collectionMaxCardNumber = Math.max(0, Number(numberResponse.data.maxCardNumber) || 0);
+        const reportedMaximum = Number(numberResponse.data.maxCardNumber);
+        if (Number.isSafeInteger(reportedMaximum) && reportedMaximum >= 0) {
+            collectionMaxCardNumber = reportedMaximum;
+        } else {
+            // Compatibilité avec l’ancienne version de getOwnedCardNumbers,
+            // qui renvoie les numéros possédés mais pas encore le total.
+            try {
+                const countResponse = await callGetPublicCardCount();
+                collectionMaxCardNumber = Math.max(0, Number(countResponse.data.count) || 0);
+            } catch (countError) {
+                console.warn("Impossible de récupérer le total de cartes pour paginer le classeur :", countError);
+                collectionMaxCardNumber = Math.max(0, ...snapshot.docs.map((item) => Number(item.data().cardNumber) || 0));
+            }
+        }
         const cards = snapshot.docs
             .map((item) => {
                 const card = { id: item.id, ...item.data() };
