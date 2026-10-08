@@ -969,8 +969,11 @@ body {
 
 .announcement-item { border-left: 3px solid #e5b530; padding-left: 12px; }
 .announcement-item .journal-title { color: #173b52; }
-.card-count-note { margin: 8px 4px 2px; color: #aebbd0; font-size: 11px; text-align: right; }
-.card-count-note strong { color: #f7d46b; font-size: 12px; }
+.home-card-count { display: flex; align-items: center; justify-content: center; gap: 14px; margin: 14px 0 22px; padding: 13px 18px; border: 1px solid rgba(243, 191, 56, .75); border-radius: 15px; background: linear-gradient(110deg, #10264a, #183966); color: #fbfaf5; box-shadow: 0 8px 20px rgba(0, 0, 0, .22); }
+.home-card-count-icon { font-size: 27px; line-height: 1; }
+.home-card-count-copy { display: flex; align-items: baseline; flex-wrap: wrap; gap: 6px; }
+.home-card-count-value { color: #f7d46b; font-size: 27px; font-weight: 900; line-height: 1; }
+.home-card-count-label { color: #fbfaf5; font-size: 13px; font-weight: 700; }
 
 
 /* ==================================================
@@ -1800,6 +1803,14 @@ body {
 
         </section>
 
+        <section class="home-card-count" aria-label="Nombre de cartes créées dans le jeu">
+            <span class="home-card-count-icon" aria-hidden="true">🃏</span>
+            <div class="home-card-count-copy">
+                <strong id="publicCardCount" class="home-card-count-value">—</strong>
+                <span class="home-card-count-label">cartes déjà créées</span>
+            </div>
+        </section>
+
 
 
         <!-- BOOSTERS -->
@@ -1926,8 +1937,6 @@ body {
 
 
         </section>
-
-        <p class="card-count-note" aria-live="polite">🃏 <strong id="publicCardCount">—</strong> cartes créées</p>
 
         <div class="message-compose-card">
             <button id="feedbackToggleButton" class="message-compose-toggle" type="button" aria-expanded="false" aria-controls="feedbackFormPanel" aria-label="Envoyer un message à l’Admin">
