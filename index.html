@@ -3694,7 +3694,7 @@ async function loadCards() {
         sortedGroups.forEach((group) => {
             const categoryBlock = document.createElement("details");
             categoryBlock.className = "admin-card-category";
-            categoryBlock.open = true;
+            categoryBlock.open = false;
             const heading = document.createElement("summary");
             heading.className = "admin-category-heading";
             heading.textContent = group.category + " • " + group.cards.length + (group.cards.length > 1 ? " cartes" : " carte");
