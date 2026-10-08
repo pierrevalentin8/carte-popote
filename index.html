@@ -2175,7 +2175,6 @@ import {
     runTransaction,
     query,
     where,
-    orderBy,
     serverTimestamp
 
 } from
@@ -3588,8 +3587,7 @@ async function loadAdminMessages(category) {
     try {
         const messagesQuery = query(
             collection(db, "messages"),
-            where("category", "==", category),
-            orderBy("createdAt", "desc")
+            where("category", "==", category)
         );
         const snapshot = await getDocs(messagesQuery);
 
@@ -3601,7 +3599,15 @@ async function loadAdminMessages(category) {
         }
 
         adminMessagesStatus.textContent = snapshot.size + (snapshot.size > 1 ? " message(s)" : " message");
-        snapshot.docs.forEach((messageDoc) => {
+        const sortedMessages = [...snapshot.docs].sort((left, right) => {
+            const leftDate = left.data().createdAt;
+            const rightDate = right.data().createdAt;
+            const leftTime = leftDate && typeof leftDate.toMillis === "function" ? leftDate.toMillis() : 0;
+            const rightTime = rightDate && typeof rightDate.toMillis === "function" ? rightDate.toMillis() : 0;
+            return rightTime - leftTime;
+        });
+
+        sortedMessages.forEach((messageDoc) => {
             const message = messageDoc.data();
             const item = document.createElement("article");
             item.className = "admin-message-item" + (message.status === "traite" ? " is-read" : "");
@@ -3642,9 +3648,13 @@ async function loadAdminMessages(category) {
         });
     } catch (error) {
         console.error("Erreur de chargement de la messagerie Admin :", error);
-        adminMessagesStatus.textContent = error.code === "permission-denied"
-            ? "Accès refusé. Vérifie que tu es connecté avec le compte Admin et que les règles Firestore sont publiées."
-            : "Impossible de charger les messages. Vérifie les règles Firestore.";
+        if (error.code === "permission-denied") {
+            adminMessagesStatus.textContent = "Accès refusé. Publie les nouvelles règles Firestore et vérifie que tu es connecté avec le compte Admin.";
+        } else if (error.code === "failed-precondition") {
+            adminMessagesStatus.textContent = "Firestore demande une vérification supplémentaire. Ouvre la console du navigateur (F12) et regarde le détail de l’erreur.";
+        } else {
+            adminMessagesStatus.textContent = "Impossible de charger les messages. Vérifie ta connexion puis les règles Firestore publiées.";
+        }
     }
 }
 
