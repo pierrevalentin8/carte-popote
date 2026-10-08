@@ -1177,6 +1177,9 @@ body {
 .collection-page-nav button { min-width: 92px; padding: 10px 12px; border: 1px solid #d7a51e; border-radius: 10px; background: linear-gradient(135deg, #ffe17b, #edb52b); color: #10264a; font: inherit; font-size: 13px; font-weight: 800; cursor: pointer; }
 .collection-page-nav button:disabled { opacity: .45; cursor: not-allowed; }
 .collection-page-indicator { min-width: 74px; color: #fbfaf5; font-size: 13px; font-weight: 800; text-align: center; }
+.collection-search { width: 100%; max-width: 480px; margin: 12px 0 6px; padding: 12px 14px; border: 1px solid rgba(243, 191, 56, .75); border-radius: 11px; background: #fffdf7; color: #10264a; font: inherit; }
+.collection-search-label { display: block; margin-top: 12px; color: #fbfaf5; font-size: 13px; font-weight: 700; }
+.collection-search-status { min-height: 18px; margin: 4px 0 8px; color: #c6d2e5; font-size: 12px; }
 .player-card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; margin-top: 16px; }
 .player-card { position: relative; overflow: hidden; background: #fff; border: 3px solid #9e9e9e; border-radius: 16px; box-shadow: 0 6px 18px rgba(30,90,120,.1); }
 .card-quantity-badge { position: absolute; z-index: 2; top: 8px; right: 8px; min-width: 38px; padding: 6px 9px; border: 2px solid #fff; border-radius: 999px; background: #173b52; color: #fff; text-align: center; font-size: 13px; font-weight: 800; box-shadow: 0 2px 8px rgba(0,0,0,.25); }
@@ -2073,6 +2076,9 @@ body {
         <button id="collectionBackButton" class="admin-back" type="button">← Retour à l’accueil</button>
         <h2 id="collectionTitle">🗂️ Mon classeur</h2>
         <p class="admin-note">Tes cartes sont rangées par numéro. Les emplacements vides correspondent aux cartes encore à découvrir.</p>
+        <label class="collection-search-label" for="collectionSearchInput">Rechercher une carte par son nom</label>
+        <input id="collectionSearchInput" class="collection-search" type="search" maxlength="80" placeholder="Rechercher une carte découverte…" autocomplete="off">
+        <p id="collectionSearchStatus" class="collection-search-status" role="status" aria-live="polite"></p>
         <p id="ownedCardsStatus" class="admin-status" role="status"></p>
         <div class="collection-album-sheet">
             <div id="ownedPlayerCardGrid" class="collection-album-grid" aria-label="Page du classeur, neuf emplacements"></div>
@@ -2588,6 +2594,8 @@ const feedbackSubmitButton = document.getElementById("feedbackSubmitButton");
 const feedbackStatus = document.getElementById("feedbackStatus");
 const collectionPage = document.getElementById("collectionPage");
 const collectionBackButton = document.getElementById("collectionBackButton");
+const collectionSearchInput = document.getElementById("collectionSearchInput");
+const collectionSearchStatus = document.getElementById("collectionSearchStatus");
 const rulesPage = document.getElementById("rulesPage");
 const rulesBackButton = document.getElementById("rulesBackButton");
 const rulesLoadStatus = document.getElementById("rulesLoadStatus");
@@ -2602,6 +2610,7 @@ const rulesNavButton = document.getElementById("rulesNavButton");
 let ownedAlbumCards = [];
 let collectionMaxCardNumber = 0;
 let collectionAlbumPage = 0;
+let collectionSearchQuery = "";
 const adminBackButton = document.getElementById("adminBackButton");
 const playersStatus = document.getElementById("playersStatus");
 const playersList = document.getElementById("playersList");
@@ -3323,7 +3332,12 @@ async function loadOwnedPlayerCards() {
 }
 
 function renderCollectionAlbum() {
-    const totalPages = Math.max(1, Math.ceil(collectionMaxCardNumber / 9));
+    const normalizedQuery = collectionSearchQuery.trim().toLocaleLowerCase("fr");
+    const matchingCards = normalizedQuery
+        ? ownedAlbumCards.filter((card) => String(card.name || "").toLocaleLowerCase("fr").includes(normalizedQuery))
+        : null;
+    const totalItems = matchingCards ? matchingCards.length : collectionMaxCardNumber;
+    const totalPages = Math.max(1, Math.ceil(totalItems / 9));
     collectionAlbumPage = Math.min(Math.max(0, collectionAlbumPage), totalPages - 1);
     const firstCardNumber = collectionAlbumPage * 9 + 1;
     const cardsByNumber = new Map();
@@ -3334,12 +3348,23 @@ function renderCollectionAlbum() {
     });
 
     ownedPlayerCardGrid.replaceChildren();
-    for (let number = firstCardNumber; number < firstCardNumber + 9; number += 1) {
-        const card = cardsByNumber.get(number);
-        ownedPlayerCardGrid.append(card ? createAlbumCardElement(card) : createEmptyAlbumSlot());
+    if (matchingCards) {
+        collectionSearchStatus.textContent = matchingCards.length
+            ? matchingCards.length + (matchingCards.length > 1 ? " carte(s) découverte(s) trouvée(s)." : " carte découverte trouvée.")
+            : "Aucune carte découverte ne correspond à cette recherche.";
+        for (let index = collectionAlbumPage * 9; index < collectionAlbumPage * 9 + 9; index += 1) {
+            const card = matchingCards[index];
+            ownedPlayerCardGrid.append(card ? createAlbumCardElement(card) : createEmptyAlbumSlot());
+        }
+    } else {
+        collectionSearchStatus.textContent = "La recherche porte sur les cartes déjà découvertes.";
+        for (let number = firstCardNumber; number < firstCardNumber + 9; number += 1) {
+            const card = cardsByNumber.get(number);
+            ownedPlayerCardGrid.append(card ? createAlbumCardElement(card) : createEmptyAlbumSlot());
+        }
     }
 
-    collectionPageIndicator.textContent = "Page " + (collectionAlbumPage + 1) + " / " + totalPages;
+    collectionPageIndicator.textContent = (matchingCards ? "Résultats " : "Page ") + (collectionAlbumPage + 1) + " / " + totalPages;
     collectionPreviousPageButton.disabled = collectionAlbumPage === 0;
     collectionNextPageButton.disabled = collectionAlbumPage >= totalPages - 1;
 }
@@ -3698,6 +3723,11 @@ openDailyBoosterButton.addEventListener("click", async () => {
 homeNavButton.addEventListener("click", showHomePage);
 collectionBackButton.addEventListener("click", showHomePage);
 rulesBackButton.addEventListener("click", showHomePage);
+collectionSearchInput.addEventListener("input", () => {
+    collectionSearchQuery = collectionSearchInput.value;
+    collectionAlbumPage = 0;
+    renderCollectionAlbum();
+});
 collectionPreviousPageButton.addEventListener("click", () => {
     collectionAlbumPage -= 1;
     renderCollectionAlbum();
