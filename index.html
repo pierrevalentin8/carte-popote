@@ -974,7 +974,7 @@ body {
 .announcement-item { border-left: 3px solid #e5b530; padding-left: 12px; }
 .announcement-item .journal-title { color: #173b52; }
 .home-card-count { display: flex; align-items: center; justify-content: center; gap: 14px; margin: 14px 0 22px; padding: 13px 18px; border: 1px solid rgba(243, 191, 56, .75); border-radius: 15px; background: linear-gradient(110deg, #10264a, #183966); color: #fbfaf5; box-shadow: 0 8px 20px rgba(0, 0, 0, .22); }
-.home-card-count-icon { font-size: 27px; line-height: 1; }
+.home-card-count-icon { display: block; width: 42px; height: 58px; flex: 0 0 auto; object-fit: contain; filter: drop-shadow(0 3px 5px rgba(0, 0, 0, .32)); }
 .home-card-count-copy { display: flex; align-items: baseline; flex-wrap: wrap; gap: 6px; }
 .home-card-count-value { color: #f7d46b; font-size: 27px; font-weight: 900; line-height: 1; }
 .home-card-count-label { color: #fbfaf5; font-size: 13px; font-weight: 700; }
@@ -1797,7 +1797,7 @@ body {
 
 
         <section class="home-card-count" aria-label="Nombre de cartes créées dans le jeu">
-            <span class="home-card-count-icon" aria-hidden="true">🃏</span>
+            <img class="home-card-count-icon" src="./assets/dos-cartes.png" alt="Dos d’une carte Cartes & Popote">
             <div class="home-card-count-copy">
                 <strong id="publicCardCount" class="home-card-count-value">—</strong>
                 <span class="home-card-count-label">cartes déjà créées</span>
