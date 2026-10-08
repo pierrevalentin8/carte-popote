@@ -577,6 +577,28 @@ body {
         );
 }
 
+.profile-card-toggle {
+    width: 100%;
+    font: inherit;
+    text-align: left;
+    color: inherit;
+    border: 1px solid transparent;
+    cursor: pointer;
+    transition: transform .18s ease, box-shadow .18s ease;
+}
+
+.profile-card-toggle:active { transform: scale(.99); }
+.profile-card-toggle:focus-visible { outline: 3px solid #f0bd36; outline-offset: 3px; }
+.profile-card-toggle::after {
+    content: "⌄";
+    color: #b08012;
+    font-size: 22px;
+    font-weight: 800;
+    margin-left: auto;
+    transition: transform .2s ease;
+}
+.profile-card-toggle[aria-expanded="true"]::after { transform: rotate(180deg); }
+
 
 .avatar {
 
@@ -600,8 +622,6 @@ body {
     border: 0;
     cursor: pointer;
 }
-
-.avatar:focus-visible { outline: 3px solid #f0bd36; outline-offset: 3px; }
 
 .avatar img {
     display: block;
@@ -692,6 +712,36 @@ body {
     margin-top: 12px;
 }
 
+.stats-disclosure {
+    max-height: 0;
+    margin-top: 0;
+    opacity: 0;
+    overflow: hidden;
+    pointer-events: none;
+    transition: max-height .28s ease, opacity .2s ease, margin-top .2s ease;
+}
+.stats-disclosure.is-open {
+    max-height: 190px;
+    margin-top: 12px;
+    opacity: 1;
+    pointer-events: auto;
+}
+.stats-disclosure .stats { margin-top: 0; }
+.profile-shortcut {
+    display: block;
+    margin: 9px 0 0 auto;
+    padding: 5px 9px;
+    border: 0;
+    border-radius: 8px;
+    background: transparent;
+    color: #173b52;
+    font: inherit;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+}
+.profile-shortcut:hover { background: rgba(243, 191, 56, .16); }
+
 
 .stat {
 
@@ -726,52 +776,6 @@ body {
     color: #7192a4;
 }
 
-
-/* ==================================================
-   BIENVENUE
-   ================================================== */
-
-.welcome {
-
-    margin-top: 18px;
-
-    padding: 22px;
-
-    border-radius: 20px;
-
-    background:
-        linear-gradient(
-            135deg,
-            #45b5df,
-            #73c9e8
-        );
-
-    color: #ffffff;
-
-    box-shadow:
-        0 8px 22px
-        rgba(
-            69,
-            181,
-            223,
-            0.22
-        );
-}
-
-
-.welcome h2 {
-
-    font-size: 22px;
-
-    margin-bottom: 7px;
-}
-
-
-.welcome p {
-
-    font-size: 13px;
-
-    line-height: 1.5;
 
     opacity: 0.95;
 }
@@ -1377,13 +1381,6 @@ body {
 .stat { background: #f1ead9; border: 1px solid #e5d3a5; }
 .stat-value { color: #9a6b09; }
 .stat-label { color: #6c7180; }
-.welcome {
-    background: linear-gradient(135deg, #10264a, #183966);
-    border: 1px solid rgba(243, 191, 56, .72);
-    color: var(--theme-cream);
-    box-shadow: 0 12px 28px rgba(0, 0, 0, .28);
-}
-.welcome h2 { color: var(--theme-gold-light); }
 .section-title h3 { color: var(--theme-gold-light); }
 .section-title span { color: #c6d2e5; }
 .booster { padding: 14px 10px; }
@@ -1688,12 +1685,11 @@ body {
 
         <!-- PROFIL -->
 
-        <section class="profile-card">
+        <section class="profile-card profile-card-toggle" id="playerStatsToggle" role="button" tabindex="0" aria-expanded="false" aria-controls="playerStatsPanel" aria-label="Afficher les jetons, cartes et boosters disponibles">
 
-
-            <button class="avatar" id="playerAvatar" type="button" aria-label="Ouvrir mon profil" title="Ouvrir mon profil">
+            <span class="avatar" id="playerAvatar" aria-hidden="true">
                 👤
-            </button>
+            </span>
 
 
             <div class="profile-info">
@@ -1732,6 +1728,7 @@ body {
 
         <!-- STATS -->
 
+        <div class="stats-disclosure" id="playerStatsPanel" aria-hidden="true" inert>
         <div class="stats">
 
 
@@ -1784,24 +1781,10 @@ body {
 
 
         </div>
+        <button class="profile-shortcut" id="viewProfileFromStatsButton" type="button">Voir mon profil →</button>
+        </div>
 
 
-
-        <!-- BIENVENUE -->
-
-        <section class="welcome">
-
-            <h2>
-                Bienvenue ! 👋
-            </h2>
-
-            <p>
-                Prépare-toi à découvrir,
-                collectionner et échanger
-                tes cartes.
-            </p>
-
-        </section>
 
         <section class="home-card-count" aria-label="Nombre de cartes créées dans le jeu">
             <span class="home-card-count-icon" aria-hidden="true">🃏</span>
@@ -2341,6 +2324,9 @@ const registerPseudo = document.getElementById("registerPseudo");
 const registerAvatarField = document.getElementById("registerAvatarField");
 const avatarChoices = Array.from(document.querySelectorAll(".avatar-choice"));
 const playerAvatar = document.getElementById("playerAvatar");
+const playerStatsToggle = document.getElementById("playerStatsToggle");
+const playerStatsPanel = document.getElementById("playerStatsPanel");
+const viewProfileFromStatsButton = document.getElementById("viewProfileFromStatsButton");
 const PLAYER_AVATARS = {
     "femme-blonde": "./avatar-femme-blonde.png",
     "femme-brune": "./avatar-femme-brune.png",
@@ -2884,6 +2870,22 @@ function showHomePage() {
     collectionNavButton.classList.remove("active");
 }
 
+function togglePlayerStats() {
+    const expanded = playerStatsToggle.getAttribute("aria-expanded") === "true";
+    playerStatsToggle.setAttribute("aria-expanded", String(!expanded));
+    playerStatsPanel.setAttribute("aria-hidden", String(expanded));
+    playerStatsPanel.inert = expanded;
+    playerStatsPanel.classList.toggle("is-open", !expanded);
+}
+
+playerStatsToggle.addEventListener("click", togglePlayerStats);
+playerStatsToggle.addEventListener("keydown", (event) => {
+    if (event.key === "Enter" || event.key === " ") {
+        event.preventDefault();
+        togglePlayerStats();
+    }
+});
+
 async function loadPersonalProfile() {
     if (!auth.currentUser) return;
     try {
@@ -2961,7 +2963,7 @@ function totalXpRequiredForLevel(targetLevel) {
     return total;
 }
 
-playerAvatar.addEventListener("click", async () => {
+viewProfileFromStatsButton.addEventListener("click", async () => {
     dropdownMenu.classList.add("hidden");
     document.querySelector(".app-content").classList.add("hidden");
     leaderboardPage.classList.add("hidden");
