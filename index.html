@@ -967,6 +967,9 @@ body {
     color: #9aafb9;
 }
 
+.announcement-item { border-left: 3px solid #e5b530; padding-left: 12px; }
+.announcement-item .journal-title { color: #173b52; }
+
 
 /* ==================================================
    NAVIGATION BAS
@@ -1876,7 +1879,7 @@ body {
 
 
         <section class="journal">
-
+            <div id="announcementsList"></div>
 
             <article class="journal-item">
 
@@ -2012,14 +2015,30 @@ body {
     <section id="adminPage" class="admin-page hidden">
         <button id="adminBackButton" class="admin-back" type="button">← Retour à l’accueil</button>
         <h2>🛡️ Administration</h2>
-        <p class="admin-note">Gestion des joueurs, des raretés et des cartes. Les accès sont protégés par les règles Firestore.</p>
+        <p class="admin-note">Gestion des joueurs, du journal, des raretés, des cartes et des messages. Les accès sont protégés par les règles Firestore.</p>
         <nav class="admin-menu" aria-label="Rubriques d’administration">
             <button class="admin-menu-button" type="button" data-admin-section="players" aria-controls="adminPlayersSection" aria-pressed="false">👥 Joueurs</button>
+            <button class="admin-menu-button" type="button" data-admin-section="journal" aria-controls="adminJournalSection" aria-pressed="false">📰 Journal</button>
             <button class="admin-menu-button" type="button" data-admin-section="rarities" aria-controls="adminRaritiesSection" aria-pressed="false">⭐ Catégories de rareté</button>
             <button class="admin-menu-button" type="button" data-admin-section="cards" aria-controls="adminCardsSection" aria-pressed="false">🃏 Création de cartes</button>
             <button class="admin-menu-button admin-messaging-button" type="button" data-admin-section="messages" aria-controls="adminMessagesSection" aria-pressed="false" aria-label="Messagerie Admin, boîte à idées et problèmes"><img src="./Messagerie.png" alt=""><span>Boîte de réception</span></button>
         </nav>
         <p id="adminSectionHint" class="admin-note">Choisis une rubrique pour afficher son contenu.</p>
+        <div id="adminJournalSection" class="admin-panel admin-section hidden" style="margin-bottom:16px">
+            <h3>📰 Publier une annonce</h3>
+            <p class="admin-note">Ton annonce apparaîtra dans le Journal de la page d’accueil.</p>
+            <form id="announcementForm">
+                <label for="announcementTitle">Titre de l’annonce</label>
+                <input id="announcementTitle" class="admin-field" type="text" maxlength="80" placeholder="Ex. Nouveau booster disponible" required>
+                <label for="announcementMessage">Message</label>
+                <textarea id="announcementMessage" class="admin-field" maxlength="1500" rows="4" placeholder="Écris ton annonce…" required></textarea>
+                <button id="announcementSubmit" class="primary-button admin-submit" type="submit">Publier dans le Journal</button>
+            </form>
+            <p id="announcementStatus" class="admin-status" role="status" aria-live="polite"></p>
+            <h3>📋 Annonces publiées</h3>
+            <p id="adminAnnouncementsStatus" class="admin-status" role="status" aria-live="polite"></p>
+            <div id="adminAnnouncementsList"></div>
+        </div>
         <div id="adminPlayersSection" class="admin-panel admin-section hidden" style="margin-bottom:16px">
             <h3>👥 Joueurs</h3>
             <p class="admin-note">Tu peux ajouter ou retirer des jetons. Un achat de booster débite uniquement le prix prévu par les règles du jeu.</p>
@@ -2400,10 +2419,19 @@ const adminPage = document.getElementById("adminPage");
 const adminSectionHint = document.getElementById("adminSectionHint");
 const adminSections = {
     players: document.getElementById("adminPlayersSection"),
+    journal: document.getElementById("adminJournalSection"),
     rarities: document.getElementById("adminRaritiesSection"),
     cards: document.getElementById("adminCardsSection"),
     messages: document.getElementById("adminMessagesSection")
 };
+const announcementsList = document.getElementById("announcementsList");
+const announcementForm = document.getElementById("announcementForm");
+const announcementTitle = document.getElementById("announcementTitle");
+const announcementMessage = document.getElementById("announcementMessage");
+const announcementSubmit = document.getElementById("announcementSubmit");
+const announcementStatus = document.getElementById("announcementStatus");
+const adminAnnouncementsStatus = document.getElementById("adminAnnouncementsStatus");
+const adminAnnouncementsList = document.getElementById("adminAnnouncementsList");
 const adminMessagesStatus = document.getElementById("adminMessagesStatus");
 const adminMessagesList = document.getElementById("adminMessagesList");
 const feedbackToggleButton = document.getElementById("feedbackToggleButton");
@@ -2629,6 +2657,7 @@ onAuthStateChanged(
         // Affichage seulement : les règles Firestore protègent les données.
         const isAdminAccount = (user.email || "").toLowerCase() === ADMIN_EMAIL;
         adminButton.classList.toggle("hidden", !isAdminAccount);
+        loadHomeAnnouncements();
 
 
 
@@ -3555,6 +3584,7 @@ async function showAdminSection(sectionName) {
     });
 
     if (sectionName === "players") await loadPlayers();
+    if (sectionName === "journal") await loadAdminAnnouncements();
     if (sectionName === "rarities") await loadRarities();
     if (sectionName === "cards") {
         await loadRarities();
@@ -3564,6 +3594,138 @@ async function showAdminSection(sectionName) {
         await loadAdminMessages("idee");
     }
 }
+
+function timestampToMilliseconds(value) {
+    if (value && typeof value.toMillis === "function") return value.toMillis();
+    if (value && typeof value.toDate === "function") return value.toDate().getTime();
+    return 0;
+}
+
+function makeAnnouncementItem(announcement) {
+    const item = document.createElement("article");
+    item.className = "journal-item announcement-item";
+    const title = document.createElement("div");
+    title.className = "journal-title";
+    title.textContent = "📣 " + announcement.title;
+    const message = document.createElement("p");
+    message.className = "journal-title";
+    message.style.marginTop = "7px";
+    message.style.fontWeight = "400";
+    message.style.lineHeight = "1.5";
+    message.textContent = announcement.message;
+    const date = document.createElement("div");
+    date.className = "journal-date";
+    date.textContent = formatAdminMessageDate(announcement.createdAt);
+    item.append(title, message, date);
+    return item;
+}
+
+async function loadHomeAnnouncements() {
+    announcementsList.replaceChildren();
+    if (!auth.currentUser) return;
+    try {
+        const snapshot = await getDocs(collection(db, "announcements"));
+        const announcements = snapshot.docs
+            .map((announcementDoc) => announcementDoc.data())
+            .sort((left, right) => timestampToMilliseconds(right.createdAt) - timestampToMilliseconds(left.createdAt))
+            .slice(0, 10);
+        announcements.forEach((announcement) => announcementsList.append(makeAnnouncementItem(announcement)));
+    } catch (error) {
+        console.error("Erreur de chargement des annonces du Journal :", error);
+    }
+}
+
+async function loadAdminAnnouncements() {
+    adminAnnouncementsList.replaceChildren();
+    adminAnnouncementsStatus.textContent = "Chargement des annonces…";
+    if (!auth.currentUser || (auth.currentUser.email || "").toLowerCase() !== ADMIN_EMAIL) {
+        adminAnnouncementsStatus.textContent = "Accès réservé au compte Admin.";
+        return;
+    }
+
+    try {
+        const snapshot = await getDocs(collection(db, "announcements"));
+        const announcements = snapshot.docs
+            .map((announcementDoc) => ({ id: announcementDoc.id, ...announcementDoc.data() }))
+            .sort((left, right) => timestampToMilliseconds(right.createdAt) - timestampToMilliseconds(left.createdAt));
+        if (announcements.length === 0) {
+            adminAnnouncementsStatus.textContent = "Aucune annonce publiée pour le moment.";
+            return;
+        }
+
+        adminAnnouncementsStatus.textContent = announcements.length + (announcements.length > 1 ? " annonces publiées" : " annonce publiée");
+        announcements.forEach((announcement) => {
+            const row = document.createElement("div");
+            row.className = "admin-card-row";
+            const details = document.createElement("div");
+            const title = document.createElement("strong");
+            title.textContent = announcement.title || "Annonce sans titre";
+            const message = document.createElement("small");
+            message.textContent = (announcement.message || "") + " • " + formatAdminMessageDate(announcement.createdAt);
+            details.append(title, message);
+            const remove = document.createElement("button");
+            remove.type = "button";
+            remove.className = "admin-danger";
+            remove.textContent = "Supprimer";
+            remove.addEventListener("click", async () => {
+                if (!confirm("Supprimer cette annonce du Journal ?")) return;
+                remove.disabled = true;
+                try {
+                    await deleteDoc(doc(db, "announcements", announcement.id));
+                    announcementStatus.textContent = "Annonce supprimée.";
+                    await Promise.all([loadAdminAnnouncements(), loadHomeAnnouncements()]);
+                } catch (error) {
+                    console.error("Erreur de suppression de l’annonce :", error);
+                    adminAnnouncementsStatus.textContent = "Suppression refusée. Vérifie les règles Firestore.";
+                    remove.disabled = false;
+                }
+            });
+            row.append(details, remove);
+            adminAnnouncementsList.append(row);
+        });
+    } catch (error) {
+        console.error("Erreur de chargement des annonces Admin :", error);
+        adminAnnouncementsStatus.textContent = error.code === "permission-denied"
+            ? "Accès refusé. Vérifie que les nouvelles règles Firestore sont publiées."
+            : "Impossible de charger les annonces. Vérifie les règles Firestore.";
+    }
+}
+
+announcementForm.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    if (!auth.currentUser || (auth.currentUser.email || "").toLowerCase() !== ADMIN_EMAIL) {
+        announcementStatus.textContent = "Accès réservé au compte Admin.";
+        return;
+    }
+
+    const title = announcementTitle.value.trim();
+    const message = announcementMessage.value.trim();
+    if (title.length < 3 || title.length > 80 || message.length < 3 || message.length > 1500) {
+        announcementStatus.textContent = "Le titre doit faire 3 à 80 caractères et le message 3 à 1 500 caractères.";
+        return;
+    }
+
+    announcementSubmit.disabled = true;
+    announcementStatus.textContent = "Publication de l’annonce…";
+    try {
+        await addDoc(collection(db, "announcements"), {
+            title,
+            message,
+            authorUid: auth.currentUser.uid,
+            createdAt: serverTimestamp()
+        });
+        announcementForm.reset();
+        announcementStatus.textContent = "Annonce publiée dans le Journal.";
+        await Promise.all([loadAdminAnnouncements(), loadHomeAnnouncements()]);
+    } catch (error) {
+        console.error("Erreur de publication de l’annonce :", error);
+        announcementStatus.textContent = error.code === "permission-denied"
+            ? "Publication refusée. Publie les nouvelles règles Firestore."
+            : "Impossible de publier l’annonce. Vérifie la connexion et les règles Firestore.";
+    } finally {
+        announcementSubmit.disabled = false;
+    }
+});
 
 function formatAdminMessageDate(value) {
     const date = value && typeof value.toDate === "function" ? value.toDate() : null;
