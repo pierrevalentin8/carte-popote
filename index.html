@@ -1095,6 +1095,14 @@ body {
 
 .admin-page { width: 100%; max-width: 700px; margin: auto; padding: 20px 16px 100px; }
 .admin-page:has(#adminCardsSection) { max-width: 1600px; }
+.rules-page { width: 100%; max-width: 760px; margin: auto; padding: 20px 16px 100px; color: var(--theme-cream); }
+.rules-page h2 { margin-bottom: 8px; color: var(--theme-gold-light); }
+.rules-viewer { min-height: 110px; margin-top: 14px; padding: 16px; border: 1px solid rgba(243, 191, 56, .65); border-radius: 14px; background: var(--theme-cream); color: var(--theme-ink); white-space: pre-wrap; overflow-wrap: anywhere; line-height: 1.6; }
+.rules-admin-panel { margin-top: 18px; padding: 16px; border: 1px solid rgba(243, 191, 56, .65); border-radius: 14px; background: #10264a; }
+.rules-admin-panel h3 { color: var(--theme-gold-light); }
+.rules-admin-panel label { display: block; margin: 12px 0 6px; color: var(--theme-cream); font-size: 13px; font-weight: 700; }
+.rules-admin-panel textarea { min-height: 230px; resize: vertical; white-space: pre-wrap; }
+.rules-page-status { min-height: 20px; margin-top: 8px; color: var(--theme-cream); font-size: 13px; }
 .admin-panel { background: #fff; border-radius: 18px; padding: 18px; box-shadow: 0 6px 20px rgba(45,155,200,.08); }
 .admin-page h2 { margin-bottom: 8px; color: #173b52; }
 .admin-note, .admin-status { color: #68899b; font-size: 13px; line-height: 1.5; margin: 8px 0 14px; }
@@ -2076,6 +2084,20 @@ body {
         </nav>
     </section>
 
+    <section id="rulesPage" class="rules-page hidden" aria-labelledby="rulesPageTitle">
+        <button id="rulesBackButton" class="admin-back" type="button">← Retour à l’accueil</button>
+        <h2 id="rulesPageTitle">📖 Règles du jeu</h2>
+        <p id="rulesLoadStatus" class="admin-note" role="status" aria-live="polite"></p>
+        <div id="rulesViewer" class="rules-viewer">Les règles seront publiées prochainement.</div>
+        <div id="rulesAdminPanel" class="rules-admin-panel hidden">
+            <h3>Modifier les règles</h3>
+            <label for="rulesEditor">Texte visible par les joueurs</label>
+            <textarea id="rulesEditor" class="admin-field" maxlength="12000" placeholder="Écris ici les règles du jeu…"></textarea>
+            <button id="rulesSaveButton" class="primary-button admin-submit" type="button">Enregistrer les règles</button>
+            <p id="rulesSaveStatus" class="rules-page-status" role="status" aria-live="polite"></p>
+        </div>
+    </section>
+
     <section id="cardZoomModal" class="card-zoom-modal hidden" role="dialog" aria-modal="true" aria-labelledby="cardZoomTitle" aria-hidden="true">
         <div class="card-zoom-content">
             <button id="cardZoomCloseButton" class="card-zoom-close" type="button" aria-label="Fermer l’aperçu">×</button>
@@ -2231,7 +2253,7 @@ body {
         </button>
 
 
-        <button class="nav-item" type="button" disabled title="Bientôt disponible">
+        <button id="rulesNavButton" class="nav-item" type="button">
 
             <span class="nav-icon">
                 📖
@@ -2566,8 +2588,17 @@ const feedbackSubmitButton = document.getElementById("feedbackSubmitButton");
 const feedbackStatus = document.getElementById("feedbackStatus");
 const collectionPage = document.getElementById("collectionPage");
 const collectionBackButton = document.getElementById("collectionBackButton");
+const rulesPage = document.getElementById("rulesPage");
+const rulesBackButton = document.getElementById("rulesBackButton");
+const rulesLoadStatus = document.getElementById("rulesLoadStatus");
+const rulesViewer = document.getElementById("rulesViewer");
+const rulesAdminPanel = document.getElementById("rulesAdminPanel");
+const rulesEditor = document.getElementById("rulesEditor");
+const rulesSaveButton = document.getElementById("rulesSaveButton");
+const rulesSaveStatus = document.getElementById("rulesSaveStatus");
 const homeNavButton = document.getElementById("homeNavButton");
 const collectionNavButton = document.getElementById("collectionNavButton");
+const rulesNavButton = document.getElementById("rulesNavButton");
 let ownedAlbumCards = [];
 let collectionMaxCardNumber = 0;
 let collectionAlbumPage = 0;
@@ -2782,6 +2813,7 @@ onAuthStateChanged(
             adminButton.classList.add("hidden");
             adminMessagesMenuButton.classList.add("hidden");
             messagingPage.classList.add("hidden");
+            rulesPage.classList.add("hidden");
             profilePage.classList.add("hidden");
             leaderboardPage.classList.add("hidden");
             statisticsPage.classList.add("hidden");
@@ -2996,9 +3028,11 @@ function showHomePage() {
     collectionPage.classList.add("hidden");
     adminPage.classList.add("hidden");
     messagingPage.classList.add("hidden");
+    rulesPage.classList.add("hidden");
     bottomNav.classList.remove("hidden");
     homeNavButton.classList.add("active");
     collectionNavButton.classList.remove("active");
+    rulesNavButton.classList.remove("active");
 }
 
 function togglePlayerStats() {
@@ -3102,6 +3136,7 @@ viewProfileFromStatsButton.addEventListener("click", async () => {
     collectionPage.classList.add("hidden");
     adminPage.classList.add("hidden");
     messagingPage.classList.add("hidden");
+    rulesPage.classList.add("hidden");
     bottomNav.classList.add("hidden");
     profilePage.classList.remove("hidden");
     await loadPersonalProfile();
@@ -3208,6 +3243,7 @@ statisticsMenuButton.addEventListener("click", async () => {
     collectionPage.classList.add("hidden");
     adminPage.classList.add("hidden");
     messagingPage.classList.add("hidden");
+    rulesPage.classList.add("hidden");
     bottomNav.classList.add("hidden");
     statisticsPage.classList.remove("hidden");
     await loadStatistics();
@@ -3223,6 +3259,7 @@ leaderboardMenuButton.addEventListener("click", async () => {
     collectionPage.classList.add("hidden");
     adminPage.classList.add("hidden");
     messagingPage.classList.add("hidden");
+    rulesPage.classList.add("hidden");
     bottomNav.classList.add("hidden");
     leaderboardPage.classList.remove("hidden");
     await loadLeaderboard();
@@ -3576,10 +3613,12 @@ document.getElementById("viewOwnedCardsButton").addEventListener("click", async 
     document.querySelector(".app-content").classList.add("hidden");
     adminPage.classList.add("hidden");
     messagingPage.classList.add("hidden");
+    rulesPage.classList.add("hidden");
     collectionPage.classList.remove("hidden");
     bottomNav.classList.remove("hidden");
     homeNavButton.classList.remove("active");
     collectionNavButton.classList.add("active");
+    rulesNavButton.classList.remove("active");
     await loadOwnedPlayerCards();
 });
 
@@ -3658,6 +3697,7 @@ openDailyBoosterButton.addEventListener("click", async () => {
 
 homeNavButton.addEventListener("click", showHomePage);
 collectionBackButton.addEventListener("click", showHomePage);
+rulesBackButton.addEventListener("click", showHomePage);
 collectionPreviousPageButton.addEventListener("click", () => {
     collectionAlbumPage -= 1;
     renderCollectionAlbum();
@@ -3667,6 +3707,69 @@ collectionNextPageButton.addEventListener("click", () => {
     renderCollectionAlbum();
 });
 
+async function loadGameRules() {
+    const isAdmin = auth.currentUser && (auth.currentUser.email || "").toLowerCase() === ADMIN_EMAIL;
+    rulesAdminPanel.classList.toggle("hidden", !isAdmin);
+    rulesLoadStatus.textContent = "Chargement des règles…";
+    rulesSaveStatus.textContent = "";
+    try {
+        const rulesSnapshot = await getDoc(doc(db, "gameRules", "main"));
+        const text = rulesSnapshot.exists() && typeof rulesSnapshot.data().text === "string"
+            ? rulesSnapshot.data().text
+            : "";
+        rulesViewer.textContent = text.trim() ? text : "Les règles seront publiées prochainement.";
+        if (isAdmin) rulesEditor.value = text;
+        rulesLoadStatus.textContent = "";
+    } catch (error) {
+        console.error("Erreur de chargement des règles :", error);
+        rulesLoadStatus.textContent = "Impossible de charger les règles. Vérifie que les règles Firestore mises à jour ont été publiées.";
+    }
+}
+
+rulesSaveButton.addEventListener("click", async () => {
+    if (!auth.currentUser || (auth.currentUser.email || "").toLowerCase() !== ADMIN_EMAIL) {
+        rulesSaveStatus.textContent = "Seul le compte Admin peut modifier les règles.";
+        return;
+    }
+    const text = rulesEditor.value.trim();
+    if (!text) {
+        rulesSaveStatus.textContent = "Écris le texte des règles avant de l’enregistrer.";
+        return;
+    }
+
+    rulesSaveButton.disabled = true;
+    rulesSaveStatus.textContent = "Enregistrement…";
+    try {
+        await setDoc(doc(db, "gameRules", "main"), {
+            text,
+            updatedAt: serverTimestamp(),
+            updatedBy: auth.currentUser.uid
+        });
+        rulesViewer.textContent = text;
+        rulesSaveStatus.textContent = "Les règles ont été enregistrées et sont visibles par les joueurs.";
+    } catch (error) {
+        console.error("Erreur d’enregistrement des règles :", error);
+        rulesSaveStatus.textContent = "Enregistrement refusé. Vérifie que les nouvelles règles Firestore ont été publiées.";
+    } finally {
+        rulesSaveButton.disabled = false;
+    }
+});
+
+rulesNavButton.addEventListener("click", async () => {
+    document.querySelector(".app-content").classList.add("hidden");
+    profilePage.classList.add("hidden");
+    leaderboardPage.classList.add("hidden");
+    statisticsPage.classList.add("hidden");
+    collectionPage.classList.add("hidden");
+    adminPage.classList.add("hidden");
+    messagingPage.classList.add("hidden");
+    rulesPage.classList.remove("hidden");
+    bottomNav.classList.remove("hidden");
+    document.querySelectorAll(".bottom-nav .nav-item").forEach((button) => button.classList.remove("active"));
+    rulesNavButton.classList.add("active");
+    await loadGameRules();
+});
+
 collectionNavButton.addEventListener("click", async () => {
     document.querySelector(".app-content").classList.add("hidden");
     profilePage.classList.add("hidden");
@@ -3674,10 +3777,12 @@ collectionNavButton.addEventListener("click", async () => {
     statisticsPage.classList.add("hidden");
     adminPage.classList.add("hidden");
     messagingPage.classList.add("hidden");
+    rulesPage.classList.add("hidden");
     collectionPage.classList.remove("hidden");
     bottomNav.classList.remove("hidden");
     homeNavButton.classList.remove("active");
     collectionNavButton.classList.add("active");
+    rulesNavButton.classList.remove("active");
     await loadOwnedPlayerCards();
 });
 
@@ -4412,6 +4517,7 @@ adminButton.addEventListener("click", async () => {
     statisticsPage.classList.add("hidden");
     collectionPage.classList.add("hidden");
     messagingPage.classList.add("hidden");
+    rulesPage.classList.add("hidden");
     bottomNav.classList.add("hidden");
     adminPage.classList.remove("hidden");
     Object.values(adminSections).forEach((section) => section.classList.add("hidden"));
@@ -4428,6 +4534,7 @@ adminMessagesMenuButton.addEventListener("click", async () => {
     statisticsPage.classList.add("hidden");
     collectionPage.classList.add("hidden");
     adminPage.classList.add("hidden");
+    rulesPage.classList.add("hidden");
     bottomNav.classList.add("hidden");
     messagingPage.classList.remove("hidden");
     await loadAdminMessages("idee");
