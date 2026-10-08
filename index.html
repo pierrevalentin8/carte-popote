@@ -2070,6 +2070,7 @@ body {
             <form id="cardForm">
                 <input id="cardName" class="admin-field" type="text" maxlength="80" placeholder="Nom de la carte" required>
                 <input id="cardCategory" class="admin-field" type="text" maxlength="50" placeholder="Catégorie" required>
+                <input id="cardNumber" class="admin-field" type="number" min="1" max="1000000" step="1" inputmode="numeric" placeholder="Numéro de carte (facultatif, attribué automatiquement si vide)">
                 <select id="cardRarity" class="admin-field" required>
                     <option value="">Choisir une rareté</option>
                 </select>
@@ -2477,6 +2478,7 @@ const raritiesList = document.getElementById("raritiesList");
 const cardForm = document.getElementById("cardForm");
 const cardName = document.getElementById("cardName");
 const cardCategory = document.getElementById("cardCategory");
+const cardNumber = document.getElementById("cardNumber");
 const cardRarity = document.getElementById("cardRarity");
 const cardImage = document.getElementById("cardImage");
 const cardImageFile = document.getElementById("cardImageFile");
@@ -3125,13 +3127,6 @@ function createPlayerCardElement(card, quantity = 1) {
     quantityBadge.textContent = "×" + quantity;
     quantityBadge.setAttribute("aria-label", quantity + (quantity === 1 ? " exemplaire" : " exemplaires"));
     cardElement.append(quantityBadge);
-    if (Number.isSafeInteger(Number(card.cardNumber)) && Number(card.cardNumber) > 0) {
-        const numberBadge = document.createElement("span");
-        numberBadge.className = "card-number-badge";
-        numberBadge.textContent = "N° " + String(card.cardNumber).padStart(3, "0");
-        numberBadge.setAttribute("aria-label", "Carte numéro " + card.cardNumber);
-        cardElement.append(numberBadge);
-    }
     if (/^https?:\/\//i.test(card.imageUrl || "")) {
         const image = document.createElement("img");
         image.className = "player-card-image";
@@ -3601,7 +3596,9 @@ function createAdminCardRow(cardDoc) {
     const name = document.createElement("strong");
     name.textContent = card.name || "Carte sans nom";
     const meta = document.createElement("small");
-    meta.textContent = (card.category || "Sans catégorie") + " • " + (card.rarity || "Sans rareté");
+    meta.textContent = (Number.isSafeInteger(Number(card.cardNumber)) && Number(card.cardNumber) > 0
+        ? "N° " + card.cardNumber + " • "
+        : "") + (card.category || "Sans catégorie") + " • " + (card.rarity || "Sans rareté");
     details.append(name, meta);
 
     const actions = document.createElement("div");
@@ -3613,6 +3610,7 @@ function createAdminCardRow(cardDoc) {
         editingCardId = cardDoc.id;
         cardName.value = card.name || "";
         cardCategory.value = card.category || "";
+        cardNumber.value = Number.isSafeInteger(Number(card.cardNumber)) && Number(card.cardNumber) > 0 ? String(card.cardNumber) : "";
         cardRarity.value = card.rarity || "";
         cardImage.value = card.imageUrl || "";
         cardImageFile.value = "";
@@ -4179,6 +4177,7 @@ cardForm.addEventListener("submit", async (event) => {
     const card = {
         name: cardName.value.trim(),
         category: cardCategory.value.trim(),
+        cardNumber: cardNumber.value.trim() ? Number(cardNumber.value) : null,
         rarity: cardRarity.value,
         rarityColor: getRarityColor(cardRarity.value),
         imageUrl: cardImage.value.trim(),
@@ -4186,6 +4185,10 @@ cardForm.addEventListener("submit", async (event) => {
         updatedAt: new Date().toISOString()
     };
     if (!card.name || !card.category) return;
+    if (cardNumber.value.trim() && (!Number.isSafeInteger(card.cardNumber) || card.cardNumber < 1)) {
+        adminStatus.textContent = "Le numéro doit être un nombre entier supérieur à zéro.";
+        return;
+    }
     const selectedImage = cardImageFile.files && cardImageFile.files[0];
     if (selectedImage) {
         const allowedTypes = ["image/jpeg", "image/png", "image/webp"];
@@ -4198,6 +4201,16 @@ cardForm.addEventListener("submit", async (event) => {
     adminStatus.textContent = "Enregistrement...";
     let cardSaveStage = "Firestore";
     try {
+        if (card.cardNumber !== null) {
+            const existingCards = await getDocs(collection(db, "cards"));
+            const duplicate = existingCards.docs.some((item) =>
+                item.id !== editingCardId && Number(item.data().cardNumber) === card.cardNumber
+            );
+            if (duplicate) {
+                adminStatus.textContent = "Ce numéro est déjà utilisé. Choisis un autre numéro.";
+                return;
+            }
+        }
         if (selectedImage) {
             cardSaveStage = "Storage";
             const safeName = selectedImage.name.replace(/[^a-zA-Z0-9._-]/g, "_");
