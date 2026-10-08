@@ -1710,6 +1710,10 @@ body {
                 🛡️ Administration
             </button>
 
+            <button id="adminMessagesMenuButton" class="hidden" type="button">
+                💬 Messagerie
+            </button>
+
 
             <button id="leaderboardMenuButton" type="button">
                 🏆 Classement
@@ -2504,6 +2508,7 @@ const statisticsStatus = document.getElementById("statisticsStatus");
 const statisticsTableBody = document.getElementById("statisticsTableBody");
 
 const adminButton = document.getElementById("adminButton");
+const adminMessagesMenuButton = document.getElementById("adminMessagesMenuButton");
 const ADMIN_EMAIL = "pierre.valentin8@gmail.com";
 const buyNormalBoosterButton = document.getElementById("buyNormalBoosterButton");
 const openNormalBoosterButton = document.getElementById("openNormalBoosterButton");
@@ -2771,6 +2776,7 @@ onAuthStateChanged(
 
         if (!user) {
             adminButton.classList.add("hidden");
+            adminMessagesMenuButton.classList.add("hidden");
             profilePage.classList.add("hidden");
             leaderboardPage.classList.add("hidden");
             statisticsPage.classList.add("hidden");
@@ -2806,6 +2812,7 @@ onAuthStateChanged(
         // Affichage seulement : les règles Firestore protègent les données.
         const isAdminAccount = (user.email || "").toLowerCase() === ADMIN_EMAIL;
         adminButton.classList.toggle("hidden", !isAdminAccount);
+        adminMessagesMenuButton.classList.toggle("hidden", !isAdminAccount);
         loadHomeAnnouncements();
         loadPublicCardCount();
 
@@ -4400,6 +4407,19 @@ adminButton.addEventListener("click", async () => {
     Object.values(adminSections).forEach((section) => section.classList.add("hidden"));
     adminSectionHint.classList.remove("hidden");
     document.querySelectorAll(".admin-menu-button").forEach((button) => button.setAttribute("aria-pressed", "false"));
+});
+
+adminMessagesMenuButton.addEventListener("click", async () => {
+    if (!auth.currentUser || (auth.currentUser.email || "").toLowerCase() !== ADMIN_EMAIL) return;
+    dropdownMenu.classList.add("hidden");
+    document.querySelector(".app-content").classList.add("hidden");
+    profilePage.classList.add("hidden");
+    leaderboardPage.classList.add("hidden");
+    statisticsPage.classList.add("hidden");
+    collectionPage.classList.add("hidden");
+    bottomNav.classList.add("hidden");
+    adminPage.classList.remove("hidden");
+    await showAdminSection("messages");
 });
 
 document.querySelectorAll(".admin-menu-button").forEach((button) => {
