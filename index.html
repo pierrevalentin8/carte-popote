@@ -969,6 +969,8 @@ body {
 
 .announcement-item { border-left: 3px solid #e5b530; padding-left: 12px; }
 .announcement-item .journal-title { color: #173b52; }
+.card-count-note { margin: 8px 4px 2px; color: #aebbd0; font-size: 11px; text-align: right; }
+.card-count-note strong { color: #f7d46b; font-size: 12px; }
 
 
 /* ==================================================
@@ -1925,6 +1927,8 @@ body {
 
         </section>
 
+        <p class="card-count-note" aria-live="polite">🃏 <strong id="publicCardCount">—</strong> cartes créées</p>
+
         <div class="message-compose-card">
             <button id="feedbackToggleButton" class="message-compose-toggle" type="button" aria-expanded="false" aria-controls="feedbackFormPanel" aria-label="Envoyer un message à l’Admin">
                 <img src="./enveloppe.png" alt="">
@@ -2284,6 +2288,7 @@ const callGetOwnedCardNumbers = httpsCallable(functions, "getOwnedCardNumbers");
 const callGetAdminPlayers = httpsCallable(functions, "getAdminPlayers");
 const callAdjustPlayerTokens = httpsCallable(functions, "adjustPlayerTokens");
 const callGetLeaderboard = httpsCallable(functions, "getLeaderboard");
+const callGetPublicCardCount = httpsCallable(functions, "getPublicCardCount");
 
 
 
@@ -2432,6 +2437,7 @@ const adminSections = {
     messages: document.getElementById("adminMessagesSection")
 };
 const announcementsList = document.getElementById("announcementsList");
+const publicCardCount = document.getElementById("publicCardCount");
 const announcementForm = document.getElementById("announcementForm");
 const announcementTitle = document.getElementById("announcementTitle");
 const announcementMessage = document.getElementById("announcementMessage");
@@ -2666,6 +2672,7 @@ onAuthStateChanged(
         const isAdminAccount = (user.email || "").toLowerCase() === ADMIN_EMAIL;
         adminButton.classList.toggle("hidden", !isAdminAccount);
         loadHomeAnnouncements();
+        loadPublicCardCount();
 
 
 
@@ -3556,6 +3563,7 @@ function createAdminCardRow(cardDoc) {
             await deleteDoc(doc(db, "cards", cardDoc.id));
             adminStatus.textContent = "Carte supprimée.";
             await loadCards();
+            await loadPublicCardCount();
         } catch (error) {
             console.error(error);
             adminStatus.textContent = "Suppression refusée. Vérifie les règles Firestore.";
@@ -3679,6 +3687,21 @@ async function loadHomeAnnouncements() {
         announcements.forEach((announcement) => announcementsList.append(makeAnnouncementItem(announcement)));
     } catch (error) {
         console.error("Erreur de chargement des annonces du Journal :", error);
+    }
+}
+
+async function loadPublicCardCount() {
+    publicCardCount.textContent = "…";
+    if (!auth.currentUser) return;
+    try {
+        const response = await callGetPublicCardCount();
+        const count = Number(response.data.count);
+        publicCardCount.textContent = Number.isSafeInteger(count) && count >= 0
+            ? count.toLocaleString("fr-FR")
+            : "—";
+    } catch (error) {
+        console.error("Erreur de chargement du nombre de cartes :", error);
+        publicCardCount.textContent = "—";
     }
 }
 
@@ -4125,6 +4148,7 @@ cardForm.addEventListener("submit", async (event) => {
         cardSubmit.textContent = "Ajouter la carte";
         cardCancelEdit.classList.add("hidden");
         await loadCards();
+        await loadPublicCardCount();
     } catch (error) {
         console.error("Erreur d’enregistrement :", error);
         if (cardSaveStage === "Storage" || String(error.code || "").startsWith("storage/")) {
