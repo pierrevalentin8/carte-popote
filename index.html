@@ -1100,6 +1100,23 @@ body {
 .player-token-controls .admin-danger { padding: 10px 12px; border: 0; border-radius: 9px; font-weight: 700; white-space: nowrap; cursor: pointer; }
 .admin-danger { color: #c0392b !important; background: #fff0f0 !important; }
 .admin-submit { margin-top: 8px; }
+.message-compose-card { margin-top: 20px; padding: 16px; border: 1px solid rgba(243, 191, 56, .65); border-radius: 16px; background: #10264a; color: #fbfaf5; }
+.message-compose-card h3 { margin-bottom: 6px; color: var(--theme-gold-light); }
+.message-compose-card p { margin: 6px 0 12px; color: #c6d2e5; font-size: 13px; line-height: 1.5; }
+.message-compose-toggle { padding: 10px 14px; border: 1px solid #d7a51e; border-radius: 10px; background: linear-gradient(135deg, var(--theme-gold-light), #edb52b); color: var(--theme-navy); font: inherit; font-weight: 800; cursor: pointer; }
+.message-compose-form { margin-top: 14px; }
+.message-category-tabs { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0; }
+.message-category-button { flex: 1 1 150px; min-height: 44px; padding: 9px 12px; border: 1px solid #d7a51e; border-radius: 10px; background: #10264a; color: var(--theme-cream); font: inherit; font-weight: 700; cursor: pointer; }
+.message-category-button[aria-pressed="true"] { background: linear-gradient(135deg, var(--theme-gold-light), #edb52b); color: var(--theme-navy); }
+.admin-messaging-button { display: flex; min-height: 105px; flex-direction: column; align-items: center; justify-content: center; gap: 5px; }
+.admin-messaging-button img { display: block; width: min(100%, 210px); height: 70px; object-fit: contain; }
+.admin-message-item { display: block; padding: 14px 0; border-top: 1px solid #e8dfca; }
+.admin-message-item:first-child { border-top: 0; }
+.admin-message-item strong, .admin-message-item small { display: block; }
+.admin-message-item small { margin-top: 4px; color: var(--theme-muted); }
+.admin-message-copy { margin-top: 9px; white-space: pre-wrap; overflow-wrap: anywhere; line-height: 1.5; }
+.admin-message-item.is-read { opacity: .72; }
+.admin-message-item .admin-actions { margin-top: 10px; }
 .player-collection { width: 100%; max-width: 900px; margin: auto; padding: 20px 16px 100px; }
 .player-collection h2 { margin-bottom: 8px; color: #173b52; }
 .player-card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; margin-top: 16px; }
@@ -1367,6 +1384,10 @@ body {
 .booster button:disabled { background: #d8d5cc; border-color: #c6c1b5; color: #696b70; opacity: 1; }
 .admin-page h2, .player-collection h2 { color: var(--theme-gold-light); }
 .admin-page .admin-panel { color: var(--theme-ink); }
+.admin-panel .message-category-button { background: #10264a; color: var(--theme-cream); }
+.admin-panel .message-category-button[aria-pressed="true"] { background: linear-gradient(135deg, var(--theme-gold-light), #edb52b); color: var(--theme-navy); }
+.admin-panel .admin-message-copy { color: var(--theme-ink); }
+.admin-panel .admin-message-item small { color: var(--theme-muted); }
 .admin-menu { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; margin: 18px 0 12px; }
 .admin-menu-button { min-height: 56px; padding: 11px 12px; border: 1px solid rgba(243, 191, 56, .72); border-radius: 13px; background: #10264a; color: var(--theme-cream); font: inherit; font-weight: 700; cursor: pointer; transition: background .16s ease, transform .16s ease, color .16s ease; }
 .admin-menu-button:hover { transform: translateY(-1px); background: #183966; }
@@ -1891,6 +1912,25 @@ body {
 
         </section>
 
+        <section class="message-compose-card" aria-labelledby="feedbackTitle">
+            <h3 id="feedbackTitle">💬 Un mot pour l’équipe ?</h3>
+            <p>Partage une idée ou signale un problème rencontré dans le jeu.</p>
+            <button id="feedbackToggleButton" class="message-compose-toggle" type="button" aria-expanded="false" aria-controls="feedbackFormPanel">Écrire un message</button>
+            <div id="feedbackFormPanel" class="hidden">
+                <form id="feedbackForm" class="message-compose-form">
+                    <label for="feedbackCategory">Sujet du message</label>
+                    <select id="feedbackCategory" class="admin-field" required>
+                        <option value="idee">Boîte à idée</option>
+                        <option value="probleme">Problème</option>
+                    </select>
+                    <label for="feedbackText">Ton message</label>
+                    <textarea id="feedbackText" class="admin-field" maxlength="2000" rows="4" placeholder="Écris ton idée ou décris le problème…" required></textarea>
+                    <button id="feedbackSubmitButton" class="message-compose-toggle" type="submit">Envoyer à l’Admin</button>
+                </form>
+                <p id="feedbackStatus" role="status" aria-live="polite"></p>
+            </div>
+        </section>
+
 
     </main>
 
@@ -1972,6 +2012,7 @@ body {
             <button class="admin-menu-button" type="button" data-admin-section="players" aria-controls="adminPlayersSection" aria-pressed="false">👥 Joueurs</button>
             <button class="admin-menu-button" type="button" data-admin-section="rarities" aria-controls="adminRaritiesSection" aria-pressed="false">⭐ Catégories de rareté</button>
             <button class="admin-menu-button" type="button" data-admin-section="cards" aria-controls="adminCardsSection" aria-pressed="false">🃏 Création de cartes</button>
+            <button class="admin-menu-button admin-messaging-button" type="button" data-admin-section="messages" aria-controls="adminMessagesSection" aria-pressed="false" aria-label="Messagerie Admin, boîte à idées et problèmes"><img src="./Messagerie.png" alt=""><span>Boîte de réception</span></button>
         </nav>
         <p id="adminSectionHint" class="admin-note">Choisis une rubrique pour afficher son contenu.</p>
         <div id="adminPlayersSection" class="admin-panel admin-section hidden" style="margin-bottom:16px">
@@ -2011,6 +2052,16 @@ body {
             <p id="adminStatus" class="admin-status" role="status"></p>
             <h3>Cartes enregistrées</h3>
             <div id="cardsList"></div>
+        </div>
+        <div id="adminMessagesSection" class="admin-panel admin-section hidden" style="margin-bottom:16px">
+            <h3>💬 Messagerie Admin</h3>
+            <p class="admin-note">Les messages des joueurs sont rangés par sujet.</p>
+            <div class="message-category-tabs" role="tablist" aria-label="Catégories de messages">
+                <button class="message-category-button" type="button" data-message-category="idee" role="tab" aria-selected="false" aria-pressed="false">💡 Boîte à idée</button>
+                <button class="message-category-button" type="button" data-message-category="probleme" role="tab" aria-selected="false" aria-pressed="false">🛠️ Problème</button>
+            </div>
+            <p id="adminMessagesStatus" class="admin-status" role="status" aria-live="polite">Choisis une catégorie pour afficher les messages.</p>
+            <div id="adminMessagesList" aria-live="polite"></div>
         </div>
     </section>
     <!-- NAVIGATION -->
@@ -2121,7 +2172,11 @@ import {
     addDoc,
     updateDoc,
     deleteDoc,
-    runTransaction
+    runTransaction,
+    query,
+    where,
+    orderBy,
+    serverTimestamp
 
 } from
 "https://www.gstatic.com/firebasejs/12.3.0/firebase-firestore.js";
@@ -2342,8 +2397,18 @@ const adminSectionHint = document.getElementById("adminSectionHint");
 const adminSections = {
     players: document.getElementById("adminPlayersSection"),
     rarities: document.getElementById("adminRaritiesSection"),
-    cards: document.getElementById("adminCardsSection")
+    cards: document.getElementById("adminCardsSection"),
+    messages: document.getElementById("adminMessagesSection")
 };
+const adminMessagesStatus = document.getElementById("adminMessagesStatus");
+const adminMessagesList = document.getElementById("adminMessagesList");
+const feedbackToggleButton = document.getElementById("feedbackToggleButton");
+const feedbackFormPanel = document.getElementById("feedbackFormPanel");
+const feedbackForm = document.getElementById("feedbackForm");
+const feedbackCategory = document.getElementById("feedbackCategory");
+const feedbackText = document.getElementById("feedbackText");
+const feedbackSubmitButton = document.getElementById("feedbackSubmitButton");
+const feedbackStatus = document.getElementById("feedbackStatus");
 const collectionPage = document.getElementById("collectionPage");
 const homeNavButton = document.getElementById("homeNavButton");
 const collectionNavButton = document.getElementById("collectionNavButton");
@@ -3491,7 +3556,149 @@ async function showAdminSection(sectionName) {
         await loadRarities();
         await loadCards();
     }
+    if (sectionName === "messages") {
+        await loadAdminMessages("idee");
+    }
 }
+
+function formatAdminMessageDate(value) {
+    const date = value && typeof value.toDate === "function" ? value.toDate() : null;
+    if (!date || Number.isNaN(date.getTime())) return "Date inconnue";
+    return new Intl.DateTimeFormat("fr-FR", {
+        dateStyle: "medium",
+        timeStyle: "short"
+    }).format(date);
+}
+
+async function loadAdminMessages(category) {
+    adminMessagesList.replaceChildren();
+    adminMessagesStatus.textContent = "Chargement des messages…";
+
+    if (!auth.currentUser || (auth.currentUser.email || "").toLowerCase() !== ADMIN_EMAIL) {
+        adminMessagesStatus.textContent = "Accès réservé au compte Admin.";
+        return;
+    }
+
+    document.querySelectorAll("[data-message-category]").forEach((button) => {
+        const selected = button.dataset.messageCategory === category;
+        button.setAttribute("aria-pressed", String(selected));
+        button.setAttribute("aria-selected", String(selected));
+    });
+
+    try {
+        const messagesQuery = query(
+            collection(db, "messages"),
+            where("category", "==", category),
+            orderBy("createdAt", "desc")
+        );
+        const snapshot = await getDocs(messagesQuery);
+
+        if (snapshot.empty) {
+            adminMessagesStatus.textContent = category === "idee"
+                ? "Aucune idée reçue pour le moment."
+                : "Aucun problème signalé pour le moment.";
+            return;
+        }
+
+        adminMessagesStatus.textContent = snapshot.size + (snapshot.size > 1 ? " message(s)" : " message");
+        snapshot.docs.forEach((messageDoc) => {
+            const message = messageDoc.data();
+            const item = document.createElement("article");
+            item.className = "admin-message-item" + (message.status === "traite" ? " is-read" : "");
+
+            const title = document.createElement("strong");
+            title.textContent = message.senderPseudo || "Joueur";
+            const meta = document.createElement("small");
+            meta.textContent = (message.senderEmail || "Adresse e-mail inconnue")
+                + " • " + formatAdminMessageDate(message.createdAt)
+                + " • " + (message.status === "traite" ? "Traité" : "À lire");
+            const copy = document.createElement("p");
+            copy.className = "admin-message-copy";
+            copy.textContent = message.message || "Message vide";
+            item.append(title, meta, copy);
+
+            if (message.status !== "traite") {
+                const actions = document.createElement("div");
+                actions.className = "admin-actions";
+                const doneButton = document.createElement("button");
+                doneButton.type = "button";
+                doneButton.textContent = "Marquer traité";
+                doneButton.addEventListener("click", async () => {
+                    doneButton.disabled = true;
+                    try {
+                        await updateDoc(doc(db, "messages", messageDoc.id), { status: "traite" });
+                        await loadAdminMessages(category);
+                    } catch (error) {
+                        console.error("Erreur lors du traitement du message :", error);
+                        adminMessagesStatus.textContent = "Impossible de modifier ce message. Vérifie les règles Firestore.";
+                        doneButton.disabled = false;
+                    }
+                });
+                actions.append(doneButton);
+                item.append(actions);
+            }
+
+            adminMessagesList.append(item);
+        });
+    } catch (error) {
+        console.error("Erreur de chargement de la messagerie Admin :", error);
+        adminMessagesStatus.textContent = error.code === "permission-denied"
+            ? "Accès refusé. Vérifie que tu es connecté avec le compte Admin et que les règles Firestore sont publiées."
+            : "Impossible de charger les messages. Vérifie les règles Firestore.";
+    }
+}
+
+feedbackToggleButton.addEventListener("click", () => {
+    const willOpen = feedbackFormPanel.classList.contains("hidden");
+    feedbackFormPanel.classList.toggle("hidden", !willOpen);
+    feedbackToggleButton.setAttribute("aria-expanded", String(willOpen));
+    if (willOpen) feedbackCategory.focus();
+});
+
+feedbackForm.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    const user = auth.currentUser;
+    const message = feedbackText.value.trim();
+    const category = feedbackCategory.value;
+
+    if (!user) {
+        feedbackStatus.textContent = "Connecte-toi pour envoyer un message.";
+        return;
+    }
+    if (!message || message.length < 3 || message.length > 2000) {
+        feedbackStatus.textContent = "Écris un message de 3 à 2 000 caractères.";
+        return;
+    }
+
+    feedbackSubmitButton.disabled = true;
+    feedbackStatus.textContent = "Envoi du message…";
+    try {
+        const playerSnapshot = await getDoc(doc(db, "players", user.uid));
+        if (!playerSnapshot.exists()) throw new Error("PLAYER_PROFILE_MISSING");
+        await addDoc(collection(db, "messages"), {
+            senderUid: user.uid,
+            senderPseudo: playerSnapshot.data().pseudo || "Joueur",
+            senderEmail: user.email || "",
+            category,
+            message,
+            status: "nouveau",
+            createdAt: serverTimestamp()
+        });
+        feedbackForm.reset();
+        feedbackStatus.textContent = "Message envoyé à l’Admin. Merci !";
+    } catch (error) {
+        console.error("Erreur d’envoi du message :", error);
+        feedbackStatus.textContent = error.code === "permission-denied"
+            ? "Envoi refusé. Vérifie que les nouvelles règles Firestore sont publiées."
+            : "Le message n’a pas pu être envoyé. Réessaie dans un instant.";
+    } finally {
+        feedbackSubmitButton.disabled = false;
+    }
+});
+
+document.querySelectorAll("[data-message-category]").forEach((button) => {
+    button.addEventListener("click", () => loadAdminMessages(button.dataset.messageCategory));
+});
 
 async function loadPlayers() {
     playersList.replaceChildren();
