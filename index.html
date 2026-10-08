@@ -1095,6 +1095,7 @@ body {
 .admin-card-preview { display: block; max-width: 180px; max-height: 240px; margin: 8px 0; object-fit: contain; border-radius: 10px; background: #eefaff; }
 .admin-card-placeholder { width: 64px; height: 86px; flex: 0 0 64px; display: grid; place-items: center; border-radius: 8px; background: linear-gradient(145deg, #e4f7ff, #bdeaff); font-size: 30px; }
 .admin-card-row small { margin-top: 4px; color: #7895a6; }
+.admin-category-heading { margin: 18px 0 4px; padding: 9px 11px; border-radius: 10px; background: #10264a; color: #f7d46b; font-size: 14px; }
 .admin-actions { display: flex; gap: 6px; }
 .admin-actions button, .admin-back { padding: 9px 12px; border: 0; border-radius: 9px; background: #eefaff; color: #1687b9; font-weight: 700; cursor: pointer; }
 .player-token-controls { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; justify-content: flex-end; }
@@ -2075,6 +2076,7 @@ body {
             </form>
             <p id="adminStatus" class="admin-status" role="status"></p>
             <h3>Cartes enregistrées</h3>
+            <p id="cardsCount" class="admin-note">Nombre total de cartes créées : —</p>
             <div id="cardsList"></div>
         </div>
         <div id="adminMessagesSection" class="admin-panel admin-section hidden" style="margin-bottom:16px">
@@ -2468,6 +2470,7 @@ const cardSubmit = document.getElementById("cardSubmit");
 const cardCancelEdit = document.getElementById("cardCancelEdit");
 const adminStatus = document.getElementById("adminStatus");
 const cardsList = document.getElementById("cardsList");
+const cardsCount = document.getElementById("cardsCount");
 const bottomNav = document.querySelector(".bottom-nav");
 const exchangeNavButton = document.getElementById("exchangeNavButton");
 const exchangeUnlockNotice = document.getElementById("exchangeUnlockNotice");
@@ -3476,93 +3479,126 @@ rarityForm.addEventListener("submit", async (event) => {
     }
 });
 
+function createAdminCardRow(cardDoc) {
+    const card = cardDoc.data();
+    const row = document.createElement("div");
+    row.className = "admin-card-row";
+    const visualUrl = card.imageUrl || card.image || card.visuel || "";
+    let visual;
+    if (/^https?:\/\//i.test(visualUrl)) {
+        visual = document.createElement("img");
+        visual.className = "admin-card-thumb";
+        visual.style.border = "4px solid " + (card.rarityColor || getRarityColor(card.rarity));
+        visual.src = visualUrl;
+        visual.alt = card.name ? "Visuel de " + card.name : "Visuel de la carte";
+        visual.loading = "lazy";
+        visual.referrerPolicy = "no-referrer";
+        visual.onerror = () => {
+            const placeholder = document.createElement("div");
+            placeholder.className = "admin-card-placeholder";
+            placeholder.style.border = "4px solid " + (card.rarityColor || getRarityColor(card.rarity));
+            placeholder.textContent = "🃏";
+            visual.replaceWith(placeholder);
+        };
+    } else {
+        visual = document.createElement("div");
+        visual.className = "admin-card-placeholder";
+        visual.style.border = "4px solid " + getRarityColor(card.rarity);
+        visual.textContent = "🃏";
+    }
+
+    const details = document.createElement("div");
+    const name = document.createElement("strong");
+    name.textContent = card.name || "Carte sans nom";
+    const meta = document.createElement("small");
+    meta.textContent = (card.category || "Sans catégorie") + " • " + (card.rarity || "Sans rareté");
+    details.append(name, meta);
+
+    const actions = document.createElement("div");
+    actions.className = "admin-actions";
+    const edit = document.createElement("button");
+    edit.type = "button";
+    edit.textContent = "Modifier";
+    edit.addEventListener("click", () => {
+        editingCardId = cardDoc.id;
+        cardName.value = card.name || "";
+        cardCategory.value = card.category || "";
+        cardRarity.value = card.rarity || "";
+        cardImage.value = card.imageUrl || "";
+        cardImageFile.value = "";
+        if (previewObjectUrl) URL.revokeObjectURL(previewObjectUrl);
+        previewObjectUrl = null;
+        if (card.imageUrl) {
+            cardImagePreview.src = card.imageUrl;
+            cardImagePreview.classList.remove("hidden");
+        } else {
+            cardImagePreview.removeAttribute("src");
+            cardImagePreview.classList.add("hidden");
+        }
+        cardDescription.value = card.description || "";
+        cardSubmit.textContent = "Enregistrer";
+        cardCancelEdit.classList.remove("hidden");
+        window.scrollTo({ top: 0, behavior: "smooth" });
+    });
+
+    const remove = document.createElement("button");
+    remove.type = "button";
+    remove.textContent = "Supprimer";
+    remove.className = "admin-danger";
+    remove.addEventListener("click", async () => {
+        if (!confirm("Supprimer la carte « " + (card.name || "sans nom") + " » ?")) return;
+        try {
+            await deleteDoc(doc(db, "cards", cardDoc.id));
+            adminStatus.textContent = "Carte supprimée.";
+            await loadCards();
+        } catch (error) {
+            console.error(error);
+            adminStatus.textContent = "Suppression refusée. Vérifie les règles Firestore.";
+        }
+    });
+    actions.append(edit, remove);
+    row.append(visual, details, actions);
+    return row;
+}
+
 async function loadCards() {
     cardsList.replaceChildren();
     adminStatus.textContent = "Chargement des cartes...";
+    cardsCount.textContent = "Nombre total de cartes créées : —";
     try {
         const snapshot = await getDocs(collection(db, "cards"));
+        const groupedCards = new Map();
+        snapshot.docs.forEach((cardDoc) => {
+            const card = cardDoc.data();
+            const category = typeof card.category === "string" && card.category.trim()
+                ? card.category.trim()
+                : "Sans catégorie";
+            const key = category.toLocaleLowerCase("fr");
+            if (!groupedCards.has(key)) groupedCards.set(key, { category, cards: [] });
+            groupedCards.get(key).cards.push(cardDoc);
+        });
+
+        cardsCount.textContent = "Nombre total de cartes créées : " + snapshot.size;
         if (snapshot.empty) {
             adminStatus.textContent = "Aucune carte pour le moment.";
             return;
         }
         adminStatus.textContent = "";
-        snapshot.forEach((cardDoc) => {
-            const card = cardDoc.data();
-            const row = document.createElement("div");
-            row.className = "admin-card-row";
-            const visualUrl = card.imageUrl || card.image || card.visuel || "";
-            let visual;
-            if (/^https?:\/\//i.test(visualUrl)) {
-                visual = document.createElement("img");
-                visual.className = "admin-card-thumb";
-                visual.style.border = "4px solid " + (card.rarityColor || getRarityColor(card.rarity));
-                visual.src = visualUrl;
-                visual.alt = card.name ? "Visuel de " + card.name : "Visuel de la carte";
-                visual.loading = "lazy";
-                visual.referrerPolicy = "no-referrer";
-                visual.onerror = () => {
-                    const placeholder = document.createElement("div");
-                    placeholder.className = "admin-card-placeholder";
-                    placeholder.style.border = "4px solid " + (card.rarityColor || getRarityColor(card.rarity));
-                    placeholder.textContent = "🃏";
-                    visual.replaceWith(placeholder);
-                };
-            } else {
-                visual = document.createElement("div");
-                visual.className = "admin-card-placeholder";
-                visual.style.border = "4px solid " + getRarityColor(card.rarity);
-                visual.textContent = "🃏";
-            }
-            const details = document.createElement("div");
-            const name = document.createElement("strong");
-            name.textContent = card.name || "Carte sans nom";
-            const meta = document.createElement("small");
-            meta.textContent = (card.category || "Sans catégorie") + " • " + (card.rarity || "Sans rareté");
-            details.append(name, meta);
-            const actions = document.createElement("div");
-            actions.className = "admin-actions";
-            const edit = document.createElement("button");
-            edit.type = "button";
-            edit.textContent = "Modifier";
-            edit.addEventListener("click", () => {
-                editingCardId = cardDoc.id;
-                cardName.value = card.name || "";
-                cardCategory.value = card.category || "";
-                cardRarity.value = card.rarity || "";
-                cardImage.value = card.imageUrl || "";
-                cardImageFile.value = "";
-                if (previewObjectUrl) URL.revokeObjectURL(previewObjectUrl);
-                previewObjectUrl = null;
-                if (card.imageUrl) {
-                    cardImagePreview.src = card.imageUrl;
-                    cardImagePreview.classList.remove("hidden");
-                } else {
-                    cardImagePreview.removeAttribute("src");
-                    cardImagePreview.classList.add("hidden");
-                }
-                cardDescription.value = card.description || "";
-                cardSubmit.textContent = "Enregistrer";
-                cardCancelEdit.classList.remove("hidden");
-                window.scrollTo({ top: 0, behavior: "smooth" });
+
+        const sortedGroups = Array.from(groupedCards.values())
+            .sort((left, right) => left.category.localeCompare(right.category, "fr", { sensitivity: "base" }));
+        sortedGroups.forEach((group) => {
+            const heading = document.createElement("h4");
+            heading.className = "admin-category-heading";
+            heading.textContent = group.category + " • " + group.cards.length + (group.cards.length > 1 ? " cartes" : " carte");
+            cardsList.append(heading);
+
+            group.cards.sort((left, right) => {
+                const leftName = left.data().name || "";
+                const rightName = right.data().name || "";
+                return leftName.localeCompare(rightName, "fr", { sensitivity: "base" });
             });
-            const remove = document.createElement("button");
-            remove.type = "button";
-            remove.textContent = "Supprimer";
-            remove.className = "admin-danger";
-            remove.addEventListener("click", async () => {
-                if (!confirm("Supprimer la carte « " + (card.name || "sans nom") + " » ?")) return;
-                try {
-                    await deleteDoc(doc(db, "cards", cardDoc.id));
-                    adminStatus.textContent = "Carte supprimée.";
-                    await loadCards();
-                } catch (error) {
-                    console.error(error);
-                    adminStatus.textContent = "Suppression refusée. Vérifie les règles Firestore.";
-                }
-            });
-            actions.append(edit, remove);
-            row.append(visual, details, actions);
-            cardsList.append(row);
+            group.cards.forEach((cardDoc) => cardsList.append(createAdminCardRow(cardDoc)));
         });
     } catch (error) {
         console.error("Erreur de chargement des cartes :", error);
