@@ -1124,6 +1124,7 @@ body {
 .player-token-controls { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; justify-content: flex-end; }
 .player-token-input { width: 100px; padding: 9px; border: 1px solid #cce5ef; border-radius: 9px; font: inherit; }
 .jeton-inline-icon { display: inline-block; width: 1.08em; height: 1.08em; margin: 0 .12em; object-fit: contain; vertical-align: -.18em; }
+.jeton-screen-reader-only { position: absolute !important; width: 1px !important; height: 1px !important; overflow: hidden !important; clip: rect(0, 0, 0, 0) !important; clip-path: inset(50%) !important; white-space: nowrap !important; }
 .player-token-icon { display: block; width: 22px; height: 22px; flex: 0 0 22px; object-fit: contain; }
 .player-token-controls .primary-button { width: auto; padding: 10px 12px; white-space: nowrap; }
 .player-token-controls .admin-danger { padding: 10px 12px; border: 0; border-radius: 9px; font-weight: 700; white-space: nowrap; cursor: pointer; }
@@ -4813,7 +4814,10 @@ function addJetonIcons(root = document.body) {
             if (match.index > cursor) fragment.append(document.createTextNode(text.slice(cursor, match.index)));
             const mention = document.createElement("span");
             mention.setAttribute("data-jeton-decorated", "true");
-            mention.append(document.createTextNode(match[0]));
+            const accessibleWord = document.createElement("span");
+            accessibleWord.className = "jeton-screen-reader-only";
+            accessibleWord.textContent = match[0];
+            mention.append(accessibleWord);
             const icon = document.createElement("img");
             icon.className = "jeton-inline-icon";
             icon.src = "./Jeton.png";
