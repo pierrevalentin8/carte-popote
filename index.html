@@ -2105,13 +2105,12 @@ body {
     <section id="adminPage" class="admin-page hidden">
         <button id="adminBackButton" class="admin-back" type="button">← Retour à l’accueil</button>
         <h2>🛡️ Administration</h2>
-        <p class="admin-note">Gestion des joueurs, du journal, des raretés, des cartes et des messages. Les accès sont protégés par les règles Firestore.</p>
+        <p class="admin-note">Gestion des joueurs, du journal, des raretés et des cartes. Les accès sont protégés par les règles Firestore.</p>
         <nav class="admin-menu" aria-label="Rubriques d’administration">
             <button class="admin-menu-button" type="button" data-admin-section="players" aria-controls="adminPlayersSection" aria-pressed="false">👥 Joueurs</button>
             <button class="admin-menu-button" type="button" data-admin-section="journal" aria-controls="adminJournalSection" aria-pressed="false">📰 Journal</button>
             <button class="admin-menu-button" type="button" data-admin-section="rarities" aria-controls="adminRaritiesSection" aria-pressed="false">⭐ Catégories de rareté</button>
             <button class="admin-menu-button" type="button" data-admin-section="cards" aria-controls="adminCardsSection" aria-pressed="false">🃏 Création de cartes</button>
-            <button class="admin-menu-button admin-messaging-button" type="button" data-admin-section="messages" aria-controls="adminMessagesSection" aria-pressed="false" aria-label="Messagerie Admin, boîte à idées et problèmes"><img src="./Messagerie.png" alt=""><span>Boîte de réception</span></button>
         </nav>
         <p id="adminSectionHint" class="admin-note">Choisis une rubrique pour afficher son contenu.</p>
         <div id="adminJournalSection" class="admin-panel admin-section hidden" style="margin-bottom:16px">
@@ -2176,9 +2175,13 @@ body {
             <p id="cardsCount" class="admin-note">Nombre total de cartes créées : —</p>
             <div id="cardsList"></div>
         </div>
-        <div id="adminMessagesSection" class="admin-panel admin-section hidden" style="margin-bottom:16px">
-            <h3>💬 Messagerie Admin</h3>
-            <p class="admin-note">Les messages des joueurs sont rangés par sujet.</p>
+    </section>
+
+    <section id="messagingPage" class="admin-page messaging-page hidden" aria-labelledby="messagingPageTitle">
+        <button id="messagingBackButton" class="admin-back" type="button">← Retour à l’accueil</button>
+        <h2 id="messagingPageTitle">💬 Messagerie</h2>
+        <p class="admin-note">Les messages des joueurs sont rangés par sujet.</p>
+        <div id="adminMessagesSection" class="admin-panel" style="margin-bottom:16px">
             <div class="message-category-tabs" role="tablist" aria-label="Catégories de messages">
                 <button class="message-category-button" type="button" data-message-category="idee" role="tab" aria-selected="false" aria-pressed="false">💡 Boîte à idée</button>
                 <button class="message-category-button" type="button" data-message-category="probleme" role="tab" aria-selected="false" aria-pressed="false">🛠️ Problème</button>
@@ -2509,6 +2512,8 @@ const statisticsTableBody = document.getElementById("statisticsTableBody");
 
 const adminButton = document.getElementById("adminButton");
 const adminMessagesMenuButton = document.getElementById("adminMessagesMenuButton");
+const messagingPage = document.getElementById("messagingPage");
+const messagingBackButton = document.getElementById("messagingBackButton");
 const ADMIN_EMAIL = "pierre.valentin8@gmail.com";
 const buyNormalBoosterButton = document.getElementById("buyNormalBoosterButton");
 const openNormalBoosterButton = document.getElementById("openNormalBoosterButton");
@@ -2539,8 +2544,7 @@ const adminSections = {
     players: document.getElementById("adminPlayersSection"),
     journal: document.getElementById("adminJournalSection"),
     rarities: document.getElementById("adminRaritiesSection"),
-    cards: document.getElementById("adminCardsSection"),
-    messages: document.getElementById("adminMessagesSection")
+    cards: document.getElementById("adminCardsSection")
 };
 const announcementsList = document.getElementById("announcementsList");
 const publicCardCount = document.getElementById("publicCardCount");
@@ -2777,6 +2781,7 @@ onAuthStateChanged(
         if (!user) {
             adminButton.classList.add("hidden");
             adminMessagesMenuButton.classList.add("hidden");
+            messagingPage.classList.add("hidden");
             profilePage.classList.add("hidden");
             leaderboardPage.classList.add("hidden");
             statisticsPage.classList.add("hidden");
@@ -2813,6 +2818,7 @@ onAuthStateChanged(
         const isAdminAccount = (user.email || "").toLowerCase() === ADMIN_EMAIL;
         adminButton.classList.toggle("hidden", !isAdminAccount);
         adminMessagesMenuButton.classList.toggle("hidden", !isAdminAccount);
+        if (!isAdminAccount) messagingPage.classList.add("hidden");
         loadHomeAnnouncements();
         loadPublicCardCount();
 
@@ -2989,6 +2995,7 @@ function showHomePage() {
     statisticsPage.classList.add("hidden");
     collectionPage.classList.add("hidden");
     adminPage.classList.add("hidden");
+    messagingPage.classList.add("hidden");
     bottomNav.classList.remove("hidden");
     homeNavButton.classList.add("active");
     collectionNavButton.classList.remove("active");
@@ -3094,6 +3101,7 @@ viewProfileFromStatsButton.addEventListener("click", async () => {
     statisticsPage.classList.add("hidden");
     collectionPage.classList.add("hidden");
     adminPage.classList.add("hidden");
+    messagingPage.classList.add("hidden");
     bottomNav.classList.add("hidden");
     profilePage.classList.remove("hidden");
     await loadPersonalProfile();
@@ -3199,6 +3207,7 @@ statisticsMenuButton.addEventListener("click", async () => {
     leaderboardPage.classList.add("hidden");
     collectionPage.classList.add("hidden");
     adminPage.classList.add("hidden");
+    messagingPage.classList.add("hidden");
     bottomNav.classList.add("hidden");
     statisticsPage.classList.remove("hidden");
     await loadStatistics();
@@ -3213,6 +3222,7 @@ leaderboardMenuButton.addEventListener("click", async () => {
     statisticsPage.classList.add("hidden");
     collectionPage.classList.add("hidden");
     adminPage.classList.add("hidden");
+    messagingPage.classList.add("hidden");
     bottomNav.classList.add("hidden");
     leaderboardPage.classList.remove("hidden");
     await loadLeaderboard();
@@ -3565,6 +3575,7 @@ document.getElementById("viewOwnedCardsButton").addEventListener("click", async 
     boosterResultModal.classList.add("hidden");
     document.querySelector(".app-content").classList.add("hidden");
     adminPage.classList.add("hidden");
+    messagingPage.classList.add("hidden");
     collectionPage.classList.remove("hidden");
     bottomNav.classList.remove("hidden");
     homeNavButton.classList.remove("active");
@@ -3662,6 +3673,7 @@ collectionNavButton.addEventListener("click", async () => {
     leaderboardPage.classList.add("hidden");
     statisticsPage.classList.add("hidden");
     adminPage.classList.add("hidden");
+    messagingPage.classList.add("hidden");
     collectionPage.classList.remove("hidden");
     bottomNav.classList.remove("hidden");
     homeNavButton.classList.remove("active");
@@ -3988,9 +4000,6 @@ async function showAdminSection(sectionName) {
     if (sectionName === "cards") {
         await loadRarities();
         await loadCards();
-    }
-    if (sectionName === "messages") {
-        await loadAdminMessages("idee");
     }
 }
 
@@ -4402,6 +4411,7 @@ adminButton.addEventListener("click", async () => {
     leaderboardPage.classList.add("hidden");
     statisticsPage.classList.add("hidden");
     collectionPage.classList.add("hidden");
+    messagingPage.classList.add("hidden");
     bottomNav.classList.add("hidden");
     adminPage.classList.remove("hidden");
     Object.values(adminSections).forEach((section) => section.classList.add("hidden"));
@@ -4417,10 +4427,13 @@ adminMessagesMenuButton.addEventListener("click", async () => {
     leaderboardPage.classList.add("hidden");
     statisticsPage.classList.add("hidden");
     collectionPage.classList.add("hidden");
+    adminPage.classList.add("hidden");
     bottomNav.classList.add("hidden");
-    adminPage.classList.remove("hidden");
-    await showAdminSection("messages");
+    messagingPage.classList.remove("hidden");
+    await loadAdminMessages("idee");
 });
+
+messagingBackButton.addEventListener("click", showHomePage);
 
 document.querySelectorAll(".admin-menu-button").forEach((button) => {
     button.addEventListener("click", () => showAdminSection(button.dataset.adminSection));
