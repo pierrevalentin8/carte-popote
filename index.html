@@ -4084,8 +4084,10 @@ cardForm.addEventListener("submit", async (event) => {
     }
     cardSubmit.disabled = true;
     adminStatus.textContent = "Enregistrement...";
+    let cardSaveStage = "Firestore";
     try {
         if (selectedImage) {
+            cardSaveStage = "Storage";
             const safeName = selectedImage.name.replace(/[^a-zA-Z0-9._-]/g, "_");
             const imagePath = "cards/" + auth.currentUser.uid + "/" + Date.now() + "-" + safeName;
             const imageRef = ref(storage, imagePath);
@@ -4094,6 +4096,7 @@ cardForm.addEventListener("submit", async (event) => {
             card.storagePath = imagePath;
         }
 
+        cardSaveStage = "Firestore";
         if (editingCardId) {
             await updateDoc(doc(db, "cards", editingCardId), card);
             adminStatus.textContent = "Carte modifiée.";
@@ -4113,7 +4116,13 @@ cardForm.addEventListener("submit", async (event) => {
         await loadCards();
     } catch (error) {
         console.error("Erreur d’enregistrement :", error);
-        adminStatus.textContent = "Enregistrement refusé. Publie les règles Firestore indiquées.";
+        if (cardSaveStage === "Storage" || String(error.code || "").startsWith("storage/")) {
+            adminStatus.textContent = "L’envoi de l’image a été refusé par Firebase Storage. Publie les règles Storage mises à jour et vérifie que l’image fait 5 Mo maximum en JPG, PNG ou WebP.";
+        } else if (error.code === "permission-denied" || error.code === "firestore/permission-denied") {
+            adminStatus.textContent = "Firestore a refusé la carte. Vérifie que les règles Firestore publiées autorisent le compte Admin.";
+        } else {
+            adminStatus.textContent = "Enregistrement impossible (" + (error.code || "erreur inconnue") + "). Ouvre la console du navigateur pour voir le détail.";
+        }
     } finally {
         cardSubmit.disabled = false;
     }
