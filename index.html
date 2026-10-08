@@ -3741,15 +3741,15 @@ rulesSaveButton.addEventListener("click", async () => {
     rulesSaveStatus.textContent = "Enregistrement…";
     try {
         await setDoc(doc(db, "gameRules", "main"), {
-            text,
-            updatedAt: serverTimestamp(),
-            updatedBy: auth.currentUser.uid
+            text
         });
         rulesViewer.textContent = text;
         rulesSaveStatus.textContent = "Les règles ont été enregistrées et sont visibles par les joueurs.";
     } catch (error) {
         console.error("Erreur d’enregistrement des règles :", error);
-        rulesSaveStatus.textContent = "Enregistrement refusé. Vérifie que les nouvelles règles Firestore ont été publiées.";
+        rulesSaveStatus.textContent = error.code === "permission-denied" || error.code === "firestore/permission-denied"
+            ? "Firestore refuse l’enregistrement. Publie le fichier firestore.rules mis à jour depuis le bon dossier Firebase."
+            : "Enregistrement impossible (" + (error.code || "erreur inconnue") + "). Vérifie ta connexion puis réessaie.";
     } finally {
         rulesSaveButton.disabled = false;
     }
@@ -4735,7 +4735,7 @@ logoutButton.addEventListener(
 
             await signOut(
                 auth
-            );
+            );a
 
         }
 
