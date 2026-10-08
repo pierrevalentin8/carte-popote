@@ -1141,6 +1141,22 @@ body {
 .admin-message-item .admin-actions { margin-top: 10px; }
 .player-collection { width: 100%; max-width: 900px; margin: auto; padding: 20px 16px 100px; }
 .player-collection h2 { margin-bottom: 8px; color: #173b52; }
+.collection-album-sheet { position: relative; margin-top: 16px; padding: 18px 14px 20px 34px; overflow: hidden; border: 1px solid #d9b74e; border-radius: 17px; background: repeating-linear-gradient(to bottom, #fbf8ee 0, #fbf8ee 31px, #e9e0cc 32px); box-shadow: 0 10px 28px rgba(0,0,0,.28), inset 0 0 0 4px rgba(255,255,255,.52); }
+.collection-album-sheet::before { position: absolute; top: 18px; bottom: 18px; left: 9px; width: 16px; background: radial-gradient(circle at 50% 10px, #dfbd53 0 4px, #fff8df 5px 7px, transparent 8px) 0 0 / 16px 54px repeat-y; content: ""; }
+.collection-album-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: clamp(6px, 1.8vw, 12px); max-width: 720px; margin: 0 auto; }
+.album-slot { position: relative; display: flex; min-width: 0; aspect-ratio: .70; flex-direction: column; align-items: stretch; overflow: hidden; padding: 4px; border: 1px dashed #c5b68f; border-radius: 9px; background: rgba(255,255,255,.45); }
+.album-slot.is-empty { background: rgba(234,226,207,.32); }
+.album-card { cursor: zoom-in; border-style: solid; border-width: 3px; padding: 3px; box-shadow: 0 3px 8px rgba(29,44,66,.2); transition: transform .16s ease, box-shadow .16s ease; }
+.album-card:hover { transform: translateY(-2px); box-shadow: 0 7px 14px rgba(29,44,66,.24); }
+.album-card:focus-visible { outline: 3px solid #f0bd36; outline-offset: 2px; }
+.album-card-image { display: block; width: 100%; min-height: 0; flex: 1 1 auto; object-fit: contain; border-radius: 4px; background: #f2eddf; }
+.album-card-placeholder { display: grid; width: 100%; min-height: 0; flex: 1 1 auto; place-items: center; border-radius: 4px; background: #f2eddf; font-size: clamp(19px, 5vw, 38px); }
+.album-card-name { display: -webkit-box; min-height: 22px; max-height: 2.5em; overflow: hidden; padding: 3px 1px 0; color: #173b52; font-size: clamp(8px, 2.2vw, 12px); font-weight: 800; line-height: 1.15; text-align: center; text-overflow: ellipsis; -webkit-box-orient: vertical; -webkit-line-clamp: 2; }
+.album-quantity { position: absolute; z-index: 1; top: 4px; right: 4px; display: grid; min-width: 24px; height: 24px; place-items: center; padding: 0 5px; border: 1px solid #f7d46b; border-radius: 999px; background: #10264a; color: #fff; font-size: 10px; font-weight: 900; box-shadow: 0 2px 5px rgba(0,0,0,.35); }
+.collection-page-nav { display: flex; align-items: center; justify-content: center; gap: 12px; margin: 15px auto 0; }
+.collection-page-nav button { min-width: 92px; padding: 10px 12px; border: 1px solid #d7a51e; border-radius: 10px; background: linear-gradient(135deg, #ffe17b, #edb52b); color: #10264a; font: inherit; font-size: 13px; font-weight: 800; cursor: pointer; }
+.collection-page-nav button:disabled { opacity: .45; cursor: not-allowed; }
+.collection-page-indicator { min-width: 74px; color: #fbfaf5; font-size: 13px; font-weight: 800; text-align: center; }
 .player-card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; margin-top: 16px; }
 .player-card { position: relative; overflow: hidden; background: #fff; border: 3px solid #9e9e9e; border-radius: 16px; box-shadow: 0 6px 18px rgba(30,90,120,.1); }
 .card-quantity-badge { position: absolute; z-index: 2; top: 8px; right: 8px; min-width: 38px; padding: 6px 9px; border: 2px solid #fff; border-radius: 999px; background: #173b52; color: #fff; text-align: center; font-size: 13px; font-weight: 800; box-shadow: 0 2px 8px rgba(0,0,0,.25); }
@@ -2029,11 +2045,19 @@ body {
         <p class="statistics-tracking-note">Sur mobile, fais glisser le tableau horizontalement. Les anciens achats, dépenses et jetons attribués avant leur suivi ne peuvent pas être reconstitués. Les échanges ne sont pas encore disponibles ; leur compteur reste à zéro.</p>
     </section>
 
-    <section id="collectionPage" class="player-collection hidden">
-        <h2>🃏 Mes cartes</h2>
-        <p class="admin-note">Les cartes obtenues en ouvrant tes boosters apparaissent ici.</p>
+    <section id="collectionPage" class="player-collection hidden" aria-labelledby="collectionTitle">
+        <button id="collectionBackButton" class="admin-back" type="button">← Retour à l’accueil</button>
+        <h2 id="collectionTitle">🗂️ Mon classeur</h2>
+        <p class="admin-note">Tes cartes sont rangées par numéro. Les emplacements vides correspondent aux cartes encore à découvrir.</p>
         <p id="ownedCardsStatus" class="admin-status" role="status"></p>
-        <div id="ownedPlayerCardGrid" class="player-card-grid owned-card-grid"></div>
+        <div class="collection-album-sheet">
+            <div id="ownedPlayerCardGrid" class="collection-album-grid" aria-label="Page du classeur, neuf emplacements"></div>
+        </div>
+        <nav class="collection-page-nav" aria-label="Pages du classeur">
+            <button id="collectionPreviousPageButton" type="button">← Précédente</button>
+            <span id="collectionPageIndicator" class="collection-page-indicator" aria-live="polite">Page 1 / 1</span>
+            <button id="collectionNextPageButton" type="button">Suivante →</button>
+        </nav>
     </section>
 
     <section id="cardZoomModal" class="card-zoom-modal hidden" role="dialog" aria-modal="true" aria-labelledby="cardZoomTitle" aria-hidden="true">
@@ -2476,6 +2500,9 @@ const boosterResultDescription = document.getElementById("boosterResultDescripti
 const viewOwnedCardsButton = document.getElementById("viewOwnedCardsButton");
 const ownedCardsStatus = document.getElementById("ownedCardsStatus");
 const ownedPlayerCardGrid = document.getElementById("ownedPlayerCardGrid");
+const collectionPageIndicator = document.getElementById("collectionPageIndicator");
+const collectionPreviousPageButton = document.getElementById("collectionPreviousPageButton");
+const collectionNextPageButton = document.getElementById("collectionNextPageButton");
 const cardZoomModal = document.getElementById("cardZoomModal");
 const cardZoomCloseButton = document.getElementById("cardZoomCloseButton");
 const cardZoomTitle = document.getElementById("cardZoomTitle");
@@ -2509,8 +2536,12 @@ const feedbackText = document.getElementById("feedbackText");
 const feedbackSubmitButton = document.getElementById("feedbackSubmitButton");
 const feedbackStatus = document.getElementById("feedbackStatus");
 const collectionPage = document.getElementById("collectionPage");
+const collectionBackButton = document.getElementById("collectionBackButton");
 const homeNavButton = document.getElementById("homeNavButton");
 const collectionNavButton = document.getElementById("collectionNavButton");
+let ownedAlbumCards = [];
+let collectionMaxCardNumber = 0;
+let collectionAlbumPage = 0;
 const adminBackButton = document.getElementById("adminBackButton");
 const playersStatus = document.getElementById("playersStatus");
 const playersList = document.getElementById("playersList");
@@ -3153,6 +3184,7 @@ async function loadOwnedPlayerCards() {
             callGetOwnedCardNumbers(),
         ]);
         const cardNumbers = numberResponse.data.cardNumbers || {};
+        collectionMaxCardNumber = Math.max(0, Number(numberResponse.data.maxCardNumber) || 0);
         const cards = snapshot.docs
             .map((item) => {
                 const card = { id: item.id, ...item.data() };
@@ -3162,17 +3194,94 @@ async function loadOwnedPlayerCards() {
             .sort((a, b) => (a.cardNumber || Number.MAX_SAFE_INTEGER) - (b.cardNumber || Number.MAX_SAFE_INTEGER));
         if (!cards.length) {
             ownedCardsStatus.textContent = "Ta collection est vide. Ouvre un booster pour obtenir tes premières cartes !";
+            ownedAlbumCards = [];
+            collectionAlbumPage = 0;
+            renderCollectionAlbum();
             return;
         }
         const groupedCards = groupCardCopies(cards);
         groupedCards.sort((a, b) => (a.cardNumber || Number.MAX_SAFE_INTEGER) - (b.cardNumber || Number.MAX_SAFE_INTEGER));
+        ownedAlbumCards = groupedCards;
+        collectionAlbumPage = 0;
         ownedCardsStatus.textContent = cards.length + (cards.length === 1 ? " exemplaire obtenu" : " exemplaires obtenus")
             + " • " + groupedCards.length + (groupedCards.length === 1 ? " carte différente" : " cartes différentes");
-        groupedCards.forEach((card) => ownedPlayerCardGrid.append(createPlayerCardElement(card, card.quantity)));
+        renderCollectionAlbum();
     } catch (error) {
         console.error("Erreur de chargement de la collection du joueur :", error);
         ownedCardsStatus.textContent = "Impossible de charger ta collection. Vérifie les règles Firestore.";
     }
+}
+
+function renderCollectionAlbum() {
+    const totalPages = Math.max(1, Math.ceil(collectionMaxCardNumber / 9));
+    collectionAlbumPage = Math.min(Math.max(0, collectionAlbumPage), totalPages - 1);
+    const firstCardNumber = collectionAlbumPage * 9 + 1;
+    const cardsByNumber = new Map();
+
+    ownedAlbumCards.forEach((card) => {
+        const number = Number(card.cardNumber);
+        if (Number.isInteger(number) && number > 0) cardsByNumber.set(number, card);
+    });
+
+    ownedPlayerCardGrid.replaceChildren();
+    for (let number = firstCardNumber; number < firstCardNumber + 9; number += 1) {
+        const card = cardsByNumber.get(number);
+        ownedPlayerCardGrid.append(card ? createAlbumCardElement(card) : createEmptyAlbumSlot());
+    }
+
+    collectionPageIndicator.textContent = "Page " + (collectionAlbumPage + 1) + " / " + totalPages;
+    collectionPreviousPageButton.disabled = collectionAlbumPage === 0;
+    collectionNextPageButton.disabled = collectionAlbumPage >= totalPages - 1;
+}
+
+function createEmptyAlbumSlot() {
+    const slot = document.createElement("div");
+    slot.className = "album-slot is-empty";
+    slot.setAttribute("aria-label", "Emplacement vide");
+    return slot;
+}
+
+function createAlbumCardElement(card) {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "album-slot album-card";
+    button.style.borderColor = getCardRarityColor(card);
+    button.setAttribute("aria-label", "Agrandir " + (card.name || "la carte") + ", rareté " + (card.rarity || "inconnue"));
+
+    if (card.quantity > 1) {
+        const quantity = document.createElement("span");
+        quantity.className = "album-quantity";
+        quantity.textContent = "×" + card.quantity;
+        quantity.setAttribute("aria-label", card.quantity + " exemplaires");
+        button.append(quantity);
+    }
+
+    if (card.imageUrl) {
+        const image = document.createElement("img");
+        image.className = "album-card-image";
+        image.src = card.imageUrl;
+        image.alt = card.name || "Carte collectée";
+        image.loading = "lazy";
+        image.addEventListener("error", () => {
+            const placeholder = document.createElement("span");
+            placeholder.className = "album-card-placeholder";
+            placeholder.textContent = "🃏";
+            image.replaceWith(placeholder);
+        }, { once: true });
+        button.append(image);
+    } else {
+        const placeholder = document.createElement("span");
+        placeholder.className = "album-card-placeholder";
+        placeholder.textContent = "🃏";
+        button.append(placeholder);
+    }
+
+    const name = document.createElement("span");
+    name.className = "album-card-name";
+    name.textContent = card.name || "Carte collectée";
+    button.append(name);
+    button.addEventListener("click", () => openCardZoom(card));
+    return button;
 }
 
 function groupCardCopies(cards) {
@@ -3474,6 +3583,15 @@ openDailyBoosterButton.addEventListener("click", async () => {
 });
 
 homeNavButton.addEventListener("click", showHomePage);
+collectionBackButton.addEventListener("click", showHomePage);
+collectionPreviousPageButton.addEventListener("click", () => {
+    collectionAlbumPage -= 1;
+    renderCollectionAlbum();
+});
+collectionNextPageButton.addEventListener("click", () => {
+    collectionAlbumPage += 1;
+    renderCollectionAlbum();
+});
 
 collectionNavButton.addEventListener("click", async () => {
     document.querySelector(".app-content").classList.add("hidden");
