@@ -2192,6 +2192,7 @@ body {
                 <span class="premium-wheel-center" aria-hidden="true">★</span>
             </div>
             <button id="premiumSpinButton" class="premium-spin-button" type="button" disabled>Tourner pour 1 jeton Premium</button>
+            <button id="premiumTestWheelButton" class="secondary-button hidden" type="button" disabled>Tester la roue (sans récompense)</button>
             <p id="premiumStatus" class="premium-status" role="status" aria-live="polite"></p>
             <div id="premiumPrizeList" class="premium-prize-list"></div>
         </section>
@@ -2220,8 +2221,6 @@ body {
             </section>
             <section class="premium-player-table-card" aria-labelledby="premiumPlayersTableTitle">
                 <h3 id="premiumPlayersTableTitle">Soldes et utilisation par joueur</h3>
-                <p class="admin-note">Cette remise à zéro concerne uniquement le compteur « attribués » ; les soldes des joueurs ne changent pas.</p>
-                <button id="premiumResetAssignedButton" class="admin-danger" type="button">Remettre les jetons Premium attribués à 0</button>
                 <div class="premium-player-table-wrap">
                     <table class="premium-player-table">
                         <thead><tr><th scope="col">Joueur</th><th scope="col">Jetons Premium attribués</th><th scope="col">Jetons Premium utilisés</th></tr></thead>
@@ -2542,8 +2541,8 @@ const callGetPremiumRules = httpsCallable(functions, "getPremiumRules");
 const callSavePremiumRules = httpsCallable(functions, "savePremiumRules");
 const callSavePremiumWheel = httpsCallable(functions, "savePremiumWheel");
 const callSpinPremiumWheel = httpsCallable(functions, "spinPremiumWheel");
+const callTestPremiumWheel = httpsCallable(functions, "testPremiumWheel");
 const callAdjustPlayerPremiumTokens = httpsCallable(functions, "adjustPlayerPremiumTokens");
-const callResetPremiumAssignedTokens = httpsCallable(functions, "resetPremiumAssignedTokens");
 const callInitializePremiumAssignedTokens = httpsCallable(functions, "initializePremiumAssignedTokens");
 const callGetPremiumWheelJournal = httpsCallable(functions, "getPremiumWheelJournal");
 const callGetPremiumRewardCards = httpsCallable(functions, "getPremiumRewardCards");
@@ -2691,6 +2690,7 @@ const premiumRulesSaveButton = document.getElementById("premiumRulesSaveButton")
 const premiumRulesStatus = document.getElementById("premiumRulesStatus");
 const premiumWheel = document.getElementById("premiumWheel");
 const premiumSpinButton = document.getElementById("premiumSpinButton");
+const premiumTestWheelButton = document.getElementById("premiumTestWheelButton");
 const premiumStatus = document.getElementById("premiumStatus");
 const premiumPrizeList = document.getElementById("premiumPrizeList");
 const premiumAdminPanel = document.getElementById("premiumAdminPanel");
@@ -2704,7 +2704,6 @@ const premiumAdjustDirection = document.getElementById("premiumAdjustDirection")
 const premiumAdjustAmount = document.getElementById("premiumAdjustAmount");
 const premiumAdjustSubmit = document.getElementById("premiumAdjustSubmit");
 const premiumPlayersTableBody = document.getElementById("premiumPlayersTableBody");
-const premiumResetAssignedButton = document.getElementById("premiumResetAssignedButton");
 const premiumJournalStatus = document.getElementById("premiumJournalStatus");
 const premiumJournalList = document.getElementById("premiumJournalList");
 const messagingPage = document.getElementById("messagingPage");
@@ -3271,6 +3270,7 @@ function renderPremiumPrizeList(prizes) {
     if (accumulated < 100) stops.push("#e7d5f1 " + accumulated + "% 100%");
     premiumWheel.style.background = stops.length ? "conic-gradient(" + stops.join(", ") + ")" : "conic-gradient(#8d38d1 0 25%, #bd5be9 25% 50%, #6c24a3 50% 75%, #d77af2 75% 100%)";
     premiumSpinButton.disabled = isPlayerPreview || premiumSpinInProgress || premiumPrizes.length === 0 || premiumBalanceCount < 1;
+    premiumTestWheelButton.disabled = !isCurrentUserAdmin() || isPlayerPreview || premiumSpinInProgress || premiumPrizes.length === 0;
 }
 
 function rebalancePremiumPrizeChances() {
@@ -3388,6 +3388,7 @@ async function loadPremiumWheel() {
     if (!auth.currentUser) return;
     const isAdminView = isCurrentUserAdmin() && !isPlayerPreview;
     premiumAdminPanel.classList.toggle("hidden", !isAdminView);
+    premiumTestWheelButton.classList.toggle("hidden", !isAdminView);
     premiumRulesEditor.classList.toggle("hidden", !isAdminView);
     premiumStatus.textContent = "Chargement de la roue…";
     premiumAdminStatus.textContent = "";
@@ -3541,6 +3542,21 @@ premiumHomeButton.addEventListener("click", async () => {
 
 premiumBackButton.addEventListener("click", showHomePage);
 
+async function animatePremiumWheelToPrize(prizeIndex) {
+    if (prizeIndex < 0 || prizeIndex >= premiumPrizes.length) throw new Error("PREMIUM_PRIZE_NOT_IN_WHEEL");
+    const totalWeight = premiumPrizes.reduce((sum, prize) => sum + Number(prize.percentage), 0);
+    const midpoint = (premiumPrizes.slice(0, prizeIndex).reduce((sum, prize) => sum + Number(prize.percentage), 0) + Number(premiumPrizes[prizeIndex].percentage) / 2) / totalWeight * 360;
+    const currentNormalized = ((premiumWheelRotation % 360) + 360) % 360;
+    const extra = (360 - midpoint - currentNormalized + 720) % 360;
+    premiumWheel.style.transition = "none";
+    premiumWheel.style.transform = "rotate(" + premiumWheelRotation + "deg)";
+    void premiumWheel.offsetWidth;
+    premiumWheel.style.transition = "transform 4.8s cubic-bezier(.12,.72,.12,1)";
+    premiumWheelRotation += 5 * 360 + extra;
+    requestAnimationFrame(() => { premiumWheel.style.transform = "rotate(" + premiumWheelRotation + "deg)"; });
+    await new Promise((resolve) => setTimeout(resolve, 5000));
+}
+
 premiumRulesSaveButton.addEventListener("click", async () => {
     if (!isCurrentUserAdmin() || isPlayerPreview) return;
     const rules = premiumRulesInput.value.trim();
@@ -3621,17 +3637,7 @@ premiumSpinButton.addEventListener("click", async () => {
         const data = response.data;
         const prizeIndex = premiumPrizes.findIndex((prize) => prize.id === data.prize.id);
         if (prizeIndex < 0) throw new Error("PREMIUM_PRIZE_NOT_IN_WHEEL");
-        const totalWeight = premiumPrizes.reduce((sum, prize) => sum + Number(prize.percentage), 0);
-        const midpoint = (premiumPrizes.slice(0, prizeIndex).reduce((sum, prize) => sum + Number(prize.percentage), 0) + Number(premiumPrizes[prizeIndex].percentage) / 2) / totalWeight * 360;
-        const currentNormalized = ((premiumWheelRotation % 360) + 360) % 360;
-        const extra = (360 - midpoint - currentNormalized + 720) % 360;
-        premiumWheel.style.transition = "none";
-        premiumWheel.style.transform = "rotate(" + premiumWheelRotation + "deg)";
-        void premiumWheel.offsetWidth;
-        premiumWheel.style.transition = "transform 4.8s cubic-bezier(.12,.72,.12,1)";
-        premiumWheelRotation += 5 * 360 + extra;
-        requestAnimationFrame(() => { premiumWheel.style.transform = "rotate(" + premiumWheelRotation + "deg)"; });
-        await new Promise((resolve) => setTimeout(resolve, 5000));
+        await animatePremiumWheelToPrize(prizeIndex);
         premiumBalanceCount = Number(data.jetonsPremium);
         document.getElementById("playerTokens").textContent = Number(data.tokens).toLocaleString("fr-FR");
         document.getElementById("playerBoosters").textContent = Number(data.boostersDisponibles).toLocaleString("fr-FR");
@@ -3646,6 +3652,26 @@ premiumSpinButton.addEventListener("click", async () => {
     } finally {
         premiumSpinInProgress = false;
         premiumSpinButton.disabled = isPlayerPreview || premiumBalanceCount < 1 || premiumPrizes.length === 0;
+    }
+});
+
+premiumTestWheelButton.addEventListener("click", async () => {
+    if (!isCurrentUserAdmin() || isPlayerPreview || premiumSpinInProgress) return;
+    premiumSpinInProgress = true;
+    renderPremiumPrizeList(premiumPrizes);
+    premiumStatus.textContent = "Test de la roue en cours… Aucun cadeau ne sera attribué.";
+    try {
+        const response = await callTestPremiumWheel();
+        const data = response.data;
+        await animatePremiumWheelToPrize(Number(data.prizeIndex));
+        const description = premiumRewardDescription(data.prize);
+        premiumStatus.textContent = "Test terminé : « " + (data.prize.name || "Cadeau") + " » — " + description + ". Aucun solde, journal ou statistique n’a été modifié.";
+    } catch (error) {
+        console.error("Erreur pendant le test de la roue Premium :", error);
+        premiumStatus.textContent = error.message || "Impossible de tester la roue. Vérifie le déploiement de testPremiumWheel.";
+    } finally {
+        premiumSpinInProgress = false;
+        renderPremiumPrizeList(premiumPrizes);
     }
 });
 
@@ -3669,24 +3695,6 @@ premiumAdjustSubmit.addEventListener("click", async () => {
         premiumPlayersStatus.textContent = error.message || "Impossible de modifier le solde Premium.";
     } finally {
         premiumAdjustSubmit.disabled = false;
-    }
-});
-
-premiumResetAssignedButton.addEventListener("click", async () => {
-    if (!isCurrentUserAdmin() || isPlayerPreview) return;
-    const confirmed = window.confirm("Remettre à zéro le compteur de jetons Premium attribués pour tous les joueurs ? Leurs soldes de jetons Premium ne seront pas modifiés.");
-    if (!confirmed) return;
-    premiumResetAssignedButton.disabled = true;
-    premiumPlayersStatus.textContent = "Remise à zéro des compteurs…";
-    try {
-        const response = await callResetPremiumAssignedTokens();
-        await loadPremiumAdminPlayers();
-        premiumPlayersStatus.textContent = "Compteur remis à 0 pour " + Number(response.data.updated || 0).toLocaleString("fr-FR") + " joueur(s). Les soldes n’ont pas changé.";
-    } catch (error) {
-        console.error("Erreur de remise à zéro des compteurs Premium :", error);
-        premiumPlayersStatus.textContent = error.message || "Impossible de remettre les compteurs à zéro.";
-    } finally {
-        premiumResetAssignedButton.disabled = false;
     }
 });
 
