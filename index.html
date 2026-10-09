@@ -12,6 +12,7 @@
 
 <meta name="theme-color" content="#08172f">
 <meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <link rel="manifest" href="./manifest.webmanifest">
 <link rel="icon" type="image/png" sizes="192x192" href="./icon-192.png">
@@ -3599,7 +3600,7 @@ function setPlayerPreview(enabled) {
     playerPreviewToggle.textContent = enabled ? "🛡️ Revenir au mode Admin" : "👤 Joueur normal";
     if (enabled && (!adminPage.classList.contains("hidden") || !messagingPage.classList.contains("hidden"))) showHomePage();
     if (!premiumPage.classList.contains("hidden")) loadPremiumWheel();
-});
+}
 
 playerPreviewToggle.addEventListener("click", () => {
     dropdownMenu.classList.add("hidden");
