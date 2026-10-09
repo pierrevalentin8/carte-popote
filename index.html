@@ -1188,6 +1188,10 @@ body {
 .premium-rule-card, .premium-balance-card, .premium-wheel-card, .premium-admin-card { margin-top: 14px; padding: 16px; border: 1px solid rgba(231, 158, 255, .8); border-radius: 17px; background: linear-gradient(145deg, #fbf7ff, #f0e1ff); color: #25143c; box-shadow: 0 10px 26px rgba(0,0,0,.24); }
 .premium-rule-card { display: flex; align-items: center; gap: 14px; font-size: 19px; font-weight: 900; }
 .premium-rule-card img { width: 54px; height: 54px; object-fit: contain; }
+.premium-rules-editor { margin-top: 10px; padding: 13px; border: 1px solid #d7b4ec; border-radius: 14px; background: rgba(255,255,255,.82); }
+.premium-rules-editor label { display: block; margin-bottom: 7px; font-weight: 800; }
+.premium-rules-editor textarea { min-height: 90px; resize: vertical; }
+.premium-rules-editor button { margin-top: 8px; }
 .premium-balance-card { display: flex; align-items: center; justify-content: center; gap: 12px; font-weight: 800; }
 .premium-balance-card img { width: 42px; height: 42px; object-fit: contain; }
 .premium-balance-value { color: #791ab1; font-size: 28px; font-weight: 900; }
@@ -2171,7 +2175,13 @@ body {
         <h2 id="premiumPageTitle">Premium</h2>
         <div class="premium-rule-card">
             <img src="./Jeton%20premium.png" alt="">
-            <span>Règle Premium : 1 € = 2 jetons Premium</span>
+            <span id="premiumRulesText">Règle Premium : 1 € = 2 jetons Premium.</span>
+        </div>
+        <div id="premiumRulesEditor" class="premium-rules-editor hidden">
+            <label for="premiumRulesInput">Règles de la page Premium (visibles par les joueurs)</label>
+            <textarea id="premiumRulesInput" class="admin-field" maxlength="3000" placeholder="Écris les règles Premium…"></textarea>
+            <button id="premiumRulesSaveButton" class="primary-button" type="button">Valider</button>
+            <p id="premiumRulesStatus" class="premium-status" role="status" aria-live="polite"></p>
         </div>
         <div class="premium-balance-card" aria-label="Solde de jetons Premium">
             <img src="./Jeton%20premium.png" alt="">
@@ -2531,6 +2541,8 @@ const callGetLeaderboard = httpsCallable(functions, "getLeaderboard");
 const callBuyClassicBooster = httpsCallable(functions, "buyClassicBooster");
 const callGetPublicCardCount = httpsCallable(functions, "getPublicCardCount");
 const callGetPremiumWheel = httpsCallable(functions, "getPremiumWheel");
+const callGetPremiumRules = httpsCallable(functions, "getPremiumRules");
+const callSavePremiumRules = httpsCallable(functions, "savePremiumRules");
 const callSavePremiumWheel = httpsCallable(functions, "savePremiumWheel");
 const callSpinPremiumWheel = httpsCallable(functions, "spinPremiumWheel");
 const callAdjustPlayerPremiumTokens = httpsCallable(functions, "adjustPlayerPremiumTokens");
@@ -2674,6 +2686,11 @@ const premiumHomeButton = document.getElementById("premiumHomeButton");
 const premiumPage = document.getElementById("premiumPage");
 const premiumBackButton = document.getElementById("premiumBackButton");
 const premiumBalance = document.getElementById("premiumBalance");
+const premiumRulesText = document.getElementById("premiumRulesText");
+const premiumRulesEditor = document.getElementById("premiumRulesEditor");
+const premiumRulesInput = document.getElementById("premiumRulesInput");
+const premiumRulesSaveButton = document.getElementById("premiumRulesSaveButton");
+const premiumRulesStatus = document.getElementById("premiumRulesStatus");
 const premiumWheel = document.getElementById("premiumWheel");
 const premiumSpinButton = document.getElementById("premiumSpinButton");
 const premiumStatus = document.getElementById("premiumStatus");
@@ -3257,6 +3274,21 @@ function renderPremiumPrizeList(prizes) {
     premiumSpinButton.disabled = isPlayerPreview || premiumSpinInProgress || premiumPrizes.length === 0 || premiumBalanceCount < 1;
 }
 
+function rebalancePremiumPrizeChances() {
+    const rows = Array.from(premiumPrizeEditor.querySelectorAll(".premium-prize-edit-row"));
+    if (!rows.length) return;
+    const raw = rows.map((row) => Math.max(0, Number(row.querySelector(".premium-prize-chance").value) || 0));
+    const sum = raw.reduce((total, value) => total + value, 0);
+    const weights = raw.map((value) => sum > 0 ? value / sum * 10000 : 10000 / rows.length);
+    const points = weights.map((value, index) => ({ index, whole: Math.floor(value), remainder: value - Math.floor(value) }));
+    let leftover = 10000 - points.reduce((total, point) => total + point.whole, 0);
+    points.slice().sort((a, b) => b.remainder - a.remainder || a.index - b.index)
+        .slice(0, leftover).forEach((point) => { points[point.index].whole += 1; });
+    points.forEach((point) => {
+        rows[point.index].querySelector(".premium-prize-chance").value = (point.whole / 100).toFixed(2);
+    });
+}
+
 function createPremiumPrizeEditorRow(prize = {}) {
     const row = document.createElement("div");
     row.className = "premium-prize-edit-row";
@@ -3336,8 +3368,15 @@ function createPremiumPrizeEditorRow(prize = {}) {
     const remove = document.createElement("button");
     remove.type = "button";
     remove.className = "admin-danger";
-    remove.textContent = "Retirer";
-    remove.addEventListener("click", () => row.remove());
+    remove.textContent = "Supprimer";
+    remove.setAttribute("aria-label", "Supprimer le cadeau « " + (prize.name || "nouveau cadeau") + " »");
+    remove.addEventListener("click", () => {
+        row.remove();
+        rebalancePremiumPrizeChances();
+        premiumAdminStatus.textContent = premiumPrizeEditor.children.length
+            ? "Cadeau supprimé. Les taux restants ont été rééquilibrés ; clique sur « Enregistrer la roue » pour confirmer."
+            : "Tous les cadeaux sont retirés. Clique sur « Enregistrer la roue » pour désactiver la roue.";
+    });
     row.append(name, type, chanceGroup, amountGroup, cardSelect, remove);
     premiumPrizeEditor.append(row);
 }
@@ -3350,6 +3389,7 @@ async function loadPremiumWheel() {
     if (!auth.currentUser) return;
     const isAdminView = isCurrentUserAdmin() && !isPlayerPreview;
     premiumAdminPanel.classList.toggle("hidden", !isAdminView);
+    premiumRulesEditor.classList.toggle("hidden", !isAdminView);
     premiumStatus.textContent = "Chargement de la roue…";
     premiumAdminStatus.textContent = "";
     premiumJournalStatus.textContent = "Chargement du journal…";
@@ -3379,9 +3419,16 @@ async function loadPremiumWheel() {
             renderPremiumAdminPlayers();
             premiumPrizeEditor.replaceChildren();
             prizes.forEach((prize) => createPremiumPrizeEditorRow(prize));
-            if (!prizes.length) createPremiumPrizeEditorRow({ percentage: 100, rewardType: "tokens", rewardAmount: 1 });
         } else {
             premiumPrizeEditor.replaceChildren();
+        }
+        try {
+            const rulesResponse = await callGetPremiumRules();
+            premiumRulesText.textContent = rulesResponse.data.rules;
+            if (isAdminView) premiumRulesInput.value = rulesResponse.data.rules;
+        } catch (rulesError) {
+            console.error("Erreur de chargement des règles Premium :", rulesError);
+            premiumRulesText.textContent = "Les règles Premium ne sont pas disponibles.";
         }
         await loadPremiumJournal();
     } catch (error) {
@@ -3482,9 +3529,31 @@ premiumHomeButton.addEventListener("click", async () => {
 
 premiumBackButton.addEventListener("click", showHomePage);
 
+premiumRulesSaveButton.addEventListener("click", async () => {
+    if (!isCurrentUserAdmin() || isPlayerPreview) return;
+    const rules = premiumRulesInput.value.trim();
+    if (!rules || rules.length > 3000) {
+        premiumRulesStatus.textContent = "Écris une règle (3 000 caractères maximum).";
+        return;
+    }
+    premiumRulesSaveButton.disabled = true;
+    premiumRulesStatus.textContent = "Enregistrement…";
+    try {
+        const response = await callSavePremiumRules({ rules });
+        premiumRulesText.textContent = response.data.rules;
+        premiumRulesStatus.textContent = "Règles Premium enregistrées.";
+    } catch (error) {
+        console.error("Erreur d’enregistrement des règles Premium :", error);
+        premiumRulesStatus.textContent = error.message || "Impossible d’enregistrer les règles Premium.";
+    } finally {
+        premiumRulesSaveButton.disabled = false;
+    }
+});
+
 premiumAddPrizeButton.addEventListener("click", () => {
     if (!isCurrentUserAdmin() || isPlayerPreview) return;
-    createPremiumPrizeEditorRow({ percentage: 1, rewardType: "tokens", rewardAmount: 1 });
+    createPremiumPrizeEditorRow({ percentage: premiumPrizeEditor.children.length ? 1 : 100, rewardType: "tokens", rewardAmount: 1 });
+    rebalancePremiumPrizeChances();
 });
 
 premiumSavePrizesButton.addEventListener("click", async () => {
@@ -3499,7 +3568,7 @@ premiumSavePrizesButton.addEventListener("click", async () => {
         if (prize.rewardType === "card") prize.rewardCardId = row.querySelector(".premium-prize-card").value;
         return prize;
     });
-    if (!prizes.length || prizes.some((prize) => !prize.name || !Number.isFinite(prize.percentage) || !Number.isSafeInteger(prize.rewardAmount) || (prize.rewardType === "card" && !prize.rewardCardId))) {
+    if (prizes.some((prize) => !prize.name || !Number.isFinite(prize.percentage) || !Number.isSafeInteger(prize.rewardAmount) || (prize.rewardType === "card" && !prize.rewardCardId))) {
         premiumAdminStatus.textContent = "Complète le nom, le taux, la quantité et la carte si le cadeau est une carte.";
         return;
     }
@@ -3507,7 +3576,9 @@ premiumSavePrizesButton.addEventListener("click", async () => {
     premiumAdminStatus.textContent = "Enregistrement…";
     try {
         const response = await callSavePremiumWheel({ prizes });
-        premiumAdminStatus.textContent = "Roue enregistrée. Le total des taux est de " + Number(response.data.totalPercentage).toLocaleString("fr-FR") + " %.";
+        premiumAdminStatus.textContent = prizes.length
+            ? "Roue enregistrée. Le total des taux est de " + Number(response.data.totalPercentage).toLocaleString("fr-FR") + " %."
+            : "Tous les cadeaux ont été supprimés : la roue est désactivée.";
         renderPremiumPrizeList(response.data.prizes);
     } catch (error) {
         console.error("Erreur d’enregistrement de la roue Premium :", error);
