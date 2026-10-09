@@ -1188,6 +1188,7 @@ body {
 .premium-rule-card, .premium-balance-card, .premium-wheel-card, .premium-admin-card { margin-top: 14px; padding: 16px; border: 1px solid rgba(231, 158, 255, .8); border-radius: 17px; background: linear-gradient(145deg, #fbf7ff, #f0e1ff); color: #25143c; box-shadow: 0 10px 26px rgba(0,0,0,.24); }
 .premium-rule-card { display: flex; align-items: center; gap: 14px; font-size: 19px; font-weight: 900; }
 .premium-rule-card img { width: 1.1em; height: 1.1em; object-fit: contain; }
+#premiumRulesText { white-space: pre-line; }
 .premium-rules-editor { margin-top: 10px; padding: 13px; border: 1px solid #d7b4ec; border-radius: 14px; background: rgba(255,255,255,.82); }
 .premium-rules-editor label { display: block; margin-bottom: 7px; font-weight: 800; }
 .premium-rules-editor textarea { min-height: 90px; resize: vertical; }
@@ -2174,7 +2175,6 @@ body {
         <button id="premiumBackButton" class="admin-back" type="button">← Retour à l’accueil</button>
         <h2 id="premiumPageTitle">Premium</h2>
         <div class="premium-rule-card">
-            <img src="./Jeton%20premium.png" alt="">
             <span id="premiumRulesText">Règle Premium : 1 € = 2 jetons Premium.</span>
         </div>
         <div id="premiumRulesEditor" class="premium-rules-editor hidden">
@@ -2544,6 +2544,7 @@ const callSavePremiumWheel = httpsCallable(functions, "savePremiumWheel");
 const callSpinPremiumWheel = httpsCallable(functions, "spinPremiumWheel");
 const callAdjustPlayerPremiumTokens = httpsCallable(functions, "adjustPlayerPremiumTokens");
 const callResetPremiumAssignedTokens = httpsCallable(functions, "resetPremiumAssignedTokens");
+const callInitializePremiumAssignedTokens = httpsCallable(functions, "initializePremiumAssignedTokens");
 const callGetPremiumWheelJournal = httpsCallable(functions, "getPremiumWheelJournal");
 const callGetPremiumRewardCards = httpsCallable(functions, "getPremiumRewardCards");
 
@@ -3407,6 +3408,12 @@ async function loadPremiumWheel() {
             : prizes.length ? "Chaque tour utilise 1 jeton Premium." : "La roue n’a pas encore de cadeau configuré.";
 
         if (isAdminView) {
+            try {
+                await callInitializePremiumAssignedTokens();
+            } catch (migrationError) {
+                console.error("Remise à zéro initiale du compteur Premium impossible :", migrationError);
+                premiumPlayersStatus.textContent = "Déploie les fonctions Firebase mises à jour pour remettre les compteurs attribués à zéro.";
+            }
             const [playersResponse, cardsResponse] = await Promise.all([
                 callGetAdminPlayers(),
                 callGetPremiumRewardCards()
@@ -3450,9 +3457,17 @@ function renderPremiumAdminPlayers() {
             option.textContent = (player.pseudo || "Joueur") + " • solde " + (Number(player.jetonsPremium) || 0).toLocaleString("fr-FR");
             premiumPlayerSelect.append(option);
             const row = document.createElement("tr");
-            [player.pseudo || "Joueur", Number(player.jetonsPremiumAttribues) || 0, Number(player.jetonsPremiumUtilises) || 0].forEach((value) => {
+            [player.pseudo || "Joueur", Number(player.jetonsPremiumAttribues) || 0, Number(player.jetonsPremiumUtilises) || 0].forEach((value, columnIndex) => {
                 const cell = document.createElement("td");
-                cell.textContent = typeof value === "number" ? value.toLocaleString("fr-FR") : value;
+                if (columnIndex === 1) {
+                    const amount = document.createElement("span");
+                    amount.textContent = value.toLocaleString("fr-FR") + " jetons Premium";
+                    const equivalent = document.createElement("small");
+                    equivalent.textContent = "≈ " + (value / 2).toLocaleString("fr-FR", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + " €";
+                    cell.append(amount, document.createElement("br"), equivalent);
+                } else {
+                    cell.textContent = typeof value === "number" ? value.toLocaleString("fr-FR") : value;
+                }
                 row.append(cell);
             });
             premiumPlayersTableBody.append(row);
