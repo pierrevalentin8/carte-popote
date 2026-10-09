@@ -1,4 +1,4 @@
-const CACHE_NAME = "cartes-popote-app-v10";
+const CACHE_NAME = "cartes-popote-app-v11";
 const APP_SHELL = ["./", "./index.html", "./manifest.webmanifest", "./Logo.png", "./icon-192.png", "./icon-512.png", "./icon-maskable-512.png", "./apple-touch-icon.png", "./Messagerie.png", "./enveloppe.png", "./Jeton.png", "./Dos%20cartes.png", "./Jeton%20premium.png"];
 self.addEventListener("install", (event) => {
   event.waitUntil(caches.open(CACHE_NAME).then(async (cache) => {
