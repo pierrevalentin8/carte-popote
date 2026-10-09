@@ -1206,7 +1206,28 @@ body {
 .premium-admin-player { display: grid; grid-template-columns: minmax(100px, 1fr) auto auto; align-items: center; gap: 8px; padding: 10px 0; border-top: 1px solid #e3c8f1; color: #28133c; font-size: 13px; }
 .premium-admin-player-controls { display: flex; align-items: center; gap: 6px; }
 .premium-admin-player-controls .player-token-input { width: 82px; }
-@media (max-width: 600px) { .premium-prize-edit-row { grid-template-columns: 1fr 1fr; } .premium-prize-edit-row > :first-child { grid-column: 1 / -1; } .premium-admin-player { grid-template-columns: minmax(90px, 1fr) auto; } .premium-admin-player-controls { grid-column: 1 / -1; justify-content: flex-end; } }
+.player-preview-banner { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 9px 14px; background: #fff1ae; color: #3a2452; font-size: 12px; font-weight: 700; }
+.player-preview-banner button { padding: 7px 10px; border: 1px solid #70439a; border-radius: 9px; background: #47216c; color: #fff; font: inherit; cursor: pointer; }
+.premium-journal-card, .premium-grant-card, .premium-player-table-card { margin-top: 14px; padding: 16px; border: 1px solid rgba(231, 158, 255, .8); border-radius: 17px; background: linear-gradient(145deg, #fbf7ff, #f0e1ff); color: #25143c; box-shadow: 0 10px 26px rgba(0,0,0,.24); }
+.premium-journal-card h3, .premium-grant-card h3, .premium-player-table-card h3 { color: #32104c; }
+.premium-journal-list { display: grid; gap: 7px; margin-top: 10px; }
+.premium-journal-entry { display: flex; justify-content: space-between; gap: 12px; padding: 10px; border: 1px solid #e3c8f1; border-radius: 10px; background: rgba(255,255,255,.72); color: #28133c; font-size: 12px; }
+.premium-journal-entry span:last-child { color: #6d2a98; font-weight: 800; text-align: right; }
+.premium-grant-fields { display: grid; grid-template-columns: minmax(120px,1fr) minmax(120px,1fr) auto; align-items: end; gap: 8px; }
+.premium-grant-fields label { color: #4c335d; font-size: 11px; font-weight: 800; }
+.premium-grant-fields .admin-field { margin: 5px 0; }
+.premium-grant-fields #premiumAdjustSubmit { min-height: 42px; }
+.premium-player-table-wrap { margin-top: 10px; overflow-x: auto; border: 1px solid #e3c8f1; border-radius: 11px; }
+.premium-player-table { width: 100%; min-width: 430px; border-collapse: collapse; color: #28133c; font-size: 12px; }
+.premium-player-table th, .premium-player-table td { padding: 10px; border-bottom: 1px solid #e3c8f1; text-align: center; white-space: nowrap; }
+.premium-player-table th { background: #48206c; color: #fff; }
+.premium-player-table td:first-child, .premium-player-table th:first-child { text-align: left; }
+.premium-prize-edit-row { grid-template-columns: minmax(120px, 1.2fr) minmax(110px, 1fr) minmax(110px, 1fr) minmax(120px, 1fr) 72px auto; }
+.premium-prize-field-caption { display: block; align-self: end; padding: 0 2px 2px; color: #4c335d; font-size: 10px; font-weight: 800; }
+.premium-prize-edit-row .premium-card-select { grid-column: 1 / -2; }
+.premium-wheel-preview-note { margin: 8px 0; color: #685279; font-size: 12px; }
+@media (max-width: 600px) { .premium-prize-edit-row { grid-template-columns: 1fr 1fr; } .premium-prize-edit-row > :first-child { grid-column: 1 / -1; } .premium-admin-player { grid-template-columns: minmax(90px, 1fr) auto; } .premium-admin-player-controls { grid-column: 1 / -1; justify-content: flex-end; } .premium-grant-fields { grid-template-columns: 1fr 1fr; } .premium-grant-fields #premiumAdjustSubmit { grid-column: 1 / -1; } }
+@media (max-width: 600px) { .premium-prize-edit-row .premium-card-select { grid-column: 1 / -1; } .premium-journal-entry { flex-direction: column; gap: 4px; } .premium-journal-entry span:last-child { text-align: left; } .player-preview-banner { align-items: flex-start; flex-direction: column; } }
 .collection-search { width: 100%; max-width: 480px; margin: 12px 0 6px; padding: 12px 14px; border: 1px solid rgba(243, 191, 56, .75); border-radius: 11px; background: #fffdf7; color: #10264a; font: inherit; }
 .collection-search-label { display: block; margin-top: 12px; color: #fbfaf5; font-size: 13px; font-weight: 700; }
 .collection-search-status { min-height: 18px; margin: 4px 0 8px; color: #c6d2e5; font-size: 12px; }
@@ -1747,6 +1768,7 @@ body {
             id="dropdownMenu"
             class="dropdown-menu hidden"
         >
+            <button id="playerPreviewToggle" class="hidden" type="button">👤 Joueur normal</button>
             <button id="adminButton" class="hidden" type="button">
                 🛡️ Administration
             </button>
@@ -1775,6 +1797,11 @@ body {
 
 
     </header>
+
+    <div id="playerPreviewBanner" class="player-preview-banner hidden" role="status">
+        <span>Aperçu joueur normal : les boutons réservés à l’Admin sont masqués.</span>
+        <button id="playerPreviewExitButton" type="button">Revenir au mode Admin</button>
+    </div>
 
 
 
@@ -1894,7 +1921,7 @@ body {
             </div>
         </section>
 
-        <button id="premiumHomeButton" class="premium-home-button hidden" type="button">
+        <button id="premiumHomeButton" class="premium-home-button" type="button">
             <img src="./Jeton%20premium.png" alt="">
             <span>Premium</span>
         </button>
@@ -2148,7 +2175,7 @@ body {
         <div class="premium-balance-card" aria-label="Solde de jetons Premium">
             <img src="./Jeton%20premium.png" alt="">
             <span id="premiumBalance" class="premium-balance-value">0</span>
-            <span>jeton(s) Premium attribué(s)</span>
+            <span>jetons Premium disponibles</span>
         </div>
         <section class="premium-wheel-card" aria-labelledby="premiumWheelTitle">
             <h3 id="premiumWheelTitle">Roue Premium</h3>
@@ -2162,17 +2189,38 @@ body {
             <p id="premiumStatus" class="premium-status" role="status" aria-live="polite"></p>
             <div id="premiumPrizeList" class="premium-prize-list"></div>
         </section>
+        <section class="premium-journal-card" aria-labelledby="premiumJournalTitle">
+            <h3 id="premiumJournalTitle">Journal des tirages</h3>
+            <p id="premiumJournalStatus" class="premium-status" role="status" aria-live="polite">Chargement du journal…</p>
+            <div id="premiumJournalList" class="premium-journal-list" aria-live="polite"></div>
+        </section>
         <section id="premiumAdminPanel" class="premium-admin-card hidden" aria-labelledby="premiumAdminTitle">
             <h3 id="premiumAdminTitle">Administration Premium</h3>
             <p class="admin-note">Configure les cadeaux et leurs taux. Le total des taux doit faire 100 %.</p>
             <div id="premiumPrizeEditor"></div>
-            <button id="premiumAddPrizeButton" class="secondary-button" type="button">Ajouter un cadeau</button>
+            <button id="premiumAddPrizeButton" class="secondary-button" type="button">Créer un cadeau</button>
             <button id="premiumSavePrizesButton" class="primary-button admin-submit" type="button">Enregistrer la roue</button>
             <p id="premiumAdminStatus" class="premium-status" role="status" aria-live="polite"></p>
-            <h3 style="margin-top:20px">Attribuer des jetons Premium</h3>
-            <p class="admin-note">Les jetons attribués apparaîtront sur le compte du joueur.</p>
-            <p id="premiumPlayersStatus" class="premium-status" role="status" aria-live="polite"></p>
-            <div id="premiumPlayersList"></div>
+            <section class="premium-grant-card" aria-labelledby="premiumGrantTitle">
+                <h3 id="premiumGrantTitle">Attribuer ou enlever des jetons Premium</h3>
+                <label class="premium-prize-field-caption" for="premiumPlayerSelect">Joueur</label>
+                <select id="premiumPlayerSelect" class="admin-field"></select>
+                <div class="premium-grant-fields">
+                    <div><label for="premiumAdjustDirection">Action</label><select id="premiumAdjustDirection" class="admin-field"><option value="add">Attribuer</option><option value="remove">Enlever</option></select></div>
+                    <div><label for="premiumAdjustAmount">Nombre de jetons Premium</label><input id="premiumAdjustAmount" class="admin-field" type="number" min="1" max="1000000" step="1" value="2"></div>
+                    <button id="premiumAdjustSubmit" class="primary-button" type="button">Appliquer</button>
+                </div>
+                <p id="premiumPlayersStatus" class="premium-status" role="status" aria-live="polite"></p>
+            </section>
+            <section class="premium-player-table-card" aria-labelledby="premiumPlayersTableTitle">
+                <h3 id="premiumPlayersTableTitle">Soldes et utilisation par joueur</h3>
+                <div class="premium-player-table-wrap">
+                    <table class="premium-player-table">
+                        <thead><tr><th scope="col">Joueur</th><th scope="col">Jetons Premium attribués</th><th scope="col">Jetons Premium utilisés</th></tr></thead>
+                        <tbody id="premiumPlayersTableBody"></tbody>
+                    </table>
+                </div>
+            </section>
         </section>
     </section>
 
@@ -2485,6 +2533,8 @@ const callGetPremiumWheel = httpsCallable(functions, "getPremiumWheel");
 const callSavePremiumWheel = httpsCallable(functions, "savePremiumWheel");
 const callSpinPremiumWheel = httpsCallable(functions, "spinPremiumWheel");
 const callAdjustPlayerPremiumTokens = httpsCallable(functions, "adjustPlayerPremiumTokens");
+const callGetPremiumWheelJournal = httpsCallable(functions, "getPremiumWheelJournal");
+const callGetPremiumRewardCards = httpsCallable(functions, "getPremiumRewardCards");
 
 
 
@@ -2616,6 +2666,9 @@ const statisticsTableBody = document.getElementById("statisticsTableBody");
 
 const adminButton = document.getElementById("adminButton");
 const adminMessagesMenuButton = document.getElementById("adminMessagesMenuButton");
+const playerPreviewToggle = document.getElementById("playerPreviewToggle");
+const playerPreviewBanner = document.getElementById("playerPreviewBanner");
+const playerPreviewExitButton = document.getElementById("playerPreviewExitButton");
 const premiumHomeButton = document.getElementById("premiumHomeButton");
 const premiumPage = document.getElementById("premiumPage");
 const premiumBackButton = document.getElementById("premiumBackButton");
@@ -2630,10 +2683,19 @@ const premiumAddPrizeButton = document.getElementById("premiumAddPrizeButton");
 const premiumSavePrizesButton = document.getElementById("premiumSavePrizesButton");
 const premiumAdminStatus = document.getElementById("premiumAdminStatus");
 const premiumPlayersStatus = document.getElementById("premiumPlayersStatus");
-const premiumPlayersList = document.getElementById("premiumPlayersList");
+const premiumPlayerSelect = document.getElementById("premiumPlayerSelect");
+const premiumAdjustDirection = document.getElementById("premiumAdjustDirection");
+const premiumAdjustAmount = document.getElementById("premiumAdjustAmount");
+const premiumAdjustSubmit = document.getElementById("premiumAdjustSubmit");
+const premiumPlayersTableBody = document.getElementById("premiumPlayersTableBody");
+const premiumJournalStatus = document.getElementById("premiumJournalStatus");
+const premiumJournalList = document.getElementById("premiumJournalList");
 const messagingPage = document.getElementById("messagingPage");
 const messagingBackButton = document.getElementById("messagingBackButton");
 const ADMIN_EMAIL = "pierre.valentin8@gmail.com";
+let isPlayerPreview = false;
+let premiumAdminPlayers = [];
+let premiumRewardCards = [];
 const buyNormalBoosterButton = document.getElementById("buyNormalBoosterButton");
 const openNormalBoosterButton = document.getElementById("openNormalBoosterButton");
 const openDailyBoosterButton = document.getElementById("openDailyBoosterButton");
@@ -2910,8 +2972,11 @@ onAuthStateChanged(
            ========================================== */
 
         if (!user) {
+            isPlayerPreview = false;
             adminButton.classList.add("hidden");
             adminMessagesMenuButton.classList.add("hidden");
+            playerPreviewToggle.classList.add("hidden");
+            playerPreviewBanner.classList.add("hidden");
             premiumHomeButton.classList.add("hidden");
             premiumPage.classList.add("hidden");
             messagingPage.classList.add("hidden");
@@ -2950,11 +3015,14 @@ onAuthStateChanged(
 
         // Affichage seulement : les règles Firestore protègent les données.
         const isAdminAccount = (user.email || "").toLowerCase() === ADMIN_EMAIL;
-        adminButton.classList.toggle("hidden", !isAdminAccount);
-        adminMessagesMenuButton.classList.toggle("hidden", !isAdminAccount);
-        premiumHomeButton.classList.toggle("hidden", !isAdminAccount);
-        premiumAdminPanel.classList.toggle("hidden", !isAdminAccount);
-        if (!isAdminAccount) premiumPage.classList.add("hidden");
+        if (!isAdminAccount) isPlayerPreview = false;
+        adminButton.classList.toggle("hidden", !isAdminAccount || isPlayerPreview);
+        adminMessagesMenuButton.classList.toggle("hidden", !isAdminAccount || isPlayerPreview);
+        playerPreviewToggle.classList.toggle("hidden", !isAdminAccount);
+        playerPreviewToggle.textContent = isPlayerPreview ? "🛡️ Revenir au mode Admin" : "👤 Joueur normal";
+        playerPreviewBanner.classList.toggle("hidden", !isPlayerPreview);
+        premiumHomeButton.classList.remove("hidden");
+        premiumAdminPanel.classList.toggle("hidden", !isAdminAccount || isPlayerPreview);
         if (!isAdminAccount) messagingPage.classList.add("hidden");
         loadHomeAnnouncements();
         loadPublicCardCount();
@@ -3099,6 +3167,7 @@ onAuthStateChanged(
 
 
 buyNormalBoosterButton.addEventListener("click", async () => {
+    if (isPlayerPreview) return;
     if (!auth.currentUser) return;
 
     buyNormalBoosterButton.disabled = true;
@@ -3144,7 +3213,8 @@ function showHomePage() {
 const PREMIUM_REWARD_TYPES = [
     { value: "tokens", label: "Jetons classiques" },
     { value: "premium", label: "Jetons Premium" },
-    { value: "booster", label: "Booster classique" }
+    { value: "booster", label: "Booster classique" },
+    { value: "card", label: "Carte de la collection" }
 ];
 const PREMIUM_WHEEL_COLORS = ["#7e27b5", "#d050e5", "#4f167b", "#a83ed2", "#6b209c", "#e47af1", "#522078", "#bc58df"];
 let premiumPrizes = [];
@@ -3157,7 +3227,8 @@ function premiumRewardDescription(prize) {
     const labels = {
         tokens: amount + (amount > 1 ? " jetons" : " jeton"),
         premium: amount + (amount > 1 ? " jetons Premium" : " jeton Premium"),
-        booster: amount + (amount > 1 ? " boosters classiques" : " booster classique")
+        booster: amount + (amount > 1 ? " boosters classiques" : " booster classique"),
+        card: prize.rewardCardName ? (amount > 1 ? amount + " exemplaires de « " + prize.rewardCardName + " »" : "Carte « " + prize.rewardCardName + " »") : "Carte surprise"
     };
     return labels[prize.rewardType] || prize.name || "Cadeau";
 }
@@ -3174,26 +3245,29 @@ function renderPremiumPrizeList(prizes) {
         accumulated = end;
         const item = document.createElement("div");
         item.className = "premium-prize-item";
-        item.textContent = (prize.name || "Cadeau") + " — " + premiumRewardDescription(prize) + " • " + chance.toLocaleString("fr-FR") + " %";
+        const displayName = prize.rewardType === "card" && (isPlayerPreview || !isCurrentUserAdmin())
+            ? "Carte surprise"
+            : (prize.name || "Cadeau");
+        item.textContent = displayName + " — " + premiumRewardDescription(prize) + " • " + chance.toLocaleString("fr-FR") + " %";
         premiumPrizeList.append(item);
     });
     if (accumulated < 100) stops.push("#e7d5f1 " + accumulated + "% 100%");
     premiumWheel.style.background = stops.length ? "conic-gradient(" + stops.join(", ") + ")" : "conic-gradient(#8d38d1 0 25%, #bd5be9 25% 50%, #6c24a3 50% 75%, #d77af2 75% 100%)";
-    premiumSpinButton.disabled = premiumSpinInProgress || premiumPrizes.length === 0 || premiumBalanceCount < 1;
+    premiumSpinButton.disabled = isPlayerPreview || premiumSpinInProgress || premiumPrizes.length === 0 || premiumBalanceCount < 1;
 }
 
 function createPremiumPrizeEditorRow(prize = {}) {
     const row = document.createElement("div");
     row.className = "premium-prize-edit-row";
     const name = document.createElement("input");
-    name.className = "admin-field";
+    name.className = "admin-field premium-prize-name";
     name.type = "text";
     name.maxLength = 60;
     name.placeholder = "Nom du cadeau";
     name.value = prize.name || "";
     name.setAttribute("aria-label", "Nom du cadeau");
     const type = document.createElement("select");
-    type.className = "admin-field";
+    type.className = "admin-field premium-prize-type";
     type.setAttribute("aria-label", "Type de cadeau");
     PREMIUM_REWARD_TYPES.forEach((rewardType) => {
         const option = document.createElement("option");
@@ -3202,41 +3276,86 @@ function createPremiumPrizeEditorRow(prize = {}) {
         type.append(option);
     });
     type.value = PREMIUM_REWARD_TYPES.some((item) => item.value === prize.rewardType) ? prize.rewardType : "tokens";
+    const chanceGroup = document.createElement("div");
+    chanceGroup.className = "premium-prize-field-group";
+    const chanceLabel = document.createElement("label");
+    chanceLabel.className = "premium-prize-field-caption";
+    chanceLabel.textContent = "Taux de tirage (%)";
     const percentage = document.createElement("input");
-    percentage.className = "admin-field";
+    percentage.className = "admin-field premium-prize-chance";
     percentage.type = "number";
     percentage.min = "0.01";
     percentage.max = "100";
     percentage.step = "0.01";
-    percentage.placeholder = "%";
     percentage.value = prize.percentage ?? "";
     percentage.setAttribute("aria-label", "Taux de tirage en pourcentage");
+    chanceGroup.append(chanceLabel, percentage);
+    const amountGroup = document.createElement("div");
+    amountGroup.className = "premium-prize-field-group";
+    const amountLabel = document.createElement("label");
+    amountLabel.className = "premium-prize-field-caption";
+    amountLabel.textContent = "Quantité attribuée";
     const amount = document.createElement("input");
-    amount.className = "admin-field";
+    amount.className = "admin-field premium-prize-amount";
     amount.type = "number";
     amount.min = "1";
     amount.max = "1000000";
     amount.step = "1";
-    amount.placeholder = "Qté";
     amount.value = prize.rewardAmount ?? 1;
     amount.setAttribute("aria-label", "Quantité attribuée");
+    amountGroup.append(amountLabel, amount);
+    const cardSelect = document.createElement("select");
+    cardSelect.className = "admin-field premium-card-select";
+    cardSelect.classList.add("premium-prize-card");
+    cardSelect.setAttribute("aria-label", "Carte à attribuer");
+    const cardPlaceholder = document.createElement("option");
+    cardPlaceholder.value = "";
+    cardPlaceholder.textContent = premiumRewardCards.length ? "Choisir la carte cadeau" : "Aucune carte disponible";
+    cardSelect.append(cardPlaceholder);
+    premiumRewardCards.forEach((card) => {
+        const option = document.createElement("option");
+        option.value = card.id;
+        option.textContent = (card.cardNumber ? "N° " + card.cardNumber + " • " : "") + (card.name || "Carte sans nom");
+        cardSelect.append(option);
+    });
+    cardSelect.value = prize.rewardCardId || "";
+    cardSelect.classList.toggle("hidden", type.value !== "card");
+    cardSelect.required = type.value === "card";
+    if (type.value === "card") {
+        amountLabel.textContent = "Exemplaires de cette carte";
+        amount.max = "100";
+    }
+    type.addEventListener("change", () => {
+        cardSelect.classList.toggle("hidden", type.value !== "card");
+        cardSelect.required = type.value === "card";
+        amountLabel.textContent = type.value === "card" ? "Exemplaires de cette carte" : "Quantité attribuée";
+        amount.max = type.value === "card" ? "100" : "1000000";
+        if (type.value === "card") amount.value = "1";
+    });
     const remove = document.createElement("button");
     remove.type = "button";
     remove.className = "admin-danger";
     remove.textContent = "Retirer";
     remove.addEventListener("click", () => row.remove());
-    row.append(name, type, percentage, amount, remove);
+    row.append(name, type, chanceGroup, amountGroup, cardSelect, remove);
     premiumPrizeEditor.append(row);
 }
 
+function isCurrentUserAdmin() {
+    return Boolean(auth.currentUser && (auth.currentUser.email || "").toLowerCase() === ADMIN_EMAIL);
+}
+
 async function loadPremiumWheel() {
-    if (!auth.currentUser || (auth.currentUser.email || "").toLowerCase() !== ADMIN_EMAIL) return;
+    if (!auth.currentUser) return;
+    const isAdminView = isCurrentUserAdmin() && !isPlayerPreview;
+    premiumAdminPanel.classList.toggle("hidden", !isAdminView);
     premiumStatus.textContent = "Chargement de la roue…";
     premiumAdminStatus.textContent = "";
+    premiumJournalStatus.textContent = "Chargement du journal…";
     try {
         const [playerSnapshot, configResponse] = await Promise.all([
             getDoc(doc(db, "players", auth.currentUser.uid)),
-            callGetPremiumWheel()
+            callGetPremiumWheel({ previewAsPlayer: isPlayerPreview })
         ]);
         if (!playerSnapshot.exists()) throw new Error("PLAYER_PROFILE_MISSING");
         const player = playerSnapshot.data();
@@ -3245,80 +3364,103 @@ async function loadPremiumWheel() {
         premiumBalance.textContent = premiumBalanceCount.toLocaleString("fr-FR");
         const prizes = Array.isArray(configResponse.data.prizes) ? configResponse.data.prizes : [];
         renderPremiumPrizeList(prizes);
-        premiumStatus.textContent = prizes.length ? "Chaque tour utilise 1 jeton Premium." : "La roue n’a pas encore de cadeau configuré.";
-        premiumPrizeEditor.replaceChildren();
-        prizes.forEach((prize) => createPremiumPrizeEditorRow(prize));
-        if (!prizes.length) createPremiumPrizeEditorRow({ percentage: 100, rewardType: "tokens", rewardAmount: 1 });
-        await loadPremiumAdminPlayers();
+        premiumStatus.textContent = isPlayerPreview
+            ? "Aperçu joueur normal : les actions de jeu sont désactivées."
+            : prizes.length ? "Chaque tour utilise 1 jeton Premium." : "La roue n’a pas encore de cadeau configuré.";
+
+        if (isAdminView) {
+            const [playersResponse, cardsResponse] = await Promise.all([
+                callGetAdminPlayers(),
+                callGetPremiumRewardCards()
+            ]);
+            premiumAdminPlayers = Array.isArray(playersResponse.data.players) ? playersResponse.data.players : [];
+            premiumRewardCards = Array.isArray(cardsResponse.data.cards) ? cardsResponse.data.cards : [];
+            renderPremiumAdminPlayers();
+            premiumPrizeEditor.replaceChildren();
+            prizes.forEach((prize) => createPremiumPrizeEditorRow(prize));
+            if (!prizes.length) createPremiumPrizeEditorRow({ percentage: 100, rewardType: "tokens", rewardAmount: 1 });
+        } else {
+            premiumPrizeEditor.replaceChildren();
+        }
+        await loadPremiumJournal();
     } catch (error) {
         console.error("Erreur de chargement de la roue Premium :", error);
-        premiumStatus.textContent = "Impossible de charger la roue. Vérifie que les fonctions Firebase Premium sont déployées.";
+        premiumStatus.textContent = "Impossible de charger Premium. Déploie les fonctions Firebase mises à jour.";
+        await loadPremiumJournal();
     }
 }
 
+function renderPremiumAdminPlayers() {
+    premiumPlayerSelect.replaceChildren();
+    const placeholder = document.createElement("option");
+    placeholder.value = "";
+    placeholder.textContent = premiumAdminPlayers.length ? "Choisir un joueur" : "Aucun joueur inscrit";
+    premiumPlayerSelect.append(placeholder);
+    premiumPlayersTableBody.replaceChildren();
+    premiumAdminPlayers
+        .sort((left, right) => (left.pseudo || "").localeCompare(right.pseudo || "", "fr", { sensitivity: "base" }))
+        .forEach((player) => {
+            const option = document.createElement("option");
+            option.value = player.id;
+            option.textContent = (player.pseudo || "Joueur") + " • solde " + (Number(player.jetonsPremium) || 0).toLocaleString("fr-FR");
+            premiumPlayerSelect.append(option);
+            const row = document.createElement("tr");
+            [player.pseudo || "Joueur", Number(player.jetonsPremiumAttribues) || 0, Number(player.jetonsPremiumUtilises) || 0].forEach((value) => {
+                const cell = document.createElement("td");
+                cell.textContent = typeof value === "number" ? value.toLocaleString("fr-FR") : value;
+                row.append(cell);
+            });
+            premiumPlayersTableBody.append(row);
+        });
+}
+
 async function loadPremiumAdminPlayers() {
-    premiumPlayersList.replaceChildren();
-    premiumPlayersStatus.textContent = "Chargement des joueurs…";
+    if (!isCurrentUserAdmin() || isPlayerPreview) return;
+    premiumPlayersStatus.textContent = "Mise à jour des soldes…";
     try {
         const response = await callGetAdminPlayers();
-        const players = Array.isArray(response.data.players) ? response.data.players : [];
-        players.sort((left, right) => (left.pseudo || "").localeCompare(right.pseudo || "", "fr", { sensitivity: "base" }));
-        premiumPlayersStatus.textContent = players.length ? "Joueurs inscrits : " + players.length : "Aucun joueur trouvé.";
-        players.forEach((player) => {
+        premiumAdminPlayers = Array.isArray(response.data.players) ? response.data.players : [];
+        renderPremiumAdminPlayers();
+        premiumPlayersStatus.textContent = premiumAdminPlayers.length
+            ? premiumAdminPlayers.length + (premiumAdminPlayers.length > 1 ? " joueurs" : " joueur")
+            : "Aucun joueur inscrit.";
+    } catch (error) {
+        console.error("Erreur de chargement des statistiques Premium :", error);
+        premiumPlayersStatus.textContent = "Impossible de charger les joueurs. Vérifie que getAdminPlayers est déployée.";
+    }
+}
+
+async function loadPremiumJournal() {
+    premiumJournalList.replaceChildren();
+    try {
+        const response = await callGetPremiumWheelJournal();
+        const entries = Array.isArray(response.data.entries) ? response.data.entries : [];
+        premiumJournalStatus.textContent = entries.length ? "" : "Aucun joueur n’a encore tourné la roue.";
+        entries.forEach((entry) => {
             const row = document.createElement("div");
-            row.className = "premium-admin-player";
-            const details = document.createElement("strong");
-            details.textContent = (player.pseudo || "Joueur") + " • " + (Number(player.jetonsPremium) || 0).toLocaleString("fr-FR") + " Premium";
-            const email = document.createElement("span");
-            email.textContent = player.email || "";
-            const controls = document.createElement("div");
-            controls.className = "premium-admin-player-controls";
-            const amount = document.createElement("input");
-            amount.className = "player-token-input";
-            amount.type = "number";
-            amount.min = "1";
-            amount.max = "1000000";
-            amount.step = "1";
-            amount.value = "2";
-            amount.setAttribute("aria-label", "Nombre de jetons Premium à attribuer à " + (player.pseudo || "ce joueur"));
-            const grant = document.createElement("button");
-            grant.type = "button";
-            grant.className = "primary-button";
-            grant.textContent = "Attribuer";
-            grant.addEventListener("click", async () => {
-                const amountValue = Number(amount.value);
-                if (!Number.isSafeInteger(amountValue) || amountValue < 1 || amountValue > 1_000_000) {
-                    premiumPlayersStatus.textContent = "Entre un montant entier entre 1 et 1 000 000.";
-                    return;
-                }
-                grant.disabled = true;
-                try {
-                    const result = await callAdjustPlayerPremiumTokens({ playerId: player.id, amount: amountValue });
-                    if (auth.currentUser && player.id === auth.currentUser.uid) {
-                        premiumBalanceCount = Number(result.data.jetonsPremium);
-                        premiumBalance.textContent = premiumBalanceCount.toLocaleString("fr-FR");
-                        renderPremiumPrizeList(premiumPrizes);
-                    }
-                    premiumPlayersStatus.textContent = "Jetons Premium attribués à " + (player.pseudo || "ce joueur") + ".";
-                    await loadPremiumAdminPlayers();
-                } catch (error) {
-                    console.error("Erreur d’attribution des jetons Premium :", error);
-                    premiumPlayersStatus.textContent = "Attribution refusée. Vérifie que tu es connecté avec le compte Admin.";
-                    grant.disabled = false;
-                }
-            });
-            controls.append(amount, grant);
-            row.append(details, email, controls);
-            premiumPlayersList.append(row);
+            row.className = "premium-journal-entry";
+            const player = document.createElement("span");
+            player.textContent = entry.pseudo || "Joueur";
+            const reward = document.createElement("span");
+            reward.textContent = "a obtenu : " + (entry.rewardName || "un cadeau");
+            if (entry.createdAt) {
+                const date = document.createElement("small");
+                const time = new Date(entry.createdAt);
+                date.textContent = Number.isNaN(time.getTime()) ? "" : time.toLocaleString("fr-FR");
+                row.append(player, reward, date);
+            } else {
+                row.append(player, reward);
+            }
+            premiumJournalList.append(row);
         });
     } catch (error) {
-        console.error("Erreur de chargement des joueurs Premium :", error);
-        premiumPlayersStatus.textContent = "Impossible de charger la liste. Vérifie les fonctions Firebase.";
+        console.error("Erreur de chargement du journal Premium :", error);
+        premiumJournalStatus.textContent = "Impossible de charger le journal. Déploie les fonctions Firebase mises à jour.";
     }
 }
 
 premiumHomeButton.addEventListener("click", async () => {
-    if (!auth.currentUser || (auth.currentUser.email || "").toLowerCase() !== ADMIN_EMAIL) return;
+    if (!auth.currentUser) return;
     dropdownMenu.classList.add("hidden");
     document.querySelector(".app-content").classList.add("hidden");
     profilePage.classList.add("hidden");
@@ -3333,24 +3475,31 @@ premiumHomeButton.addEventListener("click", async () => {
     premiumWheelRotation = 0;
     premiumWheel.style.transition = "none";
     premiumWheel.style.transform = "rotate(0deg)";
-    premiumAdminPanel.classList.remove("hidden");
+    premiumAdminPanel.classList.toggle("hidden", !isCurrentUserAdmin() || isPlayerPreview);
     await loadPremiumWheel();
 });
 
 premiumBackButton.addEventListener("click", showHomePage);
 
 premiumAddPrizeButton.addEventListener("click", () => {
+    if (!isCurrentUserAdmin() || isPlayerPreview) return;
     createPremiumPrizeEditorRow({ percentage: 1, rewardType: "tokens", rewardAmount: 1 });
 });
 
 premiumSavePrizesButton.addEventListener("click", async () => {
-    if (!auth.currentUser || (auth.currentUser.email || "").toLowerCase() !== ADMIN_EMAIL) return;
+    if (!isCurrentUserAdmin() || isPlayerPreview) return;
     const prizes = Array.from(premiumPrizeEditor.querySelectorAll(".premium-prize-edit-row")).map((row) => {
-        const fields = row.querySelectorAll("input, select");
-        return { name: fields[0].value.trim(), rewardType: fields[1].value, percentage: Number(fields[2].value), rewardAmount: Number(fields[3].value) };
+        const prize = {
+            name: row.querySelector(".premium-prize-name").value.trim(),
+            rewardType: row.querySelector(".premium-prize-type").value,
+            percentage: Number(row.querySelector(".premium-prize-chance").value),
+            rewardAmount: Number(row.querySelector(".premium-prize-amount").value)
+        };
+        if (prize.rewardType === "card") prize.rewardCardId = row.querySelector(".premium-prize-card").value;
+        return prize;
     });
-    if (!prizes.length || prizes.some((prize) => !prize.name || !Number.isFinite(prize.percentage) || !Number.isSafeInteger(prize.rewardAmount))) {
-        premiumAdminStatus.textContent = "Complète le nom, le taux et la quantité de chaque cadeau.";
+    if (!prizes.length || prizes.some((prize) => !prize.name || !Number.isFinite(prize.percentage) || !Number.isSafeInteger(prize.rewardAmount) || (prize.rewardType === "card" && !prize.rewardCardId))) {
+        premiumAdminStatus.textContent = "Complète le nom, le taux, la quantité et la carte si le cadeau est une carte.";
         return;
     }
     premiumSavePrizesButton.disabled = true;
@@ -3363,14 +3512,16 @@ premiumSavePrizesButton.addEventListener("click", async () => {
         console.error("Erreur d’enregistrement de la roue Premium :", error);
         premiumAdminStatus.textContent = error.code === "functions/invalid-argument"
             ? (error.message || "Vérifie les cadeaux et la somme des taux : elle doit faire 100 %.")
-            : "Enregistrement refusé. Vérifie que la fonction Firebase savePremiumWheel est déployée.";
+            : error.code === "functions/not-found" || error.code === "functions/unavailable"
+                ? "La fonction savePremiumWheel est absente. Mets à jour functions/index.js puis redéploie les fonctions Firebase."
+                : "Enregistrement refusé : " + (error.message || error.code || "erreur Firebase");
     } finally {
         premiumSavePrizesButton.disabled = false;
     }
 });
 
 premiumSpinButton.addEventListener("click", async () => {
-    if (!auth.currentUser || (auth.currentUser.email || "").toLowerCase() !== ADMIN_EMAIL || premiumSpinInProgress) return;
+    if (!auth.currentUser || isPlayerPreview || premiumSpinInProgress) return;
     premiumSpinInProgress = true;
     premiumSpinButton.disabled = true;
     premiumStatus.textContent = "La roue tourne…";
@@ -3402,6 +3553,8 @@ premiumSpinButton.addEventListener("click", async () => {
         document.getElementById("playerTokens").textContent = Number(data.tokens).toLocaleString("fr-FR");
         document.getElementById("playerBoosters").textContent = Number(data.boostersDisponibles).toLocaleString("fr-FR");
         premiumStatus.textContent = "Cadeau obtenu : " + data.prize.name + " — " + premiumRewardDescription(data.prize) + ".";
+        await loadPremiumJournal();
+        await loadPremiumAdminPlayers();
     } catch (error) {
         console.error("Erreur pendant le tirage Premium :", error);
         premiumStatus.textContent = error.code === "functions/failed-precondition"
@@ -3409,9 +3562,50 @@ premiumSpinButton.addEventListener("click", async () => {
             : "Tirage refusé. Vérifie que la fonction Firebase spinPremiumWheel est déployée.";
     } finally {
         premiumSpinInProgress = false;
-        premiumSpinButton.disabled = premiumBalanceCount < 1 || premiumPrizes.length === 0;
+        premiumSpinButton.disabled = isPlayerPreview || premiumBalanceCount < 1 || premiumPrizes.length === 0;
     }
 });
+
+premiumAdjustSubmit.addEventListener("click", async () => {
+    if (!isCurrentUserAdmin() || isPlayerPreview) return;
+    const playerId = premiumPlayerSelect.value;
+    const amount = Number(premiumAdjustAmount.value);
+    if (!playerId || !Number.isSafeInteger(amount) || amount < 1) {
+        premiumPlayersStatus.textContent = "Choisis un joueur et indique un nombre entier supérieur à zéro.";
+        return;
+    }
+    premiumAdjustSubmit.disabled = true;
+    premiumPlayersStatus.textContent = "Mise à jour du solde…";
+    try {
+        const direction = premiumAdjustDirection.value;
+        await callAdjustPlayerPremiumTokens({ playerId, amount, direction });
+        premiumPlayersStatus.textContent = direction === "add" ? "Jetons Premium attribués." : "Jetons Premium retirés.";
+        await loadPremiumAdminPlayers();
+    } catch (error) {
+        console.error("Erreur de modification du solde Premium :", error);
+        premiumPlayersStatus.textContent = error.message || "Impossible de modifier le solde Premium.";
+    } finally {
+        premiumAdjustSubmit.disabled = false;
+    }
+});
+
+function setPlayerPreview(enabled) {
+    if (!isCurrentUserAdmin()) return;
+    isPlayerPreview = enabled;
+    adminButton.classList.toggle("hidden", enabled);
+    adminMessagesMenuButton.classList.toggle("hidden", enabled);
+    premiumAdminPanel.classList.toggle("hidden", enabled);
+    playerPreviewBanner.classList.toggle("hidden", !enabled);
+    playerPreviewToggle.textContent = enabled ? "🛡️ Revenir au mode Admin" : "👤 Joueur normal";
+    if (enabled && (!adminPage.classList.contains("hidden") || !messagingPage.classList.contains("hidden"))) showHomePage();
+    if (!premiumPage.classList.contains("hidden")) loadPremiumWheel();
+});
+
+playerPreviewToggle.addEventListener("click", () => {
+    dropdownMenu.classList.add("hidden");
+    setPlayerPreview(!isPlayerPreview);
+});
+playerPreviewExitButton.addEventListener("click", () => setPlayerPreview(false));
 
 function togglePlayerStats() {
     const expanded = playerStatsToggle.getAttribute("aria-expanded") === "true";
@@ -4026,6 +4220,7 @@ openNextBoosterButton.addEventListener("click", () => {
 });
 
 openNormalBoosterButton.addEventListener("click", async () => {
+    if (isPlayerPreview) return;
     if (!auth.currentUser || openNormalBoosterButton.disabled) return;
     openNormalBoosterButton.disabled = true;
     boosterPurchaseStatus.textContent = "Ouverture du booster...";
@@ -4063,6 +4258,7 @@ openNormalBoosterButton.addEventListener("click", async () => {
 });
 
 openDailyBoosterButton.addEventListener("click", async () => {
+    if (isPlayerPreview) return;
     if (!auth.currentUser || openDailyBoosterButton.disabled) return;
     openDailyBoosterButton.disabled = true;
     openDailyBoosterButton.textContent = "Ouverture...";
@@ -5166,7 +5362,7 @@ function addJetonIcons(root = document.body) {
     if (!scanRoot) return;
     const walker = document.createTreeWalker(scanRoot, NodeFilter.SHOW_TEXT, {
         acceptNode(node) {
-            if (!/\bjeton(?:s\b|\(s\)(?=\W|$)|\b)/i.test(node.nodeValue || "")) {
+            if (!/\bjeton(?:s|\(s\))?(?:\s+premium\b)?/i.test(node.nodeValue || "")) {
                 return NodeFilter.FILTER_REJECT;
             }
             if (!node.parentElement || node.parentElement.closest("script, style, textarea, input, option, select, [contenteditable='true'], [data-jeton-decorated='true']")) {
@@ -5180,7 +5376,7 @@ function addJetonIcons(root = document.body) {
 
     matchingNodes.forEach((textNode) => {
         const text = textNode.nodeValue;
-        const pattern = /\bjeton(?:s\b|\(s\)(?=\W|$)|\b)/gi;
+        const pattern = /\bjeton(?:s|\(s\))?(?:\s+premium\b)?/gi;
         const fragment = document.createDocumentFragment();
         let cursor = 0;
         let match;
@@ -5194,7 +5390,7 @@ function addJetonIcons(root = document.body) {
             mention.append(accessibleWord);
             const icon = document.createElement("img");
             icon.className = "jeton-inline-icon";
-            icon.src = "./Jeton.png";
+            icon.src = /\s+premium\b/i.test(match[0]) ? "./Jeton%20premium.png" : "./Jeton.png";
             icon.alt = "";
             icon.setAttribute("aria-hidden", "true");
             mention.append(icon);
