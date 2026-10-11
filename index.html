@@ -1228,11 +1228,11 @@ body {
 .premium-wheel-center-button:disabled { opacity: .6; cursor: not-allowed; }
 .premium-wheel-wrap.is-spinning .premium-wheel-center-button { animation: premium-center-glow .8s ease-in-out infinite alternate; }
 .premium-test-button { margin-top: 10px; }
-.premium-wheel-wrap { position: relative; width: min(78vw, 340px); aspect-ratio: 1; margin: 22px auto; isolation: isolate; }
-.premium-wheel-wrap::before { position: absolute; inset: -9px; z-index: -1; border: 3px solid #ffe895; border-radius: 50%; background: conic-gradient(from 15deg, #fff7c4, #e98cff, #fff7c4, #ffca44, #fff7c4); box-shadow: 0 0 18px rgba(244, 172, 255, .62), 0 0 38px rgba(190, 93, 242, .3); content: ""; }
+.premium-wheel-wrap { position: relative; width: min(78vw, 340px); aspect-ratio: 1; margin: 30px auto 36px; isolation: isolate; filter: drop-shadow(0 17px 14px rgba(0,0,0,.48)); }
+.premium-wheel-wrap::before { position: absolute; inset: -15px; z-index: -1; border: 5px solid #512a16; border-radius: 50%; background: repeating-linear-gradient(8deg, rgba(60,27,12,.25) 0 2px, rgba(255,219,151,.16) 2px 4px, transparent 4px 13px), linear-gradient(135deg, #d59a55 0%, #75401f 18%, #bd7b3b 33%, #603219 52%, #d29a57 70%, #75401f 86%, #bd8144 100%); box-shadow: inset 0 0 0 3px #edc77b, inset 0 0 0 7px #6a391d, inset 0 0 0 10px rgba(255,225,158,.75), 0 8px 12px rgba(0,0,0,.4); content: ""; }
 .premium-wheel-wrap.is-spinning::before { animation: premium-wheel-aura .9s ease-in-out infinite alternate; }
-.premium-wheel-pointer { position: absolute; z-index: 3; top: -11px; left: 50%; width: 30px; height: 43px; transform: translateX(-50%); clip-path: polygon(0 0, 100% 0, 50% 100%); background: linear-gradient(90deg, #d58b11, #fff7bf 40%, #ffcf3f 72%, #a95608); filter: drop-shadow(0 3px 4px #35104f); transform-origin: 50% 0; }
-.premium-wheel { position: absolute; inset: 0; overflow: hidden; border: 7px solid #fff4bb; border-radius: 50%; background: conic-gradient(#8d38d1 0 25%, #bd5be9 25% 50%, #6c24a3 50% 75%, #d77af2 75% 100%); box-shadow: inset 0 0 0 3px rgba(255,255,255,.55), 0 0 0 4px #5c1888, 0 10px 24px rgba(34, 5, 55, .45); transition: transform 6.4s cubic-bezier(.08,.74,.08,1); will-change: transform; }
+.premium-wheel-pointer { position: absolute; z-index: 3; top: -19px; left: 50%; width: 34px; height: 48px; transform: translateX(-50%); clip-path: polygon(0 0, 100% 0, 50% 100%); background: linear-gradient(90deg, #4c2413, #bc7b3c 30%, #e4b76e 50%, #8f5227 75%, #4d2818); filter: drop-shadow(0 3px 2px #f5d28d) drop-shadow(0 5px 4px rgba(0,0,0,.65)); transform-origin: 50% 0; }
+.premium-wheel { position: absolute; inset: 0; overflow: hidden; border: 9px solid #75431f; border-radius: 50%; background: conic-gradient(#8d38d1 0 25%, #bd5be9 25% 50%, #6c24a3 50% 75%, #d77af2 75% 100%); box-shadow: inset 0 0 0 3px #e5bd79, inset 0 0 0 6px rgba(61,31,17,.75), 0 0 0 3px #e2b96f; transition: transform 6.4s cubic-bezier(.08,.74,.08,1); will-change: transform; }
 .premium-wheel-wrap.is-spinning .premium-wheel-pointer { animation: premium-pointer-tick .28s ease-in-out infinite alternate; }
 .premium-wheel-center { position: absolute; z-index: 2; top: 50%; left: 50%; display: grid; width: 68px; height: 68px; place-items: center; transform: translate(-50%,-50%); border: 4px solid #fff0a5; border-radius: 50%; background: radial-gradient(circle at 35% 25%, #a94be0, #48106e 72%); color: #fff; font-size: 25px; box-shadow: 0 0 0 4px rgba(255,255,255,.7), 0 4px 14px rgba(0,0,0,.45); }
 .premium-wheel-wrap.is-spinning .premium-wheel-center { animation: premium-center-glow .8s ease-in-out infinite alternate; }
@@ -1852,7 +1852,6 @@ body {
                 💬 Messagerie
             </button>
 
-            <button id="premiumAdminMenuButton" class="hidden" type="button">💶 Finance</button>
 
 
             <button id="leaderboardMenuButton" type="button">
@@ -2255,22 +2254,6 @@ body {
         </section>
     </section>
 
-    <section id="financePage" class="premium-page hidden" aria-labelledby="financeTitle">
-        <button id="financeBackButton" class="admin-back" type="button">← Retour à l’accueil</button>
-        <h2 id="financeTitle">💶 Finance</h2>
-        <section class="premium-player-table-card" aria-labelledby="premiumMonthlySalesTitle">
-            <h3 id="premiumMonthlySalesTitle">Achats Premium par mois et par joueur</h3>
-            <p class="admin-note">Montants saisis par l’Admin lors des attributions payantes. Le suivi commence après le déploiement de cette modification ; les achats antérieurs ne peuvent pas être reconstitués.</p>
-            <p id="premiumMonthlySalesStatus" class="premium-status" role="status" aria-live="polite">Les achats enregistrés apparaîtront ici.</p>
-            <div class="premium-player-table-wrap">
-                <table class="premium-player-table premium-monthly-sales-table">
-                    <thead><tr><th scope="col">Mois</th><th scope="col">Joueur</th><th scope="col">Montant payé</th><th scope="col">Jetons Premium attribués</th></tr></thead>
-                    <tbody id="premiumMonthlySalesTableBody"></tbody>
-                </table>
-            </div>
-        </section>
-    </section>
-
     <section id="cardZoomModal" class="card-zoom-modal hidden" role="dialog" aria-modal="true" aria-labelledby="cardZoomTitle" aria-hidden="true">
         <div class="card-zoom-content">
             <button id="cardZoomCloseButton" class="card-zoom-close" type="button" aria-label="Fermer l’aperçu">×</button>
@@ -2593,7 +2576,6 @@ const callSavePremiumWheel = httpsCallable(functions, "savePremiumWheel");
 const callSpinPremiumWheel = httpsCallable(functions, "spinPremiumWheel");
 const callTestPremiumWheel = httpsCallable(functions, "testPremiumWheel");
 const callAdjustPlayerPremiumTokens = httpsCallable(functions, "adjustPlayerPremiumTokens");
-const callGetPremiumMonthlySales = httpsCallable(functions, "getPremiumMonthlySales");
 const callInitializePremiumAssignedTokens = httpsCallable(functions, "initializePremiumAssignedTokens");
 const callGetPremiumWheelJournal = httpsCallable(functions, "getPremiumWheelJournal");
 const callGetPremiumRewardCards = httpsCallable(functions, "getPremiumRewardCards");
@@ -2732,10 +2714,7 @@ const playerPreviewToggle = document.getElementById("playerPreviewToggle");
 const playerPreviewBanner = document.getElementById("playerPreviewBanner");
 const playerPreviewExitButton = document.getElementById("playerPreviewExitButton");
 const premiumHomeButton = document.getElementById("premiumHomeButton");
-const premiumAdminMenuButton = document.getElementById("premiumAdminMenuButton");
 const premiumPage = document.getElementById("premiumPage");
-const financePage = document.getElementById("financePage");
-const financeBackButton = document.getElementById("financeBackButton");
 const premiumSettingsDisclosure = document.getElementById("premiumSettingsDisclosure");
 const premiumAdministrationDisclosure = document.getElementById("premiumAdministrationDisclosure");
 const premiumBackButton = document.getElementById("premiumBackButton");
@@ -2767,8 +2746,6 @@ const premiumAdjustDirection = document.getElementById("premiumAdjustDirection")
 const premiumAdjustAmount = document.getElementById("premiumAdjustAmount");
 const premiumAdjustSubmit = document.getElementById("premiumAdjustSubmit");
 const premiumPlayersTableBody = document.getElementById("premiumPlayersTableBody");
-const premiumMonthlySalesStatus = document.getElementById("premiumMonthlySalesStatus");
-const premiumMonthlySalesTableBody = document.getElementById("premiumMonthlySalesTableBody");
 const premiumJournalStatus = document.getElementById("premiumJournalStatus");
 const premiumJournalList = document.getElementById("premiumJournalList");
 const messagingPage = document.getElementById("messagingPage");
@@ -3072,12 +3049,10 @@ onAuthStateChanged(
             isPlayerPreview = false;
             adminButton.classList.add("hidden");
             adminMessagesMenuButton.classList.add("hidden");
-            premiumAdminMenuButton.classList.add("hidden");
             playerPreviewToggle.classList.add("hidden");
             playerPreviewBanner.classList.add("hidden");
             premiumHomeButton.classList.add("hidden");
             premiumPage.classList.add("hidden");
-            financePage.classList.add("hidden");
             messagingPage.classList.add("hidden");
             rulesPage.classList.add("hidden");
             profilePage.classList.add("hidden");
@@ -3118,7 +3093,6 @@ onAuthStateChanged(
         if (!isAdminAccount) isPlayerPreview = false;
         adminButton.classList.toggle("hidden", !isAdminAccount || isPlayerPreview);
         adminMessagesMenuButton.classList.toggle("hidden", !isAdminAccount || isPlayerPreview);
-        premiumAdminMenuButton.classList.toggle("hidden", !isAdminAccount || isPlayerPreview);
         playerPreviewToggle.classList.toggle("hidden", !isAdminAccount);
         playerPreviewToggle.textContent = isPlayerPreview ? "🛡️ Revenir au mode Admin" : "👤 Joueur normal";
         playerPreviewBanner.classList.toggle("hidden", !isPlayerPreview);
@@ -3308,7 +3282,6 @@ function showHomePage() {
     messagingPage.classList.add("hidden");
     rulesPage.classList.add("hidden");
     premiumPage.classList.add("hidden");
-    financePage.classList.add("hidden");
     bottomNav.classList.remove("hidden");
     homeNavButton.classList.add("active");
     collectionNavButton.classList.remove("active");
@@ -3373,21 +3346,19 @@ function renderPremiumPrizeList(prizes) {
     premiumPrizes = Array.isArray(prizes) ? prizes : [];
     premiumPrizeList.replaceChildren();
     const stops = [];
-    let accumulated = 0;
+    const isAdminView = isCurrentUserAdmin() && !isPlayerPreview;
+    premiumPrizeList.classList.toggle("hidden", !isAdminView);
     premiumPrizes.forEach((prize, index) => {
         const chance = Number(prize.percentage) || 0;
-        const end = accumulated + chance;
-        stops.push(PREMIUM_WHEEL_COLORS[index % PREMIUM_WHEEL_COLORS.length] + " " + accumulated + "% " + end + "%");
-        accumulated = end;
+        const start = index / premiumPrizes.length * 100;
+        const end = (index + 1) / premiumPrizes.length * 100;
+        stops.push(PREMIUM_WHEEL_COLORS[index % PREMIUM_WHEEL_COLORS.length] + " " + start + "% " + end + "%");
         const item = document.createElement("div");
         item.className = "premium-prize-item";
-        const displayName = prize.rewardType === "card" && (isPlayerPreview || !isCurrentUserAdmin())
-            ? "Carte surprise"
-            : (prize.name || "Cadeau");
+        const displayName = prize.name || "Cadeau";
         item.textContent = displayName + " — " + premiumRewardDescription(prize) + " • " + chance.toLocaleString("fr-FR") + " %";
         premiumPrizeList.append(item);
     });
-    if (accumulated < 100) stops.push("#e7d5f1 " + accumulated + "% 100%");
     premiumWheel.style.background = stops.length ? "conic-gradient(" + stops.join(", ") + ")" : "conic-gradient(#8d38d1 0 25%, #bd5be9 25% 50%, #6c24a3 50% 75%, #d77af2 75% 100%)";
     premiumSpinButton.disabled = isPlayerPreview || premiumSpinInProgress || premiumPrizes.length === 0 || premiumBalanceCount < 1;
     premiumTestWheelButton.disabled = !isCurrentUserAdmin() || isPlayerPreview || premiumSpinInProgress || premiumPrizes.length === 0;
@@ -3613,65 +3584,6 @@ async function loadPremiumAdminPlayers() {
     }
 }
 
-async function loadPremiumMonthlySales() {
-    premiumMonthlySalesTableBody.replaceChildren();
-    premiumMonthlySalesStatus.textContent = "Chargement des achats enregistrés…";
-    if (!isCurrentUserAdmin() || isPlayerPreview) {
-        premiumMonthlySalesStatus.textContent = "Cette synthèse est réservée à l’Admin.";
-        return;
-    }
-    try {
-        const response = await callGetPremiumMonthlySales();
-        const rows = Array.isArray(response.data.rows) ? response.data.rows : [];
-        if (!rows.length) {
-            premiumMonthlySalesStatus.textContent = "Aucun achat Premium enregistré depuis l’activation du suivi.";
-            return;
-        }
-        const currency = new Intl.NumberFormat("fr-FR", { style: "currency", currency: "EUR" });
-        const byMonth = new Map();
-        rows.forEach((row) => {
-            if (!byMonth.has(row.month)) byMonth.set(row.month, []);
-            byMonth.get(row.month).push(row);
-        });
-        byMonth.forEach((monthRows, month) => {
-            const monthTotalCents = monthRows.reduce((sum, row) => sum + Number(row.amountCents || 0), 0);
-            const monthDate = new Date(month + "-01T12:00:00");
-            const monthLabel = new Intl.DateTimeFormat("fr-FR", { month: "long", year: "numeric", timeZone: "UTC" }).format(monthDate);
-            monthRows.forEach((sale) => {
-                const row = document.createElement("tr");
-                const values = [
-                    monthLabel.charAt(0).toLocaleUpperCase("fr-FR") + monthLabel.slice(1),
-                    sale.pseudo || "Joueur",
-                    currency.format(Number(sale.amountCents || 0) / 100),
-                    Number(sale.premiumTokens || 0).toLocaleString("fr-FR")
-                ];
-                values.forEach((value, index) => {
-                    const cell = document.createElement("td");
-                    cell.textContent = value;
-                    if (index === 0) cell.className = "premium-month-cell";
-                    row.append(cell);
-                });
-                premiumMonthlySalesTableBody.append(row);
-            });
-            const totalRow = document.createElement("tr");
-            totalRow.className = "premium-month-total-row";
-            const labelCell = document.createElement("td");
-            labelCell.colSpan = 2;
-            labelCell.textContent = "Total " + monthLabel;
-            const amountCell = document.createElement("td");
-            amountCell.textContent = currency.format(monthTotalCents / 100);
-            const tokensCell = document.createElement("td");
-            tokensCell.textContent = monthRows.reduce((sum, row) => sum + Number(row.premiumTokens || 0), 0).toLocaleString("fr-FR");
-            totalRow.append(labelCell, amountCell, tokensCell);
-            premiumMonthlySalesTableBody.append(totalRow);
-        });
-        premiumMonthlySalesStatus.textContent = rows.length + (rows.length > 1 ? " achats enregistrés." : " achat enregistré.");
-    } catch (error) {
-        console.error("Erreur de chargement des achats mensuels Premium :", error);
-        premiumMonthlySalesStatus.textContent = error.message || "Impossible de charger ce tableau. Déploie la fonction Firebase getPremiumMonthlySales.";
-    }
-}
-
 async function loadPremiumJournal() {
     premiumJournalList.replaceChildren();
     try {
@@ -3706,7 +3618,6 @@ async function openPremiumPage() {
     adminPage.classList.add("hidden");
     messagingPage.classList.add("hidden");
     rulesPage.classList.add("hidden");
-    financePage.classList.add("hidden");
     bottomNav.classList.add("hidden");
     premiumPage.classList.remove("hidden");
     premiumSettingsDisclosure.open = false;
@@ -3719,31 +3630,11 @@ async function openPremiumPage() {
 }
 
 premiumHomeButton.addEventListener("click", openPremiumPage);
-premiumAdminMenuButton.addEventListener("click", () => {
-    if (!isCurrentUserAdmin() || isPlayerPreview) return;
-    dropdownMenu.classList.add("hidden");
-    document.querySelector(".app-content").classList.add("hidden");
-    profilePage.classList.add("hidden");
-    leaderboardPage.classList.add("hidden");
-    statisticsPage.classList.add("hidden");
-    collectionPage.classList.add("hidden");
-    recyclingPage.classList.add("hidden");
-    adminPage.classList.add("hidden");
-    messagingPage.classList.add("hidden");
-    rulesPage.classList.add("hidden");
-    premiumPage.classList.add("hidden");
-    financePage.classList.remove("hidden");
-    bottomNav.classList.add("hidden");
-    loadPremiumMonthlySales();
-});
-
 premiumBackButton.addEventListener("click", showHomePage);
-financeBackButton.addEventListener("click", showHomePage);
 
 async function animatePremiumWheelToPrize(prizeIndex) {
     if (prizeIndex < 0 || prizeIndex >= premiumPrizes.length) throw new Error("PREMIUM_PRIZE_NOT_IN_WHEEL");
-    const totalWeight = premiumPrizes.reduce((sum, prize) => sum + Number(prize.percentage), 0);
-    const midpoint = (premiumPrizes.slice(0, prizeIndex).reduce((sum, prize) => sum + Number(prize.percentage), 0) + Number(premiumPrizes[prizeIndex].percentage) / 2) / totalWeight * 360;
+    const midpoint = ((prizeIndex + 0.5) / premiumPrizes.length) * 360;
     const currentNormalized = ((premiumWheelRotation % 360) + 360) % 360;
     const extra = (360 - midpoint - currentNormalized + 720) % 360;
     premiumWheel.style.transition = "none";
@@ -3919,11 +3810,10 @@ function setPlayerPreview(enabled) {
     isPlayerPreview = enabled;
     adminButton.classList.toggle("hidden", enabled);
     adminMessagesMenuButton.classList.toggle("hidden", enabled);
-    premiumAdminMenuButton.classList.toggle("hidden", enabled);
     premiumAdminPanel.classList.toggle("hidden", enabled);
     playerPreviewBanner.classList.toggle("hidden", !enabled);
     playerPreviewToggle.textContent = enabled ? "🛡️ Revenir au mode Admin" : "👤 Joueur normal";
-    if (enabled && (!adminPage.classList.contains("hidden") || !messagingPage.classList.contains("hidden") || !financePage.classList.contains("hidden"))) showHomePage();
+    if (enabled && (!adminPage.classList.contains("hidden") || !messagingPage.classList.contains("hidden"))) showHomePage();
     if (!premiumPage.classList.contains("hidden")) loadPremiumWheel();
 }
 
@@ -4013,7 +3903,6 @@ function totalXpRequiredForLevel(targetLevel) {
 playerProfileHomeButton.addEventListener("click", async () => {
     dropdownMenu.classList.add("hidden");
     premiumPage.classList.add("hidden");
-    financePage.classList.add("hidden");
     document.querySelector(".app-content").classList.add("hidden");
     leaderboardPage.classList.add("hidden");
     statisticsPage.classList.add("hidden");
@@ -4123,7 +4012,6 @@ async function loadStatistics() {
 statisticsMenuButton.addEventListener("click", async () => {
     dropdownMenu.classList.add("hidden");
     premiumPage.classList.add("hidden");
-    financePage.classList.add("hidden");
     document.querySelector(".app-content").classList.add("hidden");
     profilePage.classList.add("hidden");
     leaderboardPage.classList.add("hidden");
@@ -4142,7 +4030,6 @@ statisticsBackButton.addEventListener("click", showHomePage);
 leaderboardMenuButton.addEventListener("click", async () => {
     dropdownMenu.classList.add("hidden");
     premiumPage.classList.add("hidden");
-    financePage.classList.add("hidden");
     document.querySelector(".app-content").classList.add("hidden");
     profilePage.classList.add("hidden");
     statisticsPage.classList.add("hidden");
@@ -4772,7 +4659,6 @@ rulesSaveButton.addEventListener("click", async () => {
 
 rulesNavButton.addEventListener("click", async () => {
     premiumPage.classList.add("hidden");
-    financePage.classList.add("hidden");
     document.querySelector(".app-content").classList.add("hidden");
     profilePage.classList.add("hidden");
     leaderboardPage.classList.add("hidden");
@@ -4790,7 +4676,6 @@ rulesNavButton.addEventListener("click", async () => {
 
 collectionNavButton.addEventListener("click", async () => {
     premiumPage.classList.add("hidden");
-    financePage.classList.add("hidden");
     document.querySelector(".app-content").classList.add("hidden");
     profilePage.classList.add("hidden");
     leaderboardPage.classList.add("hidden");
@@ -4810,7 +4695,6 @@ collectionNavButton.addEventListener("click", async () => {
 
 recyclingNavButton.addEventListener("click", async () => {
     premiumPage.classList.add("hidden");
-    financePage.classList.add("hidden");
     document.querySelector(".app-content").classList.add("hidden");
     profilePage.classList.add("hidden");
     leaderboardPage.classList.add("hidden");
@@ -5604,7 +5488,6 @@ adminButton.addEventListener("click", async () => {
     if (!auth.currentUser || (auth.currentUser.email || "").toLowerCase() !== ADMIN_EMAIL) return;
     dropdownMenu.classList.add("hidden");
     premiumPage.classList.add("hidden");
-    financePage.classList.add("hidden");
     document.querySelector(".app-content").classList.add("hidden");
     profilePage.classList.add("hidden");
     leaderboardPage.classList.add("hidden");
@@ -5624,7 +5507,6 @@ adminMessagesMenuButton.addEventListener("click", async () => {
     if (!auth.currentUser || (auth.currentUser.email || "").toLowerCase() !== ADMIN_EMAIL) return;
     dropdownMenu.classList.add("hidden");
     premiumPage.classList.add("hidden");
-    financePage.classList.add("hidden");
     document.querySelector(".app-content").classList.add("hidden");
     profilePage.classList.add("hidden");
     leaderboardPage.classList.add("hidden");
