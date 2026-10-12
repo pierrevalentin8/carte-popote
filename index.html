@@ -1315,7 +1315,11 @@ body {
 .profile-identity-heading h2 { margin: 0; }
 .profile-identity-editor { display: grid; gap: 9px; margin-top: 12px; padding: 13px; border: 1px solid rgba(243,191,56,.5); border-radius: 13px; background: rgba(251,250,245,.08); }
 .profile-identity-editor label { color: #e3eaf4; font-size: 12px; font-weight: 800; }
+.profile-identity-editor .register-avatar-label { color: #e3eaf4; }
 .profile-identity-editor input, .profile-identity-editor select { width: 100%; margin-top: 5px; padding: 10px; border-radius: 8px; }
+.profile-avatar-picker { max-width: 340px; margin-top: 7px; }
+.profile-avatar-picker .avatar-choice { border-color: rgba(255,255,255,.7); }
+.profile-avatar-picker .avatar-choice:disabled { opacity: .55; cursor: not-allowed; transform: none; }
 .leaderboard-profile-link { padding: 0; border: 0; background: transparent; color: var(--theme-ink); font: inherit; font-size: 15px; font-weight: 800; text-align: left; cursor: pointer; }
 .leaderboard-profile-link:hover { color: #8b650d; text-decoration: underline; }
 .leaderboard-profile-link:focus-visible { outline: 2px solid #b98b1b; outline-offset: 3px; }
@@ -2096,7 +2100,17 @@ body {
         <p class="profile-page-intro">Voici tes statistiques personnelles.</p>
         <section id="profileIdentityEditor" class="profile-identity-editor hidden" aria-label="Modifier mon pseudo et mon avatar">
             <label for="profilePseudoInput">Modifier mon pseudo (une seule fois)<input id="profilePseudoInput" class="admin-field" type="text" minlength="3" maxlength="24" autocomplete="nickname"></label>
-            <label for="profileAvatarSelect">Modifier mon avatar (une seule fois)<select id="profileAvatarSelect" class="admin-field"><option value="femme-blonde">Avatar 1</option><option value="femme-brune">Avatar 2</option><option value="homme-blanc">Avatar 3</option><option value="homme-noir">Avatar 4</option><option value="vieil-homme">Avatar 5</option></select></label>
+            <div class="profile-avatar-field">
+                <span class="register-avatar-label">Modifier mon avatar (une seule fois)</span>
+                <select id="profileAvatarSelect" class="hidden" aria-hidden="true" tabindex="-1"><option value="femme-blonde">Avatar 1</option><option value="femme-brune">Avatar 2</option><option value="homme-blanc">Avatar 3</option><option value="homme-noir">Avatar 4</option><option value="vieil-homme">Avatar 5</option></select>
+                <div id="profileAvatarChoices" class="avatar-picker profile-avatar-picker" role="group" aria-label="Choisir un avatar">
+                    <button class="avatar-choice" type="button" data-profile-avatar="femme-blonde" aria-label="Choisir l’avatar 1" aria-pressed="false"><img src="./avatar-femme-blonde.png" alt=""></button>
+                    <button class="avatar-choice" type="button" data-profile-avatar="femme-brune" aria-label="Choisir l’avatar 2" aria-pressed="false"><img src="./avatar-femme-brune.png" alt=""></button>
+                    <button class="avatar-choice" type="button" data-profile-avatar="homme-blanc" aria-label="Choisir l’avatar 3" aria-pressed="false"><img src="./avatar-homme-blanc.png" alt=""></button>
+                    <button class="avatar-choice" type="button" data-profile-avatar="homme-noir" aria-label="Choisir l’avatar 4" aria-pressed="false"><img src="./avatar-homme-noir.png" alt=""></button>
+                    <button class="avatar-choice" type="button" data-profile-avatar="vieil-homme" aria-label="Choisir l’avatar 5" aria-pressed="false"><img src="./avatar-vieil-homme.png" alt=""></button>
+                </div>
+            </div>
             <button id="profileIdentitySaveButton" class="primary-button" type="button">Enregistrer mes modifications</button>
             <p id="profileIdentityStatus" class="admin-status" role="status" aria-live="polite"></p>
         </section>
@@ -2765,6 +2779,7 @@ const profilePageAvatar = document.getElementById("profilePageAvatar");
 const profileIdentityEditor = document.getElementById("profileIdentityEditor");
 const profilePseudoInput = document.getElementById("profilePseudoInput");
 const profileAvatarSelect = document.getElementById("profileAvatarSelect");
+const profileAvatarChoices = Array.from(document.querySelectorAll("[data-profile-avatar]"));
 const profileIdentitySaveButton = document.getElementById("profileIdentitySaveButton");
 const profileIdentityStatus = document.getElementById("profileIdentityStatus");
 const profilePremiumSpendingCard = document.getElementById("profilePremiumSpendingCard");
@@ -3755,7 +3770,7 @@ async function renderMonthlyPremiumReport(tableBody, statusElement, totalElement
         });
     } catch (error) {
         console.error("Erreur de chargement des ventes mensuelles Premium :", error);
-        statusElement.textContent = "Impossible de charger les montants. Vérifie que getPremiumMonthlySales est déployée.";
+        statusElement.textContent = "Échec du chargement (" + (error.code || "erreur") + ") : " + (error.message || "la fonction getPremiumMonthlySales doit être redéployée.");
         if (totalElement) totalElement.textContent = "Total récolté : —";
     }
 }
@@ -4136,6 +4151,7 @@ async function loadPersonalProfile(playerId = auth.currentUser?.uid) {
             profileAvatarSelect.value = player.avatar || "femme-blonde";
             profilePseudoInput.disabled = player.pseudoChangeUsed === true;
             profileAvatarSelect.disabled = player.avatarChangeUsed === true;
+            syncProfileAvatarPicker();
             profileIdentitySaveButton.disabled = player.pseudoChangeUsed === true && player.avatarChangeUsed === true;
             profileIdentityStatus.textContent = "Pseudo : " + (player.pseudoChangeUsed ? "modification utilisée" : "1 modification possible") + " • Avatar : " + (player.avatarChangeUsed ? "modification utilisée" : "1 modification possible");
             try {
@@ -4276,6 +4292,7 @@ profileIdentitySaveButton.addEventListener("click", async () => {
         const player = playerSnapshot.data() || {};
         profilePseudoInput.disabled = player.pseudoChangeUsed === true;
         profileAvatarSelect.disabled = player.avatarChangeUsed === true;
+        syncProfileAvatarPicker();
         profileIdentitySaveButton.disabled = player.pseudoChangeUsed === true && player.avatarChangeUsed === true;
         profileIdentityStatus.textContent = "Modifications enregistrées.";
     } catch (error) {
@@ -4283,6 +4300,23 @@ profileIdentitySaveButton.addEventListener("click", async () => {
         profileIdentityStatus.textContent = error.message || "Impossible d’enregistrer ces modifications.";
         profileIdentitySaveButton.disabled = false;
     }
+});
+
+function syncProfileAvatarPicker() {
+    profileAvatarChoices.forEach((choice) => {
+        const selected = choice.dataset.profileAvatar === profileAvatarSelect.value;
+        choice.classList.toggle("is-selected", selected);
+        choice.setAttribute("aria-pressed", String(selected));
+        choice.disabled = profileAvatarSelect.disabled;
+    });
+}
+
+profileAvatarChoices.forEach((choice) => {
+    choice.addEventListener("click", () => {
+        if (profileAvatarSelect.disabled) return;
+        profileAvatarSelect.value = choice.dataset.profileAvatar;
+        syncProfileAvatarPicker();
+    });
 });
 
 async function loadLeaderboard() {
