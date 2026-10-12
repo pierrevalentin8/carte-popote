@@ -2481,7 +2481,7 @@ body {
         <div id="adminPlayersSection" class="admin-panel admin-section hidden" style="margin-bottom:16px">
             <h3>👥 Joueurs</h3>
             <p class="admin-note">Tu peux ajouter ou retirer des jetons. Un achat de booster débite uniquement le prix prévu par les règles du jeu.</p>
-            <button id="downloadPlayersBackupButton" class="secondary-button admin-backup-button" type="button">Télécharger une sauvegarde des joueurs (CSV)</button>
+            <button id="downloadPlayersBackupButton" class="secondary-button admin-backup-button" type="button">Télécharger le tableau de sauvegarde des joueurs (Excel)</button>
             <p id="playersBackupStatus" class="admin-status" role="status" aria-live="polite"></p>
             <p id="playersCount" class="admin-note">Nombre de joueurs inscrits : —</p>
             <p id="playersStatus" class="admin-status" role="status"></p>
@@ -6050,11 +6050,17 @@ function buildUniqueCardsWorkbookXml(players) {
     const cell = (value, numeric = false) => "<Cell><Data ss:Type=\"" + (numeric && value !== "" && value !== null && value !== undefined && Number.isFinite(Number(value)) ? "Number" : "String") + "\">" + escapeXml(value) + "</Data></Cell>";
     const sheets = (Array.isArray(players) ? players : []).map((player, index) => {
         const headers = ["Numéro", "Nom de la carte", "Catégorie", "Rareté", "Identifiant carte"];
-        const headerRow = "<Row>" + headers.map((value) => cell(value)).join("") + "</Row>";
+        const profileRows = [
+            "<Row>" + cell("Joueur") + cell(player.pseudo) + "</Row>",
+            "<Row>" + cell("Identifiant joueur") + cell(player.playerUid) + "</Row>",
+            "<Row>" + cell("Dépenses Premium enregistrées (€)") + cell((Number(player.premiumSpentCents) || 0) / 100, true) + "</Row>",
+            "<Row></Row>",
+            "<Row>" + headers.map((value) => cell(value)).join("") + "</Row>"
+        ].join("");
         const cardRows = (Array.isArray(player.cards) ? player.cards : []).map((card) => "<Row>" + [
             cell(card.cardNumber, true), cell(card.name), cell(card.category), cell(card.rarity), cell(card.cardId)
         ].join("") + "</Row>").join("");
-        return "<Worksheet ss:Name=\"" + escapeXml(worksheetName(player.pseudo, index)) + "\"><Table>" + headerRow + cardRows + "</Table></Worksheet>";
+        return "<Worksheet ss:Name=\"" + escapeXml(worksheetName(player.pseudo, index)) + "\"><Table>" + profileRows + cardRows + "</Table></Worksheet>";
     }).join("");
     return '<?xml version="1.0" encoding="UTF-8"?><?mso-application progid="Excel.Sheet"?><Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet" xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet" xmlns:html="http://www.w3.org/TR/REC-html40">' + sheets + "</Workbook>";
 }
@@ -6067,21 +6073,17 @@ downloadPlayersBackupButton.addEventListener("click", async () => {
         const response = await callDownloadPlayerBackup();
         const backup = response.data;
         const stamp = new Date().toISOString().slice(0, 10);
-        const files = [
-            { name: "joueurs-" + stamp + ".csv", content: backup.playersCsv, type: "text/csv;charset=utf-8" },
-            { name: "cartes-uniques-par-joueur-" + stamp + ".xml", content: buildUniqueCardsWorkbookXml(backup.uniqueCardsByPlayer), type: "application/vnd.ms-excel;charset=utf-8" },
-            { name: "comptes-authentication-" + stamp + ".csv", content: backup.authUsersCsv, type: "text/csv;charset=utf-8" }
-        ];
-        files.forEach((file, index) => {
-            const blob = new Blob(["\uFEFF", file.content], { type: file.type });
-            const url = URL.createObjectURL(blob);
-            const link = document.createElement("a");
-            link.href = url;
-            link.download = file.name;
-            document.body.append(link);
-            setTimeout(() => { link.click(); link.remove(); URL.revokeObjectURL(url); }, index * 500);
-        });
-        playersBackupStatus.textContent = "Sauvegarde prête : " + backup.playerCount + " profil(s), " + backup.authUserCount + " compte(s) et " + backup.uniqueCardCount + " cartes uniques. Les profils et comptes sont en CSV ; les cartes uniques sont dans un classeur Excel compatible avec un onglet par joueur.";
+        const workbook = buildUniqueCardsWorkbookXml(backup.uniqueCardsByPlayer);
+        const blob = new Blob(["\uFEFF", workbook], { type: "application/vnd.ms-excel;charset=utf-8" });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = "sauvegarde-joueurs-" + stamp + ".xls";
+        document.body.append(link);
+        link.click();
+        link.remove();
+        setTimeout(() => URL.revokeObjectURL(url), 1000);
+        playersBackupStatus.textContent = "Tableau téléchargé : " + backup.playerCount + " joueur(s), " + backup.uniqueCardCount + " cartes uniques. Chaque feuille indique aussi les dépenses Premium enregistrées pour le joueur.";
     } catch (error) {
         console.error("Erreur lors de la création de la sauvegarde des joueurs :", error);
         playersBackupStatus.textContent = error.message || "Impossible de créer la sauvegarde. Vérifie que downloadPlayerBackup est déployée.";
