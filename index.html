@@ -1242,28 +1242,42 @@ body {
 .premium-wheel-card { text-align: center; }
 .premium-balance-indicator { display: inline-flex; align-items: center; gap: 7px; margin: 8px auto 0; padding: 7px 12px; border: 1px solid #efc34b; border-radius: 999px; background: #fffaf0; color: #3b1755; font-size: 14px; font-weight: 900; box-shadow: 0 3px 10px rgba(50,16,76,.12); }
 .premium-balance-indicator img { width: 21px; height: 21px; object-fit: contain; }
-.premium-wheel-center-button { position: absolute; z-index: 5; top: 50%; left: 50%; display: flex; width: clamp(78px, 19vw, 112px); aspect-ratio: 1; transform: translate(-50%,-50%); flex-direction: column; align-items: center; justify-content: center; gap: 2px; padding: 8px; border: 5px solid #ffe9a4; border-radius: 50%; background: radial-gradient(circle at 34% 26%, #df8af4, #751ca4 52%, #35104f 100%); color: #fff; font: inherit; font-size: clamp(11px, 2.6vw, 15px); font-weight: 1000; line-height: 1; cursor: pointer; box-shadow: 0 0 0 5px #77462b, inset 0 0 0 4px rgba(255,255,255,.32), 0 6px 14px rgba(0,0,0,.62); }
+.premium-wheel-center-button { display: inline-flex; min-width: 190px; min-height: 48px; align-items: center; justify-content: center; gap: 9px; padding: 10px 20px; border: 2px solid #ffe398; border-radius: 14px; background: linear-gradient(135deg, #8e22be, #541276 72%, #32104b); color: #fff; font: inherit; font-size: 14px; font-weight: 1000; cursor: pointer; box-shadow: inset 0 1px 0 rgba(255,255,255,.42), 0 7px 18px rgba(38,8,55,.4); }
 .premium-wheel-center-button img { width: 27px; height: 27px; object-fit: contain; }
 .premium-wheel-center-button:disabled { opacity: .68; cursor: not-allowed; }
 .premium-wheel-wrap.is-spinning .premium-wheel-center-button { animation: premium-center-glow .8s ease-in-out infinite alternate; }
 .premium-test-button { margin-top: 10px; }
-.premium-wheel-wrap { width: min(96%, 620px); margin: 28px auto 24px; }
-.premium-machine { position: relative; width: min(100%, 560px); aspect-ratio: 1; margin: 0 auto; isolation: isolate; filter: drop-shadow(0 24px 18px rgba(10,3,22,.6)); }
-.premium-wheel-frame { position: absolute; inset: 0; padding: clamp(10px, 2.7vw, 18px); border: 3px solid #ffe39a; border-radius: 50%; background: repeating-conic-gradient(from 0deg, #5a2d15 0deg 3deg, #b87537 3deg 6deg, #75401d 6deg 9deg, #d39a52 9deg 12deg); box-shadow: inset 0 0 0 5px #492411, inset 0 0 0 9px #e5ad5a, inset 0 0 23px #2a140b, 0 0 0 5px #51276e, 0 11px 24px rgba(0,0,0,.58); }
-.premium-wheel-window { position: relative; width: 100%; height: 100%; overflow: hidden; border: 4px solid #f8d779; border-radius: 50%; background: #35104f; box-shadow: inset 0 0 24px rgba(0,0,0,.58); }
-.premium-wheel { display: block; width: 100%; height: 100%; transform: rotate(0deg); transform-origin: 50% 50%; will-change: transform; }
-.premium-wheel-sector { stroke: #ffe7a0; stroke-width: 7; transition: filter .25s ease; }
-.premium-wheel-sector.is-winner { filter: brightness(1.55) drop-shadow(0 0 14px #fff1a5); }
-.premium-wheel-label { fill: #fff9e7; font-family: Arial, Helvetica, sans-serif; font-size: 34px; font-weight: 900; paint-order: stroke; stroke: rgba(35,10,52,.9); stroke-linejoin: round; stroke-width: 5px; text-anchor: middle; dominant-baseline: middle; pointer-events: none; }
-.premium-wheel-label-small { fill: #ffe48b; font-size: 25px; font-weight: 800; }
-.premium-machine.is-spinning .premium-wheel { filter: saturate(1.15) brightness(1.06); }
-.premium-machine.is-winning .premium-wheel-sector.is-winner { animation: premium-panel-win .8s ease-in-out infinite alternate; }
-.premium-wheel-pointer { position: absolute; z-index: 6; top: -3px; left: 50%; display: block; width: clamp(42px, 9vw, 68px); height: clamp(56px, 12vw, 88px); transform: translateX(-50%); filter: drop-shadow(0 5px 5px rgba(0,0,0,.72)); }
-.premium-wheel-pointer::before, .premium-wheel-pointer i { position: absolute; inset: 0; display: block; clip-path: polygon(50% 100%, 5% 0, 95% 0); content: ""; }
-.premium-wheel-pointer::before { background: linear-gradient(90deg, #5c3018, #e0aa5f 35%, #f6d58e 50%, #8d4e24); }
-.premium-wheel-pointer i { inset: 4px 7px 8px; background: linear-gradient(180deg, #fff0ae, #a96b2d 72%, #572a16); }
-.premium-wheel-wrap.is-spinning .premium-wheel-pointer { animation: premium-pointer-tick .12s ease-in-out infinite alternate; }
-.premium-machine.is-winning::after { position: absolute; z-index: 5; inset: -10px; border: 3px solid rgba(255,230,143,.8); border-radius: 50%; content: ""; pointer-events: none; animation: premium-victory-particles 1.1s ease-out 3; }
+.premium-wheel-wrap { width: min(100%, 650px); margin: 22px auto 24px; }
+.premium-machine { position: relative; display: grid; width: 100%; height: clamp(330px, 76vw, 450px); grid-template-columns: 15% 70% 15%; align-items: stretch; margin: 0 auto; padding: 0 2%; isolation: isolate; filter: drop-shadow(0 25px 19px rgba(10,3,22,.65)); }
+.premium-wheel-frame { position: relative; z-index: 2; align-self: center; height: 90%; padding: 10px; border: 4px solid #ffe39a; border-radius: 28px; background: linear-gradient(90deg,#4c164f,#a650b6 13%,#f7d883 19%,#754326 24%,#f9dc85 50%,#704022 76%,#f7d883 81%,#a650b6 87%,#421247); box-shadow: inset 0 0 0 4px #542a42, inset 0 0 15px #2a0b31, 0 0 0 4px #511b67, 0 14px 25px rgba(0,0,0,.58); }
+.premium-wheel-axle { position: relative; width: 100%; height: 100%; overflow: hidden; perspective: 850px; transform-style: preserve-3d; border: 3px solid #fce59c; border-radius: 17px; background: linear-gradient(90deg,#160d2c,#45205d 16%,#1c1032 50%,#45205d 84%,#160d2c); box-shadow: inset 0 0 25px #090611, 0 0 0 2px #713b84; }
+.premium-wheel-window { position: absolute; inset: 0; overflow: hidden; transform-style: preserve-3d; background: radial-gradient(ellipse at center,#321644 0,#170b27 76%); }
+.premium-wheel-window::before,.premium-wheel-window::after { position:absolute;z-index:3;left:0;right:0;height:16%;content:"";pointer-events:none; }
+.premium-wheel-window::before { top:0;background:linear-gradient(#130a20,transparent); }
+.premium-wheel-window::after { bottom:0;background:linear-gradient(transparent,#130a20); }
+.premium-wheel { position:absolute;top:50%;left:0;width:100%;height:1px;transform-style:preserve-3d;transform:translateY(-50%) rotateX(0deg);will-change:transform; }
+.premium-wheel-panel { position:absolute;top:0;left:0;display:flex;width:100%;height:var(--panel-height,90px);align-items:center;gap:clamp(6px,2vw,18px);overflow:hidden;padding:8px clamp(10px,3vw,25px);border:3px solid #fff0b4;border-radius:8px;background:linear-gradient(110deg,var(--panel-color,#6f28a0),#29113f 62%,var(--panel-color,#6f28a0));color:#fff9e9;box-shadow:inset 0 0 0 2px rgba(255,255,255,.18),inset 0 0 18px rgba(255,220,123,.25),0 5px 12px rgba(0,0,0,.62);backface-visibility:hidden;transform:rotateX(var(--panel-angle)) translateZ(var(--reel-radius)); }
+.premium-wheel-panel::after {position:absolute;inset:3px;border:1px solid rgba(255,225,139,.7);border-radius:5px;content:"";pointer-events:none;}
+.premium-wheel-panel-illustration {display:grid;flex:0 0 clamp(42px,10vw,76px);width:clamp(42px,10vw,76px);height:70%;place-items:center;border:2px solid #f7d267;border-radius:10px;background:linear-gradient(145deg,rgba(255,255,255,.22),rgba(38,10,54,.5));font-size:clamp(24px,6vw,42px);filter:drop-shadow(0 3px 3px rgba(0,0,0,.5));}
+.premium-wheel-panel-illustration img {width:85%;height:85%;object-fit:contain;}
+.premium-wheel-panel-copy {min-width:0;text-align:left;text-shadow:0 2px 2px #15081e;}
+.premium-wheel-panel-name {display:block;overflow:hidden;color:#fff9e9;font-size:clamp(14px,3.6vw,24px);font-weight:1000;line-height:1.08;text-overflow:ellipsis;text-transform:uppercase;white-space:nowrap;}
+.premium-wheel-panel-detail {display:block;margin-top:4px;color:#ffe08a;font-size:clamp(10px,2.7vw,17px);font-weight:900;line-height:1.1;text-transform:uppercase;}
+.premium-wheel-post {position:relative;z-index:3;display:flex;align-self:stretch;flex-direction:column;align-items:center;justify-content:space-between;margin:7px 0 13px;padding:10px 3px;border:3px solid #ffd878;border-radius:18px;background:linear-gradient(90deg,#311044,#8e36a6 40%,#53175f 72%,#270d39);box-shadow:inset 0 0 0 3px #38144d,inset 0 0 14px #f3a8ff,0 7px 12px rgba(0,0,0,.48);}
+.premium-wheel-chef {display:grid;width:clamp(30px,7vw,48px);aspect-ratio:1;place-items:center;border:2px solid #ffdd81;border-radius:12px;background:linear-gradient(145deg,#a342bc,#32124c);font-size:clamp(18px,4vw,28px);}
+.premium-wheel-stars {color:#ffd34e;font-size:clamp(15px,3.4vw,23px);line-height:1;text-shadow:0 0 8px #ffdb55;}
+.premium-wheel-bulbs {display:flex;flex:1;flex-direction:column;align-items:center;justify-content:space-evenly;width:100%;}
+.premium-wheel-bulbs i {width:clamp(9px,2.2vw,15px);aspect-ratio:1;border:1px solid #fff7c6;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fff,#ffe770 45%,#ff9f13);box-shadow:0 0 8px #fff1a0,0 0 16px #ffc632;animation:premium-bulb-glow 1.8s ease-in-out infinite alternate;}
+.premium-wheel-bulbs i:nth-child(even) {animation-delay:.45s;}
+.premium-wheel-pointer {position:absolute;z-index:6;top:50%;right:-1%;display:block;width:clamp(56px,13vw,92px);height:clamp(60px,14vw,102px);transform:translateY(-50%);filter:drop-shadow(0 5px 5px rgba(0,0,0,.7));}
+.premium-wheel-pointer::before,.premium-wheel-pointer i {position:absolute;inset:0;display:block;clip-path:polygon(0 50%,100% 0,100% 100%);content:"";}
+.premium-wheel-pointer::before {background:linear-gradient(90deg,#8c260e,#f5ba3f 15%,#ffe89c 25%,#9d3420 90%);}
+.premium-wheel-pointer i {inset:5px 8px 5px 3px;background:linear-gradient(90deg,#ff382d,#dd0816 65%,#910415);}
+.premium-wheel-wrap.is-spinning .premium-wheel-pointer {animation:premium-pointer-tick .12s ease-in-out infinite alternate;}
+.premium-machine.is-winning .premium-wheel-frame {animation:premium-wheel-win .65s ease-in-out 3;}
+.premium-machine.is-exceptional .premium-wheel-frame {box-shadow:0 0 24px #ffdd68,0 0 46px #e45bff,inset 0 0 18px #2a0b31;}
+.premium-wheel-panel.is-winner {filter:brightness(1.5) drop-shadow(0 0 15px #fff1a5);box-shadow:inset 0 0 0 3px #fff3a9,0 0 28px #ffe35e;}
+.premium-wheel-wrap.is-spinning .premium-wheel-panel {filter:saturate(1.28) brightness(1.08);}
 .premium-wheel-controls { display: flex; align-items: center; justify-content: center; gap: 12px; flex-wrap: wrap; margin: 14px auto 0; }
 .premium-sound-toggle { min-height: 42px; padding: 9px 13px; border: 1px solid #dbbb6e; border-radius: 12px; background: rgba(56,18,82,.92); color: #fff6db; font: inherit; font-size: 12px; font-weight: 800; cursor: pointer; }
 .premium-status { min-height: 22px; margin: 11px 0 0; color: #45215e; font-size: 13px; font-weight: 700; }
@@ -1318,13 +1332,15 @@ body {
 @media (max-width: 600px) { .premium-prize-edit-row .premium-card-select { grid-column: 1 / -1; } .premium-journal-entry { flex-direction: column; gap: 4px; } .premium-journal-entry span:last-child { text-align: left; } .player-preview-banner { align-items: flex-start; flex-direction: column; } }
 @keyframes premium-wheel-aura { from { opacity: .72; transform: scale(1); filter: brightness(1); } to { opacity: 1; transform: scale(1.025); filter: brightness(1.2); } }
 @keyframes premium-pointer-tick { from { transform: translateY(-50%) rotate(-3deg); } to { transform: translateY(-50%) rotate(4deg); } }
+@keyframes premium-bulb-glow { from { opacity:.74;filter:brightness(.82);transform:scale(.92); } to { opacity:1;filter:brightness(1.35);transform:scale(1.08); } }
+@keyframes premium-wheel-win { 50% { filter:brightness(1.32) drop-shadow(0 0 20px #fff0a4); } }
 @keyframes premium-center-glow { from { box-shadow: 0 0 0 4px rgba(255,255,255,.7), 0 4px 14px rgba(0,0,0,.45); } to { box-shadow: 0 0 0 5px rgba(255,246,183,.95), 0 0 22px rgba(255,213,83,.95); } }
 @keyframes premium-panel-win { from { filter: brightness(1.05); } to { filter: brightness(1.55) saturate(1.35); } }
 @keyframes premium-victory-particles { 0% { opacity: 0; transform: scale(.88); background: radial-gradient(circle at 18% 28%, #fff3a8 0 2px, transparent 4px), radial-gradient(circle at 82% 20%, #ff8de7 0 2px, transparent 5px), radial-gradient(circle at 76% 78%, #fff3a8 0 2px, transparent 5px), radial-gradient(circle at 20% 78%, #ed76ff 0 2px, transparent 5px); } 35% { opacity: 1; transform: scale(1.06); } 100% { opacity: 0; transform: scale(1.18); } }
 @keyframes premium-prize-pop { 0% { opacity: 0; transform: translateY(14px) scale(.84); } 65% { opacity: 1; transform: translateY(-3px) scale(1.035); } 100% { opacity: 1; transform: translateY(0) scale(1); } }
 @keyframes premium-sparkle { 0% { opacity: 0; transform: scale(.2) rotate(-35deg); } 35% { opacity: 1; transform: scale(1.2) rotate(15deg); } 100% { opacity: 0; transform: scale(.7) rotate(45deg); } }
-@media (max-width: 480px) { .premium-wheel-wrap { width: min(100%, 390px); margin-top: 23px; } .premium-wheel-frame { padding: 10px; } .premium-wheel-label { font-size: 30px; stroke-width: 4px; } .premium-wheel-label-small { font-size: 22px; } .premium-wheel-controls { gap: 9px; } }
-@media (prefers-reduced-motion: reduce) { .premium-wheel, .premium-wheel-pointer, .premium-wheel-center-button, .premium-prize-reveal, .premium-reveal-sparkle, .premium-machine.is-winning::after, .premium-wheel-sector.is-winner { animation-duration: .01ms !important; transition-duration: .01ms !important; } }
+@media (max-width: 480px) { .premium-wheel-wrap { width: min(100%, 410px); margin-top: 20px; } .premium-machine { height:clamp(300px,88vw,370px);grid-template-columns:14% 72% 14%;padding:0; } .premium-wheel-frame { padding:7px;border-radius:21px; } .premium-wheel-post {margin:7px 0 12px;padding:7px 2px;border-radius:13px;} .premium-wheel-pointer {right:-2%;width:56px;height:66px;} .premium-wheel-panel {padding:6px 8px;border-width:2px;} .premium-wheel-controls { gap: 9px; } }
+@media (prefers-reduced-motion: reduce) { .premium-wheel, .premium-wheel-pointer, .premium-wheel-center-button, .premium-prize-reveal, .premium-reveal-sparkle, .premium-wheel-frame, .premium-wheel-bulbs i, .premium-wheel-panel.is-winner { animation-duration: .01ms !important; transition-duration: .01ms !important; } }
 .collection-search { width: 100%; max-width: 480px; margin: 12px 0 6px; padding: 12px 14px; border: 1px solid rgba(243, 191, 56, .75); border-radius: 11px; background: #fffdf7; color: #10264a; font: inherit; }
 .collection-rarity-filter { width: 100%; max-width: 300px; margin: 8px 0; padding: 10px 12px; border: 1px solid rgba(243, 191, 56, .75); border-radius: 10px; background: #fffdf7; color: #10264a; font: inherit; }
 .profile-identity-heading { display: flex; align-items: center; gap: 12px; margin-top: 18px; }
@@ -2359,15 +2375,29 @@ body {
             <p class="premium-balance-indicator" aria-label="Solde de jetons Premium"><img src="./Jeton%20premium.png" alt=""><span id="premiumBalanceDisplay">0</span></p>
             <div class="premium-wheel-wrap">
                 <div id="premiumMachine" class="premium-machine">
+                    <div class="premium-wheel-post" aria-hidden="true">
+                        <span class="premium-wheel-chef">👨‍🍳</span>
+                        <span class="premium-wheel-stars">★</span>
+                        <span class="premium-wheel-bulbs"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span>
+                        <span class="premium-wheel-stars">★</span>
+                    </div>
                     <div class="premium-wheel-frame">
-                        <div class="premium-wheel-window">
-                            <svg id="premiumWheel" class="premium-wheel" viewBox="0 0 1000 1000" role="img" aria-label="Roue des lots"></svg>
+                        <div class="premium-wheel-axle">
+                            <div class="premium-wheel-window">
+                                <div id="premiumWheel" class="premium-wheel" role="img" aria-label="Roue mécanique des lots"></div>
+                            </div>
                         </div>
                     </div>
+                    <div class="premium-wheel-post" aria-hidden="true">
+                        <span class="premium-wheel-chef">👨‍🍳</span>
+                        <span class="premium-wheel-stars">★</span>
+                        <span class="premium-wheel-bulbs"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span>
+                        <span class="premium-wheel-stars">★</span>
+                    </div>
                     <span class="premium-wheel-pointer" aria-hidden="true"><i></i></span>
-                    <button id="premiumSpinButton" class="premium-wheel-center-button" type="button" aria-label="Lancer la roue pour un jeton Premium" disabled><img src="./Jeton%20premium.png" alt=""><span>LANCER</span></button>
                 </div>
                 <div class="premium-wheel-controls">
+                    <button id="premiumSpinButton" class="premium-wheel-center-button" type="button" aria-label="Lancer la roue pour un jeton Premium" disabled><img src="./Jeton%20premium.png" alt=""><span>LANCER LA ROUE</span></button>
                     <button id="premiumSoundToggle" class="premium-sound-toggle" type="button" aria-pressed="false">🔇 Sons désactivés</button>
                 </div>
             </div>
@@ -3543,6 +3573,8 @@ const PREMIUM_REWARD_TYPES = [
     { value: "card", label: "Carte de la collection" }
 ];
 let premiumPrizes = [];
+let premiumWheelSlots = [];
+let premiumWheelTargetSlot = -1;
 let premiumWheelRotation = 0;
 let premiumSpinInProgress = false;
 let premiumBalanceCount = 0;
@@ -3604,58 +3636,60 @@ function renderPremiumPrizeList(prizes) {
     premiumMachine.classList.remove("is-winning", "is-exceptional");
     const isAdminView = isCurrentUserAdmin() && !isPlayerPreview;
     premiumPrizeList.classList.toggle("hidden", !isAdminView);
+    premiumWheelSlots = [];
     const count = premiumPrizes.length;
-    const stepDegrees = count ? 360 / count : 0;
-    const colors = ["#7d27a8", "#bb3a9f", "#55227f", "#d14cba", "#6538ad", "#a72c77", "#47206c", "#c64acb"];
-    const svgNamespace = "http://www.w3.org/2000/svg";
-    const center = 500;
-    const radius = 492;
-    const labelRadius = count > 9 ? 330 : 350;
-    const labelFontSize = count > 10 ? 27 : count > 7 ? 31 : 35;
-    const createSvg = (tag, attrs = {}) => {
-        const element = document.createElementNS(svgNamespace, tag);
-        Object.entries(attrs).forEach(([key, value]) => element.setAttribute(key, String(value)));
-        return element;
+    const slotCount = count ? Math.max(12, count * Math.ceil(12 / count)) : 0;
+    const stepDegrees = slotCount ? 360 / slotCount : 0;
+    const colors = ["#7422a5", "#1667bc", "#bc8118", "#b72b91", "#a32634", "#4c38aa", "#167f9c", "#8244b3"];
+    const icons = { tokens: "🪙", premium: "💎", booster: "🎴", card: "🃏" };
+    const stageHeight = premiumWheel.parentElement.clientHeight || 320;
+    const reelRadius = Math.max(110, stageHeight * 0.455);
+    const panelHeight = Math.max(52, 2 * reelRadius * Math.tan(Math.PI / Math.max(slotCount, 1)));
+    premiumWheel.style.setProperty("--reel-radius", reelRadius + "px");
+    premiumWheel.style.setProperty("--panel-height", panelHeight + "px");
+    premiumWheel.style.top = "50%";
+    premiumWheel.style.left = "0";
+    premiumWheel.style.height = "1px";
+    premiumWheelSlots = Array.from({ length: slotCount }, (_, slotIndex) => ({
+        slotIndex,
+        prizeIndex: slotIndex % count
+    }));
+    const addPanel = (slot) => {
+        const prize = premiumPrizes[slot.prizeIndex] || {};
+        const panel = document.createElement("div");
+        panel.className = "premium-wheel-panel";
+        panel.dataset.slotIndex = String(slot.slotIndex);
+        panel.dataset.prizeIndex = String(slot.prizeIndex);
+        panel.style.setProperty("--panel-color", colors[slot.prizeIndex % colors.length]);
+        panel.style.setProperty("--panel-angle", (slot.slotIndex * stepDegrees) + "deg");
+        panel.style.top = (-panelHeight / 2) + "px";
+
+        const illustration = document.createElement("span");
+        illustration.className = "premium-wheel-panel-illustration";
+        illustration.setAttribute("aria-hidden", "true");
+        illustration.textContent = isAdminView ? (icons[prize.rewardType] || "🎁") : "✨";
+        const copy = document.createElement("span");
+        copy.className = "premium-wheel-panel-copy";
+        const name = document.createElement("strong");
+        name.className = "premium-wheel-panel-name";
+        name.textContent = isAdminView ? (prize.name || "Cadeau") : "Lot mystère";
+        const detail = document.createElement("small");
+        detail.className = "premium-wheel-panel-detail";
+        detail.textContent = isAdminView ? premiumRewardDescription(prize) : "Surprise Premium";
+        copy.append(name, detail);
+        panel.append(illustration, copy);
+        premiumWheel.append(panel);
     };
+    premiumWheelSlots.forEach(addPanel);
     premiumPrizes.forEach((prize, index) => {
         const chance = Number(prize.percentage) || 0;
-        const concealed = !isAdminView;
-        const startAngle = -90 + index * stepDegrees;
-        const endAngle = startAngle + stepDegrees;
-        const pointAt = (degrees) => {
-            const radians = degrees * Math.PI / 180;
-            return [center + radius * Math.cos(radians), center + radius * Math.sin(radians)];
-        };
-        const start = pointAt(startAngle);
-        const end = pointAt(endAngle);
-        const largeArc = stepDegrees > 180 ? 1 : 0;
-        const pathData = count === 1
-            ? `M ${center} ${center - radius} A ${radius} ${radius} 0 1 1 ${center} ${center + radius} A ${radius} ${radius} 0 1 1 ${center} ${center - radius} Z`
-            : `M ${center} ${center} L ${start[0]} ${start[1]} A ${radius} ${radius} 0 ${largeArc} 1 ${end[0]} ${end[1]} Z`;
-        const sector = createSvg("path", { d: pathData, fill: colors[index % colors.length], class: "premium-wheel-sector", "data-prize-index": index });
-        premiumWheel.append(sector);
-
-        const centerAngle = startAngle + stepDegrees / 2;
-        let labelRotation = ((centerAngle + 90) % 360 + 360) % 360;
-        if (labelRotation > 90 && labelRotation < 270) labelRotation += 180;
-        const radians = centerAngle * Math.PI / 180;
-        const labelX = center + labelRadius * Math.cos(radians);
-        const labelY = center + labelRadius * Math.sin(radians);
-        const labelGroup = createSvg("g", { transform: `translate(${labelX} ${labelY}) rotate(${labelRotation})`, "aria-hidden": "true" });
-        const label = createSvg("text", { class: "premium-wheel-label", "font-size": labelFontSize, y: -8 });
-        label.textContent = concealed ? "Lot mystère" : (prize.name || "Cadeau");
-        const detail = createSvg("text", { class: "premium-wheel-label premium-wheel-label-small", y: 28 });
-        detail.textContent = concealed ? "Surprise" : premiumRewardDescription(prize);
-        labelGroup.append(label, detail);
-        premiumWheel.append(labelGroup);
-
         const item = document.createElement("div");
         item.className = "premium-prize-item";
         const displayName = prize.name || "Cadeau";
         item.textContent = displayName + " — " + premiumRewardDescription(prize) + " • " + chance.toLocaleString("fr-FR") + " %";
         premiumPrizeList.append(item);
     });
-    premiumWheel.style.transform = "rotate(" + premiumWheelRotation + "deg)";
+    premiumWheel.style.transform = "translateY(-50%) rotateX(" + premiumWheelRotation + "deg)";
     premiumSpinButton.disabled = isPlayerPreview || premiumSpinInProgress || premiumPrizes.length === 0 || premiumBalanceCount < 1;
     premiumTestWheelButton.disabled = !isCurrentUserAdmin() || isPlayerPreview || premiumSpinInProgress || premiumPrizes.length === 0;
 }
@@ -4073,7 +4107,7 @@ async function openPremiumPage() {
     premiumAdministrationDisclosure.open = false;
     premiumWheelRotation = 0;
     premiumWheel.style.transition = "none";
-    premiumWheel.style.transform = "rotate(0deg)";
+    premiumWheel.style.transform = "translateY(-50%) rotateX(0deg)";
     premiumAdminPanel.classList.toggle("hidden", !isCurrentUserAdmin() || isPlayerPreview);
     await loadPremiumWheel();
 }
@@ -4130,10 +4164,19 @@ function playPremiumWinSound(exceptional = false) {
 
 async function animatePremiumWheelToPrize(prizeIndex) {
     if (prizeIndex < 0 || prizeIndex >= premiumPrizes.length) throw new Error("PREMIUM_PRIZE_NOT_IN_WHEEL");
-    const step = 360 / premiumPrizes.length;
+    const slotCount = premiumWheelSlots.length;
+    if (!slotCount) throw new Error("PREMIUM_WHEEL_EMPTY");
+    const step = 360 / slotCount;
     const currentNormalized = ((premiumWheelRotation % 360) + 360) % 360;
-    const targetNormalized = ((360 - (prizeIndex + 0.5) * step) % 360 + 360) % 360;
-    const alignment = (targetNormalized - currentNormalized + 360) % 360;
+    const targetSlots = premiumWheelSlots.filter((slot) => slot.prizeIndex === prizeIndex);
+    const candidates = targetSlots.map((slot) => {
+        const targetNormalized = ((360 - slot.slotIndex * step) % 360 + 360) % 360;
+        return { slotIndex: slot.slotIndex, alignment: (targetNormalized - currentNormalized + 360) % 360 };
+    });
+    const target = candidates.sort((left, right) => left.alignment - right.alignment)[0];
+    if (!target) throw new Error("PREMIUM_PRIZE_NOT_IN_WHEEL");
+    premiumWheelTargetSlot = target.slotIndex;
+    const alignment = target.alignment;
     const rotationDistance = 7 * 360 + alignment;
     const startRotation = premiumWheelRotation;
     const startTime = performance.now();
@@ -4154,7 +4197,7 @@ async function animatePremiumWheelToPrize(prizeIndex) {
                 : 1 - Math.pow(-2 * progress + 2, 3) / 2;
             const angle = startRotation + rotationDistance * eased;
             premiumWheelRotation = progress === 1 ? startRotation + rotationDistance : angle;
-            premiumWheel.style.transform = "rotate(" + premiumWheelRotation + "deg)";
+            premiumWheel.style.transform = "translateY(-50%) rotateX(" + premiumWheelRotation + "deg)";
             const crossedPanel = Math.floor(premiumWheelRotation / step);
             if (crossedPanel > lastCrossedPanel && timestamp - premiumLastTickAt > 24) {
                 playPremiumTick();
@@ -4167,8 +4210,8 @@ async function animatePremiumWheelToPrize(prizeIndex) {
             }
             premiumMachine.classList.remove("is-spinning");
             premiumWheelWrap.classList.remove("is-spinning");
-            premiumWheel.querySelectorAll(".premium-wheel-sector").forEach((sector) => sector.classList.remove("is-winner"));
-            const winner = premiumWheel.querySelector('.premium-wheel-sector[data-prize-index="' + prizeIndex + '"]');
+            premiumWheel.querySelectorAll(".premium-wheel-panel").forEach((panel) => panel.classList.remove("is-winner"));
+            const winner = premiumWheel.querySelector('.premium-wheel-panel[data-slot-index="' + premiumWheelTargetSlot + '"]');
             if (winner) winner.classList.add("is-winner");
             premiumMachine.classList.add("is-winning");
             resolve();
