@@ -1010,6 +1010,13 @@ body {
 .terms-content p, .terms-content ul { margin: 0; font-size: 13px; line-height: 1.55; }
 .terms-content ul { padding-left: 20px; }
 .terms-content a { color: #14599c; }
+.finance-history-form { margin: 16px 0; padding: 14px; border: 1px solid rgba(243,191,56,.45); border-radius: 14px; background: rgba(251,250,245,.97); color: #142745; }
+.finance-history-form h3 { margin: 0 0 6px; color: #10264a; font-size: 16px; }
+.finance-history-form p { margin: 0 0 12px; font-size: 12px; line-height: 1.45; }
+.finance-history-fields { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+.finance-history-fields label { display: grid; gap: 5px; font-size: 12px; font-weight: 700; }
+.finance-history-fields .admin-field { min-width: 0; }
+@media (max-width: 560px) { .finance-history-fields { grid-template-columns: 1fr; } }
 @media (max-width: 380px) { .home-player-summary { gap: 6px; grid-template-columns: minmax(0, 1.15fr) repeat(2, minmax(0, 1fr)); } .home-profile-button { flex-direction: column; gap: 3px; padding: 7px 4px; } .home-profile-button .avatar { width: 42px; height: 42px; } .home-profile-info { text-align: center; } .home-profile-info strong { max-width: 88px; font-size: 11px; } .home-profile-info span { display: none; } .home-resource-tile { padding: 7px 4px; } .home-overview-premium { flex-direction: column; gap: 2px; } .home-overview-premium img { width: 36px; height: 36px; } }
 
 
@@ -2102,7 +2109,6 @@ body {
             </div>
 
         <footer class="home-site-note">
-            <p>L’argent gagné avec ce site ira dans la caisse Popote Montech.</p>
             <a id="termsLink" href="#conditions-generales">Conditions générales d’utilisation</a>
         </footer>
 
@@ -2228,6 +2234,17 @@ body {
         <button id="financeBackButton" class="admin-back" type="button">← Retour à l’accueil</button>
         <h2 id="financeTitle">💶 Finance — ventes Premium</h2>
         <p class="statistics-intro">Suivi des montants payés par joueur et par mois pour les jetons Premium.</p>
+        <form id="financeHistoricalPaymentForm" class="finance-history-form">
+            <h3>Ajouter un ancien paiement Premium</h3>
+            <p>Cette saisie ajoute une ligne à l’historique financier sans créditer de jetons au joueur. Le taux appliqué est de 2 jetons Premium par euro, dans la limite de 10&nbsp;€ par joueur et par mois.</p>
+            <div class="finance-history-fields">
+                <label for="financeHistoricalPlayer">Joueur<select id="financeHistoricalPlayer" class="admin-field" required><option value="">Chargement des joueurs…</option></select></label>
+                <label for="financeHistoricalAmount">Montant payé (€)<input id="financeHistoricalAmount" class="admin-field" type="number" min="0.50" max="10" step="0.50" inputmode="decimal" required></label>
+                <label for="financeHistoricalMonth">Mois du paiement<input id="financeHistoricalMonth" class="admin-field" type="month" required></label>
+            </div>
+            <button id="financeHistoricalSubmit" class="primary-button" type="submit">Enregistrer ce paiement</button>
+            <p id="financeHistoricalStatus" class="admin-status" role="status" aria-live="polite"></p>
+        </form>
         <p id="financeTotal" class="premium-monthly-sales-total">Total récolté : —</p>
         <p id="financeStatus" class="statistics-status" role="status" aria-live="polite">Chargement des paiements…</p>
         <div class="statistics-table-wrap"><table class="statistics-table premium-monthly-sales-table"><thead><tr><th>Mois</th><th>Joueur</th><th>Jetons Premium attribués</th><th>Montant payé</th></tr></thead><tbody id="financeTableBody"></tbody></table></div>
@@ -2720,6 +2737,7 @@ const callOpenClassicBooster = httpsCallable(functions, "openClassicBooster");
 const callOpenDailyBooster = httpsCallable(functions, "openDailyBooster");
 const callGetOwnedCardNumbers = httpsCallable(functions, "getOwnedCardNumbers");
 const callGetAdminPlayers = httpsCallable(functions, "getAdminPlayers");
+const callRecordHistoricalPremiumPayment = httpsCallable(functions, "recordHistoricalPremiumPayment");
 const callAdjustPlayerTokens = httpsCallable(functions, "adjustPlayerTokens");
 const callGetLeaderboard = httpsCallable(functions, "getLeaderboard");
 const callBuyClassicBooster = httpsCallable(functions, "buyClassicBooster");
@@ -2909,6 +2927,12 @@ const financeBackButton = document.getElementById("financeBackButton");
 const financeTotal = document.getElementById("financeTotal");
 const financeStatus = document.getElementById("financeStatus");
 const financeTableBody = document.getElementById("financeTableBody");
+const financeHistoricalPaymentForm = document.getElementById("financeHistoricalPaymentForm");
+const financeHistoricalPlayer = document.getElementById("financeHistoricalPlayer");
+const financeHistoricalAmount = document.getElementById("financeHistoricalAmount");
+const financeHistoricalMonth = document.getElementById("financeHistoricalMonth");
+const financeHistoricalSubmit = document.getElementById("financeHistoricalSubmit");
+const financeHistoricalStatus = document.getElementById("financeHistoricalStatus");
 const termsPage = document.getElementById("termsPage");
 const termsLink = document.getElementById("termsLink");
 const termsBackButton = document.getElementById("termsBackButton");
@@ -3872,12 +3896,13 @@ async function renderMonthlyPremiumReport(tableBody, statusElement, totalElement
     tableBody.replaceChildren();
     statusElement.textContent = "Chargement des paiements…";
     try {
-        const [snapshot, playersSnapshot] = await Promise.all([
+        const [snapshot, monthlyTotalsSnapshot, playersSnapshot] = await Promise.all([
             getDocs(collection(db, "premiumTokenPurchases")),
+            getDocs(collection(db, "premiumMonthlyTotals")),
             getDocs(collection(db, "players")),
         ]);
         const monthly = new Map();
-        let totalAmountCents = 0;
+        const playerNames = new Map(playersSnapshot.docs.map((playerDoc) => [playerDoc.id, playerDoc.data().pseudo || "Joueur"]));
         const octoberCutoff = new Date("2026-10-12T00:00:00+02:00").getTime();
         snapshot.docs.forEach((purchaseDoc) => {
             const purchase = purchaseDoc.data();
@@ -3892,10 +3917,45 @@ async function renderMonthlyPremiumReport(tableBody, statusElement, totalElement
             row.premiumTokens += premiumTokens;
             row.amountCents += amountCents;
             monthly.set(key, row);
-            totalAmountCents += amountCents;
+        });
+        // Les récapitulatifs mensuels récupèrent aussi les paiements qui n'ont plus de ligne individuelle.
+        monthlyTotalsSnapshot.docs.forEach((summaryDoc) => {
+            const summary = summaryDoc.data();
+            const playerId = summary.playerId;
+            const month = summary.month;
+            const amountCents = Number(summary.amountCents);
+            const premiumTokens = Number(summary.premiumTokens);
+            if (!playerId || !/^\d{4}-\d{2}$/.test(month || "")
+                || !Number.isSafeInteger(amountCents) || amountCents < 0
+                || !Number.isSafeInteger(premiumTokens) || premiumTokens < 0) return;
+            const key = month + ":" + playerId;
+            monthly.set(key, {
+                month,
+                pseudo: playerNames.get(playerId) || "Joueur",
+                premiumTokens,
+                amountCents,
+            });
         });
         const rows = [...monthly.values()].sort((left, right) => right.month.localeCompare(left.month) || left.pseudo.localeCompare(right.pseudo, "fr", { sensitivity: "base" }));
+        const totalAmountCents = rows.reduce((sum, item) => sum + item.amountCents, 0);
         if (totalElement) totalElement.textContent = "Total récolté : " + (totalAmountCents / 100).toLocaleString("fr-FR", { style: "currency", currency: "EUR" });
+        const previousPlayerId = financeHistoricalPlayer.value;
+        financeHistoricalPlayer.replaceChildren();
+        const playerPlaceholder = document.createElement("option");
+        playerPlaceholder.value = "";
+        playerPlaceholder.textContent = playersSnapshot.docs.length ? "Choisir un joueur" : "Aucun joueur";
+        financeHistoricalPlayer.append(playerPlaceholder);
+        playersSnapshot.docs
+            .map((playerDoc) => ({ id: playerDoc.id, pseudo: playerDoc.data().pseudo || "Joueur" }))
+            .sort((left, right) => left.pseudo.localeCompare(right.pseudo, "fr", { sensitivity: "base" }))
+            .forEach((player) => {
+                const option = document.createElement("option");
+                option.value = player.id;
+                option.textContent = player.pseudo;
+                financeHistoricalPlayer.append(option);
+            });
+        if (previousPlayerId && playersSnapshot.docs.some((playerDoc) => playerDoc.id === previousPlayerId)) financeHistoricalPlayer.value = previousPlayerId;
+        if (!financeHistoricalMonth.value) financeHistoricalMonth.value = getParisMonthKey(new Date());
         if (rows.length) {
             statusElement.textContent = "";
         } else {
@@ -3941,6 +4001,36 @@ financeMenuButton.addEventListener("click", async () => {
     await renderMonthlyPremiumReport(financeTableBody, financeStatus, financeTotal);
 });
 financeBackButton.addEventListener("click", showHomePage);
+
+financeHistoricalPaymentForm.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    if (!isCurrentUserAdmin() || isPlayerPreview) return;
+    const amount = Number(financeHistoricalAmount.value);
+    const amountCents = Math.round(amount * 100);
+    if (!financeHistoricalPlayer.value || !financeHistoricalMonth.value || !Number.isFinite(amount)
+        || amountCents < 50 || amountCents > 1000 || amountCents % 50 !== 0) {
+        financeHistoricalStatus.textContent = "Choisis un joueur, un mois et un montant entre 0,50 € et 10 €, par pas de 0,50 €.";
+        return;
+    }
+    financeHistoricalSubmit.disabled = true;
+    financeHistoricalStatus.textContent = "Enregistrement du paiement antérieur…";
+    try {
+        await callRecordHistoricalPremiumPayment({
+            playerId: financeHistoricalPlayer.value,
+            amountCents,
+            month: financeHistoricalMonth.value,
+            operationId: crypto.randomUUID(),
+        });
+        financeHistoricalAmount.value = "";
+        financeHistoricalStatus.textContent = "Paiement ajouté à l’historique. Aucun jeton n’a été crédité une seconde fois.";
+        await renderMonthlyPremiumReport(financeTableBody, financeStatus, financeTotal);
+    } catch (error) {
+        console.error("Erreur pendant l’ajout d’un paiement Premium antérieur :", error);
+        financeHistoricalStatus.textContent = error.message || "Impossible d’enregistrer ce paiement antérieur.";
+    } finally {
+        financeHistoricalSubmit.disabled = false;
+    }
+});
 
 async function loadPremiumJournal() {
     premiumJournalList.replaceChildren();
