@@ -1504,7 +1504,7 @@ body {
     #loginPage .login-card { padding-top: 17px; padding-bottom: 17px; }
 }
 .register-avatar-label { display: block; margin-bottom: 9px; color: #102544; font-size: 14px; font-weight: 700; }
-.avatar-picker { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: clamp(6px, 2vw, 11px); }
+.avatar-picker { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: clamp(6px, 2vw, 11px); }
 .avatar-choice {
     position: relative;
     display: block;
@@ -1782,6 +1782,9 @@ body {
                     <button class="avatar-choice" type="button" data-avatar="homme-blanc" aria-label="Avatar 3" aria-pressed="false"><img src="./avatar-homme-blanc.png" alt="" aria-hidden="true"></button>
                     <button class="avatar-choice" type="button" data-avatar="homme-noir" aria-label="Avatar 4" aria-pressed="false"><img src="./avatar-homme-noir.png" alt="" aria-hidden="true"></button>
                     <button class="avatar-choice" type="button" data-avatar="vieil-homme" aria-label="Avatar 5" aria-pressed="false"><img src="./avatar-vieil-homme.png" alt="" aria-hidden="true"></button>
+                    <button class="avatar-choice" type="button" data-avatar="homme-chauve-barbu" aria-label="Avatar 6" aria-pressed="false"><img src="./avatar-homme-chauve-barbu.png" alt="" aria-hidden="true"></button>
+                    <button class="avatar-choice" type="button" data-avatar="homme-vieux" aria-label="Avatar 7" aria-pressed="false"><img src="./avatar-homme-vieux.png" alt="" aria-hidden="true"></button>
+                    <button class="avatar-choice" type="button" data-avatar="licorne" aria-label="Avatar 8" aria-pressed="false"><img src="./avatar-licorne.png" alt="" aria-hidden="true"></button>
                 </div>
             </div>
 
@@ -2102,13 +2105,16 @@ body {
             <label for="profilePseudoInput">Modifier mon pseudo (une seule fois)<input id="profilePseudoInput" class="admin-field" type="text" minlength="3" maxlength="24" autocomplete="nickname"></label>
             <div class="profile-avatar-field">
                 <span class="register-avatar-label">Modifier mon avatar (une seule fois)</span>
-                <select id="profileAvatarSelect" class="hidden" aria-hidden="true" tabindex="-1"><option value="femme-blonde">Avatar 1</option><option value="femme-brune">Avatar 2</option><option value="homme-blanc">Avatar 3</option><option value="homme-noir">Avatar 4</option><option value="vieil-homme">Avatar 5</option></select>
+                <select id="profileAvatarSelect" class="hidden" aria-hidden="true" tabindex="-1"><option value="femme-blonde">Avatar 1</option><option value="femme-brune">Avatar 2</option><option value="homme-blanc">Avatar 3</option><option value="homme-noir">Avatar 4</option><option value="vieil-homme">Avatar 5</option><option value="homme-chauve-barbu">Avatar 6</option><option value="homme-vieux">Avatar 7</option><option value="licorne">Avatar 8</option></select>
                 <div id="profileAvatarChoices" class="avatar-picker profile-avatar-picker" role="group" aria-label="Choisir un avatar">
                     <button class="avatar-choice" type="button" data-profile-avatar="femme-blonde" aria-label="Choisir l’avatar 1" aria-pressed="false"><img src="./avatar-femme-blonde.png" alt=""></button>
                     <button class="avatar-choice" type="button" data-profile-avatar="femme-brune" aria-label="Choisir l’avatar 2" aria-pressed="false"><img src="./avatar-femme-brune.png" alt=""></button>
                     <button class="avatar-choice" type="button" data-profile-avatar="homme-blanc" aria-label="Choisir l’avatar 3" aria-pressed="false"><img src="./avatar-homme-blanc.png" alt=""></button>
                     <button class="avatar-choice" type="button" data-profile-avatar="homme-noir" aria-label="Choisir l’avatar 4" aria-pressed="false"><img src="./avatar-homme-noir.png" alt=""></button>
                     <button class="avatar-choice" type="button" data-profile-avatar="vieil-homme" aria-label="Choisir l’avatar 5" aria-pressed="false"><img src="./avatar-vieil-homme.png" alt=""></button>
+                    <button class="avatar-choice" type="button" data-profile-avatar="homme-chauve-barbu" aria-label="Choisir l’avatar 6" aria-pressed="false"><img src="./avatar-homme-chauve-barbu.png" alt=""></button>
+                    <button class="avatar-choice" type="button" data-profile-avatar="homme-vieux" aria-label="Choisir l’avatar 7" aria-pressed="false"><img src="./avatar-homme-vieux.png" alt=""></button>
+                    <button class="avatar-choice" type="button" data-profile-avatar="licorne" aria-label="Choisir l’avatar 8" aria-pressed="false"><img src="./avatar-licorne.png" alt=""></button>
                 </div>
             </div>
             <button id="profileIdentitySaveButton" class="primary-button" type="button">Enregistrer mes modifications</button>
@@ -2714,8 +2720,36 @@ const PLAYER_AVATARS = {
     "femme-brune": "./avatar-femme-brune.png",
     "homme-blanc": "./avatar-homme-blanc.png",
     "homme-noir": "./avatar-homme-noir.png",
-    "vieil-homme": "./avatar-vieil-homme.png"
+    "vieil-homme": "./avatar-vieil-homme.png",
+    "homme-chauve-barbu": "./avatar-homme-chauve-barbu.png",
+    "homme-vieux": "./avatar-homme-vieux.png",
+    "licorne": "./avatar-licorne.png"
 };
+const PLAYER_AVATAR_IMAGE_CANDIDATES = {
+    "homme-chauve-barbu": ["./avatar-homme-chauve-barbu.png", "./Images/Avatar/avatar-homme-chauve-barbu.png"],
+    "homme-vieux": ["./avatar-homme-vieux.png", "./homme-vieux.png", "./Images/Avatar/homme-vieux.png", "./Images/Avatar/Vieil%20homme%20blanc.png"],
+    "licorne": ["./avatar-licorne.png", "./Licorne.png", "./licorne.png", "./Images/Avatar/Licorne.png"]
+};
+
+function setPlayerAvatarImage(image, avatarId) {
+    const candidates = PLAYER_AVATAR_IMAGE_CANDIDATES[avatarId] || [PLAYER_AVATARS[avatarId]];
+    let nextCandidate = 1;
+    image.onerror = () => {
+        if (nextCandidate >= candidates.length) {
+            image.onerror = null;
+            image.style.visibility = "hidden";
+            return;
+        }
+        image.src = candidates[nextCandidate++];
+    };
+    image.src = candidates[0];
+}
+
+document.querySelectorAll(".avatar-choice img").forEach((image) => {
+    const choice = image.closest(".avatar-choice");
+    const avatarId = choice?.dataset.avatar || choice?.dataset.profileAvatar;
+    if (avatarId) setPlayerAvatarImage(image, avatarId);
+});
 let isRegisterMode = false;
 let pendingSignupPseudo = "";
 let pendingSignupAvatar = "";
@@ -2729,7 +2763,7 @@ function renderPlayerAvatar(avatarId) {
         return;
     }
     const image = document.createElement("img");
-    image.src = imagePath;
+    setPlayerAvatarImage(image, avatarId);
     image.alt = "";
     image.onerror = () => { playerAvatar.textContent = "👤"; };
     playerAvatar.append(image);
@@ -3759,7 +3793,10 @@ async function renderMonthlyPremiumReport(tableBody, statusElement, totalElement
     tableBody.replaceChildren();
     statusElement.textContent = "Chargement des paiements…";
     try {
-        const snapshot = await getDocs(collection(db, "premiumTokenPurchases"));
+        const [snapshot, playersSnapshot] = await Promise.all([
+            getDocs(collection(db, "premiumTokenPurchases")),
+            getDocs(collection(db, "players")),
+        ]);
         const monthly = new Map();
         let totalAmountCents = 0;
         const octoberCutoff = new Date("2026-10-12T00:00:00+02:00").getTime();
@@ -3780,7 +3817,23 @@ async function renderMonthlyPremiumReport(tableBody, statusElement, totalElement
         });
         const rows = [...monthly.values()].sort((left, right) => right.month.localeCompare(left.month) || left.pseudo.localeCompare(right.pseudo, "fr", { sensitivity: "base" }));
         if (totalElement) totalElement.textContent = "Total récolté : " + (totalAmountCents / 100).toLocaleString("fr-FR", { style: "currency", currency: "EUR" });
-        statusElement.textContent = rows.length ? "" : "Aucun jeton Premium attribué pour le moment.";
+        if (rows.length) {
+            statusElement.textContent = "";
+        } else {
+            const playersWithAttributedTokens = playersSnapshot.docs
+                .map((playerDoc) => playerDoc.data())
+                .filter((player) => Number(player.jetonsPremiumAttribues ?? player.jetonsPremium) > 0);
+            const attributedTokens = playersWithAttributedTokens.reduce(
+                (sum, player) => sum + (Number(player.jetonsPremiumAttribues ?? player.jetonsPremium) || 0),
+                0,
+            );
+            statusElement.textContent = attributedTokens > 0
+                ? playersWithAttributedTokens.length + " joueur(s) ont bien reçu " + attributedTokens.toLocaleString("fr-FR") + " jetons Premium. Leur historique d’achat mensuel n’est toutefois pas enregistré : les profils ne permettent pas de retrouver les dates ni les paiements."
+                : "Aucun jeton Premium attribué pour le moment.";
+            if (totalElement && attributedTokens > 0) {
+                totalElement.textContent = "Total récolté : historique des paiements manquant";
+            }
+        }
         rows.forEach((item) => {
             const row = document.createElement("tr");
             [displayFinanceMonth(item.month), item.pseudo || "Joueur", Number(item.premiumTokens) || 0, ((Number(item.amountCents) || 0) / 100).toLocaleString("fr-FR", { style: "currency", currency: "EUR" })].forEach((value) => {
@@ -4204,7 +4257,7 @@ async function loadPersonalProfile(playerId = auth.currentUser?.uid) {
         const avatarPath = PLAYER_AVATARS[player.avatar];
         if (avatarPath) {
             const avatarImage = document.createElement("img");
-            avatarImage.src = avatarPath;
+            setPlayerAvatarImage(avatarImage, player.avatar);
             avatarImage.alt = "";
             profilePageAvatar.append(avatarImage);
         } else profilePageAvatar.textContent = "👤";
@@ -4311,7 +4364,7 @@ profileIdentitySaveButton.addEventListener("click", async () => {
         profilePageTitle.textContent = response.pseudo;
         profilePageAvatar.replaceChildren();
         const image = document.createElement("img");
-        image.src = PLAYER_AVATARS[response.avatar];
+        setPlayerAvatarImage(image, response.avatar);
         image.alt = "";
         profilePageAvatar.append(image);
         profilePseudoInput.value = response.pseudo;
