@@ -2661,8 +2661,6 @@ const callAdjustPlayerPremiumTokens = httpsCallable(functions, "adjustPlayerPrem
 const callInitializePremiumAssignedTokens = httpsCallable(functions, "initializePremiumAssignedTokens");
 const callGetPremiumWheelJournal = httpsCallable(functions, "getPremiumWheelJournal");
 const callGetPremiumRewardCards = httpsCallable(functions, "getPremiumRewardCards");
-const callGetPremiumMonthlySales = httpsCallable(functions, "getPremiumMonthlySales");
-const callGetMyPremiumSpending = httpsCallable(functions, "getMyPremiumSpending");
 const callGetPublicPlayerProfile = httpsCallable(functions, "getPublicPlayerProfile");
 const callUpdateMyPlayerIdentity = httpsCallable(functions, "updateMyPlayerIdentity");
 const callRecycleDuplicateCards = httpsCallable(functions, "recycleDuplicateCards");
@@ -3751,13 +3749,37 @@ function displayFinanceMonth(month) {
     return parts.length === 2 ? parts[1] + "/" + parts[0] : month || "—";
 }
 
+function getParisMonthKey(date) {
+    const parts = new Intl.DateTimeFormat("en-CA", { timeZone: "Europe/Paris", year: "numeric", month: "2-digit" }).formatToParts(date);
+    const values = Object.fromEntries(parts.map((part) => [part.type, part.value]));
+    return values.year + "-" + values.month;
+}
+
 async function renderMonthlyPremiumReport(tableBody, statusElement, totalElement = null) {
     tableBody.replaceChildren();
     statusElement.textContent = "Chargement des paiements…";
     try {
-        const response = await callGetPremiumMonthlySales();
-        const rows = Array.isArray(response.data.rows) ? response.data.rows : [];
-        if (totalElement) totalElement.textContent = "Total récolté : " + ((Number(response.data.totalAmountCents) || 0) / 100).toLocaleString("fr-FR", { style: "currency", currency: "EUR" });
+        const snapshot = await getDocs(collection(db, "premiumTokenPurchases"));
+        const monthly = new Map();
+        let totalAmountCents = 0;
+        const octoberCutoff = new Date("2026-10-12T00:00:00+02:00").getTime();
+        snapshot.docs.forEach((purchaseDoc) => {
+            const purchase = purchaseDoc.data();
+            const amountCents = Number(purchase.amountCents);
+            const premiumTokens = Number(purchase.premiumTokens);
+            if (!purchase.playerId || !Number.isSafeInteger(amountCents) || amountCents < 0 || !Number.isSafeInteger(premiumTokens) || premiumTokens < 0) return;
+            const createdAt = purchase.createdAt?.toDate?.() || (typeof purchase.createdAt === "string" ? new Date(purchase.createdAt) : null);
+            const isPreviouslyRecorded = createdAt instanceof Date && Number.isFinite(createdAt.getTime()) && createdAt.getTime() < octoberCutoff;
+            const month = isPreviouslyRecorded ? "2026-10" : (purchase.month || (createdAt ? getParisMonthKey(createdAt) : "2026-10"));
+            const key = month + ":" + purchase.playerId;
+            const row = monthly.get(key) || { month, pseudo: purchase.pseudo || "Joueur", premiumTokens: 0, amountCents: 0 };
+            row.premiumTokens += premiumTokens;
+            row.amountCents += amountCents;
+            monthly.set(key, row);
+            totalAmountCents += amountCents;
+        });
+        const rows = [...monthly.values()].sort((left, right) => right.month.localeCompare(left.month) || left.pseudo.localeCompare(right.pseudo, "fr", { sensitivity: "base" }));
+        if (totalElement) totalElement.textContent = "Total récolté : " + (totalAmountCents / 100).toLocaleString("fr-FR", { style: "currency", currency: "EUR" });
         statusElement.textContent = rows.length ? "" : "Aucun jeton Premium attribué pour le moment.";
         rows.forEach((item) => {
             const row = document.createElement("tr");
@@ -3770,7 +3792,9 @@ async function renderMonthlyPremiumReport(tableBody, statusElement, totalElement
         });
     } catch (error) {
         console.error("Erreur de chargement des ventes mensuelles Premium :", error);
-        statusElement.textContent = "Échec du chargement (" + (error.code || "erreur") + ") : " + (error.message || "la fonction getPremiumMonthlySales doit être redéployée.");
+        statusElement.textContent = error.code === "permission-denied"
+            ? "Accès refusé. Publie les règles Firestore mises à jour et connecte-toi avec le compte Admin."
+            : "Impossible de lire les paiements Premium (" + (error.code || "erreur") + ").";
         if (totalElement) totalElement.textContent = "Total récolté : —";
     }
 }
@@ -4155,8 +4179,12 @@ async function loadPersonalProfile(playerId = auth.currentUser?.uid) {
             profileIdentitySaveButton.disabled = player.pseudoChangeUsed === true && player.avatarChangeUsed === true;
             profileIdentityStatus.textContent = "Pseudo : " + (player.pseudoChangeUsed ? "modification utilisée" : "1 modification possible") + " • Avatar : " + (player.avatarChangeUsed ? "modification utilisée" : "1 modification possible");
             try {
-                const spending = (await callGetMyPremiumSpending()).data;
-                profilePremiumSpending.textContent = ((Number(spending.totalAmountCents) || 0) / 100).toLocaleString("fr-FR", { style: "currency", currency: "EUR" });
+                const purchases = await getDocs(query(collection(db, "premiumTokenPurchases"), where("playerId", "==", auth.currentUser.uid)));
+                const totalAmountCents = purchases.docs.reduce((sum, purchaseDoc) => {
+                    const amountCents = Number(purchaseDoc.data().amountCents);
+                    return sum + (Number.isSafeInteger(amountCents) && amountCents >= 0 ? amountCents : 0);
+                }, 0);
+                profilePremiumSpending.textContent = (totalAmountCents / 100).toLocaleString("fr-FR", { style: "currency", currency: "EUR" });
             } catch (spendingError) {
                 console.error("Erreur de chargement des dépenses Premium personnelles :", spendingError);
                 profilePremiumSpending.textContent = "Indisponible";
