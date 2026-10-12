@@ -1347,6 +1347,8 @@ body {
 .profile-page-avatar { width: 68px; height: 68px; overflow: hidden; flex: 0 0 68px; border: 3px solid var(--theme-gold); border-radius: 50%; background: #fff; }
 .profile-page-avatar img { width: 100%; height: 100%; object-fit: cover; }
 .profile-identity-heading h2 { margin: 0; }
+.profile-premium-badge { display: inline-flex; width: 42px; height: 42px; flex: 0 0 42px; align-items: center; justify-content: center; }
+.profile-premium-badge img { display: block; width: 100%; height: 100%; object-fit: contain; }
 .profile-identity-editor { display: grid; gap: 9px; margin-top: 12px; padding: 13px; border: 1px solid rgba(243,191,56,.5); border-radius: 13px; background: rgba(251,250,245,.08); }
 .profile-identity-editor label { color: #e3eaf4; font-size: 12px; font-weight: 800; }
 .profile-identity-editor .register-avatar-label { color: #e3eaf4; }
@@ -2188,7 +2190,7 @@ body {
 
     <section id="profilePage" class="player-profile hidden" aria-labelledby="profilePageTitle">
         <button id="profileBackButton" class="admin-back" type="button">← Retour à l’accueil</button>
-        <div class="profile-identity-heading"><span id="profilePageAvatar" class="profile-page-avatar" aria-hidden="true">👤</span><h2 id="profilePageTitle">Mon profil</h2></div>
+        <div class="profile-identity-heading"><span id="profilePageAvatar" class="profile-page-avatar" aria-hidden="true">👤</span><h2 id="profilePageTitle">Mon profil</h2><span id="profilePremiumBadge" class="profile-premium-badge hidden" title="Au moins 10 € dépensés en Premium" aria-label="Badge Premium : au moins 10 euros dépensés"><img src="./badge-premium-10.png" alt="Badge Premium 10 €"></span></div>
         <p class="profile-page-intro">Voici tes statistiques personnelles.</p>
         <section id="profileIdentityEditor" class="profile-identity-editor hidden" aria-label="Modifier mon pseudo et mon avatar">
             <label for="profilePseudoInput">Modifier mon pseudo (une seule fois)<input id="profilePseudoInput" class="admin-field" type="text" minlength="3" maxlength="24" autocomplete="nickname"></label>
@@ -2783,6 +2785,7 @@ const callInitializePremiumAssignedTokens = httpsCallable(functions, "initialize
 const callGetPremiumWheelJournal = httpsCallable(functions, "getPremiumWheelJournal");
 const callGetPremiumRewardCards = httpsCallable(functions, "getPremiumRewardCards");
 const callGetPublicPlayerProfile = httpsCallable(functions, "getPublicPlayerProfile");
+const callGetMyPremiumSpending = httpsCallable(functions, "getMyPremiumSpending");
 const callUpdateMyPlayerIdentity = httpsCallable(functions, "updateMyPlayerIdentity");
 const callRecycleDuplicateCards = httpsCallable(functions, "recycleDuplicateCards");
 const callDownloadPlayerBackup = httpsCallable(functions, "downloadPlayerBackup");
@@ -4449,11 +4452,9 @@ async function loadPersonalProfile(playerId = auth.currentUser?.uid) {
             profileIdentitySaveButton.disabled = player.pseudoChangeUsed === true && player.avatarChangeUsed === true;
             profileIdentityStatus.textContent = "Pseudo : " + (player.pseudoChangeUsed ? "modification utilisée" : "1 modification possible") + " • Avatar : " + (player.avatarChangeUsed ? "modification utilisée" : "1 modification possible");
             try {
-                const purchases = await getDocs(query(collection(db, "premiumTokenPurchases"), where("playerId", "==", auth.currentUser.uid)));
-                const totalAmountCents = purchases.docs.reduce((sum, purchaseDoc) => {
-                    const amountCents = Number(purchaseDoc.data().amountCents);
-                    return sum + (Number.isSafeInteger(amountCents) && amountCents >= 0 ? amountCents : 0);
-                }, 0);
+                const spendingResponse = await callGetMyPremiumSpending();
+                const totalAmountCents = Number(spendingResponse.data.totalAmountCents) || 0;
+                player.hasPremiumBadge = spendingResponse.data.hasPremiumBadge === true;
                 profilePremiumSpending.textContent = (totalAmountCents / 100).toLocaleString("fr-FR", { style: "currency", currency: "EUR" });
             } catch (spendingError) {
                 console.error("Erreur de chargement des dépenses Premium personnelles :", spendingError);
@@ -4471,6 +4472,7 @@ async function loadPersonalProfile(playerId = auth.currentUser?.uid) {
             document.querySelector(".profile-page-intro").textContent = "Profil public du joueur.";
         }
         profilePageAvatar.replaceChildren();
+        document.getElementById("profilePremiumBadge").classList.toggle("hidden", player.hasPremiumBadge !== true);
         const avatarPath = PLAYER_AVATARS[player.avatar];
         if (avatarPath) {
             const avatarImage = document.createElement("img");
