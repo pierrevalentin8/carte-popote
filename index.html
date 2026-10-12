@@ -1287,6 +1287,7 @@ body {
 .premium-player-table th, .premium-player-table td { padding: 10px; border-bottom: 1px solid #e3c8f1; text-align: center; white-space: nowrap; }
 .premium-player-table th { background: #48206c; color: #fff; }
 .premium-monthly-sales-table { min-width: 500px; }
+.premium-monthly-sales-card { margin-top: 12px; padding: 13px; border: 1px solid #e3c8f1; border-radius: 12px; background: rgba(255,255,255,.72); color: #28133c; }
 .premium-monthly-sales-total { margin: 9px 0 4px; color: #4c335d; font-size: 13px; font-weight: 800; }
 .premium-month-cell { font-weight: 800; }
 .premium-month-total-row td { background: #f0e1ff; color: #32104c; font-weight: 900; }
@@ -1307,6 +1308,17 @@ body {
 @media (max-width: 480px) { .premium-wheel-wrap { width: min(100%, 390px); margin-top: 23px; } .premium-wheel-frame { padding: 10px; } .premium-wheel-label { font-size: 30px; stroke-width: 4px; } .premium-wheel-label-small { font-size: 22px; } .premium-wheel-controls { gap: 9px; } }
 @media (prefers-reduced-motion: reduce) { .premium-wheel, .premium-wheel-pointer, .premium-wheel-center-button, .premium-prize-reveal, .premium-reveal-sparkle, .premium-machine.is-winning::after, .premium-wheel-sector.is-winner { animation-duration: .01ms !important; transition-duration: .01ms !important; } }
 .collection-search { width: 100%; max-width: 480px; margin: 12px 0 6px; padding: 12px 14px; border: 1px solid rgba(243, 191, 56, .75); border-radius: 11px; background: #fffdf7; color: #10264a; font: inherit; }
+.collection-rarity-filter { width: 100%; max-width: 300px; margin: 8px 0; padding: 10px 12px; border: 1px solid rgba(243, 191, 56, .75); border-radius: 10px; background: #fffdf7; color: #10264a; font: inherit; }
+.profile-identity-heading { display: flex; align-items: center; gap: 12px; margin-top: 18px; }
+.profile-page-avatar { width: 68px; height: 68px; overflow: hidden; flex: 0 0 68px; border: 3px solid var(--theme-gold); border-radius: 50%; background: #fff; }
+.profile-page-avatar img { width: 100%; height: 100%; object-fit: cover; }
+.profile-identity-heading h2 { margin: 0; }
+.profile-identity-editor { display: grid; gap: 9px; margin-top: 12px; padding: 13px; border: 1px solid rgba(243,191,56,.5); border-radius: 13px; background: rgba(251,250,245,.08); }
+.profile-identity-editor label { color: #e3eaf4; font-size: 12px; font-weight: 800; }
+.profile-identity-editor input, .profile-identity-editor select { width: 100%; margin-top: 5px; padding: 10px; border-radius: 8px; }
+.leaderboard-profile-link { padding: 0; border: 0; background: transparent; color: var(--theme-ink); font: inherit; font-size: 15px; font-weight: 800; text-align: left; cursor: pointer; }
+.leaderboard-profile-link:hover { color: #8b650d; text-decoration: underline; }
+.leaderboard-profile-link:focus-visible { outline: 2px solid #b98b1b; outline-offset: 3px; }
 .recycle-selection-toolbar { display: flex; justify-content: space-between; gap: 12px; align-items: center; flex-wrap: wrap; max-width: 900px; margin: 16px 0 10px; padding: 12px 14px; border: 1px solid rgba(243,191,56,.65); border-radius: 13px; background: rgba(16,38,74,.72); color: #fbfaf5; }
 .recycling-cards-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(145px, 1fr)); gap: 12px; max-width: 900px; margin: 12px 0 16px; }
 .recycling-copy-option { position: relative; display: flex; min-width: 0; flex-direction: column; align-items: center; gap: 7px; padding: 10px; border: 1px solid rgba(243,191,56,.38); border-radius: 13px; background: rgba(16,38,74,.82); color: #fbfaf5; cursor: pointer; text-align: center; }
@@ -1879,6 +1891,8 @@ body {
                 📊 Statistiques
             </button>
 
+            <button id="financeMenuButton" class="hidden" type="button">💶 Finance</button>
+
             <button
                 class="logout"
                 id="logoutButton"
@@ -2078,8 +2092,14 @@ body {
 
     <section id="profilePage" class="player-profile hidden" aria-labelledby="profilePageTitle">
         <button id="profileBackButton" class="admin-back" type="button">← Retour à l’accueil</button>
-        <h2 id="profilePageTitle">👤 Mon profil</h2>
+        <div class="profile-identity-heading"><span id="profilePageAvatar" class="profile-page-avatar" aria-hidden="true">👤</span><h2 id="profilePageTitle">Mon profil</h2></div>
         <p class="profile-page-intro">Voici tes statistiques personnelles.</p>
+        <section id="profileIdentityEditor" class="profile-identity-editor hidden" aria-label="Modifier mon pseudo et mon avatar">
+            <label for="profilePseudoInput">Modifier mon pseudo (une seule fois)<input id="profilePseudoInput" class="admin-field" type="text" minlength="3" maxlength="24" autocomplete="nickname"></label>
+            <label for="profileAvatarSelect">Modifier mon avatar (une seule fois)<select id="profileAvatarSelect" class="admin-field"><option value="femme-blonde">Avatar 1</option><option value="femme-brune">Avatar 2</option><option value="homme-blanc">Avatar 3</option><option value="homme-noir">Avatar 4</option><option value="vieil-homme">Avatar 5</option></select></label>
+            <button id="profileIdentitySaveButton" class="primary-button" type="button">Enregistrer mes modifications</button>
+            <p id="profileIdentityStatus" class="admin-status" role="status" aria-live="polite"></p>
+        </section>
         <section class="profile-level-card" aria-labelledby="profileLevelTitle">
             <div class="profile-level-heading">
                 <strong id="profileLevelTitle">Niveau <span id="profileCurrentLevel">1</span></strong>
@@ -2093,29 +2113,43 @@ body {
         <h3 class="profile-roadmap-title">🎯 Progression et avantages</h3>
         <ol id="profileLevelRoadmap" class="profile-roadmap" aria-label="Niveaux et avantages à débloquer"></ol>
         <div class="profile-stats-grid">
-            <article class="profile-stat">
+            <article id="profileTokensEarnedCard" class="profile-stat">
                 <span id="profileTokensEarned" class="profile-stat-value">0</span>
                 <span class="profile-stat-label">Jetons obtenus au total</span>
             </article>
             <article class="profile-stat">
                 <span class="profile-stat-icon">🎁</span>
                 <span id="profileClassicBoostersOpened" class="profile-stat-value">0</span>
-                <span class="profile-stat-label">Boosters classiques ouverts</span>
+                <span class="profile-stat-label">Boosters ouverts</span>
             </article>
             <article class="profile-stat">
                 <span class="profile-stat-icon">🃏</span>
                 <span id="profileCardsCollected" class="profile-stat-value">0</span>
                 <span class="profile-stat-label">Cartes collectées au total</span>
             </article>
+            <article id="profilePremiumSpendingCard" class="profile-stat hidden">
+                <span class="profile-stat-icon">💜</span>
+                <span id="profilePremiumSpending" class="profile-stat-value">0 €</span>
+                <span class="profile-stat-label">Dépensés en jetons Premium</span>
+            </article>
         </div>
 
         <p class="profile-tracking-note">Les jetons attribués avant la mise en place de ce suivi ne peuvent pas être reconstitués.</p>
     </section>
 
+    <section id="financePage" class="statistics-page hidden" aria-labelledby="financeTitle">
+        <button id="financeBackButton" class="admin-back" type="button">← Retour à l’accueil</button>
+        <h2 id="financeTitle">💶 Finance — ventes Premium</h2>
+        <p class="statistics-intro">Suivi des montants payés par joueur et par mois pour les jetons Premium.</p>
+        <p id="financeTotal" class="premium-monthly-sales-total">Total récolté : —</p>
+        <p id="financeStatus" class="statistics-status" role="status" aria-live="polite">Chargement des paiements…</p>
+        <div class="statistics-table-wrap"><table class="statistics-table premium-monthly-sales-table"><thead><tr><th>Mois</th><th>Joueur</th><th>Jetons Premium attribués</th><th>Montant payé</th></tr></thead><tbody id="financeTableBody"></tbody></table></div>
+    </section>
+
     <section id="leaderboardPage" class="leaderboard-page hidden" aria-labelledby="leaderboardTitle">
         <button id="leaderboardBackButton" class="admin-back" type="button">← Retour à l’accueil</button>
         <h2 id="leaderboardTitle">🏆 Classement des joueurs</h2>
-        <p class="leaderboard-intro">Les joueurs sont classés selon le nombre de cartes uniques obtenues. Les doublons ne comptent pas.</p>
+        <p class="leaderboard-intro">Les points sont calculés sur les cartes uniques : commune 1 point, rare 2 points et légendaire 3 points. Clique sur un pseudo pour ouvrir son profil.</p>
         <p id="leaderboardStatus" class="leaderboard-status" role="status" aria-live="polite">Chargement du classement...</p>
         <div id="leaderboardList" class="leaderboard-list"></div>
     </section>
@@ -2151,6 +2185,8 @@ body {
         <p class="admin-note">Tes cartes sont rangées par numéro. Les emplacements vides correspondent aux cartes encore à découvrir.</p>
         <label class="collection-search-label" for="collectionSearchInput">Rechercher une carte par son nom</label>
         <input id="collectionSearchInput" class="collection-search" type="search" maxlength="80" placeholder="Rechercher une carte découverte…" autocomplete="off">
+        <label class="collection-search-label" for="collectionRarityFilter">Filtrer par rareté</label>
+        <select id="collectionRarityFilter" class="collection-rarity-filter"><option value="">Toutes les raretés</option><option value="commune">Communes</option><option value="rare">Rares</option><option value="legendaire">Légendaires</option><option value="mystique">Mystiques</option></select>
         <p id="collectionSearchStatus" class="collection-search-status" role="status" aria-live="polite"></p>
         <p id="ownedCardsStatus" class="admin-status" role="status"></p>
         <div class="collection-album-sheet">
@@ -2166,8 +2202,8 @@ body {
     <section id="recyclingPage" class="player-collection hidden" aria-labelledby="recyclingTitle">
         <button id="recyclingBackButton" class="admin-back" type="button">← Retour à l’accueil</button>
         <h2 id="recyclingTitle">♻️ Recyclage</h2>
-        <p class="admin-note">Choisis exactement cinq exemplaires en double à recycler. Un exemplaire de chaque carte restera dans ta collection. En échange, tu recevras un jeton classique.</p>
-        <button id="recycleDuplicatesButton" class="primary-button" type="button" disabled>Recycler les 5 exemplaires contre 1 jeton</button>
+        <p class="admin-note">Choisis cinq doubles de la même rareté. Un exemplaire de chaque carte restera dans ta collection. Communes : 1 jeton • Rares : 2 jetons • Légendaires : 3 jetons.</p>
+        <button id="recycleDuplicatesButton" class="primary-button" type="button" disabled>Recycler 5 cartes</button>
         <p id="recyclingStatus" class="admin-status" role="status" aria-live="polite">Chargement de tes doubles…</p>
         <div class="recycle-selection-toolbar">
             <strong><span id="recyclableDuplicateCount">0</span> doubles disponibles</strong>
@@ -2262,7 +2298,7 @@ body {
                 <select id="premiumPlayerSelect" class="admin-field"></select>
                 <div class="premium-grant-fields">
                     <div><label for="premiumAdjustDirection">Action</label><select id="premiumAdjustDirection" class="admin-field"><option value="add">Attribuer</option><option value="remove">Enlever</option></select></div>
-                    <div><label for="premiumAdjustAmount">Montant payé (€)</label><input id="premiumAdjustAmount" class="admin-field" type="number" min="0.50" max="500000" step="0.50" value="1.00"><small>1 € = 2 jetons Premium</small></div>
+                    <div><label for="premiumAdjustAmount">Montant payé (€)</label><input id="premiumAdjustAmount" class="admin-field" type="number" min="0.50" max="10" step="0.50" value="1.00"><small>1 € = 2 jetons Premium • limite : 10 €/mois/joueur</small></div>
                     <button id="premiumAdjustSubmit" class="primary-button" type="button">Appliquer</button>
                 </div>
                 <p id="premiumPlayersStatus" class="premium-status" role="status" aria-live="polite"></p>
@@ -2275,6 +2311,11 @@ body {
                         <tbody id="premiumPlayersTableBody"></tbody>
                     </table>
                 </div>
+            </section>
+            <section class="premium-monthly-sales-card" aria-labelledby="premiumMonthlyTitle">
+                <h3 id="premiumMonthlyTitle">Jetons Premium attribués par mois et par joueur</h3>
+                <p id="premiumMonthlyStatus" class="admin-status" role="status" aria-live="polite"></p>
+                <div class="premium-player-table-wrap"><table class="premium-player-table premium-monthly-sales-table"><thead><tr><th>Mois</th><th>Joueur</th><th>Jetons attribués</th><th>Montant (€)</th></tr></thead><tbody id="premiumMonthlyTableBody"></tbody></table></div>
             </section>
             </div>
           </details>
@@ -2460,7 +2501,7 @@ body {
     </nav>
 
     <div id="exchangeUnlockNotice" class="nav-unlock-notice hidden" role="status" aria-live="polite">
-        Les échanges entre joueurs se débloquent au niveau 10.
+        Les échanges entre joueurs se débloquent au niveau 5.
     </div>
 
 
@@ -2606,6 +2647,10 @@ const callAdjustPlayerPremiumTokens = httpsCallable(functions, "adjustPlayerPrem
 const callInitializePremiumAssignedTokens = httpsCallable(functions, "initializePremiumAssignedTokens");
 const callGetPremiumWheelJournal = httpsCallable(functions, "getPremiumWheelJournal");
 const callGetPremiumRewardCards = httpsCallable(functions, "getPremiumRewardCards");
+const callGetPremiumMonthlySales = httpsCallable(functions, "getPremiumMonthlySales");
+const callGetMyPremiumSpending = httpsCallable(functions, "getMyPremiumSpending");
+const callGetPublicPlayerProfile = httpsCallable(functions, "getPublicPlayerProfile");
+const callUpdateMyPlayerIdentity = httpsCallable(functions, "updateMyPlayerIdentity");
 const callRecycleDuplicateCards = httpsCallable(functions, "recycleDuplicateCards");
 const callDownloadPlayerBackup = httpsCallable(functions, "downloadPlayerBackup");
 
@@ -2715,6 +2760,16 @@ const logoutButton =
 
 const profilePage = document.getElementById("profilePage");
 const profileBackButton = document.getElementById("profileBackButton");
+const profilePageTitle = document.getElementById("profilePageTitle");
+const profilePageAvatar = document.getElementById("profilePageAvatar");
+const profileIdentityEditor = document.getElementById("profileIdentityEditor");
+const profilePseudoInput = document.getElementById("profilePseudoInput");
+const profileAvatarSelect = document.getElementById("profileAvatarSelect");
+const profileIdentitySaveButton = document.getElementById("profileIdentitySaveButton");
+const profileIdentityStatus = document.getElementById("profileIdentityStatus");
+const profilePremiumSpendingCard = document.getElementById("profilePremiumSpendingCard");
+const profilePremiumSpending = document.getElementById("profilePremiumSpending");
+let viewedOtherPlayerId = null;
 const profileTokensEarned = document.getElementById("profileTokensEarned");
 const profileClassicBoostersOpened = document.getElementById("profileClassicBoostersOpened");
 const profileCardsCollected = document.getElementById("profileCardsCollected");
@@ -2734,6 +2789,12 @@ const statisticsPage = document.getElementById("statisticsPage");
 const statisticsBackButton = document.getElementById("statisticsBackButton");
 const statisticsStatus = document.getElementById("statisticsStatus");
 const statisticsTableBody = document.getElementById("statisticsTableBody");
+const financeMenuButton = document.getElementById("financeMenuButton");
+const financePage = document.getElementById("financePage");
+const financeBackButton = document.getElementById("financeBackButton");
+const financeTotal = document.getElementById("financeTotal");
+const financeStatus = document.getElementById("financeStatus");
+const financeTableBody = document.getElementById("financeTableBody");
 
 const adminButton = document.getElementById("adminButton");
 const adminMessagesMenuButton = document.getElementById("adminMessagesMenuButton");
@@ -2776,6 +2837,8 @@ const premiumAdjustDirection = document.getElementById("premiumAdjustDirection")
 const premiumAdjustAmount = document.getElementById("premiumAdjustAmount");
 const premiumAdjustSubmit = document.getElementById("premiumAdjustSubmit");
 const premiumPlayersTableBody = document.getElementById("premiumPlayersTableBody");
+const premiumMonthlyStatus = document.getElementById("premiumMonthlyStatus");
+const premiumMonthlyTableBody = document.getElementById("premiumMonthlyTableBody");
 const premiumJournalStatus = document.getElementById("premiumJournalStatus");
 const premiumJournalList = document.getElementById("premiumJournalList");
 const messagingPage = document.getElementById("messagingPage");
@@ -2843,6 +2906,7 @@ const recyclingStatus = document.getElementById("recyclingStatus");
 const recyclingCardsList = document.getElementById("recyclingCardsList");
 const recycleSelectionCount = document.getElementById("recycleSelectionCount");
 const collectionSearchInput = document.getElementById("collectionSearchInput");
+const collectionRarityFilter = document.getElementById("collectionRarityFilter");
 const collectionSearchStatus = document.getElementById("collectionSearchStatus");
 const recyclableDuplicateCount = document.getElementById("recyclableDuplicateCount");
 const recycleDuplicatesButton = document.getElementById("recycleDuplicatesButton");
@@ -2865,6 +2929,7 @@ const selectedRecycleCopyIds = new Set();
 let collectionMaxCardNumber = 0;
 let collectionAlbumPage = 0;
 let collectionSearchQuery = "";
+let collectionRarityFilterValue = "";
 let activeMessageCategory = "idee";
 let activeMessageStatus = "nouveau";
 const messageArchivesButton = document.getElementById("messageArchivesButton");
@@ -3123,6 +3188,7 @@ onAuthStateChanged(
         if (!isAdminAccount) isPlayerPreview = false;
         adminButton.classList.toggle("hidden", !isAdminAccount || isPlayerPreview);
         adminMessagesMenuButton.classList.toggle("hidden", !isAdminAccount || isPlayerPreview);
+        financeMenuButton.classList.toggle("hidden", !isAdminAccount || isPlayerPreview);
         playerPreviewToggle.classList.toggle("hidden", !isAdminAccount);
         playerPreviewToggle.textContent = isPlayerPreview ? "🛡️ Revenir au mode Admin" : "👤 Joueur normal";
         playerPreviewBanner.classList.toggle("hidden", !isPlayerPreview);
@@ -3303,6 +3369,7 @@ buyNormalBoosterButton.addEventListener("click", async () => {
 
 function showHomePage() {
     document.querySelector(".app-content").classList.remove("hidden");
+    financePage.classList.add("hidden");
     profilePage.classList.add("hidden");
     leaderboardPage.classList.add("hidden");
     statisticsPage.classList.add("hidden");
@@ -3657,11 +3724,52 @@ async function loadPremiumAdminPlayers() {
         premiumPlayersStatus.textContent = premiumAdminPlayers.length
             ? premiumAdminPlayers.length + (premiumAdminPlayers.length > 1 ? " joueurs" : " joueur")
             : "Aucun joueur inscrit.";
+        await renderMonthlyPremiumReport(premiumMonthlyTableBody, premiumMonthlyStatus);
     } catch (error) {
         console.error("Erreur de chargement des statistiques Premium :", error);
         premiumPlayersStatus.textContent = "Impossible de charger les joueurs. Vérifie que getAdminPlayers est déployée.";
     }
 }
+
+function displayFinanceMonth(month) {
+    const parts = String(month || "").split("-");
+    return parts.length === 2 ? parts[1] + "/" + parts[0] : month || "—";
+}
+
+async function renderMonthlyPremiumReport(tableBody, statusElement, totalElement = null) {
+    tableBody.replaceChildren();
+    statusElement.textContent = "Chargement des paiements…";
+    try {
+        const response = await callGetPremiumMonthlySales();
+        const rows = Array.isArray(response.data.rows) ? response.data.rows : [];
+        if (totalElement) totalElement.textContent = "Total récolté : " + ((Number(response.data.totalAmountCents) || 0) / 100).toLocaleString("fr-FR", { style: "currency", currency: "EUR" });
+        statusElement.textContent = rows.length ? "" : "Aucun jeton Premium attribué pour le moment.";
+        rows.forEach((item) => {
+            const row = document.createElement("tr");
+            [displayFinanceMonth(item.month), item.pseudo || "Joueur", Number(item.premiumTokens) || 0, ((Number(item.amountCents) || 0) / 100).toLocaleString("fr-FR", { style: "currency", currency: "EUR" })].forEach((value) => {
+                const cell = document.createElement("td");
+                cell.textContent = String(value);
+                row.append(cell);
+            });
+            tableBody.append(row);
+        });
+    } catch (error) {
+        console.error("Erreur de chargement des ventes mensuelles Premium :", error);
+        statusElement.textContent = "Impossible de charger les montants. Vérifie que getPremiumMonthlySales est déployée.";
+        if (totalElement) totalElement.textContent = "Total récolté : —";
+    }
+}
+
+financeMenuButton.addEventListener("click", async () => {
+    if (!isCurrentUserAdmin() || isPlayerPreview) return;
+    dropdownMenu.classList.add("hidden");
+    document.querySelector(".app-content").classList.add("hidden");
+    [premiumPage, profilePage, leaderboardPage, statisticsPage, collectionPage, recyclingPage, adminPage, messagingPage, rulesPage].forEach((page) => page.classList.add("hidden"));
+    bottomNav.classList.add("hidden");
+    financePage.classList.remove("hidden");
+    await renderMonthlyPremiumReport(financeTableBody, financeStatus, financeTotal);
+});
+financeBackButton.addEventListener("click", showHomePage);
 
 async function loadPremiumJournal() {
     premiumJournalList.replaceChildren();
@@ -3692,6 +3800,7 @@ async function openPremiumPage() {
     profilePage.classList.add("hidden");
     leaderboardPage.classList.add("hidden");
     statisticsPage.classList.add("hidden");
+    financePage.classList.add("hidden");
     collectionPage.classList.add("hidden");
     recyclingPage.classList.add("hidden");
     adminPage.classList.add("hidden");
@@ -3952,8 +4061,8 @@ premiumAdjustSubmit.addEventListener("click", async () => {
     const playerId = premiumPlayerSelect.value;
     const amountEuros = Number(premiumAdjustAmount.value);
     const amount = Math.round(amountEuros * 2);
-    if (!playerId || !Number.isFinite(amountEuros) || amountEuros < 0.5 || !Number.isSafeInteger(amount) || Math.abs(amountEuros * 2 - amount) > 0.0001) {
-        premiumPlayersStatus.textContent = "Choisis un joueur et indique un montant par tranche de 0,50 € minimum.";
+    if (!playerId || !Number.isFinite(amountEuros) || amountEuros < 0.5 || amountEuros > 10 || !Number.isSafeInteger(amount) || Math.abs(amountEuros * 2 - amount) > 0.0001) {
+        premiumPlayersStatus.textContent = "Choisis un joueur et indique un montant entre 0,50 € et 10 €, par tranche de 0,50 €.";
         return;
     }
     premiumAdjustSubmit.disabled = true;
@@ -3983,6 +4092,7 @@ function setPlayerPreview(enabled) {
     isPlayerPreview = enabled;
     adminButton.classList.toggle("hidden", enabled);
     adminMessagesMenuButton.classList.toggle("hidden", enabled);
+    financeMenuButton.classList.toggle("hidden", enabled);
     premiumAdminPanel.classList.toggle("hidden", enabled);
     playerPreviewBanner.classList.toggle("hidden", !enabled);
     playerPreviewToggle.textContent = enabled ? "🛡️ Revenir au mode Admin" : "👤 Joueur normal";
@@ -3996,27 +4106,69 @@ playerPreviewToggle.addEventListener("click", () => {
 });
 playerPreviewExitButton.addEventListener("click", () => setPlayerPreview(false));
 
-async function loadPersonalProfile() {
-    if (!auth.currentUser) return;
+async function loadPersonalProfile(playerId = auth.currentUser?.uid) {
+    if (!auth.currentUser || !playerId) return;
+    const isOwnProfile = playerId === auth.currentUser.uid;
     try {
-        const playerRef = doc(db, "players", auth.currentUser.uid);
-        const [snapshot, collectionSnapshot] = await Promise.all([
-            getDoc(playerRef),
-            getDocs(collection(db, "players", auth.currentUser.uid, "collection"))
-        ]);
-        if (!snapshot.exists()) throw new Error("PLAYER_PROFILE_MISSING");
-        const player = snapshot.data();
+        profileIdentityEditor.classList.toggle("hidden", !isOwnProfile);
+        profilePremiumSpendingCard.classList.toggle("hidden", !isOwnProfile);
+        document.getElementById("profileTokensEarnedCard").classList.toggle("hidden", !isOwnProfile);
+        let player;
+        let openedClassics = 0;
+        if (isOwnProfile) {
+            const playerRef = doc(db, "players", playerId);
+            const [snapshot, collectionSnapshot] = await Promise.all([
+                getDoc(playerRef),
+                getDocs(collection(db, "players", playerId, "collection"))
+            ]);
+            if (!snapshot.exists()) throw new Error("PLAYER_PROFILE_MISSING");
+            player = snapshot.data();
+            const openedTimes = new Set();
+            collectionSnapshot.docs.forEach((item) => {
+                const card = item.data();
+                const openedAt = typeof card.openedAt === "string" ? card.openedAt : card.openedAt?.toMillis?.();
+                if (openedAt) openedTimes.add((card.boosterType || "classique") + ":" + String(openedAt));
+            });
+            openedClassics = openedTimes.size;
+            profileTokensEarned.textContent = (Number(player.jetonsGagnes) || 0).toLocaleString("fr-FR");
+            profileCardsCollected.textContent = (Number(player.cartesTirees) || 0).toLocaleString("fr-FR");
+            profilePseudoInput.value = player.pseudo || "";
+            profileAvatarSelect.value = player.avatar || "femme-blonde";
+            profilePseudoInput.disabled = player.pseudoChangeUsed === true;
+            profileAvatarSelect.disabled = player.avatarChangeUsed === true;
+            profileIdentitySaveButton.disabled = player.pseudoChangeUsed === true && player.avatarChangeUsed === true;
+            profileIdentityStatus.textContent = "Pseudo : " + (player.pseudoChangeUsed ? "modification utilisée" : "1 modification possible") + " • Avatar : " + (player.avatarChangeUsed ? "modification utilisée" : "1 modification possible");
+            try {
+                const spending = (await callGetMyPremiumSpending()).data;
+                profilePremiumSpending.textContent = ((Number(spending.totalAmountCents) || 0) / 100).toLocaleString("fr-FR", { style: "currency", currency: "EUR" });
+            } catch (spendingError) {
+                console.error("Erreur de chargement des dépenses Premium personnelles :", spendingError);
+                profilePremiumSpending.textContent = "Indisponible";
+            }
+            profilePageTitle.textContent = "Mon profil";
+            document.querySelector(".profile-page-intro").textContent = "Voici tes statistiques personnelles.";
+        } else {
+            const response = await callGetPublicPlayerProfile({ playerId });
+            player = response.data;
+            profileTokensEarned.textContent = "—";
+            profileCardsCollected.textContent = Number(player.cartesUniques || 0).toLocaleString("fr-FR");
+            openedClassics = Number(player.boostersOuverts) || 0;
+            profilePageTitle.textContent = player.pseudo || "Profil joueur";
+            document.querySelector(".profile-page-intro").textContent = "Profil public du joueur.";
+        }
+        profilePageAvatar.replaceChildren();
+        const avatarPath = PLAYER_AVATARS[player.avatar];
+        if (avatarPath) {
+            const avatarImage = document.createElement("img");
+            avatarImage.src = avatarPath;
+            avatarImage.alt = "";
+            profilePageAvatar.append(avatarImage);
+        } else profilePageAvatar.textContent = "👤";
         renderProfileLevelProgress(player.xp);
-        const earnedTokens = Number(player.jetonsGagnes) || 0;
-        const classicCardInstances = collectionSnapshot.docs.filter((item) => item.data().boosterType === "classique").length;
-        const openedClassics = Math.floor(classicCardInstances / 5);
-        const cardsCollected = Number(player.cartesTirees) || 0;
-
-        profileTokensEarned.textContent = earnedTokens.toLocaleString("fr-FR");
         profileClassicBoostersOpened.textContent = openedClassics.toLocaleString("fr-FR");
-        profileCardsCollected.textContent = cardsCollected.toLocaleString("fr-FR");
     } catch (error) {
-        console.error("Erreur de chargement du profil personnel :", error);
+        console.error("Erreur de chargement du profil joueur :", error);
+        profileIdentityStatus.textContent = "Impossible de charger ce profil.";
     }
 }
 
@@ -4037,8 +4189,7 @@ function renderProfileLevelProgress(totalXp) {
     }
 
     const rewards = [
-        [5, "🎁 Booster classique offert"],
-        [10, "🤝 Échanges entre joueurs"],
+        [5, "🎁 Booster classique offert • 🤝 Échanges débloqués"],
         [15, "🎁 Booster classique offert"]
     ];
     profileLevelRoadmap.replaceChildren();
@@ -4074,6 +4225,7 @@ function totalXpRequiredForLevel(targetLevel) {
 }
 
 playerProfileHomeButton.addEventListener("click", async () => {
+    viewedOtherPlayerId = null;
     dropdownMenu.classList.add("hidden");
     premiumPage.classList.add("hidden");
     document.querySelector(".app-content").classList.add("hidden");
@@ -4089,7 +4241,49 @@ playerProfileHomeButton.addEventListener("click", async () => {
     await loadPersonalProfile();
 });
 
-profileBackButton.addEventListener("click", showHomePage);
+profileBackButton.addEventListener("click", () => {
+    if (viewedOtherPlayerId) {
+        viewedOtherPlayerId = null;
+        profilePage.classList.add("hidden");
+        leaderboardPage.classList.remove("hidden");
+        loadLeaderboard();
+        return;
+    }
+    showHomePage();
+});
+
+profileIdentitySaveButton.addEventListener("click", async () => {
+    if (!auth.currentUser || viewedOtherPlayerId) return;
+    profileIdentitySaveButton.disabled = true;
+    profileIdentityStatus.textContent = "Enregistrement…";
+    try {
+        const payload = {};
+        if (!profilePseudoInput.disabled) payload.pseudo = profilePseudoInput.value.trim();
+        if (!profileAvatarSelect.disabled) payload.avatar = profileAvatarSelect.value;
+        const response = (await callUpdateMyPlayerIdentity(payload)).data;
+        document.getElementById("playerPseudo").textContent = response.pseudo;
+        playerProfileHomeButton.setAttribute("aria-label", "Ouvrir le profil de " + response.pseudo);
+        renderPlayerAvatar(response.avatar);
+        profilePageTitle.textContent = response.pseudo;
+        profilePageAvatar.replaceChildren();
+        const image = document.createElement("img");
+        image.src = PLAYER_AVATARS[response.avatar];
+        image.alt = "";
+        profilePageAvatar.append(image);
+        profilePseudoInput.value = response.pseudo;
+        profileAvatarSelect.value = response.avatar;
+        const playerSnapshot = await getDoc(doc(db, "players", auth.currentUser.uid));
+        const player = playerSnapshot.data() || {};
+        profilePseudoInput.disabled = player.pseudoChangeUsed === true;
+        profileAvatarSelect.disabled = player.avatarChangeUsed === true;
+        profileIdentitySaveButton.disabled = player.pseudoChangeUsed === true && player.avatarChangeUsed === true;
+        profileIdentityStatus.textContent = "Modifications enregistrées.";
+    } catch (error) {
+        console.error("Erreur de modification du profil :", error);
+        profileIdentityStatus.textContent = error.message || "Impossible d’enregistrer ces modifications.";
+        profileIdentitySaveButton.disabled = false;
+    }
+});
 
 async function loadLeaderboard() {
     leaderboardList.replaceChildren();
@@ -4103,7 +4297,7 @@ async function loadLeaderboard() {
         const response = await callGetLeaderboard();
         const players = response.data.classement || [];
         leaderboardStatus.textContent = players.length
-            ? players.length + (players.length > 1 ? " joueurs classés • classement par cartes uniques" : " joueur classé • classement par cartes uniques")
+            ? players.length + (players.length > 1 ? " joueurs classés • points : commune 1, rare 2, légendaire 3" : " joueur classé • points : commune 1, rare 2, légendaire 3")
             : "Aucun joueur inscrit pour le moment.";
 
         players.forEach((player) => {
@@ -4114,25 +4308,34 @@ async function loadLeaderboard() {
             rank.textContent = "#" + player.rang;
             const playerInfo = document.createElement("div");
             playerInfo.className = "leaderboard-player";
-            const name = document.createElement("strong");
-            name.className = "leaderboard-name";
+            const name = document.createElement("button");
+            name.type = "button";
+            name.className = "leaderboard-name leaderboard-profile-link";
             name.textContent = player.pseudo || "Joueur";
+            name.addEventListener("click", async () => {
+                viewedOtherPlayerId = player.id;
+                profilePage.classList.remove("hidden");
+                leaderboardPage.classList.add("hidden");
+                document.querySelector(".app-content").classList.add("hidden");
+                bottomNav.classList.add("hidden");
+                await loadPersonalProfile(player.id);
+            });
             const total = document.createElement("span");
             total.className = "leaderboard-total";
-            total.textContent = player.cartesUniques + (player.cartesUniques > 1 ? " cartes uniques" : " carte unique");
+            total.textContent = player.points + " points • " + player.cartesUniques + (player.cartesUniques > 1 ? " cartes uniques" : " carte unique");
             playerInfo.append(name, total);
 
             const rarityGrid = document.createElement("div");
             rarityGrid.className = "leaderboard-rarity-grid";
             [
-                ["Communes", player.communes, "leaderboard-common"],
-                ["Rares", player.rares, "leaderboard-rare"],
-                ["Légendaires", player.legendaires, "leaderboard-legendary"],
-                ["Mystiques", player.mystiques, "leaderboard-mystic"],
-            ].forEach(([label, count, className]) => {
+                ["Communes", player.communes, player.communesTotal, "leaderboard-common"],
+                ["Rares", player.rares, player.raresTotal, "leaderboard-rare"],
+                ["Légendaires", player.legendaires, player.legendairesTotal, "leaderboard-legendary"],
+                ["Mystiques", player.mystiques, player.mystiquesTotal, "leaderboard-mystic"],
+            ].forEach(([label, count, totalCount, className]) => {
                 const chip = document.createElement("span");
                 chip.className = "leaderboard-rarity " + className;
-                chip.textContent = label + " : " + count;
+                chip.textContent = label + " : " + count + "/" + totalCount;
                 rarityGrid.append(chip);
             });
             row.append(rank, playerInfo, rarityGrid);
@@ -4277,8 +4480,13 @@ async function loadOwnedPlayerCards() {
 
 function renderCollectionAlbum() {
     const normalizedQuery = collectionSearchQuery.trim().toLocaleLowerCase("fr");
-    const matchingCards = normalizedQuery
-        ? ownedAlbumCards.filter((card) => String(card.name || "").toLocaleLowerCase("fr").includes(normalizedQuery))
+    const selectedRarity = collectionRarityFilterValue.trim().toLocaleLowerCase("fr").normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/s$/, "");
+    const matchingCards = normalizedQuery || selectedRarity
+        ? ownedAlbumCards.filter((card) => {
+            const nameMatches = !normalizedQuery || String(card.name || "").toLocaleLowerCase("fr").includes(normalizedQuery);
+            const rarity = String(card.rarity || "").toLocaleLowerCase("fr").normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/s$/, "");
+            return nameMatches && (!selectedRarity || rarity === selectedRarity);
+        })
         : null;
     const totalItems = matchingCards ? matchingCards.length : collectionMaxCardNumber;
     const totalPages = Math.max(1, Math.ceil(totalItems / 9));
@@ -4293,9 +4501,10 @@ function renderCollectionAlbum() {
 
     ownedPlayerCardGrid.replaceChildren();
     if (matchingCards) {
+        const filterCaption = selectedRarity ? " de rareté " + collectionRarityFilter.options[collectionRarityFilter.selectedIndex].text.toLocaleLowerCase("fr") : "";
         collectionSearchStatus.textContent = matchingCards.length
-            ? matchingCards.length + (matchingCards.length > 1 ? " carte(s) découverte(s) trouvée(s)." : " carte découverte trouvée.")
-            : "Aucune carte découverte ne correspond à cette recherche.";
+            ? matchingCards.length + (matchingCards.length > 1 ? " carte(s) découverte(s) trouvée(s)" : " carte découverte trouvée") + filterCaption + "."
+            : "Aucune carte découverte ne correspond à ces filtres.";
         for (let index = collectionAlbumPage * 9; index < collectionAlbumPage * 9 + 9; index += 1) {
             const card = matchingCards[index];
             ownedPlayerCardGrid.append(card ? createAlbumCardElement(card) : createEmptyAlbumSlot());
@@ -4413,6 +4622,15 @@ function renderRecyclingCopies() {
                 recycleDuplicatesStatus.textContent = "Tu peux sélectionner exactement cinq exemplaires.";
                 return;
             }
+            if (checkbox.checked && selectedRecycleCopyIds.size) {
+                const existing = recyclableCardCopies.find((item) => selectedRecycleCopyIds.has(item.id));
+                const normalize = (value) => String(value || "").toLocaleLowerCase("fr").normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/s$/, "");
+                if (normalize(existing?.rarity) !== normalize(copy.rarity)) {
+                    checkbox.checked = false;
+                    recycleDuplicatesStatus.textContent = "Les cinq cartes recyclées doivent être de la même rareté.";
+                    return;
+                }
+            }
             if (checkbox.checked) selectedRecycleCopyIds.add(copy.id);
             else selectedRecycleCopyIds.delete(copy.id);
             updateRecycleSelectionStatus();
@@ -4453,6 +4671,12 @@ function updateRecycleSelectionStatus() {
     const selectedCount = selectedRecycleCopyIds.size;
     recycleSelectionCount.textContent = selectedCount + " / 5 sélectionnés";
     recycleDuplicatesButton.disabled = selectedCount !== 5;
+    const selected = recyclableCardCopies.find((copy) => selectedRecycleCopyIds.has(copy.id));
+    const rarity = String(selected?.rarity || "").toLocaleLowerCase("fr").normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/s$/, "");
+    const reward = { commune: 1, rare: 2, legendaire: 3 }[rarity] || 0;
+    recycleDuplicatesButton.textContent = selectedCount === 5 && reward
+        ? "Recycler les 5 cartes contre " + reward + " jeton" + (reward > 1 ? "s" : "")
+        : "Recycler 5 cartes";
     if (selectedCount < 5 && !recycleDuplicatesStatus.textContent.includes("en cours")) {
         recycleDuplicatesStatus.textContent = selectedCount + " exemplaire(s) sélectionné(s). Choisis-en " + (5 - selectedCount) + " de plus.";
     }
@@ -4753,6 +4977,11 @@ collectionSearchInput.addEventListener("input", () => {
     collectionAlbumPage = 0;
     renderCollectionAlbum();
 });
+collectionRarityFilter.addEventListener("change", () => {
+    collectionRarityFilterValue = collectionRarityFilter.value;
+    collectionAlbumPage = 0;
+    renderCollectionAlbum();
+});
 collectionPreviousPageButton.addEventListener("click", () => {
     collectionAlbumPage -= 1;
     renderCollectionAlbum();
@@ -4774,7 +5003,8 @@ recycleDuplicatesButton.addEventListener("click", async () => {
         document.getElementById("playerTokens").textContent = Number(response.data.tokens).toLocaleString("fr-FR");
         selectedRecycleCopyIds.clear();
         await loadOwnedPlayerCards();
-        recycleDuplicatesStatus.textContent = "Tes cinq doubles ont été recyclés. Un jeton classique a été ajouté à ton compte.";
+        const reward = Number(response.data.tokensAdded) || 0;
+        recycleDuplicatesStatus.textContent = "Tes cinq doubles ont été recyclés. " + reward + " jeton" + (reward > 1 ? "s" : "") + " classique" + (reward > 1 ? "s" : "") + " ajouté" + (reward > 1 ? "s" : "") + " à ton compte.";
     } catch (error) {
         console.error("Erreur pendant le recyclage des doubles :", error);
         recycleDuplicatesStatus.textContent = error.message || "Le recyclage a échoué. Recharge ta collection puis réessaie.";
@@ -5519,6 +5749,32 @@ messageArchivesButton.addEventListener("click", () => {
     loadAdminMessages(activeMessageCategory, activeMessageStatus === "traite" ? "nouveau" : "traite");
 });
 
+function buildUniqueCardsWorkbookXml(players) {
+    const escapeXml = (value) => String(value ?? "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&apos;");
+    const usedNames = new Set();
+    const worksheetName = (rawName, index) => {
+        let base = String(rawName || "Joueur " + (index + 1)).replace(/[\\/?*:[\]]/g, " ").trim().slice(0, 26) || "Joueur";
+        let candidate = base;
+        let suffix = 2;
+        while (usedNames.has(candidate.toLocaleLowerCase("fr"))) {
+            candidate = (base.slice(0, 31 - String(suffix).length - 3) + " (" + suffix + ")").slice(0, 31);
+            suffix += 1;
+        }
+        usedNames.add(candidate.toLocaleLowerCase("fr"));
+        return candidate;
+    };
+    const cell = (value, numeric = false) => "<Cell><Data ss:Type=\"" + (numeric && value !== "" && value !== null && value !== undefined && Number.isFinite(Number(value)) ? "Number" : "String") + "\">" + escapeXml(value) + "</Data></Cell>";
+    const sheets = (Array.isArray(players) ? players : []).map((player, index) => {
+        const headers = ["Numéro", "Nom de la carte", "Catégorie", "Rareté", "Identifiant carte"];
+        const headerRow = "<Row>" + headers.map((value) => cell(value)).join("") + "</Row>";
+        const cardRows = (Array.isArray(player.cards) ? player.cards : []).map((card) => "<Row>" + [
+            cell(card.cardNumber, true), cell(card.name), cell(card.category), cell(card.rarity), cell(card.cardId)
+        ].join("") + "</Row>").join("");
+        return "<Worksheet ss:Name=\"" + escapeXml(worksheetName(player.pseudo, index)) + "\"><Table>" + headerRow + cardRows + "</Table></Worksheet>";
+    }).join("");
+    return '<?xml version="1.0" encoding="UTF-8"?><?mso-application progid="Excel.Sheet"?><Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet" xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet" xmlns:html="http://www.w3.org/TR/REC-html40">' + sheets + "</Workbook>";
+}
+
 downloadPlayersBackupButton.addEventListener("click", async () => {
     if (!isCurrentUserAdmin() || isPlayerPreview) return;
     downloadPlayersBackupButton.disabled = true;
@@ -5527,12 +5783,13 @@ downloadPlayersBackupButton.addEventListener("click", async () => {
         const response = await callDownloadPlayerBackup();
         const backup = response.data;
         const stamp = new Date().toISOString().slice(0, 10);
-        [
-            { name: "joueurs-" + stamp + ".csv", content: backup.playersCsv },
-            { name: "collections-joueurs-" + stamp + ".csv", content: backup.collectionCsv },
-            { name: "comptes-authentication-" + stamp + ".csv", content: backup.authUsersCsv }
-        ].forEach((file, index) => {
-            const blob = new Blob([file.content], { type: "text/csv;charset=utf-8" });
+        const files = [
+            { name: "joueurs-" + stamp + ".csv", content: backup.playersCsv, type: "text/csv;charset=utf-8" },
+            { name: "cartes-uniques-par-joueur-" + stamp + ".xml", content: buildUniqueCardsWorkbookXml(backup.uniqueCardsByPlayer), type: "application/vnd.ms-excel;charset=utf-8" },
+            { name: "comptes-authentication-" + stamp + ".csv", content: backup.authUsersCsv, type: "text/csv;charset=utf-8" }
+        ];
+        files.forEach((file, index) => {
+            const blob = new Blob(["\uFEFF", file.content], { type: file.type });
             const url = URL.createObjectURL(blob);
             const link = document.createElement("a");
             link.href = url;
@@ -5540,7 +5797,7 @@ downloadPlayersBackupButton.addEventListener("click", async () => {
             document.body.append(link);
             setTimeout(() => { link.click(); link.remove(); URL.revokeObjectURL(url); }, index * 500);
         });
-        playersBackupStatus.textContent = "Sauvegarde prête : " + backup.playerCount + " profil(s), " + backup.authUserCount + " compte(s) et " + backup.collectionCount + " carte(s). Trois fichiers CSV ont été téléchargés.";
+        playersBackupStatus.textContent = "Sauvegarde prête : " + backup.playerCount + " profil(s), " + backup.authUserCount + " compte(s) et " + backup.uniqueCardCount + " cartes uniques. Les profils et comptes sont en CSV ; les cartes uniques sont dans un classeur Excel compatible avec un onglet par joueur.";
     } catch (error) {
         console.error("Erreur lors de la création de la sauvegarde des joueurs :", error);
         playersBackupStatus.textContent = error.message || "Impossible de créer la sauvegarde. Vérifie que downloadPlayerBackup est déployée.";
