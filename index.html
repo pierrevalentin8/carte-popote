@@ -2929,6 +2929,7 @@ const profileAvatarSelect = document.getElementById("profileAvatarSelect");
 const profileAvatarChoices = Array.from(document.querySelectorAll("[data-profile-avatar]"));
 const profileIdentitySaveButton = document.getElementById("profileIdentitySaveButton");
 const profileIdentityStatus = document.getElementById("profileIdentityStatus");
+let loadedProfileIdentity = { pseudo: "", avatar: "" };
 const profilePremiumSpendingCard = document.getElementById("profilePremiumSpendingCard");
 const profilePremiumSpending = document.getElementById("profilePremiumSpending");
 let viewedOtherPlayerId = null;
@@ -4427,6 +4428,10 @@ async function loadPersonalProfile(playerId = auth.currentUser?.uid) {
             ]);
             if (!snapshot.exists()) throw new Error("PLAYER_PROFILE_MISSING");
             player = snapshot.data();
+            loadedProfileIdentity = {
+                pseudo: player.pseudo || "",
+                avatar: player.avatar || "femme-blonde"
+            };
             const openedTimes = new Set();
             collectionSnapshot.docs.forEach((item) => {
                 const card = item.data();
@@ -4563,12 +4568,18 @@ profileBackButton.addEventListener("click", () => {
 
 profileIdentitySaveButton.addEventListener("click", async () => {
     if (!auth.currentUser || viewedOtherPlayerId) return;
+    const payload = {};
+    const nextPseudo = profilePseudoInput.value.trim();
+    const nextAvatar = profileAvatarSelect.value;
+    if (!profilePseudoInput.disabled && nextPseudo !== loadedProfileIdentity.pseudo) payload.pseudo = nextPseudo;
+    if (!profileAvatarSelect.disabled && nextAvatar !== loadedProfileIdentity.avatar) payload.avatar = nextAvatar;
+    if (!Object.keys(payload).length) {
+        profileIdentityStatus.textContent = "Choisis un pseudo ou un avatar différent avant d’enregistrer.";
+        return;
+    }
     profileIdentitySaveButton.disabled = true;
     profileIdentityStatus.textContent = "Enregistrement…";
     try {
-        const payload = {};
-        if (!profilePseudoInput.disabled) payload.pseudo = profilePseudoInput.value.trim();
-        if (!profileAvatarSelect.disabled) payload.avatar = profileAvatarSelect.value;
         const response = (await callUpdateMyPlayerIdentity(payload)).data;
         document.getElementById("playerPseudo").textContent = response.pseudo;
         playerProfileHomeButton.setAttribute("aria-label", "Ouvrir le profil de " + response.pseudo);
@@ -4581,6 +4592,7 @@ profileIdentitySaveButton.addEventListener("click", async () => {
         profilePageAvatar.append(image);
         profilePseudoInput.value = response.pseudo;
         profileAvatarSelect.value = response.avatar;
+        loadedProfileIdentity = { pseudo: response.pseudo, avatar: response.avatar };
         const playerSnapshot = await getDoc(doc(db, "players", auth.currentUser.uid));
         const player = playerSnapshot.data() || {};
         profilePseudoInput.disabled = player.pseudoChangeUsed === true;
