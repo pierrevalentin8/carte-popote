@@ -4592,6 +4592,9 @@ async function loadPersonalProfile(playerId = auth.currentUser?.uid) {
                 const totalAmountCents = Number(spendingResponse.data.totalAmountCents) || 0;
                 player.hasPremiumBadge = spendingResponse.data.hasPremiumBadge === true;
             player.badgeEquipped = player.badgeEquipped || "";
+                const badgeResponse = await callGetPublicPlayerProfile({ playerId });
+                player.unlockedBadgeIds = badgeResponse.data.unlockedBadgeIds || [];
+                player.badgeEquipped = badgeResponse.data.badgeEquipped || "";
                 profilePremiumSpending.textContent = (totalAmountCents / 100).toLocaleString("fr-FR", { style: "currency", currency: "EUR" });
             } catch (spendingError) {
                 console.error("Erreur de chargement des dépenses Premium personnelles :", spendingError);
@@ -4609,8 +4612,19 @@ async function loadPersonalProfile(playerId = auth.currentUser?.uid) {
             document.querySelector(".profile-page-intro").textContent = "Profil public du joueur.";
         }
         profilePageAvatar.replaceChildren();
-        const equippedBadge = player.badgeEquipped === "premium-10" && player.hasPremiumBadge === true;
-        document.getElementById("profilePremiumBadge").classList.toggle("hidden", !equippedBadge);
+        const badgeDetails = {
+            "premium-10": { image: "./badge-premium-10.png", label: "Badge Premium 10 €" },
+            "common-season-1": { image: "./badge-communes-27.png", label: "Badge : 27 cartes communes" }
+        }[player.badgeEquipped];
+        const equippedBadgeElement = document.getElementById("profilePremiumBadge");
+        equippedBadgeElement.classList.toggle("hidden", !badgeDetails);
+        if (badgeDetails) {
+            const badgeImage = equippedBadgeElement.querySelector("img");
+            badgeImage.src = badgeDetails.image;
+            badgeImage.alt = badgeDetails.label;
+            equippedBadgeElement.title = badgeDetails.label;
+            equippedBadgeElement.setAttribute("aria-label", badgeDetails.label);
+        }
         renderProfileBadges(player, isOwnProfile);
         const avatarPath = PLAYER_AVATARS[player.avatar];
         if (avatarPath) {
@@ -4629,7 +4643,12 @@ async function loadPersonalProfile(playerId = auth.currentUser?.uid) {
 
 function renderProfileBadges(player, isOwnProfile) {
     profileBadgeList.replaceChildren();
-    const unlockedBadges = player.hasPremiumBadge === true ? [{ id: "premium-10", label: "Premium 10 €", image: "./badge-premium-10.png" }] : [];
+    const badgeCatalog = {
+        "premium-10": { id: "premium-10", label: "Premium 10 €", image: "./badge-premium-10.png" },
+        "common-season-1": { id: "common-season-1", label: "27 cartes communes • Saison 1", image: "./badge-communes-27.png" }
+    };
+    const unlockedBadges = (player.unlockedBadgeIds || (player.hasPremiumBadge === true ? ["premium-10"] : []))
+        .map((badgeId) => badgeCatalog[badgeId]).filter(Boolean);
     profileBadgesEmpty.classList.toggle("hidden", unlockedBadges.length > 0);
     profileBadgesEmpty.textContent = isOwnProfile
         ? "Aucun badge débloqué pour le moment."
@@ -4657,9 +4676,18 @@ function renderProfileBadges(player, isOwnProfile) {
                     const playerSnapshot = await getDoc(doc(db, "players", auth.currentUser.uid));
                     const updatedPlayer = playerSnapshot.data() || {};
                     updatedPlayer.hasPremiumBadge = player.hasPremiumBadge === true;
+                    updatedPlayer.unlockedBadgeIds = player.unlockedBadgeIds || [];
                     updatedPlayer.badgeEquipped = updatedPlayer.badgeEquipped || "";
                     renderProfileBadges(updatedPlayer, true);
-                    document.getElementById("profilePremiumBadge").classList.toggle("hidden", updatedPlayer.badgeEquipped !== badge.id);
+                    const equippedBadgeElement = document.getElementById("profilePremiumBadge");
+                    equippedBadgeElement.classList.toggle("hidden", updatedPlayer.badgeEquipped !== badge.id);
+                    if (updatedPlayer.badgeEquipped === badge.id) {
+                        const badgeImage = equippedBadgeElement.querySelector("img");
+                        badgeImage.src = badge.image;
+                        badgeImage.alt = badge.label;
+                        equippedBadgeElement.title = badge.label;
+                        equippedBadgeElement.setAttribute("aria-label", badge.label);
+                    }
                     profileIdentityStatus.textContent = updatedPlayer.badgeEquipped === badge.id ? "Badge affiché sur ton profil et dans le classement." : "Badge retiré.";
                 } catch (error) {
                     console.error("Erreur de sélection du badge :", error);
@@ -4865,12 +4893,13 @@ async function loadLeaderboard() {
             level.className = "leaderboard-level";
             level.textContent = "Niveau " + (Number(player.niveau) || 1);
             nameLine.append(name);
-            if (player.badgeEquipped === "premium-10") {
+            if (["premium-10", "common-season-1"].includes(player.badgeEquipped)) {
                 const badge = document.createElement("img");
                 badge.className = "leaderboard-badge";
-                badge.src = "./badge-premium-10.png";
-                badge.alt = "Badge Premium 10 €";
-                badge.title = "Badge Premium 10 €";
+                const badgeImage = player.badgeEquipped === "common-season-1" ? "./badge-communes-27.png" : "./badge-premium-10.png";
+                badge.src = badgeImage;
+                badge.alt = player.badgeEquipped === "common-season-1" ? "Badge 27 cartes communes" : "Badge Premium 10 €";
+                badge.title = badge.alt;
                 nameLine.append(badge);
             }
             nameLine.append(level);
