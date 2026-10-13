@@ -1357,6 +1357,16 @@ body {
 .profile-identity-heading h2 { margin: 0; }
 .profile-premium-badge { display: inline-flex; width: 42px; height: 42px; flex: 0 0 42px; align-items: center; justify-content: center; }
 .profile-premium-badge img { display: block; width: 100%; height: 100%; object-fit: contain; }
+.profile-edit-toggle { margin-top: 12px; }
+.profile-badges { margin-top: 18px; padding: 14px; border: 1px solid rgba(243,191,56,.42); border-radius: 14px; background: rgba(251,250,245,.07); color: var(--theme-cream); }
+.profile-badges h3 { margin: 0 0 10px; color: var(--theme-gold-light); font-size: 16px; }
+.profile-badges-empty { margin: 0; color: #c6d2e5; font-size: 13px; }
+.profile-badge-list { display: flex; flex-wrap: wrap; gap: 10px; }
+.profile-badge-option { display: flex; align-items: center; gap: 9px; padding: 8px 11px; border: 1px solid rgba(243,191,56,.45); border-radius: 12px; background: rgba(16,38,74,.7); color: var(--theme-cream); }
+.profile-badge-option.is-equipped { border-color: var(--theme-gold-light); box-shadow: 0 0 0 2px rgba(243,191,56,.2); }
+.profile-badge-option img { width: 40px; height: 40px; object-fit: contain; }
+.profile-badge-option button { padding: 7px 10px; border: 1px solid rgba(243,191,56,.65); border-radius: 8px; background: var(--theme-cream); color: var(--theme-ink); font: inherit; font-size: 11px; font-weight: 800; cursor: pointer; }
+.leaderboard-badge { width: 25px; height: 25px; object-fit: contain; align-self: center; }
 .site-updates-overlay { position: fixed; inset: 0; z-index: 700; display: grid; place-items: center; padding: 16px; background: rgba(3,11,25,.78); }
 .site-updates-card { width: min(100%, 520px); max-height: min(82dvh, 680px); overflow: auto; padding: 24px; border: 2px solid var(--theme-gold, #e5b530); border-radius: 22px; background: var(--theme-cream, #fffdf7); color: var(--theme-ink, #10264a); box-shadow: 0 22px 65px rgba(0,0,0,.45); }
 .site-updates-card h2 { margin: 0 0 8px; color: var(--theme-ink, #10264a); }
@@ -2178,8 +2188,9 @@ body {
 
     <section id="profilePage" class="player-profile hidden" aria-labelledby="profilePageTitle">
         <button id="profileBackButton" class="admin-back" type="button">← Retour à l’accueil</button>
-        <div class="profile-identity-heading"><span id="profilePageAvatar" class="profile-page-avatar" aria-hidden="true">👤</span><h2 id="profilePageTitle">Mon profil</h2><span id="profilePremiumBadge" class="profile-premium-badge hidden" title="Au moins 10 € dépensés en Premium" aria-label="Badge Premium : au moins 10 euros dépensés"><img src="./badge-premium-10.png" alt="Badge Premium 10 €"></span></div>
+        <div class="profile-identity-heading"><span id="profilePageAvatar" class="profile-page-avatar" aria-hidden="true">👤</span><h2 id="profilePageTitle">Mon profil</h2><span id="profilePremiumBadge" class="profile-premium-badge hidden" title="Badge Premium 10 € équipé" aria-label="Badge Premium 10 euros équipé"><img src="./badge-premium-10.png" alt="Badge Premium 10 €"></span></div>
         <p class="profile-page-intro">Voici tes statistiques personnelles.</p>
+        <button id="profileEditToggleButton" class="secondary-button profile-edit-toggle hidden" type="button" aria-expanded="false" aria-controls="profileIdentityEditor">Modifier</button>
         <section id="profileIdentityEditor" class="profile-identity-editor hidden" aria-label="Modifier mon pseudo et mon avatar">
             <label for="profilePseudoInput">Modifier mon pseudo (une seule fois)<input id="profilePseudoInput" class="admin-field" type="text" minlength="3" maxlength="24" autocomplete="nickname"></label>
             <div class="profile-avatar-field">
@@ -2198,6 +2209,11 @@ body {
             </div>
             <button id="profileIdentitySaveButton" class="primary-button" type="button">Enregistrer mes modifications</button>
             <p id="profileIdentityStatus" class="admin-status" role="status" aria-live="polite"></p>
+        </section>
+        <section id="profileBadgesSection" class="profile-badges" aria-labelledby="profileBadgesTitle">
+            <h3 id="profileBadgesTitle">Badges débloqués</h3>
+            <p id="profileBadgesEmpty" class="profile-badges-empty">Aucun badge débloqué pour le moment.</p>
+            <div id="profileBadgeList" class="profile-badge-list"></div>
         </section>
         <section class="profile-level-card" aria-labelledby="profileLevelTitle">
             <div class="profile-level-heading">
@@ -2986,12 +3002,15 @@ const profilePage = document.getElementById("profilePage");
 const profileBackButton = document.getElementById("profileBackButton");
 const profilePageTitle = document.getElementById("profilePageTitle");
 const profilePageAvatar = document.getElementById("profilePageAvatar");
+const profileEditToggleButton = document.getElementById("profileEditToggleButton");
 const profileIdentityEditor = document.getElementById("profileIdentityEditor");
 const profilePseudoInput = document.getElementById("profilePseudoInput");
 const profileAvatarSelect = document.getElementById("profileAvatarSelect");
 const profileAvatarChoices = Array.from(document.querySelectorAll("[data-profile-avatar]"));
 const profileIdentitySaveButton = document.getElementById("profileIdentitySaveButton");
 const profileIdentityStatus = document.getElementById("profileIdentityStatus");
+const profileBadgeList = document.getElementById("profileBadgeList");
+const profileBadgesEmpty = document.getElementById("profileBadgesEmpty");
 let loadedProfileIdentity = { pseudo: "", avatar: "" };
 const profilePremiumSpendingCard = document.getElementById("profilePremiumSpendingCard");
 const profilePremiumSpending = document.getElementById("profilePremiumSpending");
@@ -4532,7 +4551,10 @@ async function loadPersonalProfile(playerId = auth.currentUser?.uid) {
     if (!auth.currentUser || !playerId) return;
     const isOwnProfile = playerId === auth.currentUser.uid;
     try {
-        profileIdentityEditor.classList.toggle("hidden", !isOwnProfile);
+        profileIdentityEditor.classList.add("hidden");
+        profileEditToggleButton.classList.toggle("hidden", !isOwnProfile);
+        profileEditToggleButton.setAttribute("aria-expanded", "false");
+        profileEditToggleButton.textContent = "Modifier";
         profilePremiumSpendingCard.classList.toggle("hidden", !isOwnProfile);
         document.getElementById("profileTokensEarnedCard").classList.toggle("hidden", !isOwnProfile);
         let player;
@@ -4569,6 +4591,7 @@ async function loadPersonalProfile(playerId = auth.currentUser?.uid) {
                 const spendingResponse = await callGetMyPremiumSpending();
                 const totalAmountCents = Number(spendingResponse.data.totalAmountCents) || 0;
                 player.hasPremiumBadge = spendingResponse.data.hasPremiumBadge === true;
+            player.badgeEquipped = player.badgeEquipped || "";
                 profilePremiumSpending.textContent = (totalAmountCents / 100).toLocaleString("fr-FR", { style: "currency", currency: "EUR" });
             } catch (spendingError) {
                 console.error("Erreur de chargement des dépenses Premium personnelles :", spendingError);
@@ -4586,7 +4609,9 @@ async function loadPersonalProfile(playerId = auth.currentUser?.uid) {
             document.querySelector(".profile-page-intro").textContent = "Profil public du joueur.";
         }
         profilePageAvatar.replaceChildren();
-        document.getElementById("profilePremiumBadge").classList.toggle("hidden", player.hasPremiumBadge !== true);
+        const equippedBadge = player.badgeEquipped === "premium-10" && player.hasPremiumBadge === true;
+        document.getElementById("profilePremiumBadge").classList.toggle("hidden", !equippedBadge);
+        renderProfileBadges(player, isOwnProfile);
         const avatarPath = PLAYER_AVATARS[player.avatar];
         if (avatarPath) {
             const avatarImage = document.createElement("img");
@@ -4600,6 +4625,56 @@ async function loadPersonalProfile(playerId = auth.currentUser?.uid) {
         console.error("Erreur de chargement du profil joueur :", error);
         profileIdentityStatus.textContent = "Impossible de charger ce profil.";
     }
+}
+
+function renderProfileBadges(player, isOwnProfile) {
+    profileBadgeList.replaceChildren();
+    const unlockedBadges = player.hasPremiumBadge === true ? [{ id: "premium-10", label: "Premium 10 €", image: "./badge-premium-10.png" }] : [];
+    profileBadgesEmpty.classList.toggle("hidden", unlockedBadges.length > 0);
+    profileBadgesEmpty.textContent = isOwnProfile
+        ? "Aucun badge débloqué pour le moment."
+        : "Ce joueur n’a pas encore débloqué de badge.";
+    unlockedBadges.forEach((badge) => {
+        const option = document.createElement("div");
+        const isEquipped = player.badgeEquipped === badge.id;
+        option.className = "profile-badge-option" + (isEquipped ? " is-equipped" : "");
+        const image = document.createElement("img");
+        image.src = badge.image;
+        image.alt = badge.label;
+        const label = document.createElement("strong");
+        label.textContent = badge.label;
+        option.append(image, label);
+        if (isOwnProfile) {
+            const button = document.createElement("button");
+            button.type = "button";
+            button.textContent = isEquipped ? "Retirer" : "Afficher";
+            button.setAttribute("aria-pressed", String(isEquipped));
+            button.addEventListener("click", async () => {
+                button.disabled = true;
+                profileIdentityStatus.textContent = "Mise à jour du badge…";
+                try {
+                    await callUpdateMyPlayerIdentity({ badgeEquipped: isEquipped ? "" : badge.id });
+                    const playerSnapshot = await getDoc(doc(db, "players", auth.currentUser.uid));
+                    const updatedPlayer = playerSnapshot.data() || {};
+                    updatedPlayer.hasPremiumBadge = player.hasPremiumBadge === true;
+                    updatedPlayer.badgeEquipped = updatedPlayer.badgeEquipped || "";
+                    renderProfileBadges(updatedPlayer, true);
+                    document.getElementById("profilePremiumBadge").classList.toggle("hidden", updatedPlayer.badgeEquipped !== badge.id);
+                    profileIdentityStatus.textContent = updatedPlayer.badgeEquipped === badge.id ? "Badge affiché sur ton profil et dans le classement." : "Badge retiré.";
+                } catch (error) {
+                    console.error("Erreur de sélection du badge :", error);
+                    profileIdentityStatus.textContent = error.message || "Impossible de modifier le badge affiché.";
+                    button.disabled = false;
+                }
+            });
+            option.append(button);
+        } else if (isEquipped) {
+            const equipped = document.createElement("span");
+            equipped.textContent = "Badge affiché";
+            option.append(equipped);
+        }
+        profileBadgeList.append(option);
+    });
 }
 
 function renderProfileLevelProgress(totalXp) {
@@ -4680,6 +4755,13 @@ profileBackButton.addEventListener("click", () => {
         return;
     }
     showHomePage();
+});
+
+profileEditToggleButton.addEventListener("click", () => {
+    const opening = profileIdentityEditor.classList.contains("hidden");
+    profileIdentityEditor.classList.toggle("hidden", !opening);
+    profileEditToggleButton.setAttribute("aria-expanded", String(opening));
+    profileEditToggleButton.textContent = opening ? "Fermer" : "Modifier";
 });
 
 profileIdentitySaveButton.addEventListener("click", async () => {
@@ -4782,7 +4864,16 @@ async function loadLeaderboard() {
             const level = document.createElement("span");
             level.className = "leaderboard-level";
             level.textContent = "Niveau " + (Number(player.niveau) || 1);
-            nameLine.append(name, level);
+            nameLine.append(name);
+            if (player.badgeEquipped === "premium-10") {
+                const badge = document.createElement("img");
+                badge.className = "leaderboard-badge";
+                badge.src = "./badge-premium-10.png";
+                badge.alt = "Badge Premium 10 €";
+                badge.title = "Badge Premium 10 €";
+                nameLine.append(badge);
+            }
+            nameLine.append(level);
             const total = document.createElement("span");
             total.className = "leaderboard-total";
             total.textContent = player.points + " points • " + player.cartesUniques + (player.cartesUniques > 1 ? " cartes uniques" : " carte unique");
