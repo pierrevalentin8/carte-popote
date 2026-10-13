@@ -2275,7 +2275,7 @@ body {
     <section id="leaderboardPage" class="leaderboard-page hidden" aria-labelledby="leaderboardTitle">
         <button id="leaderboardBackButton" class="admin-back" type="button">← Retour à l’accueil</button>
         <h2 id="leaderboardTitle">🏆 Classement des joueurs</h2>
-        <p class="leaderboard-intro">Les points sont calculés sur les cartes uniques : commune 1 point, rare 2 points et légendaire 3 points. Clique sur un pseudo pour ouvrir son profil.</p>
+        <p class="leaderboard-intro">Les points sont calculés sur les cartes uniques : commune 1 point, rare 2 points, légendaire 3 points et mystique 5 points. Clique sur un pseudo pour ouvrir son profil.</p>
         <p id="leaderboardStatus" class="leaderboard-status" role="status" aria-live="polite">Chargement du classement...</p>
         <div id="leaderboardList" class="leaderboard-list"></div>
     </section>
@@ -4864,7 +4864,7 @@ async function loadLeaderboard() {
         const response = await callGetLeaderboard();
         const players = response.data.classement || [];
         leaderboardStatus.textContent = players.length
-            ? players.length + (players.length > 1 ? " joueurs classés • points : commune 1, rare 2, légendaire 3" : " joueur classé • points : commune 1, rare 2, légendaire 3")
+            ? players.length + (players.length > 1 ? " joueurs classés • points : commune 1, rare 2, légendaire 3, mystique 5" : " joueur classé • points : commune 1, rare 2, légendaire 3, mystique 5")
             : "Aucun joueur inscrit pour le moment.";
 
         players.forEach((player) => {
@@ -4905,7 +4905,7 @@ async function loadLeaderboard() {
             nameLine.append(level);
             const total = document.createElement("span");
             total.className = "leaderboard-total";
-            total.textContent = player.points + " points • " + player.cartesUniques + (player.cartesUniques > 1 ? " cartes uniques" : " carte unique");
+            total.textContent = player.points + " points • " + player.cartesUniques + (player.cartesUniques > 1 ? " cartes uniques" : " carte unique") + " • mystiques : " + (Number(player.mystiques) || 0) + " × 5 = " + ((Number(player.mystiques) || 0) * 5) + " points";
             playerInfo.append(nameLine, total);
 
             const rarityGrid = document.createElement("div");
