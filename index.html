@@ -952,6 +952,13 @@ body {
     border-bottom: none;
 }
 
+.journal-columns { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.journal-column { min-width: 0; padding: 10px 12px; border-radius: 13px; background: rgba(255,255,255,.82); }
+.journal-column h4 { margin: 2px 0 8px; color: #173b52; font-size: 14px; }
+.journal-column .journal-item { overflow-wrap: anywhere; }
+.journal-column .announcement-item p { white-space: pre-line; }
+@media (max-width: 600px) { .journal-columns { grid-template-columns: 1fr; } }
+
 
 .journal-title {
 
@@ -1319,6 +1326,7 @@ body {
 .premium-player-table th, .premium-player-table td { padding: 10px; border-bottom: 1px solid #e3c8f1; text-align: center; white-space: nowrap; }
 .premium-player-table th { background: #48206c; color: #fff; }
 .premium-monthly-sales-table { min-width: 500px; }
+.finance-matrix-table { min-width: 560px; }
 .premium-monthly-sales-card { margin-top: 12px; padding: 13px; border: 1px solid #e3c8f1; border-radius: 12px; background: rgba(255,255,255,.72); color: #28133c; }
 .premium-monthly-sales-total { margin: 9px 0 4px; color: #4c335d; font-size: 13px; font-weight: 800; }
 .premium-month-cell { font-weight: 800; }
@@ -1717,7 +1725,9 @@ body {
 .leaderboard-row { display: grid; grid-template-columns: 42px minmax(135px, 1fr) minmax(280px, 2fr); align-items: center; gap: 12px; padding: 14px; border: 1px solid rgba(243, 191, 56, .65); border-radius: 16px; background: var(--theme-cream); color: var(--theme-ink); box-shadow: 0 9px 24px rgba(0, 0, 0, .23); }
 .leaderboard-rank { display: grid; place-items: center; width: 38px; height: 38px; border-radius: 50%; background: #10264a; color: var(--theme-gold-light); font-size: 14px; font-weight: 900; }
 .leaderboard-player { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.leaderboard-name-line { display: flex; align-items: baseline; gap: 8px; min-width: 0; flex-wrap: wrap; }
 .leaderboard-name { overflow: hidden; color: var(--theme-ink); font-size: 15px; font-weight: 800; text-overflow: ellipsis; }
+.leaderboard-level { color: #6d7890; font-size: 11px; font-weight: 700; white-space: nowrap; }
 .leaderboard-total { color: #8b650d; font-size: 12px; font-weight: 700; }
 .leaderboard-rarity-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; }
 .leaderboard-rarity { padding: 7px 5px; border-radius: 9px; text-align: center; font-size: 10px; font-weight: 700; line-height: 1.25; }
@@ -2072,45 +2082,15 @@ body {
         </div>
 
 
-        <section class="journal">
-            <div id="announcementsList"></div>
-
-            <article class="journal-item">
-
-                <div class="journal-title">
-
-                    🎉 Bienvenue sur
-                    Cartes & Popote !
-
-                </div>
-
-                <div class="journal-date">
-
-                    Aujourd'hui
-
-                </div>
-
-            </article>
-
-
-            <article class="journal-item">
-
-                <div class="journal-title">
-
-                    🚧 Le jeu est actuellement
-                    en construction.
-
-                </div>
-
-                <div class="journal-date">
-
-                    Bientôt disponible
-
-                </div>
-
-            </article>
-
-
+        <section class="journal journal-columns">
+            <div class="journal-column">
+                <h4>Annonces</h4>
+                <div id="announcementsList"></div>
+            </div>
+            <div class="journal-column">
+                <h4>Nouveaux joueurs</h4>
+                <div id="newPlayersList"></div>
+            </div>
         </section>
 
         <div class="message-compose-card">
@@ -2135,6 +2115,7 @@ body {
 
         <footer class="home-site-note">
             <a id="termsLink" href="#conditions-generales">Conditions générales d’utilisation</a>
+            <span>Site créé par PM</span>
         </footer>
 
 
@@ -2272,7 +2253,7 @@ body {
         </form>
         <p id="financeTotal" class="premium-monthly-sales-total">Total récolté : —</p>
         <p id="financeStatus" class="statistics-status" role="status" aria-live="polite">Chargement des paiements…</p>
-        <div class="statistics-table-wrap"><table class="statistics-table premium-monthly-sales-table"><thead><tr><th>Mois</th><th>Joueur</th><th>Jetons Premium attribués</th><th>Montant payé</th></tr></thead><tbody id="financeTableBody"></tbody></table></div>
+        <div class="statistics-table-wrap"><table id="financeMatrixTable" class="statistics-table finance-matrix-table" aria-label="Montant Premium payé par joueur et par mois"><thead><tr id="financeTableHead"><th scope="col">Joueur</th></tr></thead><tbody id="financeTableBody"></tbody></table></div>
     </section>
 
     <section id="leaderboardPage" class="leaderboard-page hidden" aria-labelledby="leaderboardTitle">
@@ -3040,6 +3021,7 @@ const financeBackButton = document.getElementById("financeBackButton");
 const financeTotal = document.getElementById("financeTotal");
 const financeStatus = document.getElementById("financeStatus");
 const financeTableBody = document.getElementById("financeTableBody");
+const financeTableHead = document.getElementById("financeTableHead");
 const financeHistoricalPaymentForm = document.getElementById("financeHistoricalPaymentForm");
 const financeHistoricalPlayer = document.getElementById("financeHistoricalPlayer");
 const financeHistoricalAmount = document.getElementById("financeHistoricalAmount");
@@ -3134,6 +3116,7 @@ const adminSections = {
     cards: document.getElementById("adminCardsSection")
 };
 const announcementsList = document.getElementById("announcementsList");
+const newPlayersList = document.getElementById("newPlayersList");
 const publicCardCount = document.getElementById("publicCardCount");
 const announcementForm = document.getElementById("announcementForm");
 const announcementTitle = document.getElementById("announcementTitle");
@@ -4014,8 +3997,9 @@ function getParisMonthKey(date) {
     return values.year + "-" + values.month;
 }
 
-async function renderMonthlyPremiumReport(tableBody, statusElement, totalElement = null) {
+async function renderMonthlyPremiumReport(tableBody, statusElement, totalElement = null, matrixMode = false) {
     tableBody.replaceChildren();
+    if (matrixMode) financeTableHead.replaceChildren(Object.assign(document.createElement("th"), { textContent: "Joueur", scope: "col" }));
     statusElement.textContent = "Chargement des paiements…";
     try {
         const [snapshot, monthlyTotalsSnapshot, playersSnapshot] = await Promise.all([
@@ -4035,7 +4019,7 @@ async function renderMonthlyPremiumReport(tableBody, statusElement, totalElement
             const isPreviouslyRecorded = createdAt instanceof Date && Number.isFinite(createdAt.getTime()) && createdAt.getTime() < octoberCutoff;
             const month = isPreviouslyRecorded ? "2026-10" : (purchase.month || (createdAt ? getParisMonthKey(createdAt) : "2026-10"));
             const key = month + ":" + purchase.playerId;
-            const row = monthly.get(key) || { month, pseudo: purchase.pseudo || "Joueur", premiumTokens: 0, amountCents: 0 };
+            const row = monthly.get(key) || { month, playerId: purchase.playerId, pseudo: purchase.pseudo || "Joueur", premiumTokens: 0, amountCents: 0 };
             row.premiumTokens += premiumTokens;
             row.amountCents += amountCents;
             monthly.set(key, row);
@@ -4053,6 +4037,7 @@ async function renderMonthlyPremiumReport(tableBody, statusElement, totalElement
             const key = month + ":" + playerId;
             monthly.set(key, {
                 month,
+                playerId,
                 pseudo: playerNames.get(playerId) || "Joueur",
                 premiumTokens,
                 amountCents,
@@ -4078,6 +4063,51 @@ async function renderMonthlyPremiumReport(tableBody, statusElement, totalElement
             });
         if (previousPlayerId && playersSnapshot.docs.some((playerDoc) => playerDoc.id === previousPlayerId)) financeHistoricalPlayer.value = previousPlayerId;
         if (!financeHistoricalMonth.value) financeHistoricalMonth.value = getParisMonthKey(new Date());
+        if (matrixMode) {
+            const months = [...new Set(rows.map((item) => item.month))].sort((left, right) => right.localeCompare(left));
+            months.forEach((month) => {
+                const header = document.createElement("th");
+                header.scope = "col";
+                header.textContent = displayFinanceMonth(month);
+                financeTableHead.append(header);
+            });
+            const playerRows = new Map();
+            rows.forEach((item) => {
+                const playerId = item.playerId || item.pseudo;
+                const row = playerRows.get(playerId) || { pseudo: item.pseudo || "Joueur", amounts: new Map() };
+                row.amounts.set(item.month, Number(item.amountCents) || 0);
+                playerRows.set(playerId, row);
+            });
+            [...playerRows.values()]
+                .sort((left, right) => left.pseudo.localeCompare(right.pseudo, "fr", { sensitivity: "base" }))
+                .forEach((player) => {
+                    const row = document.createElement("tr");
+                    const name = document.createElement("th");
+                    name.scope = "row";
+                    name.textContent = player.pseudo;
+                    row.append(name);
+                    months.forEach((month) => {
+                        const cell = document.createElement("td");
+                        const cents = player.amounts.get(month);
+                        cell.textContent = cents === undefined
+                            ? "—"
+                            : (cents / 100).toLocaleString("fr-FR", { style: "currency", currency: "EUR" });
+                        row.append(cell);
+                    });
+                    tableBody.append(row);
+                });
+            if (rows.length) {
+                statusElement.textContent = "";
+            } else {
+                const attributedTokens = playersSnapshot.docs.reduce((sum, playerDoc) =>
+                    sum + Math.max(0, Number(playerDoc.data().jetonsPremiumAttribues ?? playerDoc.data().jetonsPremium) || 0), 0);
+                statusElement.textContent = attributedTokens > 0
+                    ? "Des jetons Premium ont été attribués, mais aucun historique mensuel de paiement n’est enregistré pour ces anciens versements."
+                    : "Aucun paiement Premium enregistré.";
+                if (totalElement && attributedTokens > 0) totalElement.textContent = "Total récolté : historique des paiements manquant";
+            }
+            return;
+        }
         if (rows.length) {
             statusElement.textContent = "";
         } else {
@@ -4120,7 +4150,7 @@ financeMenuButton.addEventListener("click", async () => {
     [premiumPage, profilePage, leaderboardPage, statisticsPage, collectionPage, recyclingPage, adminPage, messagingPage, rulesPage].forEach((page) => page.classList.add("hidden"));
     bottomNav.classList.add("hidden");
     financePage.classList.remove("hidden");
-    await renderMonthlyPremiumReport(financeTableBody, financeStatus, financeTotal);
+    await renderMonthlyPremiumReport(financeTableBody, financeStatus, financeTotal, true);
 });
 financeBackButton.addEventListener("click", showHomePage);
 
@@ -4145,7 +4175,7 @@ financeHistoricalPaymentForm.addEventListener("submit", async (event) => {
         });
         financeHistoricalAmount.value = "";
         financeHistoricalStatus.textContent = "Paiement ajouté à l’historique. Aucun jeton n’a été crédité une seconde fois.";
-        await renderMonthlyPremiumReport(financeTableBody, financeStatus, financeTotal);
+        await renderMonthlyPremiumReport(financeTableBody, financeStatus, financeTotal, true);
     } catch (error) {
         console.error("Erreur pendant l’ajout d’un paiement Premium antérieur :", error);
         financeHistoricalStatus.textContent = error.message || "Impossible d’enregistrer ce paiement antérieur.";
@@ -4747,10 +4777,16 @@ async function loadLeaderboard() {
                 bottomNav.classList.add("hidden");
                 await loadPersonalProfile(player.id);
             });
+            const nameLine = document.createElement("div");
+            nameLine.className = "leaderboard-name-line";
+            const level = document.createElement("span");
+            level.className = "leaderboard-level";
+            level.textContent = "Niveau " + (Number(player.niveau) || 1);
+            nameLine.append(name, level);
             const total = document.createElement("span");
             total.className = "leaderboard-total";
             total.textContent = player.points + " points • " + player.cartesUniques + (player.cartesUniques > 1 ? " cartes uniques" : " carte unique");
-            playerInfo.append(name, total);
+            playerInfo.append(nameLine, total);
 
             const rarityGrid = document.createElement("div");
             rarityGrid.className = "leaderboard-rarity-grid";
@@ -5886,6 +5922,7 @@ function makeAnnouncementItem(announcement) {
     message.style.marginTop = "7px";
     message.style.fontWeight = "400";
     message.style.lineHeight = "1.5";
+    message.style.whiteSpace = "pre-line";
     message.textContent = announcement.message;
     const date = document.createElement("div");
     date.className = "journal-date";
@@ -5894,15 +5931,34 @@ function makeAnnouncementItem(announcement) {
     return item;
 }
 
+function makeNewPlayerItem(announcement) {
+    const item = document.createElement("article");
+    item.className = "journal-item";
+    const title = document.createElement("div");
+    title.className = "journal-title";
+    title.textContent = "👋 " + (announcement.message || announcement.title || "Nouveau joueur inscrit.");
+    const date = document.createElement("div");
+    date.className = "journal-date";
+    date.textContent = formatAdminMessageDate(announcement.createdAt);
+    item.append(title, date);
+    return item;
+}
+
 async function loadHomeAnnouncements() {
     announcementsList.replaceChildren();
+    newPlayersList.replaceChildren();
     if (!auth.currentUser) return;
     try {
         const snapshot = await getDocs(collection(db, "announcements"));
         const allAnnouncements = snapshot.docs
             .map((announcementDoc) => ({ id: announcementDoc.id, ...announcementDoc.data() }))
             .sort((left, right) => timestampToMilliseconds(right.createdAt) - timestampToMilliseconds(left.createdAt));
-        allAnnouncements.slice(0, 10).forEach((announcement) => announcementsList.append(makeAnnouncementItem(announcement)));
+        const recentAnnouncements = allAnnouncements.filter((announcement) => announcement.announcementType !== "new-player").slice(0, 5);
+        const recentPlayers = allAnnouncements.filter((announcement) => announcement.announcementType === "new-player").slice(0, 5);
+        recentAnnouncements.forEach((announcement) => announcementsList.append(makeAnnouncementItem(announcement)));
+        recentPlayers.forEach((announcement) => newPlayersList.append(makeNewPlayerItem(announcement)));
+        if (!recentAnnouncements.length) announcementsList.textContent = "Aucune annonce pour le moment.";
+        if (!recentPlayers.length) newPlayersList.textContent = "Aucun nouveau joueur pour le moment.";
         showSiteUpdatesIfNeeded(allAnnouncements.filter((announcement) => /^MAJ\s*\|/.test(announcement.title || "")));
     } catch (error) {
         console.error("Erreur de chargement des annonces du Journal :", error);
