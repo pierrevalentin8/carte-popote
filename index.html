@@ -2030,7 +2030,7 @@ body {
                 <span>Premium</span>
             </button>
             <div class="home-overview-archive">
-                <span id="archiveHomeCountdown" class="home-archive-countdown hidden" aria-live="polite"></span>
+                <span id="archivesHomeCountdown" class="home-archive-countdown hidden" aria-live="polite"></span>
                 <button id="archivesHomeButton" type="button" aria-label="Ouvrir la Salle archives">
                     <img src="./salle-archives.png" alt="">
                 </button>
@@ -3087,7 +3087,7 @@ const archivesHomeButton = document.getElementById("archivesHomeButton");
 const archivesBackButton = document.getElementById("archivesBackButton");
 const sortArchivesButton = document.getElementById("sortArchivesButton");
 const archivesCountdown = document.getElementById("archivesCountdown");
-const archiveHomeCountdown = document.getElementById("archiveHomeCountdown");
+const archivesHomeCountdown = document.getElementById("archivesHomeCountdown");
 const archivesStatus = document.getElementById("archivesStatus");
 let archivesReadyAtMs = null;
 let archivesCountdownInterval = null;
@@ -3707,7 +3707,7 @@ function clearArchivesCountdown() {
     archivesCountdownInterval = null;
     archivesReadyAtMs = null;
     archivesCountdown.classList.add("hidden");
-    archiveHomeCountdown.classList.add("hidden");
+    archivesHomeCountdown.classList.add("hidden");
     sortArchivesButton.disabled = false;
     sortArchivesButton.textContent = "Trier les archives";
 }
@@ -3725,9 +3725,9 @@ async function claimArchivesReward() {
             profileTokensEarned.textContent = ((Number(profileTokensEarned.textContent.replace(/\D/g, "")) || 0) + 1).toLocaleString("fr-FR");
         }
         clearArchivesCountdown();
-        archiveHomeCountdown.textContent = "+1 jeton classique trouvé !";
-        archiveHomeCountdown.classList.remove("hidden");
-        setTimeout(() => archiveHomeCountdown.classList.add("hidden"), 7000);
+        archivesHomeCountdown.textContent = "+1 jeton classique trouvé !";
+        archivesHomeCountdown.classList.remove("hidden");
+        setTimeout(() => archivesHomeCountdown.classList.add("hidden"), 7000);
         archivesStatus.textContent = "Le GAV a trouvé 1 jeton classique pour toi ! Tu peux relancer un tri.";
     } catch (error) {
         console.error("Erreur lors de la récupération du jeton des archives :", error);
