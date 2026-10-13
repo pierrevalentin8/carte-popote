@@ -4595,6 +4595,7 @@ async function loadPersonalProfile(playerId = auth.currentUser?.uid) {
                 const badgeResponse = await callGetPublicPlayerProfile({ playerId });
                 player.unlockedBadgeIds = badgeResponse.data.unlockedBadgeIds || [];
                 player.badgeEquipped = badgeResponse.data.badgeEquipped || "";
+                player.commonSeasonOneProgress = Number(badgeResponse.data.commonSeasonOneProgress) || 0;
                 profilePremiumSpending.textContent = (totalAmountCents / 100).toLocaleString("fr-FR", { style: "currency", currency: "EUR" });
             } catch (spendingError) {
                 console.error("Erreur de chargement des dépenses Premium personnelles :", spendingError);
@@ -4651,8 +4652,8 @@ function renderProfileBadges(player, isOwnProfile) {
         .map((badgeId) => badgeCatalog[badgeId]).filter(Boolean);
     profileBadgesEmpty.classList.toggle("hidden", unlockedBadges.length > 0);
     profileBadgesEmpty.textContent = isOwnProfile
-        ? "Aucun badge débloqué pour le moment."
-        : "Ce joueur n’a pas encore débloqué de badge.";
+        ? "Aucun badge débloqué pour le moment. Progression du badge Saison 1 : " + (Number(player.commonSeasonOneProgress) || 0) + "/27 cartes communes uniques."
+        : "Aucun badge débloqué. Progression du badge Saison 1 : " + (Number(player.commonSeasonOneProgress) || 0) + "/27 cartes communes uniques.";
     unlockedBadges.forEach((badge) => {
         const option = document.createElement("div");
         const isEquipped = player.badgeEquipped === badge.id;
@@ -4677,6 +4678,7 @@ function renderProfileBadges(player, isOwnProfile) {
                     const updatedPlayer = playerSnapshot.data() || {};
                     updatedPlayer.hasPremiumBadge = player.hasPremiumBadge === true;
                     updatedPlayer.unlockedBadgeIds = player.unlockedBadgeIds || [];
+                    updatedPlayer.commonSeasonOneProgress = player.commonSeasonOneProgress || 0;
                     updatedPlayer.badgeEquipped = updatedPlayer.badgeEquipped || "";
                     renderProfileBadges(updatedPlayer, true);
                     const equippedBadgeElement = document.getElementById("profilePremiumBadge");
