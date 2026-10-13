@@ -997,7 +997,7 @@ body {
 .home-resource-tile { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 7px; text-align: center; }
 .home-resource-tile strong { color: #f7d46b; font-size: clamp(19px, 6vw, 27px); line-height: 1; }
 .home-resource-tile span { color: #fbfaf5; font-size: 11px; font-weight: 700; line-height: 1.25; }
-.home-overview-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 12px 0 18px; }
+.home-overview-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; margin: 12px 0 18px; }
 .home-card-count, .home-overview-premium { min-width: 0; min-height: 92px; margin: 0; padding: 10px; border: 1px solid rgba(243,191,56,.75); border-radius: 13px; background: linear-gradient(110deg, #10264a, #183966); color: #fbfaf5; box-shadow: 0 7px 17px rgba(0,0,0,.22); }
 .home-card-count-icon { width: 28px; height: 38px; }
 .home-card-count-value { font-size: 21px; }
@@ -1005,6 +1005,18 @@ body {
 .home-overview-premium { display: flex; align-items: center; justify-content: center; gap: 9px; font: inherit; cursor: pointer; }
 .home-overview-premium img { width: 43px; height: 43px; object-fit: contain; }
 .home-overview-premium span { color: #f7d46b; font-size: 16px; font-weight: 900; }
+.home-overview-archive { display: grid; grid-template-rows: auto 1fr; gap: 4px; min-width: 0; }
+.home-archive-countdown { min-height: 16px; color: #ffe181; font-size: 11px; font-weight: 800; text-align: center; }
+.home-overview-archive button { display: flex; min-width: 0; min-height: 92px; flex-direction: column; align-items: center; justify-content: center; gap: 3px; padding: 7px; border: 1px solid rgba(243,191,56,.75); border-radius: 13px; background: linear-gradient(110deg,#10264a,#183966); color: #f7d46b; box-shadow: 0 7px 17px rgba(0,0,0,.22); font: inherit; font-size: 12px; font-weight: 900; cursor: pointer; }
+.home-overview-archive img { width: min(100%, 148px); height: 62px; object-fit: contain; }
+.archives-page { width: 100%; max-width: 820px; min-height: calc(100dvh - 70px); margin: auto; padding: 24px 16px 100px; color: var(--theme-cream); }
+.archives-page h2 { margin-top: 20px; color: var(--theme-gold-light); font-size: 24px; }
+.archives-hero { display: block; width: min(100%, 560px); margin: 20px auto; border: 1px solid rgba(243,191,56,.7); border-radius: 18px; box-shadow: 0 15px 35px rgba(0,0,0,.38); }
+.archives-description { max-width: 620px; margin: 14px auto 20px; color: #e3eaf4; font-size: 17px; line-height: 1.55; text-align: center; }
+.archives-action-wrap { display: grid; justify-items: center; gap: 12px; }
+.archives-countdown { color: #ffe181; font-size: clamp(22px, 6vw, 32px); font-weight: 900; font-variant-numeric: tabular-nums; text-align: center; }
+.archives-status { min-height: 24px; color: #c6d2e5; text-align: center; }
+@media (max-width: 600px) { .home-overview-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 .home-site-note { display: grid; justify-items: center; gap: 7px; margin: 20px 0 88px; color: #c6d2e5; font-size: 11px; line-height: 1.45; text-align: center; }
 .home-site-note p { margin: 0; }
 .home-site-note a { color: #f7d46b; text-decoration: underline; text-underline-offset: 3px; }
@@ -2017,6 +2029,13 @@ body {
                 <img src="./Jeton%20premium.png" alt="">
                 <span>Premium</span>
             </button>
+            <div class="home-overview-archive">
+                <span id="archiveHomeCountdown" class="home-archive-countdown hidden" aria-live="polite"></span>
+                <button id="archivesHomeButton" type="button" aria-label="Ouvrir la Salle archives">
+                    <img src="./salle-archives.png" alt="">
+                    <span>Salle archives</span>
+                </button>
+            </div>
         </section>
 
 
@@ -2350,6 +2369,18 @@ body {
             <textarea id="rulesEditor" class="admin-field" maxlength="12000" placeholder="Écris ici les règles du jeu…"></textarea>
             <button id="rulesSaveButton" class="primary-button admin-submit" type="button">Enregistrer les règles</button>
             <p id="rulesSaveStatus" class="rules-page-status" role="status" aria-live="polite"></p>
+        </div>
+    </section>
+
+    <section id="archivesPage" class="archives-page hidden" aria-labelledby="archivesPageTitle">
+        <button id="archivesBackButton" class="admin-back" type="button">← Retour à l’accueil</button>
+        <h2 id="archivesPageTitle">Salle archives</h2>
+        <img class="archives-hero" src="./salle-archives.png" alt="Salle d’archives remplie de dossiers et de classeurs">
+        <p class="archives-description">Envoie le GAV trier les archives. Il trouvera peut-être des jetons classiques pour toi</p>
+        <div class="archives-action-wrap">
+            <span id="archivesCountdown" class="archives-countdown hidden" aria-live="polite"></span>
+            <button id="sortArchivesButton" class="primary-button" type="button" disabled>Trier les archives</button>
+            <p id="archivesStatus" class="archives-status" role="status" aria-live="polite"></p>
         </div>
     </section>
 
@@ -2791,6 +2822,9 @@ const storage = getStorage(app);
 const functions = getFunctions(app, "europe-west1");
 const callOpenClassicBooster = httpsCallable(functions, "openClassicBooster");
 const callOpenDailyBooster = httpsCallable(functions, "openDailyBooster");
+const callGetArchivesTaskStatus = httpsCallable(functions, "getArchivesTaskStatus");
+const callStartArchivesSorting = httpsCallable(functions, "startArchivesSorting");
+const callClaimArchivesSortingReward = httpsCallable(functions, "claimArchivesSortingReward");
 const callGetOwnedCardNumbers = httpsCallable(functions, "getOwnedCardNumbers");
 const callGetAdminPlayers = httpsCallable(functions, "getAdminPlayers");
 const callRecordHistoricalPremiumPayment = httpsCallable(functions, "recordHistoricalPremiumPayment");
@@ -3050,6 +3084,16 @@ const financeHistoricalStatus = document.getElementById("financeHistoricalStatus
 const termsPage = document.getElementById("termsPage");
 const termsLink = document.getElementById("termsLink");
 const termsBackButton = document.getElementById("termsBackButton");
+const archivesPage = document.getElementById("archivesPage");
+const archivesHomeButton = document.getElementById("archivesHomeButton");
+const archivesBackButton = document.getElementById("archivesBackButton");
+const sortArchivesButton = document.getElementById("sortArchivesButton");
+const archivesCountdown = document.getElementById("archivesCountdown");
+const archiveHomeCountdown = document.getElementById("archiveHomeCountdown");
+const archivesStatus = document.getElementById("archivesStatus");
+let archivesReadyAtMs = null;
+let archivesCountdownInterval = null;
+let archivesClaimInProgress = false;
 
 const adminButton = document.getElementById("adminButton");
 const adminMessagesMenuButton = document.getElementById("adminMessagesMenuButton");
@@ -3402,6 +3446,8 @@ onAuthStateChanged(
            ========================================== */
 
         if (!user) {
+            clearArchivesCountdown();
+            archivesPage.classList.add("hidden");
             isPlayerPreview = false;
             adminButton.classList.add("hidden");
             adminMessagesMenuButton.classList.add("hidden");
@@ -3458,6 +3504,7 @@ onAuthStateChanged(
         if (!isAdminAccount) messagingPage.classList.add("hidden");
         loadHomeAnnouncements();
         loadPublicCardCount();
+        loadArchivesTaskStatus();
 
 
 
@@ -3641,6 +3688,7 @@ function showHomePage() {
     messagingPage.classList.add("hidden");
     rulesPage.classList.add("hidden");
     premiumPage.classList.add("hidden");
+    archivesPage.classList.add("hidden");
     bottomNav.classList.remove("hidden");
     homeNavButton.classList.add("active");
     collectionNavButton.classList.remove("active");
@@ -3648,9 +3696,139 @@ function showHomePage() {
     rulesNavButton.classList.remove("active");
 }
 
+function formatArchivesCountdown(milliseconds) {
+    const totalSeconds = Math.max(0, Math.ceil(milliseconds / 1000));
+    const hours = Math.floor(totalSeconds / 3600);
+    const minutes = Math.floor((totalSeconds % 3600) / 60);
+    const seconds = totalSeconds % 60;
+    return [hours, minutes, seconds].map((part) => String(part).padStart(2, "0")).join(":");
+}
+
+function clearArchivesCountdown() {
+    if (archivesCountdownInterval) clearInterval(archivesCountdownInterval);
+    archivesCountdownInterval = null;
+    archivesReadyAtMs = null;
+    archivesCountdown.classList.add("hidden");
+    archiveHomeCountdown.classList.add("hidden");
+    sortArchivesButton.disabled = false;
+    sortArchivesButton.textContent = "Trier les archives";
+}
+
+async function claimArchivesReward() {
+    if (archivesClaimInProgress || !auth.currentUser) return;
+    archivesClaimInProgress = true;
+    sortArchivesButton.disabled = true;
+    archivesStatus.textContent = "Le GAV a terminé le tri. Récupération du jeton…";
+    try {
+        const response = await callClaimArchivesSortingReward();
+        const tokens = Number(response.data.tokens) || 0;
+        document.getElementById("playerTokens").textContent = tokens.toLocaleString("fr-FR");
+        if (!viewedOtherPlayerId) {
+            profileTokensEarned.textContent = ((Number(profileTokensEarned.textContent.replace(/\D/g, "")) || 0) + 1).toLocaleString("fr-FR");
+        }
+        clearArchivesCountdown();
+        archiveHomeCountdown.textContent = "+1 jeton classique trouvé !";
+        archiveHomeCountdown.classList.remove("hidden");
+        setTimeout(() => archiveHomeCountdown.classList.add("hidden"), 7000);
+        archivesStatus.textContent = "Le GAV a trouvé 1 jeton classique pour toi ! Tu peux relancer un tri.";
+    } catch (error) {
+        console.error("Erreur lors de la récupération du jeton des archives :", error);
+        archivesStatus.textContent = error.code === "functions/failed-precondition"
+            ? "Le tri n’est pas encore terminé. Le compte à rebours continue."
+            : "Impossible de récupérer le jeton. Réessaie dans un instant.";
+        await loadArchivesTaskStatus(false);
+    } finally {
+        archivesClaimInProgress = false;
+        sortArchivesButton.disabled = archivesReadyAtMs !== null;
+    }
+}
+
+function updateArchivesCountdown() {
+    if (!Number.isFinite(archivesReadyAtMs)) return;
+    const remaining = Math.max(0, archivesReadyAtMs - Date.now());
+    const countdownText = formatArchivesCountdown(remaining);
+    archivesCountdown.textContent = countdownText;
+    archivesHomeCountdown.textContent = countdownText;
+    archivesCountdown.classList.remove("hidden");
+    archivesHomeCountdown.classList.remove("hidden");
+    sortArchivesButton.disabled = true;
+    sortArchivesButton.textContent = "Tri des archives en cours";
+    if (remaining <= 0) {
+        if (archivesCountdownInterval) clearInterval(archivesCountdownInterval);
+        archivesCountdownInterval = null;
+        claimArchivesReward();
+    }
+}
+
+function setArchivesTask(readyAt) {
+    if (archivesCountdownInterval) clearInterval(archivesCountdownInterval);
+    const parsedReadyAt = typeof readyAt === "string" ? Date.parse(readyAt) : Number.NaN;
+    if (!Number.isFinite(parsedReadyAt)) {
+        clearArchivesCountdown();
+        return;
+    }
+    archivesReadyAtMs = parsedReadyAt;
+    updateArchivesCountdown();
+    if (archivesReadyAtMs !== null) archivesCountdownInterval = setInterval(updateArchivesCountdown, 1000);
+}
+
+async function loadArchivesTaskStatus(claimWhenReady = true) {
+    if (!auth.currentUser) return;
+    sortArchivesButton.disabled = true;
+    archivesStatus.textContent = "Vérification du tri des archives…";
+    try {
+        const response = await callGetArchivesTaskStatus();
+        const data = response.data || {};
+        if (data.ready && claimWhenReady) {
+            archivesStatus.textContent = "Le tri est terminé. Récupération du jeton…";
+            await claimArchivesReward();
+            return;
+        }
+        if (data.readyAt) {
+            setArchivesTask(data.readyAt);
+            archivesStatus.textContent = data.ready ? "Ton jeton est prêt à être récupéré." : "Le GAV trie les archives. Le compte à rebours est aussi affiché sur l’accueil.";
+        } else {
+            clearArchivesCountdown();
+            archivesStatus.textContent = "Tu peux envoyer le GAV trier les archives.";
+        }
+    } catch (error) {
+        console.error("Impossible de charger le compte à rebours des archives :", error);
+        archivesStatus.textContent = "Impossible de charger la Salle archives. Vérifie que les fonctions Firebase correspondantes sont déployées.";
+        sortArchivesButton.disabled = false;
+    }
+}
+
+async function openArchivesPage() {
+    if (!auth.currentUser) return;
+    dropdownMenu.classList.add("hidden");
+    document.querySelector(".app-content").classList.add("hidden");
+    [termsPage, financePage, profilePage, leaderboardPage, statisticsPage, collectionPage, recyclingPage, adminPage, messagingPage, rulesPage, premiumPage].forEach((page) => page.classList.add("hidden"));
+    bottomNav.classList.add("hidden");
+    archivesPage.classList.remove("hidden");
+    await loadArchivesTaskStatus();
+}
+
+archivesHomeButton.addEventListener("click", openArchivesPage);
+archivesBackButton.addEventListener("click", showHomePage);
+sortArchivesButton.addEventListener("click", async () => {
+    if (!auth.currentUser || sortArchivesButton.disabled) return;
+    sortArchivesButton.disabled = true;
+    archivesStatus.textContent = "Le GAV commence à trier les archives…";
+    try {
+        const response = await callStartArchivesSorting();
+        setArchivesTask(response.data.readyAt);
+        archivesStatus.textContent = "Le tri a commencé ! Reviens dans 2 heures pour ton jeton classique.";
+    } catch (error) {
+        console.error("Impossible de lancer le tri des archives :", error);
+        archivesStatus.textContent = error.message || "Impossible de lancer le tri des archives.";
+        await loadArchivesTaskStatus();
+    }
+});
+
 termsLink.addEventListener("click", (event) => {
     event.preventDefault();
     document.querySelector(".app-content").classList.add("hidden");
+    archivesPage.classList.add("hidden");
     termsPage.classList.remove("hidden");
     bottomNav.classList.add("hidden");
 });
@@ -4168,6 +4346,7 @@ financeMenuButton.addEventListener("click", async () => {
     document.querySelector(".app-content").classList.add("hidden");
     [premiumPage, profilePage, leaderboardPage, statisticsPage, collectionPage, recyclingPage, adminPage, messagingPage, rulesPage].forEach((page) => page.classList.add("hidden"));
     bottomNav.classList.add("hidden");
+    archivesPage.classList.add("hidden");
     financePage.classList.remove("hidden");
     await renderMonthlyPremiumReport(financeTableBody, financeStatus, financeTotal, true);
 });
@@ -4239,6 +4418,7 @@ async function openPremiumPage() {
     messagingPage.classList.add("hidden");
     rulesPage.classList.add("hidden");
     bottomNav.classList.add("hidden");
+    archivesPage.classList.add("hidden");
     premiumPage.classList.remove("hidden");
     premiumSettingsDisclosure.open = false;
     premiumAdministrationDisclosure.open = false;
@@ -4772,6 +4952,7 @@ playerProfileHomeButton.addEventListener("click", async () => {
     messagingPage.classList.add("hidden");
     rulesPage.classList.add("hidden");
     bottomNav.classList.add("hidden");
+    archivesPage.classList.add("hidden");
     profilePage.classList.remove("hidden");
     await loadPersonalProfile();
 });
@@ -4780,7 +4961,8 @@ profileBackButton.addEventListener("click", () => {
     if (viewedOtherPlayerId) {
         viewedOtherPlayerId = null;
         profilePage.classList.add("hidden");
-        leaderboardPage.classList.remove("hidden");
+        archivesPage.classList.add("hidden");
+    leaderboardPage.classList.remove("hidden");
         loadLeaderboard();
         return;
     }
@@ -4883,7 +5065,8 @@ async function loadLeaderboard() {
             name.textContent = player.pseudo || "Joueur";
             name.addEventListener("click", async () => {
                 viewedOtherPlayerId = player.id;
-                profilePage.classList.remove("hidden");
+                archivesPage.classList.add("hidden");
+    profilePage.classList.remove("hidden");
                 leaderboardPage.classList.add("hidden");
                 document.querySelector(".app-content").classList.add("hidden");
                 bottomNav.classList.add("hidden");
@@ -4982,6 +5165,7 @@ statisticsMenuButton.addEventListener("click", async () => {
     messagingPage.classList.add("hidden");
     rulesPage.classList.add("hidden");
     bottomNav.classList.add("hidden");
+    archivesPage.classList.add("hidden");
     statisticsPage.classList.remove("hidden");
     await loadStatistics();
 });
@@ -5000,6 +5184,7 @@ leaderboardMenuButton.addEventListener("click", async () => {
     messagingPage.classList.add("hidden");
     rulesPage.classList.add("hidden");
     bottomNav.classList.add("hidden");
+    archivesPage.classList.add("hidden");
     leaderboardPage.classList.remove("hidden");
     await loadLeaderboard();
 });
@@ -5471,6 +5656,7 @@ document.getElementById("viewOwnedCardsButton").addEventListener("click", async 
     adminPage.classList.add("hidden");
     messagingPage.classList.add("hidden");
     rulesPage.classList.add("hidden");
+    archivesPage.classList.add("hidden");
     collectionPage.classList.remove("hidden");
     bottomNav.classList.remove("hidden");
     homeNavButton.classList.remove("active");
@@ -5655,6 +5841,7 @@ rulesNavButton.addEventListener("click", async () => {
     recyclingPage.classList.add("hidden");
     adminPage.classList.add("hidden");
     messagingPage.classList.add("hidden");
+    archivesPage.classList.add("hidden");
     rulesPage.classList.remove("hidden");
     bottomNav.classList.remove("hidden");
     document.querySelectorAll(".bottom-nav .nav-item").forEach((button) => button.classList.remove("active"));
@@ -5672,6 +5859,7 @@ collectionNavButton.addEventListener("click", async () => {
     messagingPage.classList.add("hidden");
     rulesPage.classList.add("hidden");
     recyclingPage.classList.add("hidden");
+    archivesPage.classList.add("hidden");
     collectionPage.classList.remove("hidden");
     bottomNav.classList.remove("hidden");
     homeNavButton.classList.remove("active");
@@ -5691,6 +5879,7 @@ recyclingNavButton.addEventListener("click", async () => {
     adminPage.classList.add("hidden");
     messagingPage.classList.add("hidden");
     rulesPage.classList.add("hidden");
+    archivesPage.classList.add("hidden");
     recyclingPage.classList.remove("hidden");
     bottomNav.classList.remove("hidden");
     document.querySelectorAll(".bottom-nav .nav-item").forEach((button) => button.classList.remove("active"));
@@ -6569,6 +6758,7 @@ adminButton.addEventListener("click", async () => {
     messagingPage.classList.add("hidden");
     rulesPage.classList.add("hidden");
     bottomNav.classList.add("hidden");
+    archivesPage.classList.add("hidden");
     adminPage.classList.remove("hidden");
     Object.values(adminSections).forEach((section) => section.classList.add("hidden"));
     adminSectionHint.classList.remove("hidden");
@@ -6588,6 +6778,7 @@ adminMessagesMenuButton.addEventListener("click", async () => {
     adminPage.classList.add("hidden");
     rulesPage.classList.add("hidden");
     bottomNav.classList.add("hidden");
+    archivesPage.classList.add("hidden");
     messagingPage.classList.remove("hidden");
     await loadAdminMessages("idee");
 });
