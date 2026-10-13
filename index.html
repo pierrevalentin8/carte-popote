@@ -1349,6 +1349,13 @@ body {
 .profile-identity-heading h2 { margin: 0; }
 .profile-premium-badge { display: inline-flex; width: 42px; height: 42px; flex: 0 0 42px; align-items: center; justify-content: center; }
 .profile-premium-badge img { display: block; width: 100%; height: 100%; object-fit: contain; }
+.site-updates-overlay { position: fixed; inset: 0; z-index: 700; display: grid; place-items: center; padding: 16px; background: rgba(3,11,25,.78); }
+.site-updates-card { width: min(100%, 520px); max-height: min(82dvh, 680px); overflow: auto; padding: 24px; border: 2px solid var(--theme-gold, #e5b530); border-radius: 22px; background: var(--theme-cream, #fffdf7); color: var(--theme-ink, #10264a); box-shadow: 0 22px 65px rgba(0,0,0,.45); }
+.site-updates-card h2 { margin: 0 0 8px; color: var(--theme-ink, #10264a); }
+.site-updates-card p { margin: 0 0 16px; }
+.site-updates-list { display: grid; gap: 11px; margin: 0; padding-left: 22px; line-height: 1.5; }
+.site-updates-actions { display: flex; justify-content: flex-end; margin-top: 22px; }
+@media (max-width: 480px) { .site-updates-card { padding: 19px; border-radius: 18px; } .site-updates-actions button { width: 100%; } }
 .profile-identity-editor { display: grid; gap: 9px; margin-top: 12px; padding: 13px; border: 1px solid rgba(243,191,56,.5); border-radius: 13px; background: rgba(251,250,245,.08); }
 .profile-identity-editor label { color: #e3eaf4; font-size: 12px; font-weight: 800; }
 .profile-identity-editor .register-avatar-label { color: #e3eaf4; }
@@ -2484,6 +2491,15 @@ body {
         </div>
     </section>
 
+    <section id="siteUpdatesModal" class="site-updates-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="siteUpdatesTitle" aria-hidden="true">
+        <div class="site-updates-card">
+            <h2 id="siteUpdatesTitle">✨ Nouveautés</h2>
+            <p>Voici les dernières améliorations du site.</p>
+            <ul id="siteUpdatesList" class="site-updates-list"></ul>
+            <div class="site-updates-actions"><button id="siteUpdatesCloseButton" class="primary-button" type="button">C’est compris</button></div>
+        </div>
+    </section>
+
     <section id="adminPage" class="admin-page hidden">
         <button id="adminBackButton" class="admin-back" type="button">← Retour à l’accueil</button>
         <h2>🛡️ Administration</h2>
@@ -2491,6 +2507,7 @@ body {
         <nav class="admin-menu" aria-label="Rubriques d’administration">
             <button class="admin-menu-button" type="button" data-admin-section="players" aria-controls="adminPlayersSection" aria-pressed="false">👥 Joueurs</button>
             <button class="admin-menu-button" type="button" data-admin-section="journal" aria-controls="adminJournalSection" aria-pressed="false">📰 Journal</button>
+            <button class="admin-menu-button" type="button" data-admin-section="updates" aria-controls="adminUpdatesSection" aria-pressed="false">📢 Annonce MAJ</button>
             <button class="admin-menu-button" type="button" data-admin-section="rarities" aria-controls="adminRaritiesSection" aria-pressed="false">⭐ Catégories de rareté</button>
             <button class="admin-menu-button" type="button" data-admin-section="cards" aria-controls="adminCardsSection" aria-pressed="false">🃏 Création de cartes</button>
         </nav>
@@ -2509,6 +2526,16 @@ body {
             <h3>📋 Annonces publiées</h3>
             <p id="adminAnnouncementsStatus" class="admin-status" role="status" aria-live="polite"></p>
             <div id="adminAnnouncementsList"></div>
+        </div>
+        <div id="adminUpdatesSection" class="admin-panel admin-section hidden" style="margin-bottom:16px">
+            <h3>📢 Annonce MAJ</h3>
+            <p class="admin-note">Écris ici les améliorations mises en ligne. Les joueurs verront chaque nouvelle annonce une fois à leur prochaine connexion. Elle apparaîtra aussi dans le Journal de l’accueil.</p>
+            <form id="siteUpdateForm">
+                <label for="siteUpdateMessage">Modifications effectuées</label>
+                <textarea id="siteUpdateMessage" class="admin-field" maxlength="1500" rows="6" placeholder="Ex.&#10;• Le badge Premium apparaît maintenant sur le profil à partir de 10 € dépensés.&#10;• L’affichage du profil a été amélioré." required></textarea>
+                <button id="siteUpdateSubmit" class="primary-button admin-submit" type="submit">Publier l’annonce MAJ</button>
+            </form>
+            <p id="siteUpdateStatus" class="admin-status" role="status" aria-live="polite"></p>
         </div>
         <div id="adminPlayersSection" class="admin-panel admin-section hidden" style="margin-bottom:16px">
             <h3>👥 Joueurs</h3>
@@ -2790,6 +2817,58 @@ const callUpdateMyPlayerIdentity = httpsCallable(functions, "updateMyPlayerIdent
 const callRecycleDuplicateCards = httpsCallable(functions, "recycleDuplicateCards");
 const callDownloadPlayerBackup = httpsCallable(functions, "downloadPlayerBackup");
 
+const siteUpdatesModal = document.getElementById("siteUpdatesModal");
+const siteUpdatesList = document.getElementById("siteUpdatesList");
+const siteUpdatesCloseButton = document.getElementById("siteUpdatesCloseButton");
+let pendingSiteUpdateIds = [];
+
+function closeSiteUpdates() {
+    const userId = auth.currentUser?.uid;
+    if (userId) markSiteUpdatesSeen(pendingSiteUpdateIds, userId);
+    siteUpdatesModal.classList.add("hidden");
+    siteUpdatesModal.setAttribute("aria-hidden", "true");
+    pendingSiteUpdateIds = [];
+}
+
+function markSiteUpdatesSeen(ids, userId = auth.currentUser?.uid) {
+    if (!userId || !ids.length) return;
+    try {
+        const key = `cartes-popote-seen-updates:${userId}`;
+        let seen = [];
+        try { seen = JSON.parse(localStorage.getItem(key) || "[]"); } catch { seen = []; }
+        localStorage.setItem(key, JSON.stringify([...new Set([...(Array.isArray(seen) ? seen : []), ...ids])]));
+    } catch (error) { console.warn("Impossible de mémoriser les nouveautés vues.", error); }
+}
+
+function showSiteUpdatesIfNeeded(updates) {
+    const userId = auth.currentUser?.uid;
+    if (!userId || updates.length === 0) return;
+    let seen = [];
+    try {
+        seen = JSON.parse(localStorage.getItem(`cartes-popote-seen-updates:${userId}`) || "[]");
+        if (!Array.isArray(seen)) seen = [];
+    } catch (error) { console.warn("Impossible de vérifier les nouveautés déjà vues.", error); }
+    const unseen = updates.filter((update) => !seen.includes(update.id));
+    if (unseen.length === 0) return;
+    pendingSiteUpdateIds = unseen.map((update) => update.id);
+    siteUpdatesList.replaceChildren();
+    unseen.forEach((update) => {
+        const item = document.createElement("li");
+        const heading = document.createElement("strong");
+        heading.textContent = update.title.replace(/^MAJ\s*\|\s*/, "") || "Mise à jour";
+        const message = document.createElement("p");
+        message.textContent = update.message;
+        message.style.cssText = "margin:5px 0 0;white-space:pre-line";
+        item.append(heading, message);
+        siteUpdatesList.append(item);
+    });
+    siteUpdatesModal.classList.remove("hidden");
+    siteUpdatesModal.setAttribute("aria-hidden", "false");
+    siteUpdatesCloseButton.focus();
+}
+
+siteUpdatesCloseButton.addEventListener("click", closeSiteUpdates);
+
 
 
 /* ==================================================
@@ -3050,6 +3129,7 @@ const adminSectionHint = document.getElementById("adminSectionHint");
 const adminSections = {
     players: document.getElementById("adminPlayersSection"),
     journal: document.getElementById("adminJournalSection"),
+    updates: document.getElementById("adminUpdatesSection"),
     rarities: document.getElementById("adminRaritiesSection"),
     cards: document.getElementById("adminCardsSection")
 };
@@ -3060,6 +3140,10 @@ const announcementTitle = document.getElementById("announcementTitle");
 const announcementMessage = document.getElementById("announcementMessage");
 const announcementSubmit = document.getElementById("announcementSubmit");
 const announcementStatus = document.getElementById("announcementStatus");
+const siteUpdateForm = document.getElementById("siteUpdateForm");
+const siteUpdateMessage = document.getElementById("siteUpdateMessage");
+const siteUpdateSubmit = document.getElementById("siteUpdateSubmit");
+const siteUpdateStatus = document.getElementById("siteUpdateStatus");
 const adminAnnouncementsStatus = document.getElementById("adminAnnouncementsStatus");
 const adminAnnouncementsList = document.getElementById("adminAnnouncementsList");
 const adminMessagesStatus = document.getElementById("adminMessagesStatus");
@@ -5815,11 +5899,11 @@ async function loadHomeAnnouncements() {
     if (!auth.currentUser) return;
     try {
         const snapshot = await getDocs(collection(db, "announcements"));
-        const announcements = snapshot.docs
-            .map((announcementDoc) => announcementDoc.data())
-            .sort((left, right) => timestampToMilliseconds(right.createdAt) - timestampToMilliseconds(left.createdAt))
-            .slice(0, 10);
-        announcements.forEach((announcement) => announcementsList.append(makeAnnouncementItem(announcement)));
+        const allAnnouncements = snapshot.docs
+            .map((announcementDoc) => ({ id: announcementDoc.id, ...announcementDoc.data() }))
+            .sort((left, right) => timestampToMilliseconds(right.createdAt) - timestampToMilliseconds(left.createdAt));
+        allAnnouncements.slice(0, 10).forEach((announcement) => announcementsList.append(makeAnnouncementItem(announcement)));
+        showSiteUpdatesIfNeeded(allAnnouncements.filter((announcement) => /^MAJ\s*\|/.test(announcement.title || "")));
     } catch (error) {
         console.error("Erreur de chargement des annonces du Journal :", error);
     }
@@ -5929,6 +6013,41 @@ announcementForm.addEventListener("submit", async (event) => {
             : "Impossible de publier l’annonce. Vérifie la connexion et les règles Firestore.";
     } finally {
         announcementSubmit.disabled = false;
+    }
+});
+
+siteUpdateForm.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    if (!auth.currentUser || (auth.currentUser.email || "").toLowerCase() !== ADMIN_EMAIL) {
+        siteUpdateStatus.textContent = "Accès réservé au compte Admin.";
+        return;
+    }
+    const message = siteUpdateMessage.value.trim();
+    if (message.length < 3 || message.length > 1500) {
+        siteUpdateStatus.textContent = "Décris les changements en 3 à 1 500 caractères.";
+        return;
+    }
+    siteUpdateSubmit.disabled = true;
+    siteUpdateStatus.textContent = "Publication de l’annonce MAJ…";
+    try {
+        const dateLabel = new Intl.DateTimeFormat("fr-FR").format(new Date());
+        const created = await addDoc(collection(db, "announcements"), {
+            title: `MAJ | ${dateLabel}`,
+            message,
+            authorUid: auth.currentUser.uid,
+            createdAt: serverTimestamp()
+        });
+        markSiteUpdatesSeen([created.id]);
+        siteUpdateForm.reset();
+        siteUpdateStatus.textContent = "Annonce MAJ publiée. Les joueurs la verront à leur prochaine connexion.";
+        await Promise.all([loadAdminAnnouncements(), loadHomeAnnouncements()]);
+    } catch (error) {
+        console.error("Erreur de publication de l’annonce MAJ :", error);
+        siteUpdateStatus.textContent = error.code === "permission-denied"
+            ? "Publication refusée. Vérifie les règles Firestore des annonces."
+            : "Impossible de publier l’annonce MAJ. Vérifie la connexion.";
+    } finally {
+        siteUpdateSubmit.disabled = false;
     }
 });
 
