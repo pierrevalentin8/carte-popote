@@ -1007,13 +1007,13 @@ body {
 .home-overview-premium span { color: #f7d46b; font-size: 16px; font-weight: 900; }
 .home-overview-archive { display: grid; grid-template-rows: auto 1fr; gap: 4px; min-width: 0; }
 .home-archive-countdown { min-height: 16px; color: #ffe181; font-size: 11px; font-weight: 800; text-align: center; }
-.home-overview-archive button { display: flex; min-width: 0; min-height: 92px; flex-direction: column; align-items: center; justify-content: center; gap: 3px; padding: 7px; border: 1px solid rgba(243,191,56,.75); border-radius: 13px; background: linear-gradient(110deg,#10264a,#183966); color: #f7d46b; box-shadow: 0 7px 17px rgba(0,0,0,.22); font: inherit; font-size: 12px; font-weight: 900; cursor: pointer; }
-.home-overview-archive img { width: min(100%, 148px); height: 62px; object-fit: contain; }
-.archives-page { width: 100%; max-width: 820px; min-height: calc(100dvh - 70px); margin: auto; padding: 24px 16px 100px; color: var(--theme-cream); }
+.home-overview-archive button { display: flex; min-width: 0; min-height: 80px; align-items: center; justify-content: center; padding: 5px; border: 1px solid rgba(243,191,56,.75); border-radius: 13px; background: linear-gradient(110deg,#10264a,#183966); box-shadow: 0 7px 17px rgba(0,0,0,.22); cursor: pointer; }
+.home-overview-archive img { width: min(100%, 148px); height: 72px; object-fit: contain; }
+.archives-page { position: relative; isolation: isolate; width: 100%; max-width: 820px; min-height: calc(100dvh - 70px); margin: auto; padding: 24px 16px 100px; color: var(--theme-cream); }
+.archives-page::before { content: ""; position: fixed; inset: 0; z-index: -1; background: linear-gradient(135deg, rgba(4,13,29,.76), rgba(8,25,48,.66)), url("./gendarme_pixel_art_ameliore.gif") center / cover no-repeat; }
 .archives-page h2 { margin-top: 20px; color: var(--theme-gold-light); font-size: 24px; }
-.archives-hero { display: block; width: min(100%, 560px); margin: 20px auto; border: 1px solid rgba(243,191,56,.7); border-radius: 18px; box-shadow: 0 15px 35px rgba(0,0,0,.38); }
-.archives-description { max-width: 620px; margin: 14px auto 20px; color: #e3eaf4; font-size: 17px; line-height: 1.55; text-align: center; }
-.archives-action-wrap { display: grid; justify-items: center; gap: 12px; }
+.archives-description { max-width: 620px; margin: 26px auto 20px; padding: 18px 20px; border: 1px solid rgba(243,191,56,.55); border-radius: 18px; background: rgba(5,16,35,.78); color: #e3eaf4; font-size: 17px; line-height: 1.55; text-align: center; box-shadow: 0 12px 30px rgba(0,0,0,.28); }
+.archives-action-wrap { display: grid; justify-items: center; gap: 12px; padding: 20px; border: 1px solid rgba(243,191,56,.48); border-radius: 18px; background: rgba(5,16,35,.78); box-shadow: 0 12px 30px rgba(0,0,0,.28); }
 .archives-countdown { color: #ffe181; font-size: clamp(22px, 6vw, 32px); font-weight: 900; font-variant-numeric: tabular-nums; text-align: center; }
 .archives-status { min-height: 24px; color: #c6d2e5; text-align: center; }
 @media (max-width: 600px) { .home-overview-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
@@ -2033,7 +2033,6 @@ body {
                 <span id="archiveHomeCountdown" class="home-archive-countdown hidden" aria-live="polite"></span>
                 <button id="archivesHomeButton" type="button" aria-label="Ouvrir la Salle archives">
                     <img src="./salle-archives.png" alt="">
-                    <span>Salle archives</span>
                 </button>
             </div>
         </section>
@@ -2375,7 +2374,6 @@ body {
     <section id="archivesPage" class="archives-page hidden" aria-labelledby="archivesPageTitle">
         <button id="archivesBackButton" class="admin-back" type="button">← Retour à l’accueil</button>
         <h2 id="archivesPageTitle">Salle archives</h2>
-        <img class="archives-hero" src="./salle-archives.png" alt="Salle d’archives remplie de dossiers et de classeurs">
         <p class="archives-description">Envoie le GAV trier les archives. Il trouvera peut-être des jetons classiques pour toi</p>
         <div class="archives-action-wrap">
             <span id="archivesCountdown" class="archives-countdown hidden" aria-live="polite"></span>
