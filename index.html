@@ -983,6 +983,9 @@ body {
 
 .announcement-item { border-left: 3px solid #e5b530; padding-left: 12px; }
 .announcement-item .journal-title { color: #173b52; }
+.announcement-item.announcement-legendary, .announcement-item.announcement-mystic { margin: 8px 0; padding: 10px 12px; border: 2px solid; border-radius: 11px; background: rgba(255,255,255,.96); }
+.announcement-item.announcement-legendary { border-color: #d8a51b; box-shadow: 0 0 10px rgba(216,165,27,.2); }
+.announcement-item.announcement-mystic { border-color: #9638c5; box-shadow: 0 0 10px rgba(150,56,197,.2); }
 .home-card-count { display: flex; align-items: center; justify-content: center; gap: 10px; margin: 12px 0 18px; padding: 10px 14px; border: 1px solid rgba(243, 191, 56, .75); border-radius: 13px; background: linear-gradient(110deg, #10264a, #183966); color: #fbfaf5; box-shadow: 0 7px 17px rgba(0, 0, 0, .22); }
 .home-card-count-icon { display: block; width: 36px; height: 50px; flex: 0 0 auto; object-fit: contain; filter: drop-shadow(0 3px 5px rgba(0, 0, 0, .32)); }
 .home-card-count-copy { display: flex; align-items: baseline; flex-wrap: wrap; gap: 5px; }
@@ -1018,7 +1021,7 @@ body {
 .archives-page { position: relative; isolation: isolate; width: 100%; max-width: 820px; min-height: calc(100dvh - 70px); margin: auto; padding: 24px 16px 100px; color: var(--theme-cream); }
 .archives-page::before { content: ""; position: fixed; inset: 0; z-index: -1; background-color: #09172d; background-image: linear-gradient(135deg, rgba(4,13,29,.76), rgba(8,25,48,.66)), url("./gendarme_pixel_art_ameliore.gif"); background-position: center, center; background-repeat: no-repeat; background-size: cover, cover; }
 .archives-page h2 { margin-top: 20px; color: var(--theme-gold-light); font-size: 24px; }
-.archives-description { max-width: 620px; margin: 26px auto 20px; padding: 18px 20px; border: 1px solid rgba(243,191,56,.55); border-radius: 18px; background: rgba(5,16,35,.78); color: #e3eaf4; font-size: 17px; line-height: 1.55; text-align: center; box-shadow: 0 12px 30px rgba(0,0,0,.28); }
+.archives-description { max-width: 620px; margin: 26px auto 20px; padding: 18px 20px; border: 1px solid rgba(243,191,56,.55); border-radius: 18px; background: rgba(5,16,35,.78); color: #e3eaf4; font-size: 17px; line-height: 1.55; text-align: center; white-space: pre-line; box-shadow: 0 12px 30px rgba(0,0,0,.28); }
 .archives-action-wrap { display: grid; justify-items: center; gap: 12px; padding: 20px; border: 1px solid rgba(243,191,56,.48); border-radius: 18px; background: rgba(5,16,35,.78); box-shadow: 0 12px 30px rgba(0,0,0,.28); }
 .archives-countdown { color: #ffe181; font-size: clamp(22px, 6vw, 32px); font-weight: 900; font-variant-numeric: tabular-nums; text-align: center; }
 .archives-status { min-height: 24px; color: #c6d2e5; text-align: center; }
@@ -1421,6 +1424,8 @@ body {
 .player-collection #recycleDuplicatesButton { min-height: 46px; padding: 11px 18px; }
 .player-collection #recycleDuplicatesButton:disabled { opacity: .55; cursor: not-allowed; }
 .recycle-duplicates-status { grid-column: 1 / -1; min-height: 16px; margin: 0; color: #f6df9d; font-size: 12px; }
+.recycling-global-stat { display: flex; width: fit-content; align-items: baseline; gap: 7px; margin: 8px 0 14px; padding: 7px 11px; border: 1px solid rgba(243,191,56,.48); border-radius: 10px; background: rgba(16,38,74,.7); color: #d4dceb; font-size: 11px; }
+.recycling-global-stat strong { color: #f7d46b; font-size: 17px; }
 .admin-backup-button { margin: 0 0 10px; }
 @media (max-width: 420px) { .recycling-cards-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; } .recycling-copy-option { padding: 8px; } .recycling-copy-option img, .recycling-card-placeholder { max-width: 108px; } .recycle-selection-toolbar { font-size: 12px; } }
 .collection-search-label { display: block; margin-top: 12px; color: #fbfaf5; font-size: 13px; font-weight: 700; }
@@ -1718,6 +1723,7 @@ body {
 .player-profile { width: 100%; max-width: 760px; min-height: calc(100dvh - 70px); margin: auto; padding: 24px 16px 100px; color: var(--theme-cream); }
 .player-profile h2 { margin-top: 20px; color: var(--theme-gold-light); font-size: 24px; }
 .profile-page-intro { margin-top: 7px; color: #c6d2e5; font-size: 14px; }
+.profile-account-dates { margin: 6px 0 16px; color: #aebbd0; font-size: 11px; line-height: 1.5; }
 .profile-level-card { margin-top: 12px; padding: 10px 13px; border: 1px solid rgba(243, 191, 56, .7); border-radius: 14px; background: var(--theme-cream); color: var(--theme-ink); box-shadow: 0 8px 18px rgba(0, 0, 0, .2); }
 .profile-level-heading { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
 .profile-level-heading strong { color: var(--theme-ink); font-size: 15px; }
@@ -2231,6 +2237,7 @@ body {
         <button id="profileBackButton" class="admin-back" type="button">← Retour à l’accueil</button>
         <div class="profile-identity-heading"><span id="profilePageAvatar" class="profile-page-avatar" aria-hidden="true">👤</span><h2 id="profilePageTitle">Mon profil</h2><span id="profilePremiumBadge" class="profile-premium-badge hidden" title="Badge Premium 10 € équipé" aria-label="Badge Premium 10 euros équipé"><img src="./badge-premium-10.png" alt="Badge Premium 10 €"></span></div>
         <p class="profile-page-intro">Voici tes statistiques personnelles.</p>
+        <p id="profileAccountDates" class="profile-account-dates" aria-live="polite"></p>
         <button id="profileEditToggleButton" class="secondary-button profile-edit-toggle hidden" type="button" aria-expanded="false" aria-controls="profileIdentityEditor">Modifier</button>
         <section id="profileIdentityEditor" class="profile-identity-editor hidden" aria-label="Modifier mon pseudo et mon avatar">
             <label for="profilePseudoInput">Modifier mon pseudo (une seule fois)<input id="profilePseudoInput" class="admin-field" type="text" minlength="3" maxlength="24" autocomplete="nickname"></label>
@@ -2376,6 +2383,7 @@ body {
     <section id="recyclingPage" class="player-collection hidden" aria-labelledby="recyclingTitle">
         <button id="recyclingBackButton" class="admin-back" type="button">← Retour à l’accueil</button>
         <h2 id="recyclingTitle">♻️ Recyclage</h2>
+        <div class="recycling-global-stat" aria-label="Nombre total de recyclages effectués par tous les joueurs"><strong id="globalRecycleCount">0</strong><span>recyclages effectués par tous les joueurs</span></div>
         <p class="admin-note">Choisis cinq doubles de la même rareté. Un exemplaire de chaque carte restera dans ta collection. Communes : 1 jeton • Rares : 2 jetons • Légendaires : 3 jetons.</p>
         <button id="recycleDuplicatesButton" class="primary-button" type="button" disabled>Recycler 5 cartes</button>
         <p id="recyclingStatus" class="admin-status" role="status" aria-live="polite">Chargement de tes doubles…</p>
@@ -2873,6 +2881,7 @@ const callGetPublicPlayerProfile = httpsCallable(functions, "getPublicPlayerProf
 const callGetMyPremiumSpending = httpsCallable(functions, "getMyPremiumSpending");
 const callUpdateMyPlayerIdentity = httpsCallable(functions, "updateMyPlayerIdentity");
 const callRecycleDuplicateCards = httpsCallable(functions, "recycleDuplicateCards");
+const callGetGlobalRecycleCount = httpsCallable(functions, "getGlobalRecycleCount");
 const callDownloadPlayerBackup = httpsCallable(functions, "downloadPlayerBackup");
 
 const siteUpdatesModal = document.getElementById("siteUpdatesModal");
@@ -3859,6 +3868,14 @@ async function loadArchivesTaskStatus(claimWhenReady = true) {
         const response = await callGetArchivesTaskStatus();
         const data = response.data || {};
         availableMinages = Array.isArray(data.minages) ? data.minages : [];
+        if (data.readyAt) {
+            availableMinages = availableMinages.map((minage) => minage.id === data.minageId ? {
+                ...minage,
+                workDurationMs: Number(data.taskDurationMs) || minage.workDurationMs,
+                tokenReward: Number.isFinite(Number(data.tokenReward)) ? Number(data.tokenReward) : minage.tokenReward,
+                cardRewardId: data.taskCardRewardId || minage.cardRewardId,
+            } : minage);
+        }
         renderArchivesMinageOptions(data.readyAt ? (data.minageId || "") : "");
         if (data.ready && claimWhenReady) {
             archivesStatus.textContent = "Le tri est terminé. Récupération du jeton…";
@@ -3900,7 +3917,7 @@ sortArchivesButton.addEventListener("click", async () => {
         archivesMiningSelect.value = response.data.minageId || archivesMiningSelect.value;
         archivesMiningSelect.disabled = true;
         const activeMinage = availableMinages.find((item) => item.id === response.data.minageId);
-        if (activeMinage) archivesMiningDescription.textContent = activeMinage.description || "";
+        if (activeMinage) showMinageDetails(activeMinage);
         setArchivesTask(response.data.readyAt);
         archivesStatus.textContent = "Le minage a commencé ! Reviens quand le compte à rebours sera terminé pour récupérer ta récompense.";
     } catch (error) {
@@ -4823,6 +4840,13 @@ playerLogoutButton.addEventListener("click", async () => {
     }
 });
 
+function formatProfileDate(value) {
+    const date = value && typeof value.toDate === "function" ? value.toDate() : new Date(value || "");
+    if (Number.isNaN(date.getTime())) return "Non renseignée";
+    const dateOnly = typeof value === "string" && /^\d{4}-\d{2}-\d{2}$/.test(value);
+    return new Intl.DateTimeFormat("fr-FR", dateOnly ? { dateStyle: "long" } : { dateStyle: "medium", timeStyle: "short" }).format(date);
+}
+
 async function loadPersonalProfile(playerId = auth.currentUser?.uid) {
     if (!auth.currentUser || !playerId) return;
     const isOwnProfile = playerId === auth.currentUser.uid;
@@ -4888,6 +4912,8 @@ async function loadPersonalProfile(playerId = auth.currentUser?.uid) {
             profilePageTitle.textContent = player.pseudo || "Profil joueur";
             document.querySelector(".profile-page-intro").textContent = "Profil public du joueur.";
         }
+        document.getElementById("profileAccountDates").textContent = "Compte créé le " + formatProfileDate(player.createdAt)
+            + " • Dernière connexion le " + formatProfileDate(player.lastLoginAt || player.derniereConnexionAt || player.derniereConnexionDate);
         profilePageAvatar.replaceChildren();
         const badgeDetails = {
             "premium-10": { image: "./badge-premium-10.png", label: "Badge Premium 10 €" },
@@ -5144,7 +5170,7 @@ async function loadLeaderboard() {
         const response = await callGetLeaderboard();
         const players = response.data.classement || [];
         leaderboardStatus.textContent = players.length
-            ? players.length + (players.length > 1 ? " joueurs classés • points : commune 1, rare 2, légendaire 3, mystique 5" : " joueur classé • points : commune 1, rare 2, légendaire 3, mystique 5")
+            ? players.length + (players.length > 1 ? " joueurs classés" : " joueur classé")
             : "Aucun joueur inscrit pour le moment.";
 
         players.forEach((player) => {
@@ -5910,6 +5936,7 @@ recycleDuplicatesButton.addEventListener("click", async () => {
         const response = await callRecycleDuplicateCards({ copyIds });
         document.getElementById("playerTokens").textContent = Number(response.data.tokens).toLocaleString("fr-FR");
         selectedRecycleCopyIds.clear();
+        await loadGlobalRecyclingCount();
         await loadOwnedPlayerCards();
         const reward = Number(response.data.tokensAdded) || 0;
         recycleDuplicatesStatus.textContent = "Tes cinq doubles ont été recyclés. " + reward + " jeton" + (reward > 1 ? "s" : "") + " classique" + (reward > 1 ? "s" : "") + " ajouté" + (reward > 1 ? "s" : "") + " à ton compte.";
@@ -6004,6 +6031,7 @@ recyclingNavButton.addEventListener("click", async () => {
     recyclingNavButton.classList.add("active");
     recycleDuplicatesStatus.textContent = "";
     recyclingStatus.textContent = "Chargement de tes doubles…";
+    await loadGlobalRecyclingCount();
     await loadOwnedPlayerCards();
     recyclingStatus.textContent = recyclableCardCopies.length
         ? "Coche les cinq exemplaires que tu souhaites recycler."
@@ -6011,6 +6039,17 @@ recyclingNavButton.addEventListener("click", async () => {
 });
 
 recyclingBackButton.addEventListener("click", showHomePage);
+
+async function loadGlobalRecyclingCount() {
+    const counter = document.getElementById("globalRecycleCount");
+    try {
+        const response = await callGetGlobalRecycleCount();
+        counter.textContent = (Number(response.data.totalRecyclages) || 0).toLocaleString("fr-FR");
+    } catch (error) {
+        console.error("Impossible de charger le total des recyclages :", error);
+        counter.textContent = "—";
+    }
+}
 
 async function loadRarities() {
     try {
@@ -6370,21 +6409,43 @@ function renderArchivesMinageOptions(activeMinageId = "") {
     const previousChoice = activeMinageId || archivesMiningSelect.value;
     archivesMiningSelect.replaceChildren();
     availableMinages.forEach((minage) => {
-        const option = new Option(minage.name, minage.id);
+        const option = new Option(`${minage.name} — ${formatMinageDuration(minage.workDurationMs)} — ${formatMinageReward(minage)}`, minage.id);
         option.dataset.description = minage.description || "";
         archivesMiningSelect.add(option);
     });
     const selected = availableMinages.find((item) => item.id === previousChoice) || availableMinages[0];
     if (selected) {
         archivesMiningSelect.value = selected.id;
-        archivesMiningDescription.textContent = selected.description || "";
+        showMinageDetails(selected);
     }
     archivesMiningSelect.disabled = Boolean(activeMinageId);
 }
 
+function formatMinageDuration(durationMs) {
+    const minutes = Math.max(1, Math.round((Number(durationMs) || 0) / 60_000));
+    const hours = Math.floor(minutes / 60);
+    const remainingMinutes = minutes % 60;
+    if (!hours) return `${minutes} min`;
+    return `${hours} h${remainingMinutes ? ` ${remainingMinutes} min` : ""}`;
+}
+
+function formatMinageReward(minage) {
+    const tokens = Number(minage?.tokenReward) || 0;
+    return `${tokens} jeton${tokens === 1 ? "" : "s"} classique${tokens === 1 ? "" : "s"}${minage?.cardRewardId ? " + 1 carte" : ""}`;
+}
+
+function showMinageDetails(minage) {
+    if (!minage) {
+        archivesMiningDescription.textContent = "Choisis un minage pour voir sa durée et sa récompense.";
+        return;
+    }
+    const description = minage.description || "";
+    archivesMiningDescription.textContent = `${description}${description ? "\n\n" : ""}Durée : ${formatMinageDuration(minage.workDurationMs)}\nRécompense : ${formatMinageReward(minage)}`;
+}
+
 archivesMiningSelect.addEventListener("change", () => {
     const selected = availableMinages.find((item) => item.id === archivesMiningSelect.value);
-    archivesMiningDescription.textContent = selected?.description || "";
+    showMinageDetails(selected);
 });
 
 async function loadAdminGavSettings() {
@@ -6501,6 +6562,11 @@ function timestampToMilliseconds(value) {
 function makeAnnouncementItem(announcement) {
     const item = document.createElement("article");
     item.className = "journal-item announcement-item";
+    const rarityLabel = String(announcement.rarity || announcement.title || "").toLocaleLowerCase("fr").normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+    if (announcement.announcementType === "rare-pull" || /carte (legendaire|mystique) tiree/.test(rarityLabel)) {
+        if (rarityLabel.includes("mystique")) item.classList.add("announcement-mystic");
+        else if (rarityLabel.includes("legendaire")) item.classList.add("announcement-legendary");
+    }
     const title = document.createElement("div");
     title.className = "journal-title";
     title.textContent = "📣 " + announcement.title;
