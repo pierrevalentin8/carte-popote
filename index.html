@@ -988,23 +988,24 @@ body {
 .home-card-count-copy { display: flex; align-items: baseline; flex-wrap: wrap; gap: 5px; }
 .home-card-count-value { color: #f7d46b; font-size: 23px; font-weight: 900; line-height: 1; }
 .home-card-count-label { color: #fbfaf5; font-size: 12px; font-weight: 700; }
-.home-player-summary { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 9px; margin: 12px 0; }
+.home-player-summary { display: grid; grid-template-columns: 76px repeat(2, minmax(0, 1fr)); gap: 9px; margin: 12px 0; }
 .home-profile-button, .home-resource-tile { min-width: 0; min-height: 86px; padding: 10px; border: 1px solid rgba(243,191,56,.72); border-radius: 14px; background: linear-gradient(145deg, #10264a, #183966); color: #fbfaf5; box-shadow: 0 6px 15px rgba(0,0,0,.2); }
-.home-profile-button { display: flex; align-items: center; justify-content: center; gap: 8px; font: inherit; text-align: left; cursor: pointer; }
+.home-profile-button { display: flex; aspect-ratio: 1; align-items: center; justify-content: center; padding: 7px; border-radius: 50%; font: inherit; cursor: pointer; }
 .home-profile-button:focus-visible, .home-overview-premium:focus-visible { outline: 3px solid #f7d46b; outline-offset: 3px; }
-.home-profile-button .avatar { width: 48px; height: 48px; border: 2px solid #f3bf38; }
-.home-profile-info { display: grid; min-width: 0; gap: 4px; }
-.home-profile-info strong { overflow: hidden; color: #f7d46b; font-size: 13px; text-overflow: ellipsis; white-space: nowrap; }
-.home-profile-info span { color: #d4dceb; font-size: 10px; }
+.home-profile-button .avatar { width: 56px; height: 56px; border: 2px solid #f3bf38; }
 .home-resource-tile { display: flex; align-items: center; justify-content: center; gap: 7px; text-align: center; }
+.home-resource-tile { flex-direction: row-reverse; }
 .home-resource-tile strong { color: #f7d46b; font-size: clamp(19px, 6vw, 27px); line-height: 1; }
 .home-resource-tile img { width: 36px; height: 36px; object-fit: contain; }
 .home-overview-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; margin: 12px 0 18px; }
-.home-card-count, .home-overview-premium { min-width: 0; min-height: 92px; margin: 0; padding: 10px; border: 1px solid rgba(243,191,56,.75); border-radius: 13px; background: linear-gradient(110deg, #10264a, #183966); color: #fbfaf5; box-shadow: 0 7px 17px rgba(0,0,0,.22); }
+.home-card-count, .home-overview-premium { min-width: 0; min-height: 86px; margin: 0; padding: 10px; border: 1px solid rgba(243,191,56,.75); border-radius: 13px; background: linear-gradient(110deg, #10264a, #183966); color: #fbfaf5; box-shadow: 0 7px 17px rgba(0,0,0,.22); }
 .home-card-count { width: 100%; font: inherit; cursor: default; }
 .home-card-count:not(:disabled) { cursor: pointer; }
 .home-card-count:focus-visible { outline: 3px solid #f7d46b; outline-offset: 3px; }
 .home-card-count:disabled { opacity: 1; }
+.home-overview-leaderboard { display: flex; width: 100%; min-width: 0; min-height: 86px; align-items: center; justify-content: center; margin: 0; padding: 8px; border: 1px solid rgba(243,191,56,.75); border-radius: 13px; background: linear-gradient(110deg, #10264a, #183966); box-shadow: 0 7px 17px rgba(0,0,0,.22); cursor: pointer; }
+.home-overview-leaderboard img { width: min(100%, 78px); height: 72px; object-fit: contain; }
+.home-overview-leaderboard:focus-visible { outline: 3px solid #f7d46b; outline-offset: 3px; }
 .home-card-count-icon { width: 28px; height: 38px; }
 .home-card-count-value { font-size: 21px; }
 .home-card-count-label { font-size: 11px; }
@@ -1021,7 +1022,7 @@ body {
 .archives-action-wrap { display: grid; justify-items: center; gap: 12px; padding: 20px; border: 1px solid rgba(243,191,56,.48); border-radius: 18px; background: rgba(5,16,35,.78); box-shadow: 0 12px 30px rgba(0,0,0,.28); }
 .archives-countdown { color: #ffe181; font-size: clamp(22px, 6vw, 32px); font-weight: 900; font-variant-numeric: tabular-nums; text-align: center; }
 .archives-status { min-height: 24px; color: #c6d2e5; text-align: center; }
-@media (max-width: 600px) { .home-overview-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 600px) { .home-overview-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; } .home-overview-leaderboard { min-height: 78px; padding: 5px; } .home-overview-leaderboard img { height: 64px; } }
 @media (max-width: 600px) { .archives-page::before { background-size: cover, min(100vw, 480px) auto; } }
 .home-site-note { display: grid; justify-items: center; gap: 7px; margin: 20px 0 88px; color: #c6d2e5; font-size: 11px; line-height: 1.45; text-align: center; }
 .home-site-note p { margin: 0; }
@@ -1042,7 +1043,7 @@ body {
 .finance-history-fields label { display: grid; gap: 5px; font-size: 12px; font-weight: 700; }
 .finance-history-fields .admin-field { min-width: 0; }
 @media (max-width: 560px) { .finance-history-fields { grid-template-columns: 1fr; } }
-@media (max-width: 380px) { .home-player-summary { gap: 6px; grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); } .home-profile-button { flex-direction: column; gap: 3px; padding: 7px 4px; } .home-profile-button .avatar { width: 42px; height: 42px; } .home-profile-info { text-align: center; } .home-profile-info strong { max-width: 88px; font-size: 11px; } .home-profile-info span { display: none; } .home-resource-tile { padding: 7px 4px; } .home-resource-tile img { width: 30px; height: 30px; } .home-overview-premium { flex-direction: column; gap: 2px; } .home-overview-premium img { width: 50px; height: 50px; } }
+@media (max-width: 380px) { .home-player-summary { gap: 6px; grid-template-columns: 58px repeat(2, minmax(0, 1fr)); } .home-profile-button { min-height: 58px; padding: 4px; } .home-profile-button .avatar { width: 46px; height: 46px; } .home-resource-tile { padding: 7px 4px; } .home-resource-tile img { width: 30px; height: 30px; } .home-overview-premium { flex-direction: column; gap: 2px; } .home-overview-premium img { width: 50px; height: 50px; } }
 
 
 /* ==================================================
@@ -1066,7 +1067,7 @@ body {
     display: grid;
 
     grid-template-columns:
-        repeat(6, minmax(0, 1fr));
+        repeat(4, minmax(0, 1fr));
 
     background: #ffffff;
 
@@ -1787,12 +1788,13 @@ body {
 .booster-modal { background: rgba(3, 11, 25, .78); }
 .booster-modal-content { color: var(--theme-ink); }
 .bottom-nav {
-    background: rgba(8, 24, 49, .98);
-    border-top: 1px solid rgba(243, 191, 56, .72);
-    box-shadow: 0 -8px 24px rgba(0, 0, 0, .3);
+    background: #ffffff;
+    border-top: 1px solid #e2e8f0;
+    box-shadow: 0 -5px 18px rgba(16, 38, 74, .14);
 }
-.nav-item { color: #b4c1d5; }
-.nav-item.active { color: var(--theme-gold-light); }
+.nav-image-button { background: #ffffff; box-shadow: 0 2px 9px rgba(16, 38, 74, .18); }
+.nav-item { color: #5a6d87; }
+.nav-item.active { color: #a87900; }
 .nav-item:disabled { color: #8290a4; }
 .bottom-nav { box-sizing: border-box; height: calc(70px + env(safe-area-inset-bottom, 0px)); padding-bottom: env(safe-area-inset-bottom, 0px); }
 .app-content { padding-bottom: calc(100px + env(safe-area-inset-bottom, 0px)); }
@@ -2023,14 +2025,17 @@ body {
         <!-- PROFIL -->
 
         <section class="home-player-summary" aria-label="Profil et ressources du joueur">
-            <button id="playerProfileHomeButton" class="home-profile-button" type="button" aria-label="Ouvrir le profil de Joueur">
+            <button id="playerProfileHomeButton" class="home-profile-button" type="button" aria-label="Ouvrir le profil">
                 <span class="avatar" id="playerAvatar" aria-hidden="true">👤</span>
-                <span class="home-profile-info"><strong id="playerPseudo">Joueur</strong><span>Mon profil →</span></span>
             </button>
             <article class="home-resource-tile" aria-label="Jetons classiques disponibles">
                 <img src="./Jeton.png" alt="">
                 <strong id="playerTokens">0</strong>
             </article>
+            <button id="premiumHomeButton" class="home-overview-premium" type="button" aria-label="Ouvrir la page Premium">
+                <img src="./Jeton%20premium.png" alt="Jeton Premium">
+            </button>
+            <span id="playerPseudo" class="hidden">Joueur</span>
             <span id="playerBoosters" class="hidden">0</span>
             <span id="playerLevel" class="hidden">Niveau 1 • 0 XP</span>
             <span id="xpProgress" class="hidden"></span>
@@ -2038,15 +2043,15 @@ body {
         </section>
 
         <section class="home-overview-grid" aria-label="Informations Cartes & Popote">
+            <button id="leaderboardMenuButton" class="home-overview-leaderboard" type="button" aria-label="Ouvrir le classement" title="Classement">
+                <img src="./Classement.png" alt="">
+            </button>
             <button id="homeCardCountButton" class="home-card-count" type="button" aria-label="Nombre de cartes créées dans le jeu" disabled>
                 <img class="home-card-count-icon" src="./Dos%20cartes.png" alt="">
                 <span class="home-card-count-copy">
                     <strong id="publicCardCount" class="home-card-count-value">—</strong>
                     <span class="home-card-count-label">cartes créées</span>
                 </span>
-            </button>
-            <button id="premiumHomeButton" class="home-overview-premium" type="button" aria-label="Ouvrir la page Premium">
-                <img src="./Jeton%20premium.png" alt="Jeton Premium">
             </button>
             <div class="home-overview-archive">
                 <button id="archivesHomeButton" type="button" aria-label="Ouvrir la Salle archives">
@@ -2709,15 +2714,6 @@ body {
         </button>
 
 
-        <button id="rulesNavButton" class="nav-item nav-image-button" type="button" aria-label="Règles" title="Règles">
-            <img src="./Règles.png" alt="" aria-hidden="true">
-        </button>
-
-        <button id="leaderboardMenuButton" class="nav-item nav-image-button" type="button" aria-label="Classement" title="Classement">
-            <img src="./Classement.png" alt="" aria-hidden="true">
-        </button>
-
-
     </nav>
 
     <div id="exchangeUnlockNotice" class="nav-unlock-notice hidden" role="status" aria-live="polite">
@@ -3274,7 +3270,6 @@ const rulesSaveStatus = document.getElementById("rulesSaveStatus");
 const homeNavButton = document.getElementById("homeNavButton");
 const collectionNavButton = document.getElementById("collectionNavButton");
 const recyclingNavButton = document.getElementById("recyclingNavButton");
-const rulesNavButton = document.getElementById("rulesNavButton");
 let ownedAlbumCards = [];
 let recyclableCardCopies = [];
 const selectedRecycleCopyIds = new Set();
@@ -3749,7 +3744,6 @@ function showHomePage() {
     homeNavButton.classList.add("active");
     collectionNavButton.classList.remove("active");
     recyclingNavButton.classList.remove("active");
-    rulesNavButton.classList.remove("active");
     leaderboardMenuButton.classList.remove("active");
 }
 
@@ -5803,7 +5797,6 @@ document.getElementById("viewOwnedCardsButton").addEventListener("click", async 
     bottomNav.classList.remove("hidden");
     homeNavButton.classList.remove("active");
     collectionNavButton.classList.add("active");
-    rulesNavButton.classList.remove("active");
     await loadOwnedPlayerCards();
 });
 
@@ -5975,24 +5968,6 @@ rulesSaveButton.addEventListener("click", async () => {
     }
 });
 
-rulesNavButton.addEventListener("click", async () => {
-    premiumPage.classList.add("hidden");
-    document.querySelector(".app-content").classList.add("hidden");
-    profilePage.classList.add("hidden");
-    leaderboardPage.classList.add("hidden");
-    statisticsPage.classList.add("hidden");
-    collectionPage.classList.add("hidden");
-    recyclingPage.classList.add("hidden");
-    adminPage.classList.add("hidden");
-    messagingPage.classList.add("hidden");
-    archivesPage.classList.add("hidden");
-    rulesPage.classList.remove("hidden");
-    bottomNav.classList.remove("hidden");
-    document.querySelectorAll(".bottom-nav .nav-item").forEach((button) => button.classList.remove("active"));
-    rulesNavButton.classList.add("active");
-    await loadGameRules();
-});
-
 collectionNavButton.addEventListener("click", async () => {
     premiumPage.classList.add("hidden");
     document.querySelector(".app-content").classList.add("hidden");
@@ -6009,7 +5984,6 @@ collectionNavButton.addEventListener("click", async () => {
     homeNavButton.classList.remove("active");
     collectionNavButton.classList.add("active");
     recyclingNavButton.classList.remove("active");
-    rulesNavButton.classList.remove("active");
     await loadOwnedPlayerCards();
 });
 
@@ -6792,14 +6766,14 @@ async function loadAdminMessages(category = activeMessageCategory, status = acti
             copy.textContent = message.message || "Message vide";
             item.append(title, meta, copy);
 
-            if (status !== "archives") {
-                const actions = document.createElement("div");
-                actions.className = "admin-actions";
-                const makeAction = (label, action) => {
-                    const button = document.createElement("button");
-                    button.type = "button";
-                    button.textContent = label;
-                    button.addEventListener("click", async () => {
+            const actions = document.createElement("div");
+            actions.className = "admin-actions";
+            const makeAction = (label, action) => {
+                const button = document.createElement("button");
+                button.type = "button";
+                button.textContent = label;
+                button.addEventListener("click", async () => {
+                    if (action === "delete" && !window.confirm("Supprimer définitivement ce message des archives ?")) return;
                     button.disabled = true;
                     try {
                         if (action === "delete") await deleteDoc(doc(db, "messages", messageDoc.id));
@@ -6811,11 +6785,11 @@ async function loadAdminMessages(category = activeMessageCategory, status = acti
                         button.disabled = false;
                     }
                 });
-                    return button;
-                };
-                actions.append(makeAction("Valider", "valide"), makeAction("Rejeter", "rejete"), makeAction("Supprimer", "delete"));
-                item.append(actions);
-            }
+                return button;
+            };
+            if (status === "archives") actions.append(makeAction("Supprimer", "delete"));
+            else actions.append(makeAction("Valider", "valide"), makeAction("Rejeter", "rejete"), makeAction("Supprimer", "delete"));
+            item.append(actions);
             return item;
         };
 
