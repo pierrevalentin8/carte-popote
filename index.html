@@ -7,7 +7,7 @@
 
 <meta
     name="viewport"
-    content="width=device-width, initial-scale=1.0"
+    content="width=device-width, initial-scale=1.0, viewport-fit=cover"
 >
 
 <meta name="theme-color" content="#08172f">
@@ -988,7 +988,7 @@ body {
 .home-card-count-copy { display: flex; align-items: baseline; flex-wrap: wrap; gap: 5px; }
 .home-card-count-value { color: #f7d46b; font-size: 23px; font-weight: 900; line-height: 1; }
 .home-card-count-label { color: #fbfaf5; font-size: 12px; font-weight: 700; }
-.home-player-summary { display: grid; grid-template-columns: minmax(0, 1.25fr) repeat(2, minmax(0, 1fr)); gap: 9px; margin: 12px 0; }
+.home-player-summary { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 9px; margin: 12px 0; }
 .home-profile-button, .home-resource-tile { min-width: 0; min-height: 86px; padding: 10px; border: 1px solid rgba(243,191,56,.72); border-radius: 14px; background: linear-gradient(145deg, #10264a, #183966); color: #fbfaf5; box-shadow: 0 6px 15px rgba(0,0,0,.2); }
 .home-profile-button { display: flex; align-items: center; justify-content: center; gap: 8px; font: inherit; text-align: left; cursor: pointer; }
 .home-profile-button:focus-visible, .home-overview-premium:focus-visible { outline: 3px solid #f7d46b; outline-offset: 3px; }
@@ -996,9 +996,9 @@ body {
 .home-profile-info { display: grid; min-width: 0; gap: 4px; }
 .home-profile-info strong { overflow: hidden; color: #f7d46b; font-size: 13px; text-overflow: ellipsis; white-space: nowrap; }
 .home-profile-info span { color: #d4dceb; font-size: 10px; }
-.home-resource-tile { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 7px; text-align: center; }
+.home-resource-tile { display: flex; align-items: center; justify-content: center; gap: 7px; text-align: center; }
 .home-resource-tile strong { color: #f7d46b; font-size: clamp(19px, 6vw, 27px); line-height: 1; }
-.home-resource-tile span { color: #fbfaf5; font-size: 11px; font-weight: 700; line-height: 1.25; }
+.home-resource-tile img { width: 36px; height: 36px; object-fit: contain; }
 .home-overview-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; margin: 12px 0 18px; }
 .home-card-count, .home-overview-premium { min-width: 0; min-height: 92px; margin: 0; padding: 10px; border: 1px solid rgba(243,191,56,.75); border-radius: 13px; background: linear-gradient(110deg, #10264a, #183966); color: #fbfaf5; box-shadow: 0 7px 17px rgba(0,0,0,.22); }
 .home-card-count { width: 100%; font: inherit; cursor: default; }
@@ -1042,7 +1042,7 @@ body {
 .finance-history-fields label { display: grid; gap: 5px; font-size: 12px; font-weight: 700; }
 .finance-history-fields .admin-field { min-width: 0; }
 @media (max-width: 560px) { .finance-history-fields { grid-template-columns: 1fr; } }
-@media (max-width: 380px) { .home-player-summary { gap: 6px; grid-template-columns: minmax(0, 1.15fr) repeat(2, minmax(0, 1fr)); } .home-profile-button { flex-direction: column; gap: 3px; padding: 7px 4px; } .home-profile-button .avatar { width: 42px; height: 42px; } .home-profile-info { text-align: center; } .home-profile-info strong { max-width: 88px; font-size: 11px; } .home-profile-info span { display: none; } .home-resource-tile { padding: 7px 4px; } .home-overview-premium { flex-direction: column; gap: 2px; } .home-overview-premium img { width: 50px; height: 50px; } }
+@media (max-width: 380px) { .home-player-summary { gap: 6px; grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); } .home-profile-button { flex-direction: column; gap: 3px; padding: 7px 4px; } .home-profile-button .avatar { width: 42px; height: 42px; } .home-profile-info { text-align: center; } .home-profile-info strong { max-width: 88px; font-size: 11px; } .home-profile-info span { display: none; } .home-resource-tile { padding: 7px 4px; } .home-resource-tile img { width: 30px; height: 30px; } .home-overview-premium { flex-direction: column; gap: 2px; } .home-overview-premium img { width: 50px; height: 50px; } }
 
 
 /* ==================================================
@@ -1778,7 +1778,8 @@ body {
 @media (max-width: 390px) { .player-profile { padding-left: 11px; padding-right: 11px; } .profile-stats-grid { gap: 9px; } .profile-stat { min-height: 136px; padding: 14px 8px; } .profile-stat-label { font-size: 11px; } }
 @media (max-width: 390px) { .profile-roadmap-item { grid-template-columns: 46px minmax(0, 1fr); } .profile-roadmap-state { grid-column: 2; text-align: left; } }
 @media (max-width: 600px) { .leaderboard-page { padding-left: 11px; padding-right: 11px; } .leaderboard-row { grid-template-columns: 58px minmax(0, 1fr); gap: 10px; padding: 11px; } .leaderboard-rarity-grid { grid-column: 1 / -1; grid-template-columns: repeat(2, minmax(0, 1fr)); } }
-.player-card { background: var(--theme-cream); box-shadow: 0 9px 22px rgba(0, 0, 0, .28); }
+.player-card { position: relative; background: var(--theme-cream); box-shadow: 0 9px 22px rgba(0, 0, 0, .28); }
+.card-new-badge { position: absolute; z-index: 2; top: 8px; left: 8px; padding: 5px 8px; border: 1px solid #f7d46b; border-radius: 999px; background: #10264a; color: #ffe181; font-size: 10px; font-weight: 900; box-shadow: 0 2px 7px rgba(0,0,0,.3); }
 .player-card-image, .player-card-placeholder { background: #efe8d7; }
 .rarity-label { background: #f1ead9; }
 .card-quantity-badge { background: var(--theme-navy); border-color: var(--theme-gold-light); }
@@ -1793,6 +1794,10 @@ body {
 .nav-item { color: #b4c1d5; }
 .nav-item.active { color: var(--theme-gold-light); }
 .nav-item:disabled { color: #8290a4; }
+.bottom-nav { box-sizing: border-box; height: calc(70px + env(safe-area-inset-bottom, 0px)); padding-bottom: env(safe-area-inset-bottom, 0px); }
+.app-content { padding-bottom: calc(100px + env(safe-area-inset-bottom, 0px)); }
+.booster-visual { position: relative; display: block; }
+.booster-stock-badge { position: absolute; top: 7px; right: 7px; padding: 5px 8px; border: 1px solid rgba(243,191,56,.9); border-radius: 999px; background: rgba(8,24,49,.92); color: #ffe181; font-size: 11px; font-weight: 800; box-shadow: 0 2px 8px rgba(0,0,0,.3); }
 .nav-unlock-notice { position: fixed; z-index: 120; right: 16px; bottom: 82px; left: 16px; width: fit-content; max-width: 440px; margin: 0 auto; padding: 11px 16px; border: 1px solid rgba(243, 191, 56, .7); border-radius: 12px; background: #10264a; color: #fbfaf5; font-size: 13px; line-height: 1.4; text-align: center; box-shadow: 0 8px 24px rgba(0, 0, 0, .32); }
 @media (max-width: 380px) {
     .app-content { padding-left: 11px; padding-right: 11px; }
@@ -2023,11 +2028,10 @@ body {
                 <span class="home-profile-info"><strong id="playerPseudo">Joueur</strong><span>Mon profil →</span></span>
             </button>
             <article class="home-resource-tile" aria-label="Jetons classiques disponibles">
-                <strong id="playerTokens">0</strong><span>Jetons classiques</span>
+                <img src="./Jeton.png" alt="">
+                <strong id="playerTokens">0</strong>
             </article>
-            <article class="home-resource-tile" aria-label="Boosters en stock">
-                <strong id="playerBoosters">0</strong><span>Boosters en stock</span>
-            </article>
+            <span id="playerBoosters" class="hidden">0</span>
             <span id="playerLevel" class="hidden">Niveau 1 • 0 XP</span>
             <span id="xpProgress" class="hidden"></span>
             <span id="playerCards" class="hidden">0</span>
@@ -2084,11 +2088,10 @@ body {
 
             <article class="booster">
 
-                <img
-                    class="booster-image"
-                    src="./Booster%20normal.png"
-                    alt="Illustration du booster classique Cartes & Popote"
-                >
+                <span class="booster-visual">
+                    <img class="booster-image" src="./Booster%20normal.png" alt="Illustration du booster classique Cartes & Popote">
+                    <strong class="booster-stock-badge"><span id="normalBoosterStockCount">0</span> en stock</strong>
+                </span>
 
                 <h4>
                     Booster classique
@@ -2396,10 +2399,12 @@ body {
     <section id="archivesPage" class="archives-page hidden" aria-labelledby="archivesPageTitle">
         <button id="archivesBackButton" class="admin-back" type="button">← Retour à l’accueil</button>
         <h2 id="archivesPageTitle">Salle archives</h2>
-        <p class="archives-description">Envoie le GAV trier les archives. Il trouvera peut-être des jetons classiques pour toi</p>
+        <label for="archivesMiningSelect">Choisis un minage</label>
+        <select id="archivesMiningSelect" class="admin-field" aria-describedby="archivesMiningDescription"></select>
+        <p id="archivesMiningDescription" class="archives-description">Envoie le GAV trier les archives. Il trouvera peut-être des jetons classiques pour toi.</p>
         <div class="archives-action-wrap">
             <span id="archivesCountdown" class="archives-countdown hidden" aria-live="polite"></span>
-            <button id="sortArchivesButton" class="primary-button" type="button" disabled>Trier les archives</button>
+            <button id="sortArchivesButton" class="primary-button" type="button" disabled>Lancer le minage</button>
             <p id="archivesStatus" class="archives-status" role="status" aria-live="polite"></p>
         </div>
     </section>
@@ -2558,7 +2563,7 @@ body {
             <button class="admin-menu-button" type="button" data-admin-section="updates" aria-controls="adminUpdatesSection" aria-pressed="false">📢 Annonce MAJ</button>
             <button class="admin-menu-button" type="button" data-admin-section="rarities" aria-controls="adminRaritiesSection" aria-pressed="false">⭐ Catégories de rareté</button>
             <button class="admin-menu-button" type="button" data-admin-section="cards" aria-controls="adminCardsSection" aria-pressed="false">🃏 Création de cartes</button>
-            <button class="admin-menu-button" type="button" data-admin-section="gav" aria-controls="adminGavSection" aria-pressed="false">🕵️ GAV</button>
+            <button class="admin-menu-button" type="button" data-admin-section="gav" aria-controls="adminGavSection" aria-pressed="false">⛏️ Minage</button>
         </nav>
         <p id="adminSectionHint" class="admin-note">Choisis une rubrique pour afficher son contenu.</p>
         <div id="adminJournalSection" class="admin-panel admin-section hidden" style="margin-bottom:16px">
@@ -2638,20 +2643,28 @@ body {
             <div id="cardsList"></div>
         </div>
         <div id="adminGavSection" class="admin-panel admin-section hidden" style="margin-bottom:16px">
-            <h3>🕵️ Réglages du GAV</h3>
-            <p class="admin-note">Choisis la durée du tri et ce que le joueur gagne à la fin. La carte est facultative.</p>
+            <h3>⛏️ Administration du minage</h3>
+            <p class="admin-note">Crée plusieurs types de minage. Le tri des archives existant est conservé et apparaît comme premier choix.</p>
+            <label for="minageAdminSelect">Minage à modifier</label>
+            <select id="minageAdminSelect" class="admin-field"></select>
+            <button id="minageCreateButton" class="secondary-button" type="button">Créer un type de minage</button>
             <form id="adminGavForm">
-                <label for="gavDurationMinutes">Temps de travail (minutes)</label>
+                <label for="minageName">Nom</label>
+                <input id="minageName" class="admin-field" type="text" maxlength="80" required>
+                <label for="minageDescription">Description</label>
+                <textarea id="minageDescription" class="admin-field" maxlength="500" rows="3" required></textarea>
+                <label for="gavDurationMinutes">Durée du minage (minutes)</label>
                 <input id="gavDurationMinutes" class="admin-field" type="number" min="1" max="4320" step="1" required>
-                <label for="gavTokenReward">Jetons classiques offerts</label>
+                <label for="gavTokenReward">Récompense en jetons classiques</label>
                 <input id="gavTokenReward" class="admin-field" type="number" min="0" max="1000" step="1" required>
                 <label for="gavCardReward">Carte offerte (facultatif)</label>
                 <select id="gavCardReward" class="admin-field"><option value="">Aucune carte</option></select>
-                <button id="adminGavSaveButton" class="primary-button admin-submit" type="submit">Enregistrer les réglages</button>
+                <button id="adminGavSaveButton" class="primary-button admin-submit" type="submit">Enregistrer ce minage</button>
+                <button id="minageDeleteButton" class="secondary-button hidden" type="button">Supprimer ce minage</button>
             </form>
             <p id="adminGavStatus" class="admin-status" role="status" aria-live="polite"></p>
             <h3>Compteurs généraux</h3>
-            <p id="gavTotalWork" class="admin-note">Temps total de travail des GAV : —</p>
+            <p id="gavTotalWork" class="admin-note">Temps total de minage de tous les joueurs : —</p>
             <p id="gavTotalCards" class="admin-note">Cartes tirées par tous les joueurs : —</p>
         </div>
     </section>
@@ -3114,6 +3127,9 @@ const sortArchivesButton = document.getElementById("sortArchivesButton");
 const archivesCountdown = document.getElementById("archivesCountdown");
 const archivesHomeCountdown = document.getElementById("archivesHomeCountdown");
 const archivesStatus = document.getElementById("archivesStatus");
+const archivesMiningSelect = document.getElementById("archivesMiningSelect");
+const archivesMiningDescription = document.getElementById("archivesMiningDescription");
+let availableMinages = [];
 let archivesReadyAtMs = null;
 let archivesCountdownInterval = null;
 let archivesClaimInProgress = false;
@@ -3202,6 +3218,13 @@ const adminSections = {
     cards: document.getElementById("adminCardsSection"),
     gav: document.getElementById("adminGavSection")
 };
+const minageAdminSelect = document.getElementById("minageAdminSelect");
+const minageCreateButton = document.getElementById("minageCreateButton");
+const minageDeleteButton = document.getElementById("minageDeleteButton");
+const minageNameInput = document.getElementById("minageName");
+const minageDescriptionInput = document.getElementById("minageDescription");
+let adminMinages = [];
+let selectedAdminMinageId = "";
 const announcementsList = document.getElementById("announcementsList");
 const newPlayersList = document.getElementById("newPlayersList");
 const publicCardCount = document.getElementById("publicCardCount");
@@ -3770,14 +3793,15 @@ function clearArchivesCountdown() {
     archivesCountdown.classList.add("hidden");
     archivesHomeCountdown.classList.add("hidden");
     sortArchivesButton.disabled = false;
-    sortArchivesButton.textContent = "Trier les archives";
+    archivesMiningSelect.disabled = false;
+    sortArchivesButton.textContent = "Lancer le minage";
 }
 
 async function claimArchivesReward() {
     if (archivesClaimInProgress || !auth.currentUser) return;
     archivesClaimInProgress = true;
     sortArchivesButton.disabled = true;
-    archivesStatus.textContent = "Le GAV a terminé le tri. Récupération de ta récompense…";
+    archivesStatus.textContent = "Le minage est terminé. Récupération de ta récompense…";
     try {
         const response = await callClaimArchivesSortingReward();
         const tokens = Number(response.data.tokens) || 0;
@@ -3791,11 +3815,11 @@ async function claimArchivesReward() {
         archivesHomeCountdown.textContent = `+${tokenReward} jeton${tokenReward === 1 ? "" : "s"} classique${tokenReward === 1 ? "" : "s"}${response.data.cardRewarded ? " et une carte" : ""} trouvé${tokenReward === 1 ? "" : "s"} !`;
         archivesHomeCountdown.classList.remove("hidden");
         setTimeout(() => archivesHomeCountdown.classList.add("hidden"), 7000);
-        archivesStatus.textContent = `Le GAV t’a rapporté ${tokenReward} jeton${tokenReward === 1 ? "" : "s"} classique${tokenReward === 1 ? "" : "s"}${response.data.cardRewarded ? " et une carte" : ""}. Clique sur Trier les archives pour recommencer.`;
+        archivesStatus.textContent = "Minage terminé : " + tokenReward + " jeton(s) classique(s) gagné(s)" + (response.data.cardRewarded ? " et une carte." : ".") + " Tu peux en lancer un autre.";
     } catch (error) {
         console.error("Erreur lors de la récupération du jeton des archives :", error);
         archivesStatus.textContent = error.code === "functions/failed-precondition"
-            ? "Le tri n’est pas encore terminé. Le compte à rebours continue."
+            ? "Le minage n’est pas encore terminé. Le compte à rebours continue."
             : "Impossible de récupérer le jeton. Réessaie dans un instant.";
         await loadArchivesTaskStatus(false);
     } finally {
@@ -3813,7 +3837,7 @@ function updateArchivesCountdown() {
     archivesCountdown.classList.remove("hidden");
     archivesHomeCountdown.classList.remove("hidden");
     sortArchivesButton.disabled = true;
-    sortArchivesButton.textContent = "Tri des archives en cours";
+    sortArchivesButton.textContent = "Minage en cours";
     if (remaining <= 0) {
         if (archivesCountdownInterval) clearInterval(archivesCountdownInterval);
         archivesCountdownInterval = null;
@@ -3840,6 +3864,8 @@ async function loadArchivesTaskStatus(claimWhenReady = true) {
     try {
         const response = await callGetArchivesTaskStatus();
         const data = response.data || {};
+        availableMinages = Array.isArray(data.minages) ? data.minages : [];
+        renderArchivesMinageOptions(data.readyAt ? (data.minageId || "") : "");
         if (data.ready && claimWhenReady) {
             archivesStatus.textContent = "Le tri est terminé. Récupération du jeton…";
             await claimArchivesReward();
@@ -3847,10 +3873,10 @@ async function loadArchivesTaskStatus(claimWhenReady = true) {
         }
         if (data.readyAt) {
             setArchivesTask(data.readyAt);
-            archivesStatus.textContent = data.ready ? "Ta récompense est prête à être récupérée." : "Le GAV trie les archives. Le compte à rebours est aussi affiché sur l’accueil.";
+            archivesStatus.textContent = data.ready ? "Ta récompense est prête à être récupérée." : (data.minageName || "Le minage") + " est en cours. Le compte à rebours est aussi affiché sur l’accueil.";
         } else {
             clearArchivesCountdown();
-            archivesStatus.textContent = "Tu peux envoyer le GAV trier les archives.";
+            archivesStatus.textContent = "Choisis un minage puis lance-le.";
         }
     } catch (error) {
         console.error("Impossible de charger le compte à rebours des archives :", error);
@@ -3874,11 +3900,15 @@ archivesBackButton.addEventListener("click", showHomePage);
 sortArchivesButton.addEventListener("click", async () => {
     if (!auth.currentUser || sortArchivesButton.disabled) return;
     sortArchivesButton.disabled = true;
-    archivesStatus.textContent = "Le GAV commence à trier les archives…";
+    archivesStatus.textContent = "Le minage commence…";
     try {
-        const response = await callStartArchivesSorting();
+        const response = await callStartArchivesSorting({ minageId: archivesMiningSelect.value });
+        archivesMiningSelect.value = response.data.minageId || archivesMiningSelect.value;
+        archivesMiningSelect.disabled = true;
+        const activeMinage = availableMinages.find((item) => item.id === response.data.minageId);
+        if (activeMinage) archivesMiningDescription.textContent = activeMinage.description || "";
         setArchivesTask(response.data.readyAt);
-        archivesStatus.textContent = "Le tri a commencé ! Reviens quand le compte à rebours sera terminé pour récupérer ta récompense.";
+        archivesStatus.textContent = "Le minage a commencé ! Reviens quand le compte à rebours sera terminé pour récupérer ta récompense.";
     } catch (error) {
         console.error("Impossible de lancer le tri des archives :", error);
         archivesStatus.textContent = error.message || "Impossible de lancer le tri des archives.";
@@ -4702,6 +4732,7 @@ premiumSpinButton.addEventListener("click", async () => {
         premiumBalanceDisplay.textContent = premiumBalanceCount.toLocaleString("fr-FR");
         document.getElementById("playerTokens").textContent = Number(data.tokens).toLocaleString("fr-FR");
         document.getElementById("playerBoosters").textContent = Number(data.boostersDisponibles).toLocaleString("fr-FR");
+        setOpenBoosterButton(data.boostersDisponibles);
         showPremiumPrizeReveal(data.prize);
         premiumStatus.textContent = "Cadeau obtenu : " + data.prize.name + " — " + premiumRewardDescription(data.prize) + ".";
         await loadPremiumJournal();
@@ -5554,6 +5585,12 @@ function createPlayerCardElement(card, quantity = 1) {
     quantityBadge.textContent = "×" + quantity;
     quantityBadge.setAttribute("aria-label", quantity + (quantity === 1 ? " exemplaire" : " exemplaires"));
     cardElement.append(quantityBadge);
+    if (card.isNew) {
+        const newBadge = document.createElement("span");
+        newBadge.className = "card-new-badge";
+        newBadge.textContent = "Nouvelle";
+        cardElement.append(newBadge);
+    }
     if (/^https?:\/\//i.test(card.imageUrl || "")) {
         const image = document.createElement("img");
         image.className = "player-card-image";
@@ -5642,9 +5679,25 @@ document.addEventListener("keydown", (event) => {
 
 function setOpenBoosterButton(count) {
     const available = Number(count) || 0;
-    openNormalBoosterButton.textContent = "Ouvrir un booster (" + available + ")";
+    document.getElementById("playerBoosters").textContent = available.toLocaleString("fr-FR");
+    document.getElementById("normalBoosterStockCount").textContent = available.toLocaleString("fr-FR");
+    openNormalBoosterButton.textContent = "Ouvrir un booster";
     openNormalBoosterButton.disabled = available < 1;
     openNextBoosterButton.classList.toggle("hidden", available < 1);
+}
+
+async function getPreviouslyOwnedCardIds() {
+    if (!auth.currentUser) return new Set();
+    const snapshot = await getDocs(collection(db, "players", auth.currentUser.uid, "collection"));
+    return new Set(snapshot.docs.map((item) => item.data().cardId).filter(Boolean));
+}
+
+function markNewlyDiscoveredCards(cards, previouslyOwnedIds) {
+    return cards.map((card) => {
+        const isNew = Boolean(card.cardId) && !previouslyOwnedIds.has(card.cardId);
+        if (card.cardId) previouslyOwnedIds.add(card.cardId);
+        return { ...card, isNew };
+    });
 }
 
 function getParisDateKey() {
@@ -5766,6 +5819,7 @@ openNormalBoosterButton.addEventListener("click", async () => {
     openNormalBoosterButton.disabled = true;
     boosterPurchaseStatus.textContent = "Ouverture du booster...";
     try {
+        const previouslyOwnedIds = await getPreviouslyOwnedCardIds();
         const response = await callOpenClassicBooster();
         const result = response.data;
         const count = Number(result.boostersDisponibles) || 0;
@@ -5773,7 +5827,7 @@ openNormalBoosterButton.addEventListener("click", async () => {
         document.getElementById("playerCards").textContent = Number(result.cartesTirees) || 0;
         updatePlayerXpDisplay(result.xp);
         boosterPurchaseStatus.textContent = "Booster ouvert : 5 cartes ajoutées à ta collection.";
-        await showBoosterResults(result.cards || [], result.boostersOfferts, "classique");
+        await showBoosterResults(markNewlyDiscoveredCards(result.cards || [], previouslyOwnedIds), result.boostersOfferts, "classique");
     } catch (error) {
         console.error("Erreur pendant l’ouverture du booster :", error);
         if (error.code === "functions/unauthenticated") {
@@ -5805,6 +5859,7 @@ openDailyBoosterButton.addEventListener("click", async () => {
     openDailyBoosterButton.textContent = "Ouverture...";
     boosterPurchaseStatus.textContent = "Ouverture du booster journalier...";
     try {
+        const previouslyOwnedIds = await getPreviouslyOwnedCardIds();
         const response = await callOpenDailyBooster();
         const result = response.data;
         document.getElementById("playerCards").textContent = Number(result.cartesTirees) || 0;
@@ -5812,7 +5867,7 @@ openDailyBoosterButton.addEventListener("click", async () => {
         if (Number.isFinite(Number(result.boostersDisponibles))) setOpenBoosterButton(result.boostersDisponibles);
         setDailyBoosterButton(result.boosterJournalierDate);
         boosterPurchaseStatus.textContent = "Booster journalier ouvert : 3 cartes ajoutées à ta collection.";
-        await showBoosterResults(result.cards || [], result.boostersOfferts, "journalier");
+        await showBoosterResults(markNewlyDiscoveredCards(result.cards || [], previouslyOwnedIds), result.boostersOfferts, "journalier");
     } catch (error) {
         console.error("Erreur pendant l’ouverture du booster journalier :", error);
         if (error.code === "functions/failed-precondition" && /déjà ouvert/i.test(error.message || "")) {
@@ -6321,8 +6376,42 @@ function updateAdminGavWorkDisplay() {
     const hours = Math.floor(totalSeconds / 3600);
     const minutes = Math.floor((totalSeconds % 3600) / 60);
     const seconds = totalSeconds % 60;
-    document.getElementById("gavTotalWork").textContent = `Temps total de travail des GAV : ${hours} h ${String(minutes).padStart(2, "0")} min ${String(seconds).padStart(2, "0")} s`;
+    document.getElementById("gavTotalWork").textContent = `Temps total de minage de tous les joueurs : ${hours} h ${String(minutes).padStart(2, "0")} min ${String(seconds).padStart(2, "0")} s`;
 }
+
+function renderAdminMinageOptions() {
+    minageAdminSelect.replaceChildren(new Option("Créer un nouveau type…", "__new__"));
+    adminMinages.forEach((minage) => minageAdminSelect.add(new Option(minage.name, minage.id)));
+    minageAdminSelect.value = selectedAdminMinageId || "__new__";
+    const selected = adminMinages.find((item) => item.id === selectedAdminMinageId);
+    minageNameInput.value = selected?.name || "";
+    minageDescriptionInput.value = selected?.description || "";
+    document.getElementById("gavDurationMinutes").value = selected ? Math.round(selected.workDurationMs / 60000) : 120;
+    document.getElementById("gavTokenReward").value = selected ? selected.tokenReward : 1;
+    document.getElementById("gavCardReward").value = selected?.cardRewardId || "";
+    minageDeleteButton.classList.toggle("hidden", !selected);
+}
+
+function renderArchivesMinageOptions(activeMinageId = "") {
+    const previousChoice = activeMinageId || archivesMiningSelect.value;
+    archivesMiningSelect.replaceChildren();
+    availableMinages.forEach((minage) => {
+        const option = new Option(minage.name, minage.id);
+        option.dataset.description = minage.description || "";
+        archivesMiningSelect.add(option);
+    });
+    const selected = availableMinages.find((item) => item.id === previousChoice) || availableMinages[0];
+    if (selected) {
+        archivesMiningSelect.value = selected.id;
+        archivesMiningDescription.textContent = selected.description || "";
+    }
+    archivesMiningSelect.disabled = Boolean(activeMinageId);
+}
+
+archivesMiningSelect.addEventListener("change", () => {
+    const selected = availableMinages.find((item) => item.id === archivesMiningSelect.value);
+    archivesMiningDescription.textContent = selected?.description || "";
+});
 
 async function loadAdminGavSettings() {
     const status = document.getElementById("adminGavStatus");
@@ -6330,12 +6419,20 @@ async function loadAdminGavSettings() {
     try {
         const response = await callGetAdminGavSettings();
         const data = response.data || {};
-        document.getElementById("gavDurationMinutes").value = Math.round((Number(data.workDurationMs) || 7200000) / 60000);
-        document.getElementById("gavTokenReward").value = Number(data.tokenReward) || 0;
+        adminMinages = Array.isArray(data.minages) ? data.minages : [{
+            id: "archives",
+            name: "Tri des archives",
+            description: "Envoie le GAV trier les archives.",
+            workDurationMs: Number(data.workDurationMs) || 7200000,
+            tokenReward: Number(data.tokenReward) || 1,
+            cardRewardId: data.cardRewardId || "",
+        }];
+        selectedAdminMinageId = adminMinages.some((item) => item.id === selectedAdminMinageId)
+            ? selectedAdminMinageId : (adminMinages[0]?.id || "");
         const cardSelect = document.getElementById("gavCardReward");
         cardSelect.replaceChildren(new Option("Aucune carte", ""));
         (data.cards || []).forEach((card) => cardSelect.add(new Option(`${card.cardNumber ? `#${card.cardNumber} · ` : ""}${card.name || "Carte sans nom"}`, card.id)));
-        cardSelect.value = data.cardRewardId || "";
+        renderAdminMinageOptions();
         const totalMs = Math.max(0, Number(data.totalWorkMs) || 0);
         adminGavWorkBaseMs = totalMs;
         adminGavActiveWorkTasks = Array.isArray(data.activeWorkTasks) ? data.activeWorkTasks : [];
@@ -6350,12 +6447,23 @@ async function loadAdminGavSettings() {
             updateAdminGavWorkDisplay();
         }, 1000);
         document.getElementById("gavTotalCards").textContent = `Cartes tirées par tous les joueurs : ${Number(data.totalCardsDrawn) || 0}`;
-        status.textContent = "Réglages chargés.";
+        status.textContent = "Types de minage chargés.";
     } catch (error) {
-        console.error("Chargement réglages GAV impossible :", error);
-        status.textContent = "Impossible de charger les réglages GAV. Vérifie que les fonctions sont déployées.";
+        console.error("Chargement des types de minage impossible :", error);
+        status.textContent = "Impossible de charger les types de minage. Vérifie que les fonctions sont déployées.";
     }
 }
+
+minageAdminSelect.addEventListener("change", () => {
+    selectedAdminMinageId = minageAdminSelect.value === "__new__" ? "" : minageAdminSelect.value;
+    renderAdminMinageOptions();
+});
+
+minageCreateButton.addEventListener("click", () => {
+    selectedAdminMinageId = "";
+    renderAdminMinageOptions();
+    minageNameInput.focus();
+});
 
 document.getElementById("adminGavForm").addEventListener("submit", async (event) => {
     event.preventDefault();
@@ -6364,18 +6472,49 @@ document.getElementById("adminGavForm").addEventListener("submit", async (event)
     button.disabled = true;
     status.textContent = "Enregistrement…";
     try {
-        await callSaveAdminGavSettings({
-            workDurationMinutes: Number(document.getElementById("gavDurationMinutes").value),
+        const minage = {
+            id: selectedAdminMinageId || ("minage-" + (crypto.randomUUID ? crypto.randomUUID() : Date.now().toString(36))),
+            name: minageNameInput.value.trim(),
+            description: minageDescriptionInput.value.trim(),
+            workDurationMs: Number(document.getElementById("gavDurationMinutes").value) * 60000,
             tokenReward: Number(document.getElementById("gavTokenReward").value),
             cardRewardId: document.getElementById("gavCardReward").value || "",
-        });
-        status.textContent = "Réglages du GAV enregistrés.";
+        };
+        if (!minage.name || !minage.description || !Number.isSafeInteger(minage.workDurationMs) || !Number.isSafeInteger(minage.tokenReward)) {
+            status.textContent = "Renseigne le nom, la description, la durée et la récompense.";
+            return;
+        }
+        const existingIndex = adminMinages.findIndex((item) => item.id === minage.id);
+        if (existingIndex >= 0) adminMinages[existingIndex] = minage;
+        else adminMinages.push(minage);
+        await callSaveAdminGavSettings({ minages: adminMinages });
+        selectedAdminMinageId = minage.id;
+        status.textContent = "Minage enregistré.";
         await loadAdminGavSettings();
     } catch (error) {
-        console.error("Enregistrement réglages GAV impossible :", error);
-        status.textContent = error.code === "functions/permission-denied" ? "Seul l’Admin peut modifier ces réglages." : "Impossible d’enregistrer les réglages GAV.";
+        console.error("Enregistrement du minage impossible :", error);
+        status.textContent = error.code === "functions/permission-denied" ? "Seul l’Admin peut modifier ces réglages." : "Impossible d’enregistrer ce minage.";
     } finally {
         button.disabled = false;
+    }
+});
+
+minageDeleteButton.addEventListener("click", async () => {
+    if (!selectedAdminMinageId || adminMinages.length <= 1) return;
+    if (!window.confirm("Supprimer ce type de minage ?")) return;
+    const status = document.getElementById("adminGavStatus");
+    minageDeleteButton.disabled = true;
+    try {
+        adminMinages = adminMinages.filter((item) => item.id !== selectedAdminMinageId);
+        selectedAdminMinageId = adminMinages[0]?.id || "";
+        await callSaveAdminGavSettings({ minages: adminMinages });
+        status.textContent = "Type de minage supprimé.";
+        await loadAdminGavSettings();
+    } catch (error) {
+        console.error("Suppression du minage impossible :", error);
+        status.textContent = "Impossible de supprimer ce minage.";
+    } finally {
+        minageDeleteButton.disabled = false;
     }
 });
 
