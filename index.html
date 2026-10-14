@@ -1239,6 +1239,17 @@ body {
 .admin-message-item .admin-actions { margin-top: 10px; }
 .player-collection { width: 100%; max-width: 900px; margin: auto; padding: 20px 16px 100px; }
 .player-collection h2 { margin-bottom: 8px; color: #173b52; }
+.collection-display-toggle { display: flex; flex-wrap: wrap; gap: 8px; margin: 14px 0; }
+.collection-display-toggle button { padding: 8px 12px; border: 1px solid #c7b886; border-radius: 10px; background: #f8f5eb; color: #173b52; font: inherit; font-size: 13px; font-weight: 800; cursor: pointer; }
+.collection-display-toggle button[aria-pressed="true"] { border-color: #d7a51e; background: linear-gradient(135deg, #ffe17b, #edb52b); }
+.collection-album-layout { min-width: 0; }
+.collection-dividers { display: none; }
+.collection-divider-tab { display: grid; width: 54px; min-height: 58px; place-items: center; padding: 5px 3px; border: 1px solid #d7a51e; border-radius: 10px 4px 4px 10px; background: linear-gradient(135deg, #173b52, #10264a); color: #fff; font-size: 23px; cursor: pointer; box-shadow: 2px 3px 7px rgba(0,0,0,.2); }
+.collection-divider-tab[aria-pressed="true"] { background: linear-gradient(135deg, #ffe17b, #edb52b); color: #10264a; transform: translateX(3px); }
+.collection-divider-tab:focus-visible { outline: 3px solid #f0bd36; outline-offset: 2px; }
+#collectionPage[data-display-mode="intercalaires"] .collection-album-layout { display: grid; grid-template-columns: 56px minmax(0, 1fr); align-items: start; gap: 8px; }
+#collectionPage[data-display-mode="intercalaires"] .collection-dividers { display: flex; flex-direction: column; gap: 7px; max-height: 68vh; overflow-y: auto; padding: 3px 2px 6px 0; }
+.collection-album-content { min-width: 0; }
 .collection-album-sheet { position: relative; margin-top: 16px; padding: 18px 14px 20px 34px; overflow: hidden; border: 1px solid #d9b74e; border-radius: 17px; background: repeating-linear-gradient(to bottom, #fbf8ee 0, #fbf8ee 31px, #e9e0cc 32px); box-shadow: 0 10px 28px rgba(0,0,0,.28), inset 0 0 0 4px rgba(255,255,255,.52); }
 .collection-album-sheet::before { position: absolute; top: 18px; bottom: 18px; left: 9px; width: 16px; background: radial-gradient(circle at 50% 10px, #dfbd53 0 4px, #fff8df 5px 7px, transparent 8px) 0 0 / 16px 54px repeat-y; content: ""; }
 .collection-album-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: clamp(6px, 1.8vw, 12px); max-width: 720px; margin: 0 auto; }
@@ -1254,6 +1265,7 @@ body {
 .collection-page-nav { display: flex; align-items: center; justify-content: center; gap: 12px; margin: 15px auto 0; }
 .collection-page-nav button { min-width: 92px; padding: 10px 12px; border: 1px solid #d7a51e; border-radius: 10px; background: linear-gradient(135deg, #ffe17b, #edb52b); color: #10264a; font: inherit; font-size: 13px; font-weight: 800; cursor: pointer; }
 .collection-page-nav button:disabled { opacity: .45; cursor: not-allowed; }
+@media (max-width: 480px) { #collectionPage[data-display-mode="intercalaires"] .collection-album-layout { grid-template-columns: 43px minmax(0, 1fr); gap: 5px; } .collection-divider-tab { width: 42px; min-height: 48px; font-size: 19px; } }
 .collection-page-indicator { min-width: 74px; color: #fbfaf5; font-size: 13px; font-weight: 800; text-align: center; }
 .premium-home-button { display: flex; width: min(100%, 350px); min-height: 64px; align-items: center; justify-content: center; gap: 12px; margin: 0 auto 16px; padding: 9px 16px; border: 1px solid rgba(237, 161, 255, .9); border-radius: 15px; background: linear-gradient(135deg, #341064, #7d22b6 55%, #d54bf3); color: #fff; font: inherit; font-weight: 900; cursor: pointer; box-shadow: 0 8px 23px rgba(122, 27, 181, .32); }
 .premium-home-button img { width: 43px; height: 43px; object-fit: contain; }
@@ -2364,20 +2376,29 @@ body {
         <button id="collectionBackButton" class="admin-back" type="button">← Retour à l’accueil</button>
         <h2 id="collectionTitle">🗂️ Mon classeur</h2>
         <p class="admin-note">Tes cartes sont rangées par numéro. Les emplacements vides correspondent aux cartes encore à découvrir.</p>
+        <div class="collection-display-toggle" role="group" aria-label="Mode d’affichage du classeur">
+            <button id="collectionClassicModeButton" type="button" aria-pressed="true">Affichage classique</button>
+            <button id="collectionDividerModeButton" type="button" aria-pressed="false">Intercalaires</button>
+        </div>
         <label class="collection-search-label" for="collectionSearchInput">Rechercher une carte par son nom</label>
         <input id="collectionSearchInput" class="collection-search" type="search" maxlength="80" placeholder="Rechercher une carte découverte…" autocomplete="off">
         <label class="collection-search-label" for="collectionRarityFilter">Filtrer par rareté</label>
         <select id="collectionRarityFilter" class="collection-rarity-filter"><option value="">Toutes les raretés</option><option value="commune">Communes</option><option value="rare">Rares</option><option value="legendaire">Légendaires</option><option value="mystique">Mystiques</option></select>
         <p id="collectionSearchStatus" class="collection-search-status" role="status" aria-live="polite"></p>
         <p id="ownedCardsStatus" class="admin-status" role="status"></p>
-        <div class="collection-album-sheet">
-            <div id="ownedPlayerCardGrid" class="collection-album-grid" aria-label="Page du classeur, neuf emplacements"></div>
+        <div class="collection-album-layout">
+            <nav id="collectionDividers" class="collection-dividers" aria-label="Intercalaires par catégorie"></nav>
+            <div class="collection-album-content">
+                <div class="collection-album-sheet">
+                    <div id="ownedPlayerCardGrid" class="collection-album-grid" aria-label="Page du classeur, neuf emplacements"></div>
+                </div>
+                <nav class="collection-page-nav" aria-label="Pages du classeur">
+                    <button id="collectionPreviousPageButton" type="button">← Précédente</button>
+                    <span id="collectionPageIndicator" class="collection-page-indicator" aria-live="polite">Page 1 / 1</span>
+                    <button id="collectionNextPageButton" type="button">Suivante →</button>
+                </nav>
+            </div>
         </div>
-        <nav class="collection-page-nav" aria-label="Pages du classeur">
-            <button id="collectionPreviousPageButton" type="button">← Précédente</button>
-            <span id="collectionPageIndicator" class="collection-page-indicator" aria-live="polite">Page 1 / 1</span>
-            <button id="collectionNextPageButton" type="button">Suivante →</button>
-        </nav>
     </section>
 
     <section id="recyclingPage" class="player-collection hidden" aria-labelledby="recyclingTitle">
@@ -2631,7 +2652,7 @@ body {
                     <fieldset class="card-entry">
                         <legend>Carte 1</legend>
                         <input id="cardName" data-card-field="name" class="admin-field" type="text" maxlength="80" placeholder="Nom de la carte">
-                        <input id="cardCategory" data-card-field="category" class="admin-field" type="text" maxlength="50" placeholder="Catégorie">
+                        <input id="cardCategory" data-card-field="category" class="admin-field" type="text" maxlength="50" placeholder="Catégorie (ex. Unité, Véhicule, Minage)">
                         <input id="cardNumber" data-card-field="number" class="admin-field" type="number" min="1" max="1000000" step="1" inputmode="numeric" placeholder="Numéro (facultatif)">
                         <label>Saison de la carte</label>
                         <input data-card-field="season" class="admin-field" type="text" maxlength="40" placeholder="Ex. Saison 1 (par défaut)">
@@ -3264,6 +3285,9 @@ const recyclingCardsList = document.getElementById("recyclingCardsList");
 const recycleSelectionCount = document.getElementById("recycleSelectionCount");
 const collectionSearchInput = document.getElementById("collectionSearchInput");
 const collectionRarityFilter = document.getElementById("collectionRarityFilter");
+const collectionClassicModeButton = document.getElementById("collectionClassicModeButton");
+const collectionDividerModeButton = document.getElementById("collectionDividerModeButton");
+const collectionDividers = document.getElementById("collectionDividers");
 const collectionSearchStatus = document.getElementById("collectionSearchStatus");
 const recyclableDuplicateCount = document.getElementById("recyclableDuplicateCount");
 const recycleDuplicatesButton = document.getElementById("recycleDuplicatesButton");
@@ -3286,6 +3310,10 @@ let collectionMaxCardNumber = 0;
 let collectionAlbumPage = 0;
 let collectionSearchQuery = "";
 let collectionRarityFilterValue = "";
+let collectionDisplayMode = "classique";
+let collectionCategories = [];
+let collectionCategoryByNumber = {};
+let collectionCategoryFilter = "";
 let activeMessageCategory = "idee";
 let activeMessageStatus = "nouveau";
 const messageArchivesButton = document.getElementById("messageArchivesButton");
@@ -3346,6 +3374,7 @@ for (let index = 2; index <= 5; index += 1) {
     entry.querySelector("img").classList.add("hidden");
     entry.querySelector("img").removeAttribute("src");
     cardEntryGrid.append(entry);
+    syncCardRarityField(entry);
 }
 let editingRarityId = null;
 const RARITY_COLORS = {
@@ -3359,12 +3388,43 @@ function getRarityColor(name) {
     return RARITY_COLORS[(name || "").trim().toLocaleLowerCase("fr")] || "#9E9E9E";
 }
 
+function normalizeCardCategory(value) {
+    return String(value || "").trim().toLocaleLowerCase("fr").normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+}
+
+function isMinageCategory(value) {
+    return normalizeCardCategory(value) === "minage";
+}
+
+function syncCardRarityField(entry) {
+    if (!entry) return;
+    const categoryField = entry.querySelector('[data-card-field="category"]');
+    const rarityField = entry.querySelector('[data-card-field="rarity"]');
+    if (!categoryField || !rarityField) return;
+    if (isMinageCategory(categoryField.value)) {
+        rarityField.value = "";
+        rarityField.disabled = true;
+        rarityField.options[0].textContent = "Non requise pour le minage";
+        rarityField.style.borderColor = "";
+        rarityField.style.boxShadow = "";
+        rarityField.setAttribute("aria-label", "Aucune rareté requise pour les cartes de minage");
+    } else {
+        rarityField.disabled = false;
+        rarityField.options[0].textContent = "Choisir une rareté";
+        rarityField.removeAttribute("aria-label");
+    }
+}
+
 function getCardRarityColor(card) {
     const rarityKey = (card?.rarity || "").trim().toLocaleLowerCase("fr");
     return RARITY_COLORS[rarityKey] || card?.rarityColor || getRarityColor(card?.rarity);
 }
 
 cardForm.addEventListener("change", (event) => {
+    if (event.target.matches('[data-card-field="category"]')) {
+        syncCardRarityField(event.target.closest(".card-entry"));
+        return;
+    }
     if (!event.target.matches('[data-card-field="rarity"]')) return;
     const color = getRarityColor(event.target.value);
     event.target.style.borderColor = color;
@@ -5345,6 +5405,13 @@ async function loadOwnedPlayerCards() {
             callGetOwnedCardNumbers(),
         ]);
         const cardNumbers = numberResponse.data.cardNumbers || {};
+        collectionCategories = Array.isArray(numberResponse.data.categories) ? numberResponse.data.categories : [];
+        collectionCategoryByNumber = numberResponse.data.categoryByNumber && typeof numberResponse.data.categoryByNumber === "object"
+            ? numberResponse.data.categoryByNumber
+            : {};
+        if (collectionCategoryFilter && !collectionCategories.includes(collectionCategoryFilter)) collectionCategoryFilter = "";
+        if (collectionDisplayMode === "intercalaires" && !collectionCategoryFilter) collectionCategoryFilter = collectionCategories[0] || "";
+        renderCollectionDividers();
         const reportedMaximum = Number(numberResponse.data.maxCardNumber);
         if (Number.isSafeInteger(reportedMaximum) && reportedMaximum >= 0) {
             collectionMaxCardNumber = reportedMaximum;
@@ -5391,14 +5458,23 @@ async function loadOwnedPlayerCards() {
 function renderCollectionAlbum() {
     const normalizedQuery = collectionSearchQuery.trim().toLocaleLowerCase("fr");
     const selectedRarity = collectionRarityFilterValue.trim().toLocaleLowerCase("fr").normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/s$/, "");
-    const matchingCards = normalizedQuery || selectedRarity
+    const categoryNumbers = collectionDisplayMode === "intercalaires"
+        ? Object.entries(collectionCategoryByNumber)
+            .filter(([, category]) => category === collectionCategoryFilter)
+            .map(([number]) => Number(number))
+            .filter((number) => Number.isSafeInteger(number) && number > 0)
+            .sort((a, b) => a - b)
+        : null;
+    const categoryHasFilter = collectionDisplayMode === "intercalaires" && (normalizedQuery || selectedRarity);
+    const matchingCards = normalizedQuery || selectedRarity || categoryHasFilter
         ? ownedAlbumCards.filter((card) => {
             const nameMatches = !normalizedQuery || String(card.name || "").toLocaleLowerCase("fr").includes(normalizedQuery);
             const rarity = String(card.rarity || "").toLocaleLowerCase("fr").normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/s$/, "");
-            return nameMatches && (!selectedRarity || rarity === selectedRarity);
+            const categoryMatches = collectionDisplayMode !== "intercalaires" || (collectionCategoryByNumber[String(card.cardNumber)] || card.category) === collectionCategoryFilter;
+            return nameMatches && categoryMatches && (!selectedRarity || rarity === selectedRarity);
         })
         : null;
-    const totalItems = matchingCards ? matchingCards.length : collectionMaxCardNumber;
+    const totalItems = matchingCards ? matchingCards.length : (categoryNumbers ? categoryNumbers.length : collectionMaxCardNumber);
     const totalPages = Math.max(1, Math.ceil(totalItems / 9));
     collectionAlbumPage = Math.min(Math.max(0, collectionAlbumPage), totalPages - 1);
     const firstCardNumber = collectionAlbumPage * 9 + 1;
@@ -5413,15 +5489,25 @@ function renderCollectionAlbum() {
     if (matchingCards) {
         const filterCaption = selectedRarity ? " de rareté " + collectionRarityFilter.options[collectionRarityFilter.selectedIndex].text.toLocaleLowerCase("fr") : "";
         collectionSearchStatus.textContent = matchingCards.length
-            ? matchingCards.length + (matchingCards.length > 1 ? " carte(s) découverte(s) trouvée(s)" : " carte découverte trouvée") + filterCaption + "."
+            ? matchingCards.length + (matchingCards.length > 1 ? " carte(s) découverte(s) trouvée(s)" : " carte découverte trouvée") + filterCaption + (categoryHasFilter ? " dans « " + collectionCategoryFilter + " »" : "") + "."
             : "Aucune carte découverte ne correspond à ces filtres.";
         for (let index = collectionAlbumPage * 9; index < collectionAlbumPage * 9 + 9; index += 1) {
             const card = matchingCards[index];
             ownedPlayerCardGrid.append(card ? createAlbumCardElement(card) : createEmptyAlbumSlot());
         }
     } else {
-        collectionSearchStatus.textContent = "La recherche porte sur les cartes déjà découvertes.";
-        for (let number = firstCardNumber; number < firstCardNumber + 9; number += 1) {
+        collectionSearchStatus.textContent = collectionDisplayMode === "intercalaires"
+            ? "Catégorie : " + (collectionCategoryFilter || "aucune carte") + " • Les emplacements vides restent à découvrir."
+            : "La recherche porte sur les cartes déjà découvertes.";
+        const visibleNumbers = categoryNumbers
+            ? categoryNumbers.slice(collectionAlbumPage * 9, collectionAlbumPage * 9 + 9)
+            : Array.from({ length: 9 }, (_, index) => firstCardNumber + index);
+        for (let index = 0; index < 9; index += 1) {
+            const number = visibleNumbers[index];
+            if (!number) {
+                ownedPlayerCardGrid.append(createEmptyAlbumSlot());
+                continue;
+            }
             const card = cardsByNumber.get(number);
             ownedPlayerCardGrid.append(card ? createAlbumCardElement(card) : createEmptyAlbumSlot());
         }
@@ -5430,6 +5516,48 @@ function renderCollectionAlbum() {
     collectionPageIndicator.textContent = (matchingCards ? "Résultats " : "Page ") + (collectionAlbumPage + 1) + " / " + totalPages;
     collectionPreviousPageButton.disabled = collectionAlbumPage === 0;
     collectionNextPageButton.disabled = collectionAlbumPage >= totalPages - 1;
+}
+
+function getCategorySymbol(category) {
+    const value = normalizeCardCategory(category);
+    if (value.includes("minage") || value.includes("archive")) return "⛏️";
+    if (value.includes("vehicule") || value.includes("voiture") || value.includes("camion")) return "🚙";
+    if (value.includes("unite") || value.includes("soldat") || value.includes("gendarme")) return "🪖";
+    if (value.includes("arme") || value.includes("equipement")) return "🛡️";
+    if (value.includes("lieu") || value.includes("batiment")) return "📍";
+    if (value.includes("personnage")) return "🧑";
+    return "🗂️";
+}
+
+function renderCollectionDividers() {
+    collectionDividers.replaceChildren();
+    collectionCategories.forEach((category) => {
+        const tab = document.createElement("button");
+        tab.type = "button";
+        tab.className = "collection-divider-tab";
+        tab.textContent = getCategorySymbol(category);
+        tab.title = category;
+        tab.setAttribute("aria-label", "Afficher la catégorie " + category);
+        tab.setAttribute("aria-pressed", String(collectionCategoryFilter === category));
+        tab.addEventListener("click", () => {
+            collectionCategoryFilter = category;
+            collectionAlbumPage = 0;
+            renderCollectionDividers();
+            renderCollectionAlbum();
+        });
+        collectionDividers.append(tab);
+    });
+}
+
+function setCollectionDisplayMode(mode) {
+    collectionDisplayMode = mode === "intercalaires" ? "intercalaires" : "classique";
+    collectionPage.dataset.displayMode = collectionDisplayMode;
+    collectionClassicModeButton.setAttribute("aria-pressed", String(collectionDisplayMode === "classique"));
+    collectionDividerModeButton.setAttribute("aria-pressed", String(collectionDisplayMode === "intercalaires"));
+    if (collectionDisplayMode === "intercalaires" && !collectionCategoryFilter) collectionCategoryFilter = collectionCategories[0] || "";
+    collectionAlbumPage = 0;
+    renderCollectionDividers();
+    renderCollectionAlbum();
 }
 
 function createEmptyAlbumSlot() {
@@ -5916,6 +6044,8 @@ collectionRarityFilter.addEventListener("change", () => {
     collectionAlbumPage = 0;
     renderCollectionAlbum();
 });
+collectionClassicModeButton.addEventListener("click", () => setCollectionDisplayMode("classique"));
+collectionDividerModeButton.addEventListener("click", () => setCollectionDisplayMode("intercalaires"));
 collectionPreviousPageButton.addEventListener("click", () => {
     collectionAlbumPage -= 1;
     renderCollectionAlbum();
@@ -6076,6 +6206,7 @@ async function loadRarities() {
                 select.append(option);
             });
             select.value = previousValue;
+            syncCardRarityField(select.closest(".card-entry"));
         });
 
         raritiesList.replaceChildren();
@@ -6259,6 +6390,7 @@ function createAdminCardRow(cardDoc) {
         cardNumber.value = Number.isSafeInteger(Number(card.cardNumber)) && Number(card.cardNumber) > 0 ? String(card.cardNumber) : "";
         cardEntryGrid.firstElementChild.querySelector('[data-card-field="season"]').value = card.season || "Saison 1";
         cardRarity.value = card.rarity || "";
+        syncCardRarityField(cardEntryGrid.firstElementChild);
         cardImage.value = card.imageUrl || "";
         cardImageFile.value = "";
         if (card.imageUrl) {
@@ -7189,6 +7321,7 @@ cardCancelEdit.addEventListener("click", () => {
         entry.classList.remove("hidden");
         entry.querySelectorAll("input, select, textarea").forEach((field) => { field.disabled = false; });
         clearCardEntryPreview(entry);
+        syncCardRarityField(entry);
     });
     cardSubmit.textContent = "Ajouter les cartes saisies";
     cardCancelEdit.classList.add("hidden");
@@ -7204,7 +7337,9 @@ cardForm.addEventListener("submit", async (event) => {
     const entries = editingCardId ? [cardEntryGrid.querySelector(".card-entry")] : Array.from(cardEntryGrid.querySelectorAll(".card-entry"));
     const enteredRecords = entries.map((entry, index) => {
         const value = (field) => entry.querySelector('[data-card-field="' + field + '"]').value.trim();
-        const rarity = value("rarity");
+        const category = value("category");
+        const isMinage = isMinageCategory(category);
+        const rarity = isMinage ? "" : value("rarity");
         const fileInput = entry.querySelector('[data-card-field="file"]');
         return {
             entry,
@@ -7212,11 +7347,11 @@ cardForm.addEventListener("submit", async (event) => {
             file: fileInput.files && fileInput.files[0],
             card: {
                 name: value("name"),
-                category: value("category"),
+                category,
                 cardNumber: value("number") ? Number(value("number")) : null,
                 season: value("season") || "Saison 1",
                 rarity,
-                rarityColor: getRarityColor(rarity),
+                rarityColor: rarity ? getRarityColor(rarity) : "",
                 imageUrl: value("image"),
                 description: value("description"),
                 updatedAt: new Date().toISOString()
@@ -7230,9 +7365,9 @@ cardForm.addEventListener("submit", async (event) => {
         adminStatus.textContent = "Renseigne au moins une fiche avant d’enregistrer.";
         return;
     }
-    const incomplete = records.find(({ card }) => !card.name || !card.category || !card.rarity);
+    const incomplete = records.find(({ card }) => !card.name || !card.category || (!isMinageCategory(card.category) && !card.rarity));
     if (incomplete) {
-        adminStatus.textContent = "Carte " + incomplete.index + " : renseigne son nom, sa catégorie et sa rareté.";
+        adminStatus.textContent = "Carte " + incomplete.index + " : renseigne son nom, sa catégorie" + (isMinageCategory(incomplete.card.category) ? "." : " et sa rareté.");
         const missingField = !incomplete.card.name ? "name" : !incomplete.card.category ? "category" : "rarity";
         incomplete.entry.querySelector('[data-card-field="' + missingField + '"]').focus();
         return;
