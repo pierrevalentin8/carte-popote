@@ -6223,6 +6223,23 @@ async function showAdminSection(sectionName) {
     if (sectionName === "gav") await loadAdminGavSettings();
 }
 
+let adminGavWorkBaseMs = 0;
+let adminGavActiveWorkTasks = [];
+let adminGavWorkTimer = null;
+
+function updateAdminGavWorkDisplay() {
+    const activeMs = adminGavActiveWorkTasks.reduce((sum, task) => {
+        const startedAt = Date.parse(task.startedAt);
+        const durationMs = Number(task.durationMs) || 0;
+        return sum + (Number.isFinite(startedAt) ? Math.min(durationMs, Math.max(0, Date.now() - startedAt)) : 0);
+    }, 0);
+    const totalSeconds = Math.floor((adminGavWorkBaseMs + activeMs) / 1000);
+    const hours = Math.floor(totalSeconds / 3600);
+    const minutes = Math.floor((totalSeconds % 3600) / 60);
+    const seconds = totalSeconds % 60;
+    document.getElementById("gavTotalWork").textContent = `Temps total de travail des GAV : ${hours} h ${String(minutes).padStart(2, "0")} min ${String(seconds).padStart(2, "0")} s`;
+}
+
 async function loadAdminGavSettings() {
     const status = document.getElementById("adminGavStatus");
     status.textContent = "Chargement des réglages…";
@@ -6236,9 +6253,18 @@ async function loadAdminGavSettings() {
         (data.cards || []).forEach((card) => cardSelect.add(new Option(`${card.cardNumber ? `#${card.cardNumber} · ` : ""}${card.name || "Carte sans nom"}`, card.id)));
         cardSelect.value = data.cardRewardId || "";
         const totalMs = Math.max(0, Number(data.totalWorkMs) || 0);
-        const totalHours = Math.floor(totalMs / 3600000);
-        const totalMinutes = Math.floor((totalMs % 3600000) / 60000);
-        document.getElementById("gavTotalWork").textContent = `Temps total de travail des GAV : ${totalHours} h ${totalMinutes} min`;
+        adminGavWorkBaseMs = totalMs;
+        adminGavActiveWorkTasks = Array.isArray(data.activeWorkTasks) ? data.activeWorkTasks : [];
+        updateAdminGavWorkDisplay();
+        if (adminGavWorkTimer) clearInterval(adminGavWorkTimer);
+        adminGavWorkTimer = setInterval(() => {
+            if (adminSections.gav.classList.contains("hidden")) {
+                clearInterval(adminGavWorkTimer);
+                adminGavWorkTimer = null;
+                return;
+            }
+            updateAdminGavWorkDisplay();
+        }, 1000);
         document.getElementById("gavTotalCards").textContent = `Cartes tirées par tous les joueurs : ${Number(data.totalCardsDrawn) || 0}`;
         status.textContent = "Réglages chargés.";
     } catch (error) {
