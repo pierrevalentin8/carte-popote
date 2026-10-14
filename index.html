@@ -1001,6 +1001,10 @@ body {
 .home-resource-tile span { color: #fbfaf5; font-size: 11px; font-weight: 700; line-height: 1.25; }
 .home-overview-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; margin: 12px 0 18px; }
 .home-card-count, .home-overview-premium { min-width: 0; min-height: 92px; margin: 0; padding: 10px; border: 1px solid rgba(243,191,56,.75); border-radius: 13px; background: linear-gradient(110deg, #10264a, #183966); color: #fbfaf5; box-shadow: 0 7px 17px rgba(0,0,0,.22); }
+.home-card-count { width: 100%; font: inherit; cursor: default; }
+.home-card-count:not(:disabled) { cursor: pointer; }
+.home-card-count:focus-visible { outline: 3px solid #f7d46b; outline-offset: 3px; }
+.home-card-count:disabled { opacity: 1; }
 .home-card-count-icon { width: 28px; height: 38px; }
 .home-card-count-value { font-size: 21px; }
 .home-card-count-label { font-size: 11px; }
@@ -2031,13 +2035,13 @@ body {
         </section>
 
         <section class="home-overview-grid" aria-label="Informations Cartes & Popote">
-            <div class="home-card-count" aria-label="Nombre de cartes créées dans le jeu">
+            <button id="homeCardCountButton" class="home-card-count" type="button" aria-label="Nombre de cartes créées dans le jeu" disabled>
                 <img class="home-card-count-icon" src="./Dos%20cartes.png" alt="">
-                <div class="home-card-count-copy">
+                <span class="home-card-count-copy">
                     <strong id="publicCardCount" class="home-card-count-value">—</strong>
                     <span class="home-card-count-label">cartes créées</span>
-                </div>
-            </div>
+                </span>
+            </button>
             <button id="premiumHomeButton" class="home-overview-premium" type="button" aria-label="Ouvrir la page Premium">
                 <img src="./Jeton%20premium.png" alt="">
                 <span>Premium</span>
@@ -2334,6 +2338,13 @@ body {
             </table>
         </div>
         <p class="statistics-tracking-note">Sur mobile, fais glisser le tableau horizontalement. Les anciens achats, dépenses et jetons attribués avant leur suivi ne peuvent pas être reconstitués. Les échanges ne sont pas encore disponibles ; leur compteur reste à zéro.</p>
+    </section>
+
+    <section id="drawnCardsPage" class="statistics-page hidden" aria-labelledby="drawnCardsTitle">
+        <button id="drawnCardsBackButton" class="admin-back" type="button">← Retour à l’accueil</button>
+        <h2 id="drawnCardsTitle">🃏 Cartes tirées par les joueurs</h2>
+        <p class="statistics-intro">Total de toutes les cartes tirées par les joueurs, doublons compris.</p>
+        <p id="drawnCardsTotal" class="statistics-status" role="status" aria-live="polite">Chargement du total…</p>
     </section>
 
     <section id="collectionPage" class="player-collection hidden" aria-labelledby="collectionTitle">
@@ -3078,6 +3089,10 @@ const statisticsPage = document.getElementById("statisticsPage");
 const statisticsBackButton = document.getElementById("statisticsBackButton");
 const statisticsStatus = document.getElementById("statisticsStatus");
 const statisticsTableBody = document.getElementById("statisticsTableBody");
+const homeCardCountButton = document.getElementById("homeCardCountButton");
+const drawnCardsPage = document.getElementById("drawnCardsPage");
+const drawnCardsBackButton = document.getElementById("drawnCardsBackButton");
+const drawnCardsTotal = document.getElementById("drawnCardsTotal");
 const financeMenuButton = document.getElementById("financeMenuButton");
 const financePage = document.getElementById("financePage");
 const financeBackButton = document.getElementById("financeBackButton");
@@ -3474,6 +3489,7 @@ onAuthStateChanged(
             profilePage.classList.add("hidden");
             leaderboardPage.classList.add("hidden");
             statisticsPage.classList.add("hidden");
+            drawnCardsPage.classList.add("hidden");
             collectionPage.classList.add("hidden");
     recyclingPage.classList.add("hidden");
             adminPage.classList.add("hidden");
@@ -3508,6 +3524,7 @@ onAuthStateChanged(
         const isAdminAccount = (user.email || "").toLowerCase() === ADMIN_EMAIL;
         if (!isAdminAccount) isPlayerPreview = false;
         menuButton.classList.toggle("hidden", !isAdminAccount || isPlayerPreview);
+        homeCardCountButton.disabled = !isAdminAccount || isPlayerPreview;
         dropdownMenu.classList.add("hidden");
         playerLogoutButton.classList.toggle("hidden", isAdminAccount);
         adminButton.classList.toggle("hidden", !isAdminAccount || isPlayerPreview);
@@ -3699,6 +3716,7 @@ function showHomePage() {
     profilePage.classList.add("hidden");
     leaderboardPage.classList.add("hidden");
     statisticsPage.classList.add("hidden");
+    drawnCardsPage.classList.add("hidden");
     collectionPage.classList.add("hidden");
     recyclingPage.classList.add("hidden");
     adminPage.classList.add("hidden");
@@ -3713,6 +3731,31 @@ function showHomePage() {
     rulesNavButton.classList.remove("active");
     leaderboardMenuButton.classList.remove("active");
 }
+
+async function showDrawnCardsPage() {
+    if (!auth.currentUser || (auth.currentUser.email || "").toLowerCase() !== ADMIN_EMAIL || isPlayerPreview) return;
+    dropdownMenu.classList.add("hidden");
+    document.querySelector(".app-content").classList.add("hidden");
+    [termsPage, financePage, profilePage, leaderboardPage, statisticsPage, collectionPage, recyclingPage, adminPage, messagingPage, rulesPage, premiumPage, archivesPage].forEach((page) => page.classList.add("hidden"));
+    drawnCardsPage.classList.remove("hidden");
+    bottomNav.classList.add("hidden");
+    drawnCardsTotal.textContent = "Chargement du total…";
+    try {
+        const response = await callGetAdminGavSettings();
+        drawnCardsTotal.textContent = (Number(response.data?.totalCardsDrawn) || 0).toLocaleString("fr-FR");
+    } catch (error) {
+        console.error("Impossible de charger le total des cartes tirées :", error);
+        drawnCardsTotal.textContent = "Impossible de charger le total. Vérifie que les fonctions Firebase sont déployées.";
+    }
+}
+
+homeCardCountButton.addEventListener("click", showDrawnCardsPage);
+drawnCardsBackButton.addEventListener("click", showHomePage);
+document.addEventListener("click", (event) => {
+    if (event.target.closest("button, a, [role='button']") && !event.target.closest("#homeCardCountButton")) {
+        drawnCardsPage.classList.add("hidden");
+    }
+}, true);
 
 function formatArchivesCountdown(milliseconds) {
     const totalSeconds = Math.max(0, Math.ceil(milliseconds / 1000));
@@ -4732,6 +4775,7 @@ function setPlayerPreview(enabled) {
     if (!isCurrentUserAdmin()) return;
     isPlayerPreview = enabled;
     menuButton.classList.toggle("hidden", enabled);
+    homeCardCountButton.disabled = enabled;
     dropdownMenu.classList.add("hidden");
     adminButton.classList.toggle("hidden", enabled);
     adminMessagesMenuButton.classList.toggle("hidden", enabled);
