@@ -461,6 +461,8 @@ body {
     cursor: pointer;
 }
 
+.player-logout-button { width: 40px; height: 40px; border: 1px solid rgba(243,191,56,.55); border-radius: 12px; background: #10264a; color: var(--theme-gold-light); font-size: 22px; cursor: pointer; }
+
 
 /* =========================
    MENU DÉROULANT
@@ -1956,11 +1958,13 @@ body {
 
 
         <button
-            class="menu-button"
+            class="menu-button hidden"
             id="menuButton"
         >
             ☰
         </button>
+
+        <button id="playerLogoutButton" class="player-logout-button hidden" type="button" aria-label="Déconnexion" title="Déconnexion">↪</button>
 
 
         <div
@@ -3024,6 +3028,7 @@ const menuButton =
     document.getElementById(
         "menuButton"
     );
+const playerLogoutButton = document.getElementById("playerLogoutButton");
 
 
 const dropdownMenu =
@@ -3452,6 +3457,9 @@ onAuthStateChanged(
            ========================================== */
 
         if (!user) {
+            menuButton.classList.add("hidden");
+            dropdownMenu.classList.add("hidden");
+            playerLogoutButton.classList.add("hidden");
             clearArchivesCountdown();
             archivesPage.classList.add("hidden");
             isPlayerPreview = false;
@@ -3499,6 +3507,9 @@ onAuthStateChanged(
         // Affichage seulement : les règles Firestore protègent les données.
         const isAdminAccount = (user.email || "").toLowerCase() === ADMIN_EMAIL;
         if (!isAdminAccount) isPlayerPreview = false;
+        menuButton.classList.toggle("hidden", !isAdminAccount || isPlayerPreview);
+        dropdownMenu.classList.add("hidden");
+        playerLogoutButton.classList.toggle("hidden", isAdminAccount);
         adminButton.classList.toggle("hidden", !isAdminAccount || isPlayerPreview);
         adminMessagesMenuButton.classList.toggle("hidden", !isAdminAccount || isPlayerPreview);
         financeMenuButton.classList.toggle("hidden", !isAdminAccount || isPlayerPreview);
@@ -4720,6 +4731,8 @@ premiumAdjustSubmit.addEventListener("click", async () => {
 function setPlayerPreview(enabled) {
     if (!isCurrentUserAdmin()) return;
     isPlayerPreview = enabled;
+    menuButton.classList.toggle("hidden", enabled);
+    dropdownMenu.classList.add("hidden");
     adminButton.classList.toggle("hidden", enabled);
     adminMessagesMenuButton.classList.toggle("hidden", enabled);
     financeMenuButton.classList.toggle("hidden", enabled);
@@ -4735,6 +4748,13 @@ playerPreviewToggle.addEventListener("click", () => {
     setPlayerPreview(!isPlayerPreview);
 });
 playerPreviewExitButton.addEventListener("click", () => setPlayerPreview(false));
+playerLogoutButton.addEventListener("click", async () => {
+    try {
+        await signOut(auth);
+    } catch (error) {
+        console.error("Erreur de déconnexion du joueur :", error);
+    }
+});
 
 async function loadPersonalProfile(playerId = auth.currentUser?.uid) {
     if (!auth.currentUser || !playerId) return;
