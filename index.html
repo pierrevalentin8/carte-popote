@@ -1110,6 +1110,8 @@ body {
 }
 
 .nav-icon svg { display: block; width: 22px; height: 22px; }
+.nav-image-button { width: 54px; height: 54px; align-self: center; justify-self: center; padding: 3px; border: 1px solid rgba(243, 191, 56, .85); border-radius: 50%; background: #10264a; box-shadow: 0 2px 9px rgba(0, 0, 0, .32); }
+.nav-image-button img { display: block; width: 100%; height: 100%; border-radius: 50%; object-fit: contain; }
 
 
 .nav-item.active {
@@ -2656,60 +2658,31 @@ body {
     <nav class="bottom-nav">
 
 
-        <button id="homeNavButton" class="nav-item active" type="button">
-
-            <span class="nav-icon">
-                🏠
-            </span>
-
-            Accueil
-
+        <button id="homeNavButton" class="nav-item nav-image-button active" type="button" aria-label="Accueil" title="Accueil">
+            <img src="./Accueil.png" alt="" aria-hidden="true">
         </button>
 
 
-        <button id="collectionNavButton" class="nav-item" type="button">
-
-            <span class="nav-icon" aria-hidden="true">
-                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M7 3.5h13.5v17H7A2.5 2.5 0 0 1 4.5 18V6A2.5 2.5 0 0 1 7 3.5Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
-                    <path d="M7 3.5v17M2.8 7.2h3.5M2.8 12h3.5M2.8 16.8h3.5M10 8h7M10 12h7M10 16h5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
-                </svg>
-            </span>
-
-            Collection
-
+        <button id="collectionNavButton" class="nav-item nav-image-button" type="button" aria-label="Collection" title="Collection">
+            <img src="./Collection.png" alt="" aria-hidden="true">
         </button>
 
-        <button id="recyclingNavButton" class="nav-item" type="button">
-            <span class="nav-icon" aria-hidden="true">♻️</span>
-            Recyclage
+        <button id="recyclingNavButton" class="nav-item nav-image-button" type="button" aria-label="Recyclage" title="Recyclage">
+            <img src="./Recyclage.png" alt="" aria-hidden="true">
         </button>
 
 
-        <button id="exchangeNavButton" class="nav-item" type="button" aria-describedby="exchangeUnlockNotice">
-
-            <span class="nav-icon">
-                🔄
-            </span>
-
-            Échanges
-
+        <button id="exchangeNavButton" class="nav-item nav-image-button" type="button" aria-label="Échanges" title="Échanges" aria-describedby="exchangeUnlockNotice">
+            <img src="./Échange.png" alt="" aria-hidden="true">
         </button>
 
 
-        <button id="rulesNavButton" class="nav-item" type="button">
-
-            <span class="nav-icon">
-                📖
-            </span>
-
-            Règles
-
+        <button id="rulesNavButton" class="nav-item nav-image-button" type="button" aria-label="Règles" title="Règles">
+            <img src="./Règles.png" alt="" aria-hidden="true">
         </button>
 
-        <button id="leaderboardMenuButton" class="nav-item" type="button">
-            <span class="nav-icon" aria-hidden="true">🏆</span>
-            Classement
+        <button id="leaderboardMenuButton" class="nav-item nav-image-button" type="button" aria-label="Classement" title="Classement">
+            <img src="./Classement.png" alt="" aria-hidden="true">
         </button>
 
 
@@ -7177,3 +7150,4 @@ if ("serviceWorker" in navigator) {
 </body>
 
 </html>
+
