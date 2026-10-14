@@ -3934,6 +3934,7 @@ async function loadArchivesTaskStatus(claimWhenReady = true) {
                 workDurationMs: Number(data.taskDurationMs) || minage.workDurationMs,
                 tokenReward: Number.isFinite(Number(data.tokenReward)) ? Number(data.tokenReward) : minage.tokenReward,
                 cardRewardId: data.taskCardRewardId || minage.cardRewardId,
+                cardRewardName: data.taskCardRewardName || minage.cardRewardName,
             } : minage);
         }
         renderArchivesMinageOptions(data.readyAt ? (data.minageId || "") : "");
@@ -6563,7 +6564,10 @@ function formatMinageDuration(durationMs) {
 
 function formatMinageReward(minage) {
     const tokens = Number(minage?.tokenReward) || 0;
-    return `${tokens} jeton${tokens === 1 ? "" : "s"} classique${tokens === 1 ? "" : "s"}${minage?.cardRewardId ? " + 1 carte" : ""}`;
+    const cardReward = minage?.cardRewardId
+        ? ` + carte : ${minage.cardRewardName || "récompense enregistrée"}`
+        : "";
+    return `${tokens} jeton${tokens === 1 ? "" : "s"} classique${tokens === 1 ? "" : "s"}${cardReward}`;
 }
 
 function showMinageDetails(minage) {
