@@ -1061,7 +1061,7 @@ body {
     display: grid;
 
     grid-template-columns:
-        repeat(5, minmax(0, 1fr));
+        repeat(6, minmax(0, 1fr));
 
     background: #ffffff;
 
@@ -1213,6 +1213,10 @@ body {
 .message-category-tabs { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0; }
 .message-category-button { flex: 1 1 150px; min-height: 44px; padding: 9px 12px; border: 1px solid #d7a51e; border-radius: 10px; background: #10264a; color: var(--theme-cream); font: inherit; font-weight: 700; cursor: pointer; }
 .message-category-button[aria-pressed="true"] { background: linear-gradient(135deg, var(--theme-gold-light), #edb52b); color: var(--theme-navy); }
+.message-archive-columns { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; align-items: start; }
+.message-archive-column { min-width: 0; padding: 12px; border: 1px solid rgba(243, 191, 56, .42); border-radius: 14px; background: rgba(16, 38, 74, .35); }
+.message-archive-column h3 { margin-top: 0; }
+@media (max-width: 640px) { .message-archive-columns { grid-template-columns: 1fr; } }
 .admin-messaging-button { display: flex; min-height: 105px; flex-direction: column; align-items: center; justify-content: center; gap: 5px; }
 .admin-messaging-button img { display: block; width: min(100%, 210px); height: 70px; object-fit: contain; }
 .admin-message-item { display: block; padding: 14px 0; border-top: 1px solid #e8dfca; }
@@ -1966,10 +1970,6 @@ body {
 
 
 
-            <button id="leaderboardMenuButton" type="button">
-                🏆 Classement
-            </button>
-
             <button id="statisticsMenuButton" type="button">
                 📊 Statistiques
             </button>
@@ -2537,6 +2537,7 @@ body {
             <button class="admin-menu-button" type="button" data-admin-section="updates" aria-controls="adminUpdatesSection" aria-pressed="false">📢 Annonce MAJ</button>
             <button class="admin-menu-button" type="button" data-admin-section="rarities" aria-controls="adminRaritiesSection" aria-pressed="false">⭐ Catégories de rareté</button>
             <button class="admin-menu-button" type="button" data-admin-section="cards" aria-controls="adminCardsSection" aria-pressed="false">🃏 Création de cartes</button>
+            <button class="admin-menu-button" type="button" data-admin-section="gav" aria-controls="adminGavSection" aria-pressed="false">🕵️ GAV</button>
         </nav>
         <p id="adminSectionHint" class="admin-note">Choisis une rubrique pour afficher son contenu.</p>
         <div id="adminJournalSection" class="admin-panel admin-section hidden" style="margin-bottom:16px">
@@ -2615,6 +2616,23 @@ body {
             <p id="cardsCount" class="admin-note">Nombre total de cartes créées : —</p>
             <div id="cardsList"></div>
         </div>
+        <div id="adminGavSection" class="admin-panel admin-section hidden" style="margin-bottom:16px">
+            <h3>🕵️ Réglages du GAV</h3>
+            <p class="admin-note">Choisis la durée du tri et ce que le joueur gagne à la fin. La carte est facultative.</p>
+            <form id="adminGavForm">
+                <label for="gavDurationMinutes">Temps de travail (minutes)</label>
+                <input id="gavDurationMinutes" class="admin-field" type="number" min="1" max="4320" step="1" required>
+                <label for="gavTokenReward">Jetons classiques offerts</label>
+                <input id="gavTokenReward" class="admin-field" type="number" min="0" max="1000" step="1" required>
+                <label for="gavCardReward">Carte offerte (facultatif)</label>
+                <select id="gavCardReward" class="admin-field"><option value="">Aucune carte</option></select>
+                <button id="adminGavSaveButton" class="primary-button admin-submit" type="submit">Enregistrer les réglages</button>
+            </form>
+            <p id="adminGavStatus" class="admin-status" role="status" aria-live="polite"></p>
+            <h3>Compteurs généraux</h3>
+            <p id="gavTotalWork" class="admin-note">Temps total de travail des GAV : —</p>
+            <p id="gavTotalCards" class="admin-note">Cartes tirées par tous les joueurs : —</p>
+        </div>
     </section>
 
     <section id="messagingPage" class="admin-page messaging-page hidden" aria-labelledby="messagingPageTitle">
@@ -2687,6 +2705,11 @@ body {
 
             Règles
 
+        </button>
+
+        <button id="leaderboardMenuButton" class="nav-item" type="button">
+            <span class="nav-icon" aria-hidden="true">🏆</span>
+            Classement
         </button>
 
 
@@ -2826,6 +2849,8 @@ const callOpenDailyBooster = httpsCallable(functions, "openDailyBooster");
 const callGetArchivesTaskStatus = httpsCallable(functions, "getArchivesTaskStatus");
 const callStartArchivesSorting = httpsCallable(functions, "startArchivesSorting");
 const callClaimArchivesSortingReward = httpsCallable(functions, "claimArchivesSortingReward");
+const callGetAdminGavSettings = httpsCallable(functions, "getAdminGavSettings");
+const callSaveAdminGavSettings = httpsCallable(functions, "saveAdminGavSettings");
 const callGetOwnedCardNumbers = httpsCallable(functions, "getOwnedCardNumbers");
 const callGetAdminPlayers = httpsCallable(functions, "getAdminPlayers");
 const callRecordHistoricalPremiumPayment = httpsCallable(functions, "recordHistoricalPremiumPayment");
@@ -3177,7 +3202,8 @@ const adminSections = {
     journal: document.getElementById("adminJournalSection"),
     updates: document.getElementById("adminUpdatesSection"),
     rarities: document.getElementById("adminRaritiesSection"),
-    cards: document.getElementById("adminCardsSection")
+    cards: document.getElementById("adminCardsSection"),
+    gav: document.getElementById("adminGavSection")
 };
 const announcementsList = document.getElementById("announcementsList");
 const newPlayersList = document.getElementById("newPlayersList");
@@ -3695,6 +3721,7 @@ function showHomePage() {
     collectionNavButton.classList.remove("active");
     recyclingNavButton.classList.remove("active");
     rulesNavButton.classList.remove("active");
+    leaderboardMenuButton.classList.remove("active");
 }
 
 function formatArchivesCountdown(milliseconds) {
@@ -3719,19 +3746,21 @@ async function claimArchivesReward() {
     if (archivesClaimInProgress || !auth.currentUser) return;
     archivesClaimInProgress = true;
     sortArchivesButton.disabled = true;
-    archivesStatus.textContent = "Le GAV a terminé le tri. Récupération du jeton…";
+    archivesStatus.textContent = "Le GAV a terminé le tri. Récupération de ta récompense…";
     try {
         const response = await callClaimArchivesSortingReward();
         const tokens = Number(response.data.tokens) || 0;
+        const tokenReward = Number(response.data.tokenReward) || 0;
         document.getElementById("playerTokens").textContent = tokens.toLocaleString("fr-FR");
-        if (!viewedOtherPlayerId) {
-            profileTokensEarned.textContent = ((Number(profileTokensEarned.textContent.replace(/\D/g, "")) || 0) + 1).toLocaleString("fr-FR");
+        if (response.data.cartesTirees !== undefined) document.getElementById("playerCards").textContent = Number(response.data.cartesTirees || 0).toLocaleString("fr-FR");
+        if (!viewedOtherPlayerId && tokenReward > 0) {
+            profileTokensEarned.textContent = ((Number(profileTokensEarned.textContent.replace(/\D/g, "")) || 0) + tokenReward).toLocaleString("fr-FR");
         }
         clearArchivesCountdown();
-        archivesHomeCountdown.textContent = "+1 jeton classique trouvé !";
+        archivesHomeCountdown.textContent = `+${tokenReward} jeton${tokenReward === 1 ? "" : "s"} classique${tokenReward === 1 ? "" : "s"}${response.data.cardRewarded ? " et une carte" : ""} trouvé${tokenReward === 1 ? "" : "s"} !`;
         archivesHomeCountdown.classList.remove("hidden");
         setTimeout(() => archivesHomeCountdown.classList.add("hidden"), 7000);
-        archivesStatus.textContent = "Le GAV a trouvé 1 jeton classique pour toi ! Clique sur Trier les archives pour relancer un nouveau tri.";
+        archivesStatus.textContent = `Le GAV t’a rapporté ${tokenReward} jeton${tokenReward === 1 ? "" : "s"} classique${tokenReward === 1 ? "" : "s"}${response.data.cardRewarded ? " et une carte" : ""}. Clique sur Trier les archives pour recommencer.`;
     } catch (error) {
         console.error("Erreur lors de la récupération du jeton des archives :", error);
         archivesStatus.textContent = error.code === "functions/failed-precondition"
@@ -3787,7 +3816,7 @@ async function loadArchivesTaskStatus(claimWhenReady = true) {
         }
         if (data.readyAt) {
             setArchivesTask(data.readyAt);
-            archivesStatus.textContent = data.ready ? "Ton jeton est prêt à être récupéré." : "Le GAV trie les archives. Le compte à rebours est aussi affiché sur l’accueil.";
+            archivesStatus.textContent = data.ready ? "Ta récompense est prête à être récupérée." : "Le GAV trie les archives. Le compte à rebours est aussi affiché sur l’accueil.";
         } else {
             clearArchivesCountdown();
             archivesStatus.textContent = "Tu peux envoyer le GAV trier les archives.";
@@ -3818,7 +3847,7 @@ sortArchivesButton.addEventListener("click", async () => {
     try {
         const response = await callStartArchivesSorting();
         setArchivesTask(response.data.readyAt);
-        archivesStatus.textContent = "Le tri a commencé ! Reviens dans 2 heures pour ton jeton classique.";
+        archivesStatus.textContent = "Le tri a commencé ! Reviens quand le compte à rebours sera terminé pour récupérer ta récompense.";
     } catch (error) {
         console.error("Impossible de lancer le tri des archives :", error);
         archivesStatus.textContent = error.message || "Impossible de lancer le tri des archives.";
@@ -5185,6 +5214,8 @@ leaderboardMenuButton.addEventListener("click", async () => {
     messagingPage.classList.add("hidden");
     rulesPage.classList.add("hidden");
     bottomNav.classList.add("hidden");
+    document.querySelectorAll(".bottom-nav .nav-item").forEach((button) => button.classList.remove("active"));
+    leaderboardMenuButton.classList.add("active");
     archivesPage.classList.add("hidden");
     leaderboardPage.classList.remove("hidden");
     await loadLeaderboard();
@@ -6216,7 +6247,54 @@ async function showAdminSection(sectionName) {
         await loadRarities();
         await loadCards();
     }
+    if (sectionName === "gav") await loadAdminGavSettings();
 }
+
+async function loadAdminGavSettings() {
+    const status = document.getElementById("adminGavStatus");
+    status.textContent = "Chargement des réglages…";
+    try {
+        const response = await callGetAdminGavSettings();
+        const data = response.data || {};
+        document.getElementById("gavDurationMinutes").value = Math.round((Number(data.workDurationMs) || 7200000) / 60000);
+        document.getElementById("gavTokenReward").value = Number(data.tokenReward) || 0;
+        const cardSelect = document.getElementById("gavCardReward");
+        cardSelect.replaceChildren(new Option("Aucune carte", ""));
+        (data.cards || []).forEach((card) => cardSelect.add(new Option(`${card.cardNumber ? `#${card.cardNumber} · ` : ""}${card.name || "Carte sans nom"}`, card.id)));
+        cardSelect.value = data.cardRewardId || "";
+        const totalMs = Math.max(0, Number(data.totalWorkMs) || 0);
+        const totalHours = Math.floor(totalMs / 3600000);
+        const totalMinutes = Math.floor((totalMs % 3600000) / 60000);
+        document.getElementById("gavTotalWork").textContent = `Temps total de travail des GAV : ${totalHours} h ${totalMinutes} min`;
+        document.getElementById("gavTotalCards").textContent = `Cartes tirées par tous les joueurs : ${Number(data.totalCardsDrawn) || 0}`;
+        status.textContent = "Réglages chargés.";
+    } catch (error) {
+        console.error("Chargement réglages GAV impossible :", error);
+        status.textContent = "Impossible de charger les réglages GAV. Vérifie que les fonctions sont déployées.";
+    }
+}
+
+document.getElementById("adminGavForm").addEventListener("submit", async (event) => {
+    event.preventDefault();
+    const button = document.getElementById("adminGavSaveButton");
+    const status = document.getElementById("adminGavStatus");
+    button.disabled = true;
+    status.textContent = "Enregistrement…";
+    try {
+        await callSaveAdminGavSettings({
+            workDurationMinutes: Number(document.getElementById("gavDurationMinutes").value),
+            tokenReward: Number(document.getElementById("gavTokenReward").value),
+            cardRewardId: document.getElementById("gavCardReward").value || "",
+        });
+        status.textContent = "Réglages du GAV enregistrés.";
+        await loadAdminGavSettings();
+    } catch (error) {
+        console.error("Enregistrement réglages GAV impossible :", error);
+        status.textContent = error.code === "functions/permission-denied" ? "Seul l’Admin peut modifier ces réglages." : "Impossible d’enregistrer les réglages GAV.";
+    } finally {
+        button.disabled = false;
+    }
+});
 
 function timestampToMilliseconds(value) {
     if (value && typeof value.toMillis === "function") return value.toMillis();
@@ -6445,8 +6523,8 @@ async function loadAdminMessages(category = activeMessageCategory, status = acti
         button.setAttribute("aria-pressed", String(selected));
         button.setAttribute("aria-selected", String(selected));
     });
-    messageArchivesButton.setAttribute("aria-pressed", String(status === "traite"));
-    messageArchivesButton.textContent = status === "traite" ? "↩ Retour aux messages" : "🗄️ Archives";
+    messageArchivesButton.setAttribute("aria-pressed", String(status === "archives"));
+    messageArchivesButton.textContent = status === "archives" ? "↩ Retour aux messages" : "🗄️ Archives";
 
     try {
         const messagesQuery = query(
@@ -6455,9 +6533,11 @@ async function loadAdminMessages(category = activeMessageCategory, status = acti
         );
         const snapshot = await getDocs(messagesQuery);
 
-        const matchingMessages = snapshot.docs.filter((item) => item.data().status === status);
+        const matchingMessages = snapshot.docs.filter((item) => status === "archives"
+            ? ["valide", "rejete", "traite"].includes(item.data().status)
+            : item.data().status === status);
         if (!matchingMessages.length) {
-            adminMessagesStatus.textContent = status === "traite"
+            adminMessagesStatus.textContent = status === "archives"
                 ? "Aucun message dans les archives pour cette catégorie."
                 : category === "idee" ? "Aucune idée reçue dans la boîte de réception."
                     : "Aucun problème signalé dans la boîte de réception.";
@@ -6465,7 +6545,7 @@ async function loadAdminMessages(category = activeMessageCategory, status = acti
         }
 
         adminMessagesStatus.textContent = matchingMessages.length + (matchingMessages.length > 1 ? " message(s)" : " message")
-            + (status === "traite" ? " archivé(s)" : " dans la boîte de réception");
+            + (status === "archives" ? " dans les archives" : " dans les messages reçus");
         const sortedMessages = [...matchingMessages].sort((left, right) => {
             const leftDate = left.data().createdAt;
             const rightDate = right.data().createdAt;
@@ -6474,45 +6554,69 @@ async function loadAdminMessages(category = activeMessageCategory, status = acti
             return rightTime - leftTime;
         });
 
-        sortedMessages.forEach((messageDoc) => {
+        const renderMessage = (messageDoc, columnStatus) => {
             const message = messageDoc.data();
             const item = document.createElement("article");
-            item.className = "admin-message-item" + (message.status === "traite" ? " is-read" : "");
+            item.className = "admin-message-item" + (columnStatus !== "nouveau" ? " is-read" : "");
 
             const title = document.createElement("strong");
             title.textContent = message.senderPseudo || "Joueur";
             const meta = document.createElement("small");
             meta.textContent = (message.senderEmail || "Adresse e-mail inconnue")
                 + " • " + formatAdminMessageDate(message.createdAt)
-                + " • " + (message.status === "traite" ? "Traité" : "À lire");
+                + " • " + (columnStatus === "valide" ? "Validé" : columnStatus === "rejete" ? "Rejeté" : columnStatus === "traite" ? "Ancien message traité" : "À lire");
             const copy = document.createElement("p");
             copy.className = "admin-message-copy";
             copy.textContent = message.message || "Message vide";
             item.append(title, meta, copy);
 
-            if (message.status !== "traite") {
+            if (status !== "archives") {
                 const actions = document.createElement("div");
                 actions.className = "admin-actions";
-                const doneButton = document.createElement("button");
-                doneButton.type = "button";
-                doneButton.textContent = "Marquer traité";
-                doneButton.addEventListener("click", async () => {
-                    doneButton.disabled = true;
+                const makeAction = (label, action) => {
+                    const button = document.createElement("button");
+                    button.type = "button";
+                    button.textContent = label;
+                    button.addEventListener("click", async () => {
+                    button.disabled = true;
                     try {
-                        await updateDoc(doc(db, "messages", messageDoc.id), { status: "traite" });
+                        if (action === "delete") await deleteDoc(doc(db, "messages", messageDoc.id));
+                        else await updateDoc(doc(db, "messages", messageDoc.id), { status: action });
                         await loadAdminMessages(category, status);
                     } catch (error) {
                         console.error("Erreur lors du traitement du message :", error);
                         adminMessagesStatus.textContent = "Impossible de modifier ce message. Vérifie les règles Firestore.";
-                        doneButton.disabled = false;
+                        button.disabled = false;
                     }
                 });
-                actions.append(doneButton);
+                    return button;
+                };
+                actions.append(makeAction("Valider", "valide"), makeAction("Rejeter", "rejete"), makeAction("Supprimer", "delete"));
                 item.append(actions);
             }
+            return item;
+        };
 
-            adminMessagesList.append(item);
-        });
+        if (status === "archives") {
+            const columns = document.createElement("div");
+            columns.className = "message-archive-columns";
+            [["valide", "Validé"], ["rejete", "Rejeté"]].forEach(([columnStatus, label]) => {
+                const column = document.createElement("section");
+                column.className = "message-archive-column";
+                const heading = document.createElement("h3");
+                heading.textContent = label;
+                column.append(heading);
+                const columnMessages = sortedMessages.filter((item) => item.data().status === columnStatus || (columnStatus === "valide" && item.data().status === "traite"));
+                if (!columnMessages.length) {
+                    const empty = document.createElement("p");
+                    empty.className = "admin-note";
+                    empty.textContent = "Aucun message.";
+                    column.append(empty);
+                } else columnMessages.forEach((item) => column.append(renderMessage(item, item.data().status)));
+                columns.append(column);
+            });
+            adminMessagesList.append(columns);
+        } else sortedMessages.forEach((messageDoc) => adminMessagesList.append(renderMessage(messageDoc, status)));
     } catch (error) {
         console.error("Erreur de chargement de la messagerie Admin :", error);
         if (error.code === "permission-denied") {
@@ -6577,7 +6681,7 @@ document.querySelectorAll("[data-message-category]").forEach((button) => {
     button.addEventListener("click", () => loadAdminMessages(button.dataset.messageCategory, "nouveau"));
 });
 messageArchivesButton.addEventListener("click", () => {
-    loadAdminMessages(activeMessageCategory, activeMessageStatus === "traite" ? "nouveau" : "traite");
+    loadAdminMessages(activeMessageCategory, activeMessageStatus === "archives" ? "nouveau" : "archives");
 });
 
 function buildUniqueCardsWorkbookXml(players) {
