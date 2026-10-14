@@ -424,13 +424,22 @@ body {
 
 
 .header-logo {
-
-    font-size: 20px;
-
-    font-weight: 800;
-
-    color: #1687b9;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    display: flex;
+    width: min(42vw, 168px);
+    height: 56px;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    cursor: pointer;
+    transform: translate(-50%, -50%);
 }
+.header-logo img { display: block; max-width: 100%; max-height: 100%; object-fit: contain; }
+.header-logo:focus-visible { outline: 3px solid var(--theme-gold-light, #f7d46b); outline-offset: 2px; border-radius: 8px; }
 
 
 .header-logo span {
@@ -1070,7 +1079,7 @@ body {
     display: grid;
 
     grid-template-columns:
-        repeat(4, minmax(0, 1fr));
+        repeat(3, minmax(0, 1fr));
 
     background: #ffffff;
 
@@ -1978,11 +1987,9 @@ body {
     <header class="app-header">
 
 
-        <div class="header-logo">
-
-            Cartes <span>&</span> Popote
-
-        </div>
+        <button id="homeHeaderButton" class="header-logo" type="button" aria-label="Retour à l’accueil" title="Accueil">
+            <img src="./Logo.png" alt="Cartes & Popote">
+        </button>
 
 
         <button
@@ -2724,11 +2731,6 @@ body {
     <nav class="bottom-nav">
 
 
-        <button id="homeNavButton" class="nav-item nav-image-button active" type="button" aria-label="Accueil" title="Accueil">
-            <img src="./Accueil.png" alt="" aria-hidden="true">
-        </button>
-
-
         <button id="collectionNavButton" class="nav-item nav-image-button" type="button" aria-label="Collection" title="Collection">
             <img src="./Collection.png" alt="" aria-hidden="true">
         </button>
@@ -3301,7 +3303,7 @@ const rulesAdminPanel = document.getElementById("rulesAdminPanel");
 const rulesEditor = document.getElementById("rulesEditor");
 const rulesSaveButton = document.getElementById("rulesSaveButton");
 const rulesSaveStatus = document.getElementById("rulesSaveStatus");
-const homeNavButton = document.getElementById("homeNavButton");
+const homeHeaderButton = document.getElementById("homeHeaderButton");
 const collectionNavButton = document.getElementById("collectionNavButton");
 const recyclingNavButton = document.getElementById("recyclingNavButton");
 let ownedAlbumCards = [];
@@ -3811,7 +3813,6 @@ function showHomePage() {
     premiumPage.classList.add("hidden");
     archivesPage.classList.add("hidden");
     bottomNav.classList.remove("hidden");
-    homeNavButton.classList.add("active");
     collectionNavButton.classList.remove("active");
     recyclingNavButton.classList.remove("active");
     leaderboardMenuButton.classList.remove("active");
@@ -5953,7 +5954,6 @@ document.getElementById("viewOwnedCardsButton").addEventListener("click", async 
     archivesPage.classList.add("hidden");
     collectionPage.classList.remove("hidden");
     bottomNav.classList.remove("hidden");
-    homeNavButton.classList.remove("active");
     collectionNavButton.classList.add("active");
     await loadOwnedPlayerCards();
 });
@@ -6035,7 +6035,7 @@ openDailyBoosterButton.addEventListener("click", async () => {
     }
 });
 
-homeNavButton.addEventListener("click", showHomePage);
+homeHeaderButton.addEventListener("click", showHomePage);
 collectionBackButton.addEventListener("click", showHomePage);
 rulesBackButton.addEventListener("click", showHomePage);
 collectionSearchInput.addEventListener("input", () => {
@@ -6142,7 +6142,6 @@ collectionNavButton.addEventListener("click", async () => {
     archivesPage.classList.add("hidden");
     collectionPage.classList.remove("hidden");
     bottomNav.classList.remove("hidden");
-    homeNavButton.classList.remove("active");
     collectionNavButton.classList.add("active");
     recyclingNavButton.classList.remove("active");
     await loadOwnedPlayerCards();
