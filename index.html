@@ -1753,6 +1753,12 @@ body {
 .leaderboard-list { display: grid; gap: 11px; margin-top: 18px; }
 .leaderboard-row { display: grid; grid-template-columns: 42px minmax(135px, 1fr) minmax(280px, 2fr); align-items: center; gap: 12px; padding: 14px; border: 1px solid rgba(243, 191, 56, .65); border-radius: 16px; background: var(--theme-cream); color: var(--theme-ink); box-shadow: 0 9px 24px rgba(0, 0, 0, .23); }
 .leaderboard-rank { display: grid; place-items: center; width: 38px; height: 38px; border-radius: 50%; background: #10264a; color: var(--theme-gold-light); font-size: 14px; font-weight: 900; }
+.leaderboard-rank-avatar { position: relative; display: grid; place-items: center; width: 58px; height: 58px; border: 3px solid; border-radius: 50%; background: #10264a; box-shadow: 0 0 0 3px rgba(16,38,74,.1), 0 4px 10px rgba(0,0,0,.25); }
+.leaderboard-rank-avatar img { display: block; width: 100%; height: 100%; border-radius: 50%; object-fit: cover; }
+.leaderboard-rank-avatar span { position: absolute; right: -5px; bottom: -4px; display: grid; place-items: center; width: 22px; height: 22px; border: 2px solid var(--theme-cream); border-radius: 50%; background: var(--podium-color); color: #10264a; font-size: 11px; font-weight: 900; }
+.leaderboard-podium-gold { border-color: #e6b422; --podium-color: #f2c94c; }
+.leaderboard-podium-silver { border-color: #aeb8c6; --podium-color: #d7dee8; }
+.leaderboard-podium-bronze { border-color: #b87545; --podium-color: #d99a69; }
 .leaderboard-player { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
 .leaderboard-name-line { display: flex; align-items: baseline; gap: 8px; min-width: 0; flex-wrap: wrap; }
 .leaderboard-name { overflow: hidden; color: var(--theme-ink); font-size: 15px; font-weight: 800; text-overflow: ellipsis; }
@@ -1766,7 +1772,7 @@ body {
 .leaderboard-mystic { background: #efe1ff; color: #7045a3; }
 @media (max-width: 390px) { .player-profile { padding-left: 11px; padding-right: 11px; } .profile-stats-grid { gap: 9px; } .profile-stat { min-height: 136px; padding: 14px 8px; } .profile-stat-label { font-size: 11px; } }
 @media (max-width: 390px) { .profile-roadmap-item { grid-template-columns: 46px minmax(0, 1fr); } .profile-roadmap-state { grid-column: 2; text-align: left; } }
-@media (max-width: 600px) { .leaderboard-page { padding-left: 11px; padding-right: 11px; } .leaderboard-row { grid-template-columns: 38px minmax(0, 1fr); gap: 10px; padding: 11px; } .leaderboard-rarity-grid { grid-column: 1 / -1; grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 600px) { .leaderboard-page { padding-left: 11px; padding-right: 11px; } .leaderboard-row { grid-template-columns: 58px minmax(0, 1fr); gap: 10px; padding: 11px; } .leaderboard-rarity-grid { grid-column: 1 / -1; grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 .player-card { background: var(--theme-cream); box-shadow: 0 9px 22px rgba(0, 0, 0, .28); }
 .player-card-image, .player-card-placeholder { background: #efe8d7; }
 .rarity-label { background: #f1ead9; }
@@ -5057,9 +5063,25 @@ async function loadLeaderboard() {
         players.forEach((player) => {
             const row = document.createElement("article");
             row.className = "leaderboard-row";
-            const rank = document.createElement("span");
-            rank.className = "leaderboard-rank";
-            rank.textContent = "#" + player.rang;
+            const rankNumber = Number(player.rang);
+            let rank;
+            if (rankNumber >= 1 && rankNumber <= 3) {
+                rank = document.createElement("div");
+                rank.className = "leaderboard-rank-avatar " + ["leaderboard-podium-gold", "leaderboard-podium-silver", "leaderboard-podium-bronze"][rankNumber - 1];
+                const avatar = document.createElement("img");
+                setPlayerAvatarImage(avatar, player.avatar);
+                avatar.alt = "Avatar de " + (player.pseudo || "Joueur");
+                avatar.loading = "lazy";
+                const podiumNumber = document.createElement("span");
+                podiumNumber.textContent = String(rankNumber);
+                podiumNumber.setAttribute("aria-hidden", "true");
+                rank.append(avatar, podiumNumber);
+                rank.setAttribute("aria-label", `${rankNumber}${rankNumber === 1 ? "er" : "e"} du classement : ${player.pseudo || "Joueur"}`);
+            } else {
+                rank = document.createElement("span");
+                rank.className = "leaderboard-rank";
+                rank.textContent = "#" + player.rang;
+            }
             const playerInfo = document.createElement("div");
             playerInfo.className = "leaderboard-player";
             const name = document.createElement("button");
