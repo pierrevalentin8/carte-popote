@@ -1038,7 +1038,7 @@ body {
 .home-overview-archive button:focus-visible { outline: 3px solid #f7d46b; outline-offset: 3px; }
 .home-overview-archive img { display: block; width: min(100%, 220px); height: auto; object-fit: contain; }
 .archives-page { position: relative; isolation: isolate; width: 100%; max-width: 1100px; min-height: calc(100dvh - 70px); margin: auto; padding: 12px 10px 100px; color: #111; }
-.archives-page::before { content: ""; position: fixed; inset: 0; z-index: -1; background-color: #09172d; background-image: linear-gradient(135deg, rgba(4,13,29,.76), rgba(8,25,48,.66)), url("./gendarme_pixel_art_ameliore.gif"); background-position: center, center; background-repeat: no-repeat; background-size: cover, cover; }
+.archives-page::before { content: ""; position: fixed; inset: 0; z-index: -1; background: #b8b8b8; }
 .archives-page h2 { margin-top: 20px; color: var(--theme-gold-light); font-size: 24px; }
 .archives-description { max-width: 620px; margin: 26px auto 20px; padding: 18px 20px; border: 1px solid rgba(243,191,56,.55); border-radius: 18px; background: rgba(5,16,35,.78); color: #e3eaf4; font-size: 17px; line-height: 1.55; text-align: center; white-space: pre-line; box-shadow: 0 12px 30px rgba(0,0,0,.28); }
 .archives-minage-image { display: block; width: min(100%, 260px); max-height: 190px; margin: 16px auto -12px; object-fit: contain; filter: drop-shadow(0 8px 14px rgba(0,0,0,.35)); }
@@ -1080,7 +1080,6 @@ body {
 .service-win-status { min-height:22px; margin:10px 0 0; }
 @media(max-width:760px){.service-admin-grid{grid-template-columns:1fr}.service-admin-header{display:none}.service-admin-row{grid-template-columns:1fr 1fr}.service-admin-row>*:first-child,.service-admin-row>*:last-child{grid-column:1/-1}.service-row-actions{display:flex;flex-wrap:wrap}}
 @media (max-width: 600px) { .home-overview-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; } .home-overview-leaderboard { min-height: 78px; padding: 5px; } .home-overview-leaderboard img { height: 64px; } }
-@media (max-width: 600px) { .archives-page::before { background-size: cover, min(100vw, 480px) auto; } }
 .home-site-note { display: grid; justify-items: center; gap: 7px; margin: 20px 0 88px; color: #c6d2e5; font-size: 11px; line-height: 1.45; text-align: center; }
 .home-site-note p { margin: 0; }
 .home-site-note a { color: #f7d46b; text-decoration: underline; text-underline-offset: 3px; }
