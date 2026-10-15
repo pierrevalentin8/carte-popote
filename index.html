@@ -2176,6 +2176,8 @@ body {
                 🛡️ Administration
             </button>
 
+            <button id="effectifMenuButton" class="hidden" type="button">👥 Effectif</button>
+
             <button id="adminMessagesMenuButton" class="hidden" type="button">
                 💬 Messagerie
             </button>
@@ -2793,7 +2795,6 @@ body {
             <button class="admin-menu-button" type="button" data-admin-section="rarities" aria-controls="adminRaritiesSection" aria-pressed="false">⭐ Catégories de rareté</button>
             <button class="admin-menu-button" type="button" data-admin-section="cards" aria-controls="adminCardsSection" aria-pressed="false">🃏 Création de cartes</button>
             <button class="admin-menu-button" type="button" data-admin-section="serviceMissions" aria-controls="adminServiceMissionsSection" aria-pressed="false">📋 Gestion des missions</button>
-            <button class="admin-menu-button" type="button" data-admin-section="effectif" aria-controls="adminEffectifSection" aria-pressed="false">👥 Effectif</button>
         </nav>
         <p id="adminSectionHint" class="admin-note">Choisis une rubrique pour afficher son contenu.</p>
         <div id="adminJournalSection" class="admin-panel admin-section hidden" style="margin-bottom:16px">
@@ -3457,6 +3458,7 @@ let archivesCountdownInterval = null;
 let archivesClaimInProgress = false;
 
 const adminButton = document.getElementById("adminButton");
+const effectifMenuButton = document.getElementById("effectifMenuButton");
 const adminMessagesMenuButton = document.getElementById("adminMessagesMenuButton");
 const playerPreviewToggle = document.getElementById("playerPreviewToggle");
 const playerPreviewBanner = document.getElementById("playerPreviewBanner");
@@ -3960,6 +3962,7 @@ onAuthStateChanged(
         dropdownMenu.classList.add("hidden");
         playerLogoutButton.classList.toggle("hidden", isAdminAccount);
         adminButton.classList.toggle("hidden", !isAdminAccount || isPlayerPreview);
+        effectifMenuButton.classList.toggle("hidden", !isAdminAccount || isPlayerPreview);
         adminMessagesMenuButton.classList.toggle("hidden", !isAdminAccount || isPlayerPreview);
         financeMenuButton.classList.toggle("hidden", !isAdminAccount || isPlayerPreview);
         playerPreviewToggle.classList.toggle("hidden", !isAdminAccount);
@@ -5289,6 +5292,7 @@ function setPlayerPreview(enabled) {
     homeCardCountButton.disabled = enabled;
     dropdownMenu.classList.add("hidden");
     adminButton.classList.toggle("hidden", enabled);
+    effectifMenuButton.classList.toggle("hidden", enabled);
     adminMessagesMenuButton.classList.toggle("hidden", enabled);
     financeMenuButton.classList.toggle("hidden", enabled);
     premiumAdminPanel.classList.toggle("hidden", enabled);
@@ -8131,6 +8135,24 @@ adminButton.addEventListener("click", async () => {
     Object.values(adminSections).forEach((section) => section.classList.add("hidden"));
     adminSectionHint.classList.remove("hidden");
     document.querySelectorAll(".admin-menu-button").forEach((button) => button.setAttribute("aria-pressed", "false"));
+});
+
+effectifMenuButton.addEventListener("click", async () => {
+    if (!auth.currentUser || (auth.currentUser.email || "").toLowerCase() !== ADMIN_EMAIL || isPlayerPreview) return;
+    dropdownMenu.classList.add("hidden");
+    premiumPage.classList.add("hidden");
+    document.querySelector(".app-content").classList.add("hidden");
+    profilePage.classList.add("hidden");
+    leaderboardPage.classList.add("hidden");
+    statisticsPage.classList.add("hidden");
+    collectionPage.classList.add("hidden");
+    recyclingPage.classList.add("hidden");
+    messagingPage.classList.add("hidden");
+    rulesPage.classList.add("hidden");
+    bottomNav.classList.add("hidden");
+    archivesPage.classList.add("hidden");
+    adminPage.classList.remove("hidden");
+    await showAdminSection("effectif");
 });
 
 adminMessagesMenuButton.addEventListener("click", async () => {
