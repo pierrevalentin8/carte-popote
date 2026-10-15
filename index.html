@@ -1508,6 +1508,9 @@ body {
 .site-updates-list { display: grid; gap: 11px; margin: 0; padding-left: 22px; line-height: 1.5; }
 .site-updates-actions { display: flex; justify-content: flex-end; margin-top: 22px; }
 @media (max-width: 480px) { .site-updates-card { padding: 19px; border-radius: 18px; } .site-updates-actions button { width: 100%; } }
+.service-ready-image { display:block; width:min(100%,240px); max-height:190px; margin:12px auto 16px; object-fit:contain; }
+.service-ready-actions { display:flex; justify-content:flex-end; gap:10px; margin-top:20px; }
+@media (max-width: 480px) { .service-ready-actions { flex-direction:column; } .service-ready-actions button { width:100%; } }
 .profile-identity-editor { display: grid; gap: 9px; margin-top: 12px; padding: 13px; border: 1px solid rgba(243,191,56,.5); border-radius: 13px; background: rgba(251,250,245,.08); }
 .profile-identity-editor label { color: #e3eaf4; font-size: 12px; font-weight: 800; }
 .profile-identity-editor .register-avatar-label { color: #e3eaf4; }
@@ -2749,6 +2752,18 @@ body {
         </div>
     </section>
 
+    <section id="serviceReadyModal" class="site-updates-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="serviceReadyTitle" aria-hidden="true">
+        <div class="site-updates-card">
+            <h2 id="serviceReadyTitle">✅ Mission Service terminée !</h2>
+            <p id="serviceReadyMessage">Ta récompense t’attend.</p>
+            <img id="serviceReadyImage" class="service-ready-image hidden" alt="">
+            <div class="service-ready-actions">
+                <button id="serviceReadyLaterButton" class="secondary-button" type="button">Plus tard</button>
+                <button id="serviceReadyOpenButton" class="primary-button" type="button">Voir ma récompense</button>
+            </div>
+        </div>
+    </section>
+
     <section id="adminPage" class="admin-page hidden">
         <button id="adminBackButton" class="admin-back" type="button">← Retour à l’accueil</button>
         <h2>🛡️ Administration</h2>
@@ -3090,7 +3105,15 @@ const callDownloadPlayerBackup = httpsCallable(functions, "downloadPlayerBackup"
 const siteUpdatesModal = document.getElementById("siteUpdatesModal");
 const siteUpdatesList = document.getElementById("siteUpdatesList");
 const siteUpdatesCloseButton = document.getElementById("siteUpdatesCloseButton");
+const serviceReadyModal = document.getElementById("serviceReadyModal");
+const serviceReadyMessage = document.getElementById("serviceReadyMessage");
+const serviceReadyImage = document.getElementById("serviceReadyImage");
+const serviceReadyLaterButton = document.getElementById("serviceReadyLaterButton");
+const serviceReadyOpenButton = document.getElementById("serviceReadyOpenButton");
 let pendingSiteUpdateIds = [];
+let pendingServiceReadyMission = null;
+let announcementsWaitingForServiceModal = [];
+let lastNotifiedServiceTaskId = "";
 
 function closeSiteUpdates() {
     const userId = auth.currentUser?.uid;
@@ -3098,6 +3121,39 @@ function closeSiteUpdates() {
     siteUpdatesModal.classList.add("hidden");
     siteUpdatesModal.setAttribute("aria-hidden", "true");
     pendingSiteUpdateIds = [];
+    showPendingServiceReadyNotification();
+}
+
+function closeServiceReadyNotification() {
+    serviceReadyModal.classList.add("hidden");
+    serviceReadyModal.setAttribute("aria-hidden", "true");
+    if (announcementsWaitingForServiceModal.length) {
+        const announcements = announcementsWaitingForServiceModal;
+        announcementsWaitingForServiceModal = [];
+        showSiteUpdatesIfNeeded(announcements);
+    } else {
+        archivesHomeButton.focus({ preventScroll: true });
+    }
+}
+
+function showPendingServiceReadyNotification() {
+    const mission = pendingServiceReadyMission;
+    if (!mission || !siteUpdatesModal.classList.contains("hidden")) return;
+    pendingServiceReadyMission = null;
+    serviceReadyMessage.textContent = `La mission « ${mission.name || "Service"} » est terminée. Récompense : ${serviceRewardSummary(mission)}. Tu peux la récupérer dans Service.`;
+    if (mission.imageUrl) {
+        serviceReadyImage.src = mission.imageUrl;
+        serviceReadyImage.alt = `Illustration de la mission ${mission.name || "terminée"}`;
+        serviceReadyImage.onerror = () => serviceReadyImage.classList.add("hidden");
+        serviceReadyImage.classList.remove("hidden");
+    } else {
+        serviceReadyImage.removeAttribute("src");
+        serviceReadyImage.alt = "";
+        serviceReadyImage.classList.add("hidden");
+    }
+    serviceReadyModal.classList.remove("hidden");
+    serviceReadyModal.setAttribute("aria-hidden", "false");
+    serviceReadyOpenButton.focus();
 }
 
 function markSiteUpdatesSeen(ids, userId = auth.currentUser?.uid) {
@@ -3113,6 +3169,10 @@ function markSiteUpdatesSeen(ids, userId = auth.currentUser?.uid) {
 function showSiteUpdatesIfNeeded(updates) {
     const userId = auth.currentUser?.uid;
     if (!userId || updates.length === 0) return;
+    if (!serviceReadyModal.classList.contains("hidden")) {
+        announcementsWaitingForServiceModal = updates;
+        return;
+    }
     let seen = [];
     try {
         seen = JSON.parse(localStorage.getItem(`cartes-popote-seen-updates:${userId}`) || "[]");
@@ -3138,6 +3198,11 @@ function showSiteUpdatesIfNeeded(updates) {
 }
 
 siteUpdatesCloseButton.addEventListener("click", closeSiteUpdates);
+serviceReadyLaterButton.addEventListener("click", closeServiceReadyNotification);
+serviceReadyOpenButton.addEventListener("click", async () => {
+    closeServiceReadyNotification();
+    await openArchivesPage();
+});
 
 
 
@@ -3804,6 +3869,11 @@ onAuthStateChanged(
             menuButton.classList.add("hidden");
             dropdownMenu.classList.add("hidden");
             playerLogoutButton.classList.add("hidden");
+            serviceReadyModal.classList.add("hidden");
+            serviceReadyModal.setAttribute("aria-hidden", "true");
+            pendingServiceReadyMission = null;
+            announcementsWaitingForServiceModal = [];
+            lastNotifiedServiceTaskId = "";
             clearArchivesCountdown();
             archivesPage.classList.add("hidden");
             isPlayerPreview = false;
@@ -6996,6 +7066,13 @@ async function syncServiceMissionHomeCountdown() {
         updateServiceMissionCountdown();
         if (serviceCountdownInterval) clearInterval(serviceCountdownInterval);
         serviceCountdownInterval = setInterval(updateServiceMissionCountdown, 1000);
+        const readyAt = Date.parse(serviceActiveMission.readyAt);
+        const taskId = serviceActiveMission.taskId || `${serviceActiveMission.id || "service"}-${serviceActiveMission.readyAt}`;
+        if (Number.isFinite(readyAt) && readyAt <= Date.now() && taskId !== lastNotifiedServiceTaskId) {
+            lastNotifiedServiceTaskId = taskId;
+            pendingServiceReadyMission = serviceActiveMission;
+            showPendingServiceReadyNotification();
+        }
     } catch (error) { console.warn("Le compte à rebours du Service sera actualisé à l’ouverture de la page.", error); }
 }
 
