@@ -2285,7 +2285,7 @@ body {
         <section class="boosters">
 
 
-            <article class="booster">
+            <article id="dailyBoosterArticle" class="booster hidden">
 
                 <img
                     class="booster-image"
@@ -3590,6 +3590,7 @@ let premiumAdminPlayers = [];
 let premiumRewardCards = [];
 const buyNormalBoosterButton = document.getElementById("buyNormalBoosterButton");
 const openNormalBoosterButton = document.getElementById("openNormalBoosterButton");
+const dailyBoosterArticle = document.getElementById("dailyBoosterArticle");
 const openDailyBoosterButton = document.getElementById("openDailyBoosterButton");
 const boosterPurchaseStatus = document.getElementById("boosterPurchaseStatus");
 const boosterResultModal = document.getElementById("boosterResultModal");
@@ -6450,6 +6451,7 @@ function getParisDateKey() {
 
 function setDailyBoosterButton(lastOpenedDate) {
     const alreadyOpened = lastOpenedDate === getParisDateKey();
+    dailyBoosterArticle.classList.toggle("hidden", alreadyOpened);
     openDailyBoosterButton.disabled = alreadyOpened;
     openDailyBoosterButton.textContent = alreadyOpened
         ? "Déjà ouvert aujourd’hui"
