@@ -2393,7 +2393,7 @@ body {
                     <span class="profile-stat-label">Cartes collectées</span>
                 </article>
                 <article id="profilePremiumSpendingCard" class="profile-stat hidden">
-                    <span class="profile-stat-icon" aria-hidden="true">💜</span>
+                    <img class="profile-stat-icon profile-stat-icon-image" src="./Jeton%20premium.png" alt="">
                     <span id="profilePremiumSpending" class="profile-stat-value">0 €</span>
                     <span class="profile-stat-label">Dépensés en Premium</span>
                 </article>
@@ -5225,7 +5225,8 @@ async function loadPersonalProfile(playerId = auth.currentUser?.uid) {
                 player.unlockedBadgeIds = badgeResponse.data.unlockedBadgeIds || [];
                 player.badgeEquipped = badgeResponse.data.badgeEquipped || "";
                 player.commonSeasonOneProgress = Number(badgeResponse.data.commonSeasonOneProgress) || 0;
-                profilePremiumSpending.textContent = (totalAmountCents / 100).toLocaleString("fr-FR", { style: "currency", currency: "EUR" });
+                const formattedSpending = (totalAmountCents / 100).toLocaleString("fr-FR", { style: "currency", currency: "EUR" });
+                profilePremiumSpending.textContent = formattedSpending;
             } catch (spendingError) {
                 console.error("Erreur de chargement des dépenses Premium personnelles :", spendingError);
                 profilePremiumSpending.textContent = "Indisponible";
@@ -5240,9 +5241,7 @@ async function loadPersonalProfile(playerId = auth.currentUser?.uid) {
             profilePageTitle.textContent = player.pseudo || "Profil joueur";
         }
         const createdAt = player.createdAt || player.accountCreatedAt || player.dateCreation;
-        const lastLoginAt = player.lastLoginAt || player.derniereConnexionAt || player.derniereConnexionDate;
-        document.getElementById("profileAccountDates").textContent = (createdAt ? "Compte créé le " + formatProfileDate(createdAt) : "Date de création indisponible")
-            + "\n" + (lastLoginAt ? "Dernière connexion le " + formatProfileDate(lastLoginAt) : "Dernière connexion indisponible");
+        document.getElementById("profileAccountDates").textContent = createdAt ? "Compte créé le " + formatProfileDate(createdAt) : "Date de création indisponible";
         profilePageAvatar.replaceChildren();
         const badgeDetails = {
             "premium-10": { image: "./badge-premium-10.png", label: "Badge Premium 10 €" },
