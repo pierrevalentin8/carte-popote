@@ -1835,6 +1835,40 @@ body {
 .profile-stat-icon { font-size: 26px; line-height: 1; }
 .profile-stat-value { color: #9a6b09; font-size: clamp(24px, 7vw, 32px); font-weight: 900; line-height: 1.1; }
 .profile-stat-label { max-width: 230px; color: #59677b; font-size: 12px; line-height: 1.4; }
+.player-profile { max-width: 980px; }
+.profile-pro-card { position: relative; isolation: isolate; overflow: hidden; margin-top: 20px; padding: clamp(18px, 3vw, 30px); border: 3px solid #d7ad46; border-radius: 22px; background: radial-gradient(ellipse at 80% 20%, rgba(53,94,152,.42), transparent 42%), repeating-linear-gradient(135deg, rgba(255,255,255,.018) 0 2px, transparent 2px 7px), linear-gradient(145deg, #06152e, #102d59 58%, #07162f); color: #f7f1df; box-shadow: 0 18px 44px rgba(0,0,0,.38), inset 0 0 0 3px rgba(255,221,132,.16), inset 0 0 28px rgba(0,0,0,.38); }
+.profile-pro-card::before { position: absolute; z-index: -1; top: 8%; right: -3%; width: min(38%, 310px); aspect-ratio: 1; background: url('./Logo.png') center / contain no-repeat; content: ""; opacity: .075; filter: grayscale(1); pointer-events: none; }
+.profile-pro-card::after { position: absolute; z-index: -1; inset: 7px; border: 1px solid rgba(255,218,111,.37); border-radius: 15px; content: ""; pointer-events: none; }
+.profile-card-identity { display: grid; grid-template-columns: 142px minmax(0,1fr); align-items: center; gap: clamp(16px,3vw,28px); padding: 2px 48px 18px 2px; }
+.profile-avatar-frame { display: grid; place-items: center; width: 142px; height: 178px; overflow: hidden; border: 4px solid #dcb74f; border-radius: 12px; background: #f8f4e8; box-shadow: 0 6px 17px rgba(0,0,0,.4), inset 0 0 0 2px #fff1bf; }
+.profile-page-avatar { display: block; width: 100%; height: 100%; overflow: hidden; border: 0; border-radius: 7px; background: #f8f4e8; }
+.profile-page-avatar img { display: block; width: 100%; height: 100%; object-fit: cover; }
+.profile-card-details { min-width: 0; }
+.profile-name-line { display: flex; align-items: center; flex-wrap: wrap; gap: 10px; }
+.profile-name-line h2 { max-width: 100%; margin: 0; padding: 7px 14px; border: 1px solid #ead9ad; border-radius: 8px; background: linear-gradient(#fffdf5,#e9dfc9); color: #10264a; font-size: clamp(23px,4vw,34px); font-weight: 900; line-height: 1.15; overflow-wrap: anywhere; box-shadow: 0 3px 9px rgba(0,0,0,.25); }
+.profile-premium-badge { width: 44px; height: 44px; flex-basis: 44px; filter: drop-shadow(0 3px 6px rgba(0,0,0,.4)); }
+.profile-account-dates { margin: 10px 0 0; color: #d5deec; font-size: 12px; line-height: 1.65; white-space: pre-line; }
+.profile-edit-icon { position: absolute; z-index: 2; top: 17px; right: 17px; display: grid; place-items: center; width: 46px; height: 46px; padding: 0; border: 2px solid #dfbb59; border-radius: 50%; background: #0a2145; color: #fff4d0; font-size: 21px; cursor: pointer; box-shadow: 0 4px 11px rgba(0,0,0,.35); transition: transform .16s ease, background .16s ease; }
+.profile-edit-icon:hover { transform: translateY(-2px); background: #183d70; }
+.profile-level-card { margin: 0; padding: 13px 15px; border: 1px solid #d9b851; border-radius: 13px; background: linear-gradient(180deg,rgba(4,17,39,.94),rgba(10,33,68,.94)); color: #fff; box-shadow: inset 0 0 0 1px rgba(255,255,255,.06),0 5px 14px rgba(0,0,0,.25); }
+.profile-level-heading strong { display: inline-flex; align-items: center; gap: 5px; padding: 3px 10px; border: 1px solid #ffe083; border-radius: 999px; background: linear-gradient(135deg,#f7d96c,#b77c12); color: #172641; font-size: 13px; box-shadow: 0 2px 6px rgba(0,0,0,.3); }
+.profile-level-heading span, .profile-xp-caption { color: #d7e0ef; }
+.profile-xp-track { height: 12px; border: 2px solid #ad8740; background: #07152e; }
+.profile-xp-fill { background: linear-gradient(90deg,#d89b12,#ffe47b,#f4bd30); box-shadow: 0 0 9px rgba(255,218,100,.45); }
+.profile-stats-grid { grid-template-columns: repeat(4,minmax(0,1fr)); gap: 0; margin-top: 17px; border: 1px solid rgba(231,193,91,.52); border-radius: 12px; background: rgba(2,12,29,.55); }
+.profile-stat { position: relative; min-height: 82px; flex-direction: row; justify-content: center; gap: 8px; padding: 12px 8px; border: 0; border-radius: 0; background: transparent; color: #f8f3e6; box-shadow: none; }
+.profile-stat + .profile-stat { border-left: 1px solid rgba(231,193,91,.42); }
+.profile-stats-grid > .profile-stat:last-child:nth-child(odd) { grid-column: auto; }
+.profile-stat-icon { font-size: 20px; }
+.profile-stat-icon-image { width: 22px; height: 22px; object-fit: contain; }
+.profile-stat-value { color: #ffdc69; font-size: clamp(17px,2.4vw,23px); }
+.profile-stat-label { max-width: 110px; color: #d1d9e7; font-size: 11px; }
+.profile-tracking-note { margin: 9px 2px 0; color: #adbdd4; font-size: 10px; text-align: left; }
+.profile-identity-editor { margin-top: 14px; }
+.profile-badges { margin-top: 15px; }
+.profile-roadmap-visual-hidden { display: none !important; }
+@media (max-width: 620px) { .profile-card-identity { grid-template-columns: 108px minmax(0,1fr); gap: 13px; padding-right: 38px; } .profile-avatar-frame { width: 108px; height: 142px; } .profile-name-line { gap: 5px; } .profile-name-line h2 { padding: 6px 9px; font-size: clamp(19px,5.4vw,27px); } .profile-premium-badge { width: 36px; height: 36px; flex-basis: 36px; } .profile-edit-icon { top: 12px; right: 12px; width: 42px; height: 42px; } .profile-stats-grid { grid-template-columns: repeat(2,minmax(0,1fr)); } .profile-stat { min-height: 66px; justify-content: flex-start; padding: 8px 10px; } .profile-stat:nth-child(3) { border-left: 0; border-top: 1px solid rgba(231,193,91,.42); } .profile-stat:nth-child(4) { border-top: 1px solid rgba(231,193,91,.42); } }
+@media (max-width: 390px) { .profile-card-identity { grid-template-columns: 88px minmax(0,1fr); gap: 9px; padding-right: 34px; } .profile-avatar-frame { width: 88px; height: 120px; } .profile-account-dates { font-size: 10px; } .profile-stat-icon { font-size: 17px; } .profile-stat-label { font-size: 10px; } }
 .leaderboard-page { width: 100%; max-width: 900px; min-height: calc(100dvh - 70px); margin: auto; padding: 24px 16px 100px; color: var(--theme-cream); }
 .statistics-page { width: 100%; max-width: 1200px; min-height: calc(100dvh - 70px); margin: auto; padding: 24px 16px 100px; color: var(--theme-cream); }
 .statistics-page h2 { margin-top: 20px; color: var(--theme-gold-light); font-size: 24px; }
@@ -2323,10 +2357,49 @@ body {
 
     <section id="profilePage" class="player-profile hidden" aria-labelledby="profilePageTitle">
         <button id="profileBackButton" class="admin-back" type="button">← Retour à l’accueil</button>
-        <div class="profile-identity-heading"><span id="profilePageAvatar" class="profile-page-avatar" aria-hidden="true">👤</span><h2 id="profilePageTitle">Mon profil</h2><span id="profilePremiumBadge" class="profile-premium-badge hidden" title="Badge Premium 10 € équipé" aria-label="Badge Premium 10 euros équipé"><img src="./badge-premium-10.png" alt="Badge Premium 10 €"></span></div>
-        <p class="profile-page-intro">Voici tes statistiques personnelles.</p>
-        <p id="profileAccountDates" class="profile-account-dates" aria-live="polite"></p>
-        <button id="profileEditToggleButton" class="secondary-button profile-edit-toggle hidden" type="button" aria-expanded="false" aria-controls="profileIdentityEditor">Modifier</button>
+        <article class="profile-pro-card" aria-label="Carte professionnelle du joueur">
+            <button id="profileEditToggleButton" class="profile-edit-icon hidden" type="button" aria-label="Modifier le profil" title="Modifier le profil" aria-expanded="false" aria-controls="profileIdentityEditor"><span aria-hidden="true">🖌️</span></button>
+            <div class="profile-card-identity">
+                <div class="profile-avatar-frame"><span id="profilePageAvatar" class="profile-page-avatar" aria-hidden="true">👤</span></div>
+                <div class="profile-card-details">
+                    <div class="profile-name-line"><h2 id="profilePageTitle">Profil joueur</h2><span id="profilePremiumBadge" class="profile-premium-badge hidden" title="Badge équipé" aria-label="Badge équipé"><img src="./badge-premium-10.png" alt="Badge équipé"></span></div>
+                    <p id="profileAccountDates" class="profile-account-dates" aria-live="polite"></p>
+                </div>
+            </div>
+            <section class="profile-level-card" aria-labelledby="profileLevelTitle">
+                <div class="profile-level-heading">
+                    <strong id="profileLevelTitle">Niveau <span id="profileCurrentLevel">1</span></strong>
+                    <span id="profileTotalXp">0 XP au total</span>
+                </div>
+                <div id="profileXpTrack" class="profile-xp-track" role="progressbar" aria-label="Progression vers le prochain niveau" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+                    <div id="profileXpFill" class="profile-xp-fill"></div>
+                </div>
+                <span id="profileXpCaption" class="profile-xp-caption">0 / 100 XP vers le niveau 2</span>
+            </section>
+            <div class="profile-stats-grid" aria-label="Statistiques personnelles">
+                <article id="profileTokensEarnedCard" class="profile-stat">
+                    <img class="profile-stat-icon profile-stat-icon-image" src="./Jeton.png" alt="">
+                    <span id="profileTokensEarned" class="profile-stat-value">0</span>
+                    <span class="profile-stat-label">Jetons obtenus</span>
+                </article>
+                <article class="profile-stat">
+                    <span class="profile-stat-icon" aria-hidden="true">🎁</span>
+                    <span id="profileClassicBoostersOpened" class="profile-stat-value">0</span>
+                    <span class="profile-stat-label">Boosters ouverts</span>
+                </article>
+                <article class="profile-stat">
+                    <span class="profile-stat-icon" aria-hidden="true">🃏</span>
+                    <span id="profileCardsCollected" class="profile-stat-value">0</span>
+                    <span class="profile-stat-label">Cartes collectées</span>
+                </article>
+                <article id="profilePremiumSpendingCard" class="profile-stat hidden">
+                    <span class="profile-stat-icon" aria-hidden="true">💜</span>
+                    <span id="profilePremiumSpending" class="profile-stat-value">0 €</span>
+                    <span class="profile-stat-label">Dépensés en Premium</span>
+                </article>
+            </div>
+            <p class="profile-tracking-note">Totaux cumulés, distincts des soldes disponibles. Les jetons reçus avant la mise en place du suivi peuvent manquer.</p>
+        </article>
         <section id="profileIdentityEditor" class="profile-identity-editor hidden" aria-label="Modifier mon pseudo et mon avatar">
             <label for="profilePseudoInput">Modifier mon pseudo (une seule fois)<input id="profilePseudoInput" class="admin-field" type="text" minlength="3" maxlength="24" autocomplete="nickname"></label>
             <div class="profile-avatar-field">
@@ -2351,41 +2424,7 @@ body {
             <p id="profileBadgesEmpty" class="profile-badges-empty">Aucun badge débloqué pour le moment.</p>
             <div id="profileBadgeList" class="profile-badge-list"></div>
         </section>
-        <section class="profile-level-card" aria-labelledby="profileLevelTitle">
-            <div class="profile-level-heading">
-                <strong id="profileLevelTitle">Niveau <span id="profileCurrentLevel">1</span></strong>
-                <span id="profileTotalXp">0 XP au total</span>
-            </div>
-            <div id="profileXpTrack" class="profile-xp-track" role="progressbar" aria-label="Progression vers le prochain niveau" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
-                <div id="profileXpFill" class="profile-xp-fill"></div>
-            </div>
-            <span id="profileXpCaption" class="profile-xp-caption">0 / 100 XP vers le niveau 2</span>
-        </section>
-        <h3 class="profile-roadmap-title">🎯 Progression et avantages</h3>
-        <ol id="profileLevelRoadmap" class="profile-roadmap" aria-label="Niveaux et avantages à débloquer"></ol>
-        <div class="profile-stats-grid">
-            <article id="profileTokensEarnedCard" class="profile-stat">
-                <span id="profileTokensEarned" class="profile-stat-value">0</span>
-                <span class="profile-stat-label">Jetons obtenus au total</span>
-            </article>
-            <article class="profile-stat">
-                <span class="profile-stat-icon">🎁</span>
-                <span id="profileClassicBoostersOpened" class="profile-stat-value">0</span>
-                <span class="profile-stat-label">Boosters ouverts</span>
-            </article>
-            <article class="profile-stat">
-                <span class="profile-stat-icon">🃏</span>
-                <span id="profileCardsCollected" class="profile-stat-value">0</span>
-                <span class="profile-stat-label">Cartes collectées au total</span>
-            </article>
-            <article id="profilePremiumSpendingCard" class="profile-stat hidden">
-                <span class="profile-stat-icon">💜</span>
-                <span id="profilePremiumSpending" class="profile-stat-value">0 €</span>
-                <span class="profile-stat-label">Dépensés en jetons Premium</span>
-            </article>
-        </div>
-
-        <p class="profile-tracking-note">Les jetons attribués avant la mise en place de ce suivi ne peuvent pas être reconstitués.</p>
+        <ol id="profileLevelRoadmap" class="profile-roadmap profile-roadmap-visual-hidden" aria-hidden="true"></ol>
     </section>
 
     <section id="financePage" class="statistics-page hidden" aria-labelledby="financeTitle">
@@ -5143,7 +5182,8 @@ async function loadPersonalProfile(playerId = auth.currentUser?.uid) {
         profileIdentityEditor.classList.add("hidden");
         profileEditToggleButton.classList.toggle("hidden", !isOwnProfile);
         profileEditToggleButton.setAttribute("aria-expanded", "false");
-        profileEditToggleButton.textContent = "Modifier";
+        profileEditToggleButton.setAttribute("aria-label", "Modifier le profil");
+        profileEditToggleButton.title = "Modifier le profil";
         profilePremiumSpendingCard.classList.toggle("hidden", !isOwnProfile);
         document.getElementById("profileTokensEarnedCard").classList.toggle("hidden", !isOwnProfile);
         let player;
@@ -5190,8 +5230,7 @@ async function loadPersonalProfile(playerId = auth.currentUser?.uid) {
                 console.error("Erreur de chargement des dépenses Premium personnelles :", spendingError);
                 profilePremiumSpending.textContent = "Indisponible";
             }
-            profilePageTitle.textContent = "Mon profil";
-            document.querySelector(".profile-page-intro").textContent = "Voici tes statistiques personnelles.";
+            profilePageTitle.textContent = player.pseudo || "Profil joueur";
         } else {
             const response = await callGetPublicPlayerProfile({ playerId });
             player = response.data;
@@ -5199,10 +5238,11 @@ async function loadPersonalProfile(playerId = auth.currentUser?.uid) {
             profileCardsCollected.textContent = Number(player.cartesUniques || 0).toLocaleString("fr-FR");
             openedClassics = Number(player.boostersOuverts) || 0;
             profilePageTitle.textContent = player.pseudo || "Profil joueur";
-            document.querySelector(".profile-page-intro").textContent = "Profil public du joueur.";
         }
-        document.getElementById("profileAccountDates").textContent = "Compte créé le " + formatProfileDate(player.createdAt)
-            + " • Dernière connexion le " + formatProfileDate(player.lastLoginAt || player.derniereConnexionAt || player.derniereConnexionDate);
+        const createdAt = player.createdAt || player.accountCreatedAt || player.dateCreation;
+        const lastLoginAt = player.lastLoginAt || player.derniereConnexionAt || player.derniereConnexionDate;
+        document.getElementById("profileAccountDates").textContent = (createdAt ? "Compte créé le " + formatProfileDate(createdAt) : "Date de création indisponible")
+            + "\n" + (lastLoginAt ? "Dernière connexion le " + formatProfileDate(lastLoginAt) : "Dernière connexion indisponible");
         profilePageAvatar.replaceChildren();
         const badgeDetails = {
             "premium-10": { image: "./badge-premium-10.png", label: "Badge Premium 10 €" },
@@ -5386,7 +5426,8 @@ profileEditToggleButton.addEventListener("click", () => {
     const opening = profileIdentityEditor.classList.contains("hidden");
     profileIdentityEditor.classList.toggle("hidden", !opening);
     profileEditToggleButton.setAttribute("aria-expanded", String(opening));
-    profileEditToggleButton.textContent = opening ? "Fermer" : "Modifier";
+    profileEditToggleButton.setAttribute("aria-label", opening ? "Fermer la modification du profil" : "Modifier le profil");
+    profileEditToggleButton.title = opening ? "Fermer la modification du profil" : "Modifier le profil";
 });
 
 profileIdentitySaveButton.addEventListener("click", async () => {
