@@ -1054,6 +1054,41 @@ body {
 .service-window-controls { display:flex; gap:3px; }
 .service-window-controls button,.service-button { border:2px outset #eee; border-radius:0; background:#c0c0c0; color:#111; font:inherit; font-weight:bold; box-shadow:none; }
 .service-window-controls button { min-width:26px; height:24px; padding:0; }
+/* Keep every action inside Service in the same Windows 95 style, including
+   the older archive/mining controls that still use the site's shared button classes. */
+.archives-page .service-button,
+.archives-page .service-window-controls button,
+.archives-page .primary-button,
+.archives-page .secondary-button {
+    width:auto;
+    min-width:90px;
+    min-height:34px;
+    height:auto;
+    margin:0;
+    padding:8px 12px;
+    border:2px solid;
+    border-color:#fff #404040 #404040 #fff;
+    border-radius:0;
+    background:#c0c0c0;
+    color:#111;
+    box-shadow:1px 1px 0 #000;
+    font:700 14px Tahoma,Arial,sans-serif;
+    text-shadow:1px 1px #fff;
+    cursor:pointer;
+}
+.archives-page .service-window-controls button { min-width:26px; min-height:24px; padding:0; }
+.archives-page .service-button:hover,
+.archives-page .primary-button:hover,
+.archives-page .secondary-button:hover { background:#d4d0c8; }
+.archives-page .service-button:active,
+.archives-page .primary-button:active,
+.archives-page .secondary-button:active { border-color:#404040 #fff #fff #404040; box-shadow:none; transform:translate(1px,1px); }
+.archives-page .service-button:disabled,
+.archives-page .primary-button:disabled,
+.archives-page .secondary-button:disabled { border-color:#aaa #eee #eee #aaa; background:#c0c0c0; color:#777; box-shadow:none; cursor:wait; opacity:1; }
+.archives-page .service-button:focus-visible,
+.archives-page .primary-button:focus-visible,
+.archives-page .secondary-button:focus-visible { outline:2px dotted #000080; outline-offset:2px; }
 .service-confirm-overlay { position:fixed; inset:0; z-index:2500; display:grid; place-items:center; padding:18px; background:rgba(0,0,0,.62); }
 .service-confirm-window { width:min(100%,440px); padding:4px; border:3px outset #eee; background:#c0c0c0; color:#111; box-shadow:5px 6px 0 #171717; font:14px Tahoma,Arial,sans-serif; }
 .service-confirm-title { padding:8px; background:#000080; color:#fff; font-weight:bold; }
