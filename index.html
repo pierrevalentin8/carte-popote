@@ -1112,6 +1112,12 @@ body {
 .service-row-actions .service-button { padding:5px 7px; font-size:12px; }
 .service-window h2 { color:#000080; font-size:20px; }
 .service-mission-card p { white-space:pre-line; }
+.service-active-image { display:block; width:min(100%,320px); max-height:220px; margin:14px auto; padding:6px; border:2px inset #eee; background:#fff; object-fit:contain; }
+.service-active-image.hidden { display:none; }
+.service-active-details { margin:12px 0; padding:12px; border:2px inset #eee; background:#d4d0c8; line-height:1.55; }
+.service-active-details p { margin:6px 0; }
+.service-active-details #serviceActiveName { display:block; margin-bottom:8px; color:#000080; font-size:17px; }
+.service-active-countdown { margin:14px 0; padding:10px; border:2px inset #eee; background:#000080; color:#fff; font-size:20px; font-weight:bold; text-align:center; font-variant-numeric:tabular-nums; }
 .service-win-status { min-height:22px; margin:10px 0 0; }
 @media(max-width:760px){.service-admin-grid{grid-template-columns:1fr}.service-admin-header{display:none}.service-admin-row{grid-template-columns:1fr 1fr}.service-admin-row>*:first-child,.service-admin-row>*:last-child{grid-column:1/-1}.service-row-actions{display:flex;flex-wrap:wrap}}
 @media (max-width: 600px) { .home-overview-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; } .home-overview-leaderboard { min-height: 78px; padding: 5px; } .home-overview-leaderboard img { height: 64px; } }
@@ -2586,7 +2592,7 @@ body {
             <div class="service-window-body">
                 <div id="serviceHomeView"><h2>Choisis ta mission</h2><div class="service-choice-grid"><button class="service-button service-choice" type="button" data-service-type="internal"><span>🗂️</span>Service interne</button><button class="service-button service-choice" type="button" data-service-type="external"><span>🌍</span>Service externe</button></div></div>
                 <div id="serviceMissionsView" class="hidden"><button id="serviceMissionsBack" type="button" class="service-button">← Retour</button><h2 id="serviceMissionsTitle"></h2><div id="serviceMissionsList" class="service-mission-grid"></div></div>
-                <div id="serviceActiveView" class="hidden"><h2>Mission en cours</h2><strong id="serviceActiveName"></strong><p id="serviceActiveDescription"></p><p>Durée : <span id="serviceActiveDuration"></span></p><p>Récompense : <span id="serviceActiveReward"></span></p><p id="serviceActiveCountdown" class="archives-countdown" aria-live="polite"></p><button id="serviceClaimButton" class="service-button hidden" type="button">Récupérer ma récompense</button></div>
+                <div id="serviceActiveView" class="hidden"><h2>Mission en cours</h2><img id="serviceActiveImage" class="service-active-image hidden" alt=""><div class="service-active-details"><strong id="serviceActiveName"></strong><p id="serviceActiveDescription"></p><p>Durée : <span id="serviceActiveDuration"></span></p><p>Récompense : <span id="serviceActiveReward"></span></p></div><p id="serviceActiveCountdown" class="service-active-countdown" aria-live="polite"></p><button id="serviceClaimButton" class="service-button hidden" type="button">Récupérer ma récompense</button></div>
                 <div id="archivesLegacyView" class="hidden"><label for="archivesMiningSelect">Minage existant</label><select id="archivesMiningSelect" class="admin-field" aria-describedby="archivesMiningDescription"></select><img id="archivesMiningImage" class="archives-minage-image hidden" alt="Illustration du minage"><p id="archivesMiningDescription" class="archives-description">Envoie le GAV trier les archives. Il trouvera peut-être des jetons classiques pour toi.</p><div class="archives-action-wrap"><span id="archivesCountdown" class="archives-countdown hidden" aria-live="polite"></span><button id="sortArchivesButton" class="primary-button" type="button" disabled>Lancer le minage</button><p id="archivesStatus" class="archives-status" role="status" aria-live="polite"></p></div></div>
                 <p id="serviceStatus" class="service-win-status" role="status" aria-live="polite"></p>
             </div>
@@ -6949,6 +6955,17 @@ function renderServiceMissions(type) {
 function renderServiceActiveMission(active) {
     serviceActiveMission = active;
     if (!active) return;
+    const image = document.getElementById("serviceActiveImage");
+    image.onerror = () => image.classList.add("hidden");
+    if (active.imageUrl) {
+        image.src = active.imageUrl;
+        image.alt = `Illustration de la mission ${active.name || "en cours"}`;
+        image.classList.remove("hidden");
+    } else {
+        image.removeAttribute("src");
+        image.alt = "";
+        image.classList.add("hidden");
+    }
     document.getElementById("serviceActiveName").textContent = active.name;
     document.getElementById("serviceActiveDescription").textContent = active.description || "";
     const duration = Number(active.durationMinutes) || Math.round((Date.parse(active.readyAt) - Date.parse(active.startedAt)) / 60000);
