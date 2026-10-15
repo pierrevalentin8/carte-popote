@@ -1858,6 +1858,25 @@ body {
 .effectif-eligibility input { width:18px; height:18px; accent-color:#19753c; }
 .effectif-row-save { width:auto; min-width:82px; height:34px; margin:5px 0 0; padding:6px 9px; border-radius:7px; font-size:12px; }
 .effectif-status { min-height:22px; margin:8px 0; color:var(--theme-muted); font-size:12px; }
+.event-booster-admin { width:min(100%, 980px); margin:0 auto; }
+.event-booster-form-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; }
+.event-booster-form-grid label { display:grid; gap:5px; color:var(--theme-ink); font-weight:700; }
+.event-booster-form-grid .full-width { grid-column:1/-1; }
+.event-booster-player-list { display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); max-height:220px; overflow:auto; gap:7px; padding:10px; border:1px solid #d8c99f; border-radius:9px; background:#fffefa; }
+.event-booster-player-list label { display:flex; align-items:center; gap:7px; font-weight:600; }
+.event-booster-rarity-rows { display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:8px; }
+.event-booster-rarity-row { display:grid; grid-template-columns:auto 1fr; align-items:center; gap:8px; padding:8px; border:1px solid #d8c99f; border-radius:8px; background:#fffefa; }
+.event-booster-image-preview { display:block; width:110px; height:110px; object-fit:contain; border-radius:9px; background:#eee8dc; }
+.event-booster-admin-list { display:grid; gap:8px; margin-top:12px; }
+.event-booster-admin-item { display:flex; align-items:center; gap:12px; padding:10px; border:1px solid #d8c99f; border-radius:9px; background:#fffefa; }
+.event-booster-admin-item img { width:54px; height:64px; object-fit:contain; }
+.event-booster-admin-item div { display:grid; gap:3px; }
+.event-booster-prompt-card { width:min(100%,460px); text-align:center; }
+.event-booster-prompt-card img { display:block; width:min(58vw,220px); max-height:240px; object-fit:contain; margin:14px auto; }
+.event-booster-prompt-card button { width:100%; }
+.booster-modal.event-booster-mandatory { z-index:1300; }
+.event-booster-mandatory .booster-modal-content { border:3px solid #e2af31; }
+@media (max-width:600px) { .event-booster-form-grid { grid-template-columns:1fr; } .event-booster-form-grid .full-width { grid-column:auto; } }
 .admin-page > .admin-note, .player-collection .admin-note, .player-collection .admin-status { color: #c6d2e5; }
 .admin-panel h3 { color: var(--theme-ink); }
 .admin-panel .secondary-button, .booster-modal-actions .secondary-button, .admin-back {
@@ -2177,6 +2196,8 @@ body {
             </button>
 
             <button id="effectifMenuButton" class="hidden" type="button">👥 Effectif</button>
+
+            <button id="eventBoostersMenuButton" class="hidden" type="button">🎁 Booster</button>
 
             <button id="adminMessagesMenuButton" class="hidden" type="button">
                 💬 Messagerie
@@ -2741,6 +2762,40 @@ body {
         </div>
     </section>
 
+    <section id="eventBoostersAdminPage" class="admin-page hidden" aria-labelledby="eventBoostersAdminTitle">
+        <button id="eventBoostersBackButton" class="admin-back" type="button">← Retour à l’accueil</button>
+        <div class="admin-panel event-booster-admin">
+            <h2 id="eventBoostersAdminTitle">🎁 Boosters évènementiels</h2>
+            <p class="admin-note">Le booster apparaîtra à la connexion du jour choisi. Le joueur devra l’ouvrir et découvrir toutes ses cartes avant d’accéder au site.</p>
+            <form id="eventBoosterForm">
+                <div class="event-booster-form-grid">
+                    <label>Nom du booster<input id="eventBoosterName" class="admin-field" maxlength="80" required placeholder="Ex. Booster de Noël"></label>
+                    <label>Date d’apparition<input id="eventBoosterDate" class="admin-field" type="date" required></label>
+                    <label>Nombre de cartes<input id="eventBoosterCardCount" class="admin-field" type="number" min="1" max="20" step="1" value="5" required></label>
+                    <div class="full-width"><strong>Rareté de chaque carte</strong><div id="eventBoosterRarityRows" class="event-booster-rarity-rows"></div></div>
+                    <label class="full-width">Image du booster (facultative, PNG/JPG/WebP, 5 Mo max)<input id="eventBoosterImageFile" class="admin-field" type="file" accept="image/png,image/jpeg,image/webp"><img id="eventBoosterImagePreview" class="event-booster-image-preview hidden" alt="Aperçu du booster évènementiel"></label>
+                    <div class="full-width"><label><input id="eventBoosterAllPlayers" type="checkbox" checked> Tous les joueurs</label></div>
+                    <div id="eventBoosterPlayersWrap" class="full-width hidden"><strong>Joueurs concernés</strong><div id="eventBoosterPlayers" class="event-booster-player-list"></div></div>
+                </div>
+                <button id="eventBoosterSaveButton" class="primary-button admin-submit" type="submit">Créer le booster évènementiel</button>
+            </form>
+            <p id="eventBoosterAdminStatus" class="admin-status" role="status" aria-live="polite"></p>
+            <h3>Boosters programmés</h3>
+            <div id="eventBoosterAdminList" class="event-booster-admin-list"></div>
+        </div>
+    </section>
+
+    <section id="eventBoosterPromptModal" class="site-updates-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="eventBoosterPromptTitle" aria-hidden="true">
+        <div class="site-updates-card event-booster-prompt-card">
+            <h2 id="eventBoosterPromptTitle">🎁 Un booster t’attend !</h2>
+            <img id="eventBoosterPromptImage" class="hidden" alt="Illustration du booster évènementiel">
+            <p id="eventBoosterPromptDescription"></p>
+            <p id="eventBoosterPromptStatus" role="status" aria-live="polite"></p>
+            <button id="eventBoosterRetryButton" class="secondary-button hidden" type="button">Réessayer la vérification</button>
+            <button id="eventBoosterOpenButton" class="primary-button" type="button">Ouvrir le booster</button>
+        </div>
+    </section>
+
     <section id="boosterResultModal" class="booster-modal hidden" role="dialog" aria-modal="true" aria-labelledby="boosterResultTitle">
         <div class="booster-modal-content">
             <h2 id="boosterResultTitle">🎉 Booster ouvert !</h2>
@@ -3107,6 +3162,10 @@ const callSaveServiceMission = httpsCallable(functions, "saveServiceMission");
 const callGetAdminEffectif = httpsCallable(functions, "getAdminEffectif");
 const callAddEffectifMonth = httpsCallable(functions, "addEffectifMonth");
 const callSaveEffectifPlayer = httpsCallable(functions, "saveEffectifPlayer");
+const callGetAdminEventBoosters = httpsCallable(functions, "getAdminEventBoosters");
+const callSaveEventBooster = httpsCallable(functions, "saveEventBooster");
+const callGetPendingEventBoosters = httpsCallable(functions, "getPendingEventBoosters");
+const callOpenEventBooster = httpsCallable(functions, "openEventBooster");
 const callStartServiceMission = httpsCallable(functions, "startServiceMission");
 const callClaimServiceMissionReward = httpsCallable(functions, "claimServiceMissionReward");
 const callGetAdminGavSettings = httpsCallable(functions, "getAdminGavSettings");
@@ -3459,6 +3518,9 @@ let archivesClaimInProgress = false;
 
 const adminButton = document.getElementById("adminButton");
 const effectifMenuButton = document.getElementById("effectifMenuButton");
+const eventBoostersMenuButton = document.getElementById("eventBoostersMenuButton");
+const eventBoostersAdminPage = document.getElementById("eventBoostersAdminPage");
+const eventBoostersBackButton = document.getElementById("eventBoostersBackButton");
 const adminMessagesMenuButton = document.getElementById("adminMessagesMenuButton");
 const playerPreviewToggle = document.getElementById("playerPreviewToggle");
 const playerPreviewBanner = document.getElementById("playerPreviewBanner");
@@ -3514,6 +3576,14 @@ const openNormalBoosterButton = document.getElementById("openNormalBoosterButton
 const openDailyBoosterButton = document.getElementById("openDailyBoosterButton");
 const boosterPurchaseStatus = document.getElementById("boosterPurchaseStatus");
 const boosterResultModal = document.getElementById("boosterResultModal");
+const eventBoosterPromptModal = document.getElementById("eventBoosterPromptModal");
+const eventBoosterPromptTitle = document.getElementById("eventBoosterPromptTitle");
+const eventBoosterPromptImage = document.getElementById("eventBoosterPromptImage");
+const eventBoosterPromptDescription = document.getElementById("eventBoosterPromptDescription");
+const eventBoosterPromptStatus = document.getElementById("eventBoosterPromptStatus");
+const eventBoosterOpenButton = document.getElementById("eventBoosterOpenButton");
+const eventBoosterRetryButton = document.getElementById("eventBoosterRetryButton");
+const closeBoosterResultButton = document.getElementById("closeBoosterResultButton");
 const boosterResultGrid = document.getElementById("boosterResultGrid");
 const boosterCardStage = document.getElementById("boosterCardStage");
 const boosterStageCard = document.getElementById("boosterStageCard");
@@ -3531,6 +3601,14 @@ let boosterRevealIndex = 0;
 let boosterRevealBusy = false;
 let boosterSwipeStart = null;
 let ignoreBoosterCardClick = false;
+let mandatoryEventBoosterOpen = false;
+let pendingEventBoosterQueue = [];
+let activeEventBooster = null;
+let eventBoosterOpenBusy = false;
+let pendingEventBoosterUid = "";
+let eventBoosterPlayers = [];
+let eventBoosterRarities = [];
+let eventBoosterImageUrl = "";
 const ownedCardsStatus = document.getElementById("ownedCardsStatus");
 const ownedPlayerCardGrid = document.getElementById("ownedPlayerCardGrid");
 const collectionPageIndicator = document.getElementById("collectionPageIndicator");
@@ -3916,6 +3994,7 @@ onAuthStateChanged(
             archivesPage.classList.add("hidden");
             isPlayerPreview = false;
             adminButton.classList.add("hidden");
+            eventBoostersMenuButton.classList.add("hidden");
             adminMessagesMenuButton.classList.add("hidden");
             playerPreviewToggle.classList.add("hidden");
             playerPreviewBanner.classList.add("hidden");
@@ -3930,6 +4009,14 @@ onAuthStateChanged(
             collectionPage.classList.add("hidden");
     recyclingPage.classList.add("hidden");
             adminPage.classList.add("hidden");
+            eventBoostersAdminPage.classList.add("hidden");
+            eventBoosterPromptModal.classList.add("hidden");
+            eventBoosterPromptModal.setAttribute("aria-hidden", "true");
+            boosterResultModal.classList.add("hidden");
+            mandatoryEventBoosterOpen = false;
+            pendingEventBoosterQueue = [];
+            activeEventBooster = null;
+            pendingEventBoosterUid = "";
 
             loginPage.classList.remove(
                 "hidden"
@@ -3966,6 +4053,7 @@ onAuthStateChanged(
         playerLogoutButton.classList.toggle("hidden", isAdminAccount);
         adminButton.classList.toggle("hidden", !isAdminAccount || isPlayerPreview);
         effectifMenuButton.classList.toggle("hidden", !isAdminAccount || isPlayerPreview);
+        eventBoostersMenuButton.classList.toggle("hidden", !isAdminAccount || isPlayerPreview);
         adminMessagesMenuButton.classList.toggle("hidden", !isAdminAccount || isPlayerPreview);
         financeMenuButton.classList.toggle("hidden", !isAdminAccount || isPlayerPreview);
         playerPreviewToggle.classList.toggle("hidden", !isAdminAccount);
@@ -4114,6 +4202,8 @@ onAuthStateChanged(
 
         }
 
+        await checkPendingEventBoosters(user.uid);
+
     }
 
 );
@@ -4159,10 +4249,12 @@ function showHomePage() {
     collectionPage.classList.add("hidden");
     recyclingPage.classList.add("hidden");
     adminPage.classList.add("hidden");
+    eventBoostersAdminPage.classList.add("hidden");
     messagingPage.classList.add("hidden");
     rulesPage.classList.add("hidden");
     premiumPage.classList.add("hidden");
     archivesPage.classList.add("hidden");
+    eventBoostersAdminPage.classList.add("hidden");
     bottomNav.classList.remove("hidden");
     collectionNavButton.classList.remove("active");
     recyclingNavButton.classList.remove("active");
@@ -4173,7 +4265,7 @@ async function showDrawnCardsPage() {
     if (!auth.currentUser || (auth.currentUser.email || "").toLowerCase() !== ADMIN_EMAIL || isPlayerPreview) return;
     dropdownMenu.classList.add("hidden");
     document.querySelector(".app-content").classList.add("hidden");
-    [termsPage, financePage, profilePage, leaderboardPage, statisticsPage, collectionPage, recyclingPage, adminPage, messagingPage, rulesPage, premiumPage, archivesPage].forEach((page) => page.classList.add("hidden"));
+    [termsPage, financePage, profilePage, leaderboardPage, statisticsPage, collectionPage, recyclingPage, adminPage, eventBoostersAdminPage, messagingPage, rulesPage, premiumPage, archivesPage].forEach((page) => page.classList.add("hidden"));
     drawnCardsPage.classList.remove("hidden");
     bottomNav.classList.add("hidden");
     drawnCardsTotal.textContent = "Chargement du total…";
@@ -4314,7 +4406,7 @@ async function openArchivesPage() {
     if (!auth.currentUser) return;
     dropdownMenu.classList.add("hidden");
     document.querySelector(".app-content").classList.add("hidden");
-    [termsPage, financePage, profilePage, leaderboardPage, statisticsPage, collectionPage, recyclingPage, adminPage, messagingPage, rulesPage, premiumPage].forEach((page) => page.classList.add("hidden"));
+    [termsPage, financePage, profilePage, leaderboardPage, statisticsPage, collectionPage, recyclingPage, adminPage, eventBoostersAdminPage, messagingPage, rulesPage, premiumPage].forEach((page) => page.classList.add("hidden"));
     bottomNav.classList.add("hidden");
     archivesPage.classList.remove("hidden");
     await loadServicePage();
@@ -4923,7 +5015,7 @@ financeMenuButton.addEventListener("click", async () => {
     if (!isCurrentUserAdmin() || isPlayerPreview) return;
     dropdownMenu.classList.add("hidden");
     document.querySelector(".app-content").classList.add("hidden");
-    [premiumPage, profilePage, leaderboardPage, statisticsPage, collectionPage, recyclingPage, adminPage, messagingPage, rulesPage].forEach((page) => page.classList.add("hidden"));
+    [premiumPage, profilePage, leaderboardPage, statisticsPage, collectionPage, recyclingPage, adminPage, eventBoostersAdminPage, messagingPage, rulesPage].forEach((page) => page.classList.add("hidden"));
     bottomNav.classList.add("hidden");
     archivesPage.classList.add("hidden");
     financePage.classList.remove("hidden");
@@ -4994,6 +5086,7 @@ async function openPremiumPage() {
     collectionPage.classList.add("hidden");
     recyclingPage.classList.add("hidden");
     adminPage.classList.add("hidden");
+    eventBoostersAdminPage.classList.add("hidden");
     messagingPage.classList.add("hidden");
     rulesPage.classList.add("hidden");
     bottomNav.classList.add("hidden");
@@ -5296,12 +5389,13 @@ function setPlayerPreview(enabled) {
     dropdownMenu.classList.add("hidden");
     adminButton.classList.toggle("hidden", enabled);
     effectifMenuButton.classList.toggle("hidden", enabled);
+    eventBoostersMenuButton.classList.toggle("hidden", enabled);
     adminMessagesMenuButton.classList.toggle("hidden", enabled);
     financeMenuButton.classList.toggle("hidden", enabled);
     premiumAdminPanel.classList.toggle("hidden", enabled);
     playerPreviewBanner.classList.toggle("hidden", !enabled);
     playerPreviewToggle.textContent = enabled ? "🛡️ Revenir au mode Admin" : "👤 Joueur normal";
-    if (enabled && (!adminPage.classList.contains("hidden") || !messagingPage.classList.contains("hidden"))) showHomePage();
+    if (enabled && (!adminPage.classList.contains("hidden") || !messagingPage.classList.contains("hidden") || !eventBoostersAdminPage.classList.contains("hidden"))) showHomePage();
     if (!premiumPage.classList.contains("hidden")) loadPremiumWheel();
 }
 
@@ -5551,6 +5645,7 @@ playerProfileHomeButton.addEventListener("click", async () => {
     collectionPage.classList.add("hidden");
     recyclingPage.classList.add("hidden");
     adminPage.classList.add("hidden");
+    eventBoostersAdminPage.classList.add("hidden");
     messagingPage.classList.add("hidden");
     rulesPage.classList.add("hidden");
     bottomNav.classList.add("hidden");
@@ -5781,6 +5876,7 @@ statisticsMenuButton.addEventListener("click", async () => {
     collectionPage.classList.add("hidden");
     recyclingPage.classList.add("hidden");
     adminPage.classList.add("hidden");
+    eventBoostersAdminPage.classList.add("hidden");
     messagingPage.classList.add("hidden");
     rulesPage.classList.add("hidden");
     bottomNav.classList.add("hidden");
@@ -5800,6 +5896,7 @@ leaderboardMenuButton.addEventListener("click", async () => {
     collectionPage.classList.add("hidden");
     recyclingPage.classList.add("hidden");
     adminPage.classList.add("hidden");
+    eventBoostersAdminPage.classList.add("hidden");
     messagingPage.classList.add("hidden");
     rulesPage.classList.add("hidden");
     bottomNav.classList.add("hidden");
@@ -6344,7 +6441,11 @@ function wait(milliseconds) {
     return new Promise((resolve) => setTimeout(resolve, milliseconds));
 }
 
-async function showBoosterResults(cards, boostersOfferts = 0, boosterType = "classique") {
+async function showBoosterResults(cards, boostersOfferts = 0, boosterType = "classique", options = {}) {
+    mandatoryEventBoosterOpen = options.mandatory === true;
+    boosterResultModal.classList.toggle("event-booster-mandatory", mandatoryEventBoosterOpen);
+    closeBoosterResultButton.classList.toggle("hidden", mandatoryEventBoosterOpen);
+    openNextBoosterButton.classList.add("hidden");
     const cardRarityRank = (card) => {
         const rarity = normalizeCardCategory(card.rarity);
         if (rarity.includes("myst")) return 3;
@@ -6362,10 +6463,11 @@ async function showBoosterResults(cards, boostersOfferts = 0, boosterType = "cla
     boosterRevealQueue = orderedCards;
     boosterRevealIndex = 0;
     boosterRevealBusy = false;
-    boosterResultTitle.textContent = "🎁 Ton booster arrive !";
+    boosterResultTitle.textContent = options.name ? `🎁 ${options.name}` : "🎁 Ton booster arrive !";
     boosterResultDescription.textContent = "Les cartes apparaîtront de la moins rare à la plus rare.";
-    boosterRevealImage.src = boosterType === "journalier" ? "./Booster%20Journalier.png" : "./Booster%20normal.png";
-    boosterRevealImage.alt = boosterType === "journalier" ? "Booster journalier en cours d’ouverture" : "Booster classique en cours d’ouverture";
+    boosterRevealImage.src = options.imageUrl || (boosterType === "journalier" ? "./Booster%20Journalier.png" : "./Booster%20normal.png");
+    boosterRevealImage.alt = options.name ? `Illustration de ${options.name}` : boosterType === "journalier" ? "Booster journalier en cours d’ouverture" : "Booster classique en cours d’ouverture";
+    viewOwnedCardsButton.textContent = mandatoryEventBoosterOpen ? "Continuer vers le site" : "Voir ma collection";
     boosterRevealLabel.textContent = "Le booster s’ouvre…";
     boosterPackReveal.classList.remove("hidden", "is-opening");
     boosterResultGrid.classList.add("hidden");
@@ -6389,12 +6491,97 @@ async function showBoosterResults(cards, boostersOfferts = 0, boosterType = "cla
         renderBoosterRevealCard();
     }
 
-    const cardMessage = cards.length + (cards.length > 1 ? " cartes ont été ajoutées à ta collection." : " carte a été ajoutée à ta collection.");
+    const cardMessage = mandatoryEventBoosterOpen
+        ? `${cards.length} cartes du booster « ${options.name || "évènementiel"} » ont été ajoutées à ta collection.`
+        : cards.length + (cards.length > 1 ? " cartes ont été ajoutées à ta collection." : " carte a été ajoutée à ta collection.");
     const rewardMessage = Number(boostersOfferts) > 0
         ? " 🎉 Nouveau palier atteint : " + boostersOfferts + (Number(boostersOfferts) > 1 ? " boosters classiques t’ont été offerts !" : " booster classique t’a été offert !")
         : "";
     boosterResultDescription.dataset.finalMessage = cardMessage + rewardMessage;
 }
+
+async function checkPendingEventBoosters(uid) {
+    if (!uid || pendingEventBoosterUid === uid && (mandatoryEventBoosterOpen || !eventBoosterPromptModal.classList.contains("hidden"))) return;
+    eventBoosterPromptTitle.textContent = "Vérification des boosters";
+    eventBoosterPromptDescription.textContent = "Vérification des cadeaux évènementiels réservés à ton compte…";
+    eventBoosterPromptStatus.textContent = "";
+    eventBoosterOpenButton.classList.add("hidden");
+    eventBoosterRetryButton.classList.add("hidden");
+    eventBoosterPromptModal.classList.remove("hidden");
+    eventBoosterPromptModal.setAttribute("aria-hidden", "false");
+    try {
+        const response = await callGetPendingEventBoosters();
+        pendingEventBoosterUid = uid;
+        pendingEventBoosterQueue = Array.isArray(response.data?.boosters) ? response.data.boosters : [];
+        if (pendingEventBoosterQueue.length) showNextEventBoosterPrompt();
+        else {
+            eventBoosterPromptModal.classList.add("hidden");
+            eventBoosterPromptModal.setAttribute("aria-hidden", "true");
+        }
+    } catch (error) {
+        console.warn("Impossible de vérifier les boosters évènementiels en attente :", error);
+        eventBoosterPromptTitle.textContent = "Vérification nécessaire";
+        eventBoosterPromptDescription.textContent = "Impossible de vérifier les boosters réservés. Réessaie pour continuer vers le site.";
+        eventBoosterPromptStatus.textContent = error.message || "Connexion au service indisponible.";
+        eventBoosterRetryButton.classList.remove("hidden");
+    }
+}
+
+function showNextEventBoosterPrompt() {
+    activeEventBooster = pendingEventBoosterQueue[0] || null;
+    if (!activeEventBooster) {
+        eventBoosterPromptModal.classList.add("hidden");
+        eventBoosterPromptModal.setAttribute("aria-hidden", "true");
+        return;
+    }
+    eventBoosterPromptTitle.textContent = `🎁 ${activeEventBooster.name || "Un booster t’attend !"}`;
+    eventBoosterPromptDescription.textContent = `Un booster évènementiel de ${activeEventBooster.cardCount} carte${activeEventBooster.cardCount > 1 ? "s" : ""} t’est réservé. Ouvre-le pour découvrir tes cartes et accéder au site.`;
+    eventBoosterPromptStatus.textContent = "";
+    eventBoosterPromptImage.classList.toggle("hidden", !activeEventBooster.imageUrl);
+    if (activeEventBooster.imageUrl) eventBoosterPromptImage.src = activeEventBooster.imageUrl;
+    eventBoosterOpenButton.disabled = false;
+    eventBoosterOpenButton.classList.remove("hidden");
+    eventBoosterRetryButton.classList.add("hidden");
+    eventBoosterOpenButton.textContent = "Ouvrir le booster";
+    eventBoosterPromptModal.classList.remove("hidden");
+    eventBoosterPromptModal.setAttribute("aria-hidden", "false");
+}
+
+eventBoosterRetryButton.addEventListener("click", () => {
+    if (auth.currentUser) {
+        pendingEventBoosterUid = "";
+        checkPendingEventBoosters(auth.currentUser.uid);
+    }
+});
+
+eventBoosterOpenButton.addEventListener("click", async () => {
+    if (eventBoosterOpenBusy || !activeEventBooster || !auth.currentUser) return;
+    eventBoosterOpenBusy = true;
+    eventBoosterOpenButton.disabled = true;
+    eventBoosterOpenButton.classList.add("hidden");
+    eventBoosterPromptStatus.textContent = "Ouverture du booster…";
+    try {
+        const previouslyOwnedIds = await getPreviouslyOwnedCardIds();
+        const response = await callOpenEventBooster({ eventId: activeEventBooster.id });
+        const result = response.data || {};
+        pendingEventBoosterQueue.shift();
+        document.getElementById("playerCards").textContent = Number(result.cartesTirees) || 0;
+        if (Number.isFinite(Number(result.boostersDisponibles))) setOpenBoosterButton(result.boostersDisponibles);
+        if (Number.isFinite(Number(result.xp))) updatePlayerXpDisplay(result.xp);
+        eventBoosterPromptModal.classList.add("hidden");
+        eventBoosterPromptModal.setAttribute("aria-hidden", "true");
+        await showBoosterResults(markNewlyDiscoveredCards(result.cards || [], previouslyOwnedIds), result.boostersOfferts, "evenementiel", {
+            mandatory: true, name: result.boosterName || activeEventBooster.name, imageUrl: activeEventBooster.imageUrl,
+        });
+    } catch (error) {
+        console.error("Impossible d’ouvrir le booster évènementiel :", error);
+        eventBoosterPromptStatus.textContent = error.message || "L’ouverture a échoué. Réessaie pour accéder au site.";
+        eventBoosterOpenButton.disabled = false;
+        eventBoosterOpenButton.classList.remove("hidden");
+    } finally {
+        eventBoosterOpenBusy = false;
+    }
+});
 
 function renderBoosterRevealCard() {
     const card = boosterRevealQueue[boosterRevealIndex];
@@ -6466,7 +6653,7 @@ async function advanceBoosterReveal(direction = 1) {
     viewOwnedCardsButton.disabled = false;
     viewOwnedCardsButton.classList.remove("hidden");
     openNextBoosterButton.disabled = false;
-    openNextBoosterButton.classList.toggle("hidden", openNormalBoosterButton.disabled);
+    openNextBoosterButton.classList.toggle("hidden", mandatoryEventBoosterOpen || openNormalBoosterButton.disabled);
     boosterRevealBusy = false;
 }
 
@@ -6488,13 +6675,22 @@ boosterStageCard.addEventListener("pointerup", (event) => {
 });
 boosterStageCard.addEventListener("pointercancel", () => { boosterSwipeStart = null; });
 
-document.getElementById("closeBoosterResultButton").addEventListener("click", () => {
+closeBoosterResultButton.addEventListener("click", () => {
+    if (mandatoryEventBoosterOpen) return;
     boosterResultModal.classList.add("hidden");
 });
 boosterResultModal.addEventListener("click", (event) => {
-    if (event.target === boosterResultModal) boosterResultModal.classList.add("hidden");
+    if (event.target === boosterResultModal && !mandatoryEventBoosterOpen) boosterResultModal.classList.add("hidden");
 });
 document.getElementById("viewOwnedCardsButton").addEventListener("click", async () => {
+    if (mandatoryEventBoosterOpen) {
+        boosterResultModal.classList.add("hidden");
+        boosterResultModal.classList.remove("event-booster-mandatory");
+        mandatoryEventBoosterOpen = false;
+        if (pendingEventBoosterQueue.length) showNextEventBoosterPrompt();
+        else activeEventBooster = null;
+        return;
+    }
     boosterResultModal.classList.add("hidden");
     document.querySelector(".app-content").classList.add("hidden");
     adminPage.classList.add("hidden");
@@ -6508,6 +6704,7 @@ document.getElementById("viewOwnedCardsButton").addEventListener("click", async 
 });
 
 openNextBoosterButton.addEventListener("click", () => {
+    if (mandatoryEventBoosterOpen) return;
     if (openNextBoosterButton.classList.contains("hidden") || openNormalBoosterButton.disabled) return;
     boosterResultModal.classList.add("hidden");
     openNormalBoosterButton.click();
@@ -7035,6 +7232,125 @@ async function loadCards() {
         adminStatus.textContent = "Impossible de charger les cartes. Vérifie les règles Firestore.";
     }
 }
+
+function renderEventBoosterRarityRows(previousValues = []) {
+    const countInput = document.getElementById("eventBoosterCardCount");
+    const count = Math.max(1, Math.min(20, Number(countInput.value) || 1));
+    countInput.value = String(count);
+    const container = document.getElementById("eventBoosterRarityRows");
+    const oldValues = previousValues.length ? previousValues : Array.from(container.querySelectorAll("select"), (select) => select.value);
+    container.replaceChildren();
+    for (let index = 0; index < count; index += 1) {
+        const row = document.createElement("div"); row.className = "event-booster-rarity-row";
+        const label = document.createElement("strong"); label.textContent = "Carte " + (index + 1);
+        const select = document.createElement("select"); select.className = "admin-field"; select.required = true; select.dataset.eventCardRarity = "true";
+        const prompt = document.createElement("option"); prompt.value = ""; prompt.textContent = "Choisir une rareté"; select.append(prompt);
+        eventBoosterRarities.forEach((rarity) => { const option = document.createElement("option"); option.value = rarity; option.textContent = rarity; select.append(option); });
+        if (oldValues[index] && eventBoosterRarities.includes(oldValues[index])) select.value = oldValues[index];
+        row.append(label, select); container.append(row);
+    }
+}
+
+async function loadAdminEventBoosters() {
+    const status = document.getElementById("eventBoosterAdminStatus");
+    status.textContent = "Chargement des boosters et joueurs…";
+    try {
+        const response = await callGetAdminEventBoosters();
+        eventBoosterPlayers = Array.isArray(response.data?.players) ? response.data.players : [];
+        eventBoosterRarities = Array.isArray(response.data?.rarities) ? response.data.rarities : [];
+        renderEventBoosterRarityRows();
+        const playerList = document.getElementById("eventBoosterPlayers"); playerList.replaceChildren();
+        eventBoosterPlayers.forEach((player) => {
+            const label = document.createElement("label");
+            const checkbox = document.createElement("input"); checkbox.type = "checkbox"; checkbox.value = player.id; checkbox.dataset.eventRecipient = "true";
+            const text = document.createElement("span"); text.textContent = player.pseudo;
+            label.append(checkbox, text); playerList.append(label);
+        });
+        renderEventBoosterAdminList(Array.isArray(response.data?.events) ? response.data.events : []);
+        status.textContent = eventBoosterPlayers.length + " joueur" + (eventBoosterPlayers.length === 1 ? "" : "s") + " disponible" + (eventBoosterPlayers.length === 1 ? "" : "s") + " pour la sélection.";
+    } catch (error) {
+        console.error("Impossible de charger les paramètres des boosters évènementiels :", error);
+        status.textContent = error.message || "Impossible de charger les joueurs et raretés. Vérifie les fonctions Booster.";
+    }
+}
+
+function renderEventBoosterAdminList(events) {
+    const list = document.getElementById("eventBoosterAdminList"); list.replaceChildren();
+    if (!events.length) { const empty = document.createElement("p"); empty.className = "admin-note"; empty.textContent = "Aucun booster évènementiel créé."; list.append(empty); return; }
+    events.forEach((event) => {
+        const item = document.createElement("article"); item.className = "event-booster-admin-item";
+        if (event.imageUrl) { const image = document.createElement("img"); image.src = event.imageUrl; image.alt = ""; item.append(image); }
+        const details = document.createElement("div");
+        const name = document.createElement("strong"); name.textContent = event.name;
+        const target = event.allPlayers ? "Tous les joueurs" : event.recipientCount + " joueur" + (event.recipientCount === 1 ? "" : "s");
+        const meta = document.createElement("span"); meta.textContent = event.availableOn + " • " + event.cardRarities.length + " carte" + (event.cardRarities.length === 1 ? "" : "s") + " • " + target;
+        const rarities = document.createElement("small"); rarities.textContent = event.cardRarities.join(" · ");
+        details.append(name, meta, rarities); item.append(details); list.append(item);
+    });
+}
+
+document.getElementById("eventBoosterCardCount").addEventListener("input", () => renderEventBoosterRarityRows());
+document.getElementById("eventBoosterAllPlayers").addEventListener("change", (event) => {
+    document.getElementById("eventBoosterPlayersWrap").classList.toggle("hidden", event.target.checked);
+});
+document.getElementById("eventBoosterImageFile").addEventListener("change", (event) => {
+    const file = event.target.files?.[0]; const preview = document.getElementById("eventBoosterImagePreview");
+    if (!file) { preview.classList.add("hidden"); preview.removeAttribute("src"); return; }
+    if (!/^image\/(png|jpeg|webp)$/.test(file.type) || file.size > 5 * 1024 * 1024) {
+        event.target.value = ""; preview.classList.add("hidden");
+        document.getElementById("eventBoosterAdminStatus").textContent = "Choisis une image PNG, JPG ou WebP de 5 Mo maximum."; return;
+    }
+    preview.src = URL.createObjectURL(file); preview.classList.remove("hidden");
+});
+
+document.getElementById("eventBoosterForm").addEventListener("submit", async (event) => {
+    event.preventDefault();
+    if (!isCurrentUserAdmin() || isPlayerPreview) return;
+    const status = document.getElementById("eventBoosterAdminStatus");
+    const saveButton = document.getElementById("eventBoosterSaveButton");
+    const allPlayers = document.getElementById("eventBoosterAllPlayers").checked;
+    const recipientUids = Array.from(document.querySelectorAll("[data-event-recipient]:checked"), (input) => input.value);
+    const cardRarities = Array.from(document.querySelectorAll("[data-event-card-rarity]"), (select) => select.value);
+    if (!allPlayers && !recipientUids.length) { status.textContent = "Sélectionne au moins un joueur ou coche « Tous les joueurs »."; return; }
+    if (cardRarities.some((rarity) => !rarity)) { status.textContent = "Choisis une rareté pour chaque carte du booster."; return; }
+    saveButton.disabled = true; status.textContent = "Création du booster évènementiel…";
+    try {
+        const eventId = crypto.randomUUID();
+        const file = document.getElementById("eventBoosterImageFile").files?.[0];
+        let imageUrl = "";
+        if (file) {
+            const extension = file.type === "image/jpeg" ? "jpg" : file.type === "image/webp" ? "webp" : "png";
+            const imageRef = ref(storage, "eventBoosters/" + auth.currentUser.uid + "/" + eventId + "." + extension);
+            const uploaded = await uploadBytes(imageRef, file, { contentType: file.type });
+            imageUrl = await getDownloadURL(uploaded.ref);
+        }
+        await callSaveEventBooster({ eventId, name: document.getElementById("eventBoosterName").value.trim(),
+            availableOn: document.getElementById("eventBoosterDate").value, cardRarities, imageUrl, allPlayers, recipientUids });
+        document.getElementById("eventBoosterForm").reset();
+        document.getElementById("eventBoosterCardCount").value = "5";
+        document.getElementById("eventBoosterAllPlayers").checked = true;
+        document.getElementById("eventBoosterPlayersWrap").classList.add("hidden");
+        document.getElementById("eventBoosterImagePreview").classList.add("hidden");
+        renderEventBoosterRarityRows();
+        status.textContent = "Booster créé. Il sera proposé aux joueurs concernés à partir de la date choisie.";
+        await loadAdminEventBoosters();
+    } catch (error) {
+        console.error("Impossible de créer le booster évènementiel :", error);
+        status.textContent = error.message || "Création refusée. Vérifie les fonctions Booster et les règles Storage.";
+    } finally { saveButton.disabled = false; }
+});
+
+eventBoostersMenuButton.addEventListener("click", async () => {
+    if (!isCurrentUserAdmin() || isPlayerPreview) return;
+    dropdownMenu.classList.add("hidden");
+    [termsPage, financePage, profilePage, leaderboardPage, statisticsPage, drawnCardsPage, collectionPage, recyclingPage,
+        adminPage, messagingPage, rulesPage, premiumPage, archivesPage].forEach((page) => page.classList.add("hidden"));
+    document.querySelector(".app-content").classList.add("hidden");
+    bottomNav.classList.add("hidden");
+    eventBoostersAdminPage.classList.remove("hidden");
+    await loadAdminEventBoosters();
+});
+eventBoostersBackButton.addEventListener("click", showHomePage);
 
 function closeAdminPage() {
     showHomePage();
