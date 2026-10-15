@@ -1005,17 +1005,20 @@ body {
 .home-card-count-copy { display: flex; align-items: baseline; flex-wrap: wrap; gap: 5px; }
 .home-card-count-value { color: #f7d46b; font-size: 23px; font-weight: 900; line-height: 1; }
 .home-card-count-label { color: #fbfaf5; font-size: 12px; font-weight: 700; }
-.home-player-summary { display: grid; grid-template-columns: 76px repeat(2, minmax(0, 1fr)); gap: 9px; margin: 12px 0; }
-.home-profile-button, .home-resource-tile { min-width: 0; min-height: 86px; padding: 10px; border: 1px solid rgba(243,191,56,.72); border-radius: 14px; background: linear-gradient(145deg, #10264a, #183966); color: #fbfaf5; box-shadow: 0 6px 15px rgba(0,0,0,.2); }
-.home-profile-button { display: flex; aspect-ratio: 1; align-items: center; justify-content: center; padding: 7px; border-radius: 50%; font: inherit; cursor: pointer; }
+.home-player-summary { display: grid; grid-template-columns: minmax(0, 1fr) 82px minmax(0, 1fr); align-items: center; gap: 8px; margin: 12px 0; padding: 8px 12px; border: 1px solid rgba(243,191,56,.72); border-radius: 18px; background: linear-gradient(145deg, #10264a, #183966); box-shadow: 0 7px 17px rgba(0,0,0,.22); }
+.home-profile-button, .home-resource-tile { min-width: 0; min-height: 62px; padding: 5px; border: 0; border-radius: 12px; background: transparent; color: #fbfaf5; box-shadow: none; }
+.home-profile-button { display: flex; width: 78px; height: 78px; align-items: center; justify-content: center; justify-self: center; padding: 5px; border: 1px solid rgba(243,191,56,.72); border-radius: 50%; background: linear-gradient(145deg, #183966, #10264a); font: inherit; cursor: pointer; }
 .home-profile-button:focus-visible, .home-overview-premium:focus-visible { outline: 3px solid #f7d46b; outline-offset: 3px; }
-.home-profile-button .avatar { width: 56px; height: 56px; border: 2px solid #f3bf38; }
-.home-resource-tile { display: flex; align-items: center; justify-content: center; gap: 7px; text-align: center; }
+.home-profile-button .avatar { width: 66px; height: 66px; border: 2px solid #f3bf38; }
+.home-resource-tile { display: flex; align-items: center; justify-content: center; gap: 5px; text-align: center; }
 .home-resource-tile { flex-direction: row-reverse; }
 .home-resource-tile strong { color: #f7d46b; font-size: clamp(19px, 6vw, 27px); line-height: 1; }
-.home-resource-tile img { width: 36px; height: 36px; object-fit: contain; }
+.home-resource-tile img { width: 34px; height: 34px; object-fit: contain; }
+.home-overview-premium { display: flex; min-width: 0; min-height: 62px; align-items: center; justify-content: center; justify-self: stretch; padding: 5px; border: 0; border-radius: 12px; background: transparent; box-shadow: none; font: inherit; cursor: pointer; }
+.home-overview-premium img { width: 48px; height: 48px; object-fit: contain; }
+.home-overview-premium:focus-visible { outline: 3px solid #f7d46b; outline-offset: 2px; }
 .home-overview-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; margin: 12px 0 18px; }
-.home-card-count, .home-overview-premium { min-width: 0; min-height: 86px; margin: 0; padding: 10px; border: 1px solid rgba(243,191,56,.75); border-radius: 13px; background: linear-gradient(110deg, #10264a, #183966); color: #fbfaf5; box-shadow: 0 7px 17px rgba(0,0,0,.22); }
+.home-card-count, .home-overview-grid .home-overview-premium { min-width: 0; min-height: 86px; margin: 0; padding: 10px; border: 1px solid rgba(243,191,56,.75); border-radius: 13px; background: linear-gradient(110deg, #10264a, #183966); color: #fbfaf5; box-shadow: 0 7px 17px rgba(0,0,0,.22); }
 .home-card-count { width: 100%; font: inherit; cursor: default; }
 .home-card-count:not(:disabled) { cursor: pointer; }
 .home-card-count:focus-visible { outline: 3px solid #f7d46b; outline-offset: 3px; }
@@ -1026,19 +1029,56 @@ body {
 .home-card-count-icon { width: 28px; height: 38px; }
 .home-card-count-value { font-size: 21px; }
 .home-card-count-label { font-size: 11px; }
-.home-overview-premium { display: flex; align-items: center; justify-content: center; gap: 9px; font: inherit; cursor: pointer; }
-.home-overview-premium img { width: 62px; height: 62px; object-fit: contain; }
+.home-overview-grid .home-overview-premium { display: flex; align-items: center; justify-content: center; gap: 9px; font: inherit; cursor: pointer; }
+.home-overview-grid .home-overview-premium img { width: 62px; height: 62px; object-fit: contain; }
 .home-overview-archive { min-width: 0; }
 .home-archive-countdown { min-height: 14px; color: #ffe181; font-size: 10px; line-height: 1.2; font-weight: 800; text-align: center; }
-.home-overview-archive button { display: flex; width: 100%; min-width: 0; min-height: 92px; flex-direction: column; align-items: center; justify-content: center; gap: 2px; padding: 5px; border: 1px solid rgba(243,191,56,.75); border-radius: 13px; background: linear-gradient(110deg,#10264a,#183966); box-shadow: 0 7px 17px rgba(0,0,0,.22); cursor: pointer; }
-.home-overview-archive img { width: min(100%, 148px); height: 68px; object-fit: contain; }
-.archives-page { position: relative; isolation: isolate; width: 100%; max-width: 820px; min-height: calc(100dvh - 70px); margin: auto; padding: 24px 16px 100px; color: var(--theme-cream); }
+.home-overview-archive button { display: flex; width: 100%; min-width: 0; min-height: 0; flex-direction: column; align-items: center; justify-content: center; gap: 2px; padding: 0; border: 0; border-radius: 10px; background: transparent; box-shadow: none; cursor: pointer; }
+.home-overview-archive button:hover { transform: translateY(-1px); }
+.home-overview-archive button:focus-visible { outline: 3px solid #f7d46b; outline-offset: 3px; }
+.home-overview-archive img { display: block; width: min(100%, 220px); height: auto; object-fit: contain; }
+.archives-page { position: relative; isolation: isolate; width: 100%; max-width: 1100px; min-height: calc(100dvh - 70px); margin: auto; padding: 12px 10px 100px; color: #111; }
 .archives-page::before { content: ""; position: fixed; inset: 0; z-index: -1; background-color: #09172d; background-image: linear-gradient(135deg, rgba(4,13,29,.76), rgba(8,25,48,.66)), url("./gendarme_pixel_art_ameliore.gif"); background-position: center, center; background-repeat: no-repeat; background-size: cover, cover; }
 .archives-page h2 { margin-top: 20px; color: var(--theme-gold-light); font-size: 24px; }
 .archives-description { max-width: 620px; margin: 26px auto 20px; padding: 18px 20px; border: 1px solid rgba(243,191,56,.55); border-radius: 18px; background: rgba(5,16,35,.78); color: #e3eaf4; font-size: 17px; line-height: 1.55; text-align: center; white-space: pre-line; box-shadow: 0 12px 30px rgba(0,0,0,.28); }
+.archives-minage-image { display: block; width: min(100%, 260px); max-height: 190px; margin: 16px auto -12px; object-fit: contain; filter: drop-shadow(0 8px 14px rgba(0,0,0,.35)); }
+.minage-image-field { display: grid; gap: 8px; margin: 12px 0; }
+.minage-image-preview { display: block; width: min(100%, 260px); max-height: 170px; object-fit: contain; border: 1px solid rgba(243,191,56,.45); border-radius: 12px; background: rgba(16,38,74,.72); }
+.minage-image-status { min-height: 16px; margin: 0; color: #63738a; font-size: 12px; }
 .archives-action-wrap { display: grid; justify-items: center; gap: 12px; padding: 20px; border: 1px solid rgba(243,191,56,.48); border-radius: 18px; background: rgba(5,16,35,.78); box-shadow: 0 12px 30px rgba(0,0,0,.28); }
 .archives-countdown { color: #ffe181; font-size: clamp(22px, 6vw, 32px); font-weight: 900; font-variant-numeric: tabular-nums; text-align: center; }
 .archives-status { min-height: 24px; color: #c6d2e5; text-align: center; }
+.service-window { min-height: min(78dvh, 900px); background:#c0c0c0; border:3px outset #eee; box-shadow:4px 5px 0 #242424; font:14px Tahoma,Arial,sans-serif; color:#111; padding:3px; }
+.service-titlebar { display:flex; align-items:center; gap:8px; min-height:32px; padding:3px 5px; background:#000080; color:white; font-weight:bold; }
+.service-titlebar strong { flex:1; }
+.service-window-controls { display:flex; gap:3px; }
+.service-window-controls button,.service-button { border:2px outset #eee; border-radius:0; background:#c0c0c0; color:#111; font:inherit; font-weight:bold; box-shadow:none; }
+.service-window-controls button { min-width:26px; height:24px; padding:0; }
+.service-confirm-overlay { position:fixed; inset:0; z-index:2500; display:grid; place-items:center; padding:18px; background:rgba(0,0,0,.62); }
+.service-confirm-window { width:min(100%,440px); padding:4px; border:3px outset #eee; background:#c0c0c0; color:#111; box-shadow:5px 6px 0 #171717; font:14px Tahoma,Arial,sans-serif; }
+.service-confirm-title { padding:8px; background:#000080; color:#fff; font-weight:bold; }
+.service-confirm-body { padding:14px; white-space:pre-line; }
+.service-confirm-actions { display:flex; justify-content:flex-end; gap:8px; padding:8px; }
+.service-button { padding:12px 16px; cursor:pointer; }
+.service-button:active { border-style:inset; transform:translate(1px,1px); }
+.service-window-body { padding:clamp(12px,3vw,28px); }
+.service-choice-grid,.service-mission-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%,230px),1fr)); gap:14px; margin:18px 0; }
+.service-choice { min-height:130px; display:grid; place-content:center; justify-items:center; gap:8px; font-size:16px; }
+.service-choice span { font-size:36px; }
+.service-mission-card,.service-admin-card { border:2px outset #eee; background:#d4d0c8; padding:12px; }
+.service-mission-card img,.service-admin-card img { display:block; width:min(100%,180px); max-height:130px; object-fit:contain; margin:0 auto 8px; }
+.service-admin-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; }
+.service-admin-grid label { display:grid; gap:4px; font-weight:600; }
+.service-admin-grid input,.service-admin-grid select,.service-admin-grid textarea,.service-filter { min-width:0; padding:7px; border:2px inset #eee; border-radius:0; background:#fff; color:#111; }
+.service-admin-list { display:grid; gap:8px; margin-top:14px; }
+.service-admin-row { display:grid; grid-template-columns:minmax(0,1.3fr) minmax(0,1fr) minmax(60px,.5fr) minmax(0,1fr) minmax(60px,.5fr) minmax(60px,.45fr) minmax(0,2fr); gap:8px; align-items:center; padding:8px; border:1px solid #777; background:#eee; }
+.service-admin-header { font-weight:700; background:#b7c6df; }
+.service-row-actions { display:flex; flex-wrap:wrap; gap:4px; }
+.service-row-actions .service-button { padding:5px 7px; font-size:12px; }
+.service-window h2 { color:#000080; font-size:20px; }
+.service-mission-card p { white-space:pre-line; }
+.service-win-status { min-height:22px; margin:10px 0 0; }
+@media(max-width:760px){.service-admin-grid{grid-template-columns:1fr}.service-admin-header{display:none}.service-admin-row{grid-template-columns:1fr 1fr}.service-admin-row>*:first-child,.service-admin-row>*:last-child{grid-column:1/-1}.service-row-actions{display:flex;flex-wrap:wrap}}
 @media (max-width: 600px) { .home-overview-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; } .home-overview-leaderboard { min-height: 78px; padding: 5px; } .home-overview-leaderboard img { height: 64px; } }
 @media (max-width: 600px) { .archives-page::before { background-size: cover, min(100vw, 480px) auto; } }
 .home-site-note { display: grid; justify-items: center; gap: 7px; margin: 20px 0 88px; color: #c6d2e5; font-size: 11px; line-height: 1.45; text-align: center; }
@@ -1060,7 +1100,7 @@ body {
 .finance-history-fields label { display: grid; gap: 5px; font-size: 12px; font-weight: 700; }
 .finance-history-fields .admin-field { min-width: 0; }
 @media (max-width: 560px) { .finance-history-fields { grid-template-columns: 1fr; } }
-@media (max-width: 380px) { .home-player-summary { gap: 6px; grid-template-columns: 58px repeat(2, minmax(0, 1fr)); } .home-profile-button { min-height: 58px; padding: 4px; } .home-profile-button .avatar { width: 46px; height: 46px; } .home-resource-tile { padding: 7px 4px; } .home-resource-tile img { width: 30px; height: 30px; } .home-overview-premium { flex-direction: column; gap: 2px; } .home-overview-premium img { width: 50px; height: 50px; } }
+@media (max-width: 380px) { .home-player-summary { grid-template-columns: minmax(0, 1fr) 70px minmax(0, 1fr); gap: 4px; padding: 7px; } .home-profile-button { width: 68px; height: 68px; min-height: 68px; padding: 3px; } .home-profile-button .avatar { width: 58px; height: 58px; } .home-resource-tile { min-height: 54px; padding: 4px 2px; } .home-resource-tile strong { font-size: clamp(17px, 5.5vw, 22px); } .home-resource-tile img { width: 28px; height: 28px; } .home-overview-premium { min-height: 54px; padding: 3px; } .home-overview-premium img { width: 42px; height: 42px; } }
 
 
 /* ==================================================
@@ -1591,6 +1631,9 @@ body {
     background: #10264a;
     color: #fff;
 }
+.forgot-password-button { display: block; margin: -2px auto 14px; padding: 6px 8px; border: 0; background: transparent; color: #315c91; font: inherit; font-size: 13px; text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
+.forgot-password-button:hover { color: #10264a; }
+.forgot-password-button:focus-visible { outline: 2px solid #d9a91f; outline-offset: 2px; border-radius: 4px; }
 
 @media (max-width: 700px) {
     #loginPage {
@@ -1962,6 +2005,7 @@ body {
 
         </form>
 
+        <button class="forgot-password-button" id="forgotPasswordButton" type="button">Mot de passe oublié ?</button>
 
         <button
             class="secondary-button"
@@ -2055,13 +2099,13 @@ body {
         <!-- PROFIL -->
 
         <section class="home-player-summary" aria-label="Profil et ressources du joueur">
-            <button id="playerProfileHomeButton" class="home-profile-button" type="button" aria-label="Ouvrir le profil">
-                <span class="avatar" id="playerAvatar" aria-hidden="true">👤</span>
-            </button>
             <article class="home-resource-tile" aria-label="Jetons classiques disponibles">
                 <img src="./Jeton.png" alt="">
                 <strong id="playerTokens">0</strong>
             </article>
+            <button id="playerProfileHomeButton" class="home-profile-button" type="button" aria-label="Ouvrir le profil">
+                <span class="avatar" id="playerAvatar" aria-hidden="true">👤</span>
+            </button>
             <button id="premiumHomeButton" class="home-overview-premium" type="button" aria-label="Ouvrir la page Premium">
                 <img src="./Jeton%20premium.png" alt="Jeton Premium">
             </button>
@@ -2084,8 +2128,8 @@ body {
                 </span>
             </button>
             <div class="home-overview-archive">
-                <button id="archivesHomeButton" type="button" aria-label="Ouvrir la Salle archives">
-                    <img src="./salle-archives.png" alt="">
+                <button id="archivesHomeButton" type="button" aria-label="Ouvrir la page Service" title="Service">
+                    <img src="./Service.png" alt="Service">
                     <span id="archivesHomeCountdown" class="home-archive-countdown hidden" aria-live="polite"></span>
                 </button>
             </div>
@@ -2443,16 +2487,17 @@ body {
     </section>
 
     <section id="archivesPage" class="archives-page hidden" aria-labelledby="archivesPageTitle">
-        <button id="archivesBackButton" class="admin-back" type="button">← Retour à l’accueil</button>
-        <h2 id="archivesPageTitle">Salle archives</h2>
-        <label for="archivesMiningSelect">Choisis un minage</label>
-        <select id="archivesMiningSelect" class="admin-field" aria-describedby="archivesMiningDescription"></select>
-        <p id="archivesMiningDescription" class="archives-description">Envoie le GAV trier les archives. Il trouvera peut-être des jetons classiques pour toi.</p>
-        <div class="archives-action-wrap">
-            <span id="archivesCountdown" class="archives-countdown hidden" aria-live="polite"></span>
-            <button id="sortArchivesButton" class="primary-button" type="button" disabled>Lancer le minage</button>
-            <p id="archivesStatus" class="archives-status" role="status" aria-live="polite"></p>
+        <div class="service-window">
+            <div class="service-titlebar"><span aria-hidden="true">📁</span><strong id="archivesPageTitle">Service</strong><div class="service-window-controls"><button type="button" aria-label="Réduire">_</button><button type="button" aria-label="Agrandir">□</button><button id="archivesBackButton" type="button" aria-label="Fermer">×</button></div></div>
+            <div class="service-window-body">
+                <div id="serviceHomeView"><h2>Choisis ta mission</h2><div class="service-choice-grid"><button class="service-button service-choice" type="button" data-service-type="internal"><span>🗂️</span>Service interne</button><button class="service-button service-choice" type="button" data-service-type="external"><span>🌍</span>Service externe</button></div></div>
+                <div id="serviceMissionsView" class="hidden"><button id="serviceMissionsBack" type="button" class="service-button">← Retour</button><h2 id="serviceMissionsTitle"></h2><div id="serviceMissionsList" class="service-mission-grid"></div></div>
+                <div id="serviceActiveView" class="hidden"><h2>Mission en cours</h2><strong id="serviceActiveName"></strong><p id="serviceActiveDescription"></p><p>Durée : <span id="serviceActiveDuration"></span></p><p>Récompense : <span id="serviceActiveReward"></span></p><p id="serviceActiveCountdown" class="archives-countdown" aria-live="polite"></p><button id="serviceClaimButton" class="service-button hidden" type="button">Récupérer ma récompense</button></div>
+                <div id="archivesLegacyView" class="hidden"><label for="archivesMiningSelect">Minage existant</label><select id="archivesMiningSelect" class="admin-field" aria-describedby="archivesMiningDescription"></select><img id="archivesMiningImage" class="archives-minage-image hidden" alt="Illustration du minage"><p id="archivesMiningDescription" class="archives-description">Envoie le GAV trier les archives. Il trouvera peut-être des jetons classiques pour toi.</p><div class="archives-action-wrap"><span id="archivesCountdown" class="archives-countdown hidden" aria-live="polite"></span><button id="sortArchivesButton" class="primary-button" type="button" disabled>Lancer le minage</button><p id="archivesStatus" class="archives-status" role="status" aria-live="polite"></p></div></div>
+                <p id="serviceStatus" class="service-win-status" role="status" aria-live="polite"></p>
+            </div>
         </div>
+        <div id="serviceMissionConfirm" class="service-confirm-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="serviceConfirmTitle"><div class="service-confirm-window"><div id="serviceConfirmTitle" class="service-confirm-title">Confirmer la mission</div><div id="serviceConfirmDetails" class="service-confirm-body"></div><div class="service-confirm-actions"><button id="serviceConfirmCancel" class="service-button" type="button">Annuler</button><button id="serviceConfirmStart" class="service-button" type="button">Démarrer</button></div></div></div>
     </section>
 
     <section id="premiumPage" class="premium-page hidden" aria-labelledby="premiumPageTitle">
@@ -2610,6 +2655,7 @@ body {
             <button class="admin-menu-button" type="button" data-admin-section="rarities" aria-controls="adminRaritiesSection" aria-pressed="false">⭐ Catégories de rareté</button>
             <button class="admin-menu-button" type="button" data-admin-section="cards" aria-controls="adminCardsSection" aria-pressed="false">🃏 Création de cartes</button>
             <button class="admin-menu-button" type="button" data-admin-section="gav" aria-controls="adminGavSection" aria-pressed="false">⛏️ Minage</button>
+            <button class="admin-menu-button" type="button" data-admin-section="serviceMissions" aria-controls="adminServiceMissionsSection" aria-pressed="false">📋 Gestion des missions</button>
         </nav>
         <p id="adminSectionHint" class="admin-note">Choisis une rubrique pour afficher son contenu.</p>
         <div id="adminJournalSection" class="admin-panel admin-section hidden" style="margin-bottom:16px">
@@ -2699,6 +2745,12 @@ body {
                 <input id="minageName" class="admin-field" type="text" maxlength="80" required>
                 <label for="minageDescription">Description</label>
                 <textarea id="minageDescription" class="admin-field" maxlength="500" rows="3" required></textarea>
+                <div class="minage-image-field">
+                    <label for="minageImageFile">Image du minage (facultative)</label>
+                    <input id="minageImageFile" class="admin-field" type="file" accept="image/png,image/jpeg,image/webp">
+                    <img id="minageImagePreview" class="minage-image-preview hidden" alt="Aperçu de l’image du minage">
+                    <p id="minageImageStatus" class="minage-image-status" role="status" aria-live="polite">PNG, JPG ou WebP, 5 Mo maximum.</p>
+                </div>
                 <label for="gavDurationMinutes">Durée du minage (minutes)</label>
                 <input id="gavDurationMinutes" class="admin-field" type="number" min="1" max="4320" step="1" required>
                 <label for="gavTokenReward">Récompense en jetons classiques</label>
@@ -2712,6 +2764,19 @@ body {
             <h3>Compteurs généraux</h3>
             <p id="gavTotalWork" class="admin-note">Temps total de minage de tous les joueurs : —</p>
             <p id="gavTotalCards" class="admin-note">Cartes tirées par tous les joueurs : —</p>
+        </div>
+        <div id="adminServiceMissionsSection" class="admin-panel admin-section hidden" style="margin-bottom:16px">
+            <h3>📋 Gestion des missions du Service</h3><label for="serviceAdminFilter">Filtrer par type</label><select id="serviceAdminFilter" class="admin-field"><option value="all">Tous les services</option><option value="internal">Service interne</option><option value="external">Service externe</option></select>
+            <div id="serviceAdminList" class="service-admin-list"><div class="service-admin-row service-admin-header"><span>Mission</span><span>Type</span><span>Durée</span><span>Récompense</span><span>Statut</span><span>Ordre</span><span>Actions</span></div></div><button id="serviceMissionCreateButton" class="service-button" type="button">+ Créer une mission</button><div id="serviceMissionEditor" class="hidden"><h4 id="serviceAdminFormTitle">Créer une mission</h4>
+            <form id="serviceMissionForm"><div class="service-admin-grid">
+                <label>Nom (obligatoire)<input id="serviceMissionName" maxlength="80" required></label><label>Type de service<select id="serviceMissionType"><option value="internal">Interne</option><option value="external">Externe</option></select></label>
+                <label>Description<textarea id="serviceMissionDescription" maxlength="500" rows="3"></textarea></label><label>Durée (heures)<input id="serviceMissionHours" type="number" min="0" max="72" value="2" required></label>
+                <label>Durée (minutes)<input id="serviceMissionMinutes" type="number" min="0" max="59" value="0" required></label><label>Ordre d’affichage<input id="serviceMissionOrder" type="number" min="0" max="9999" value="0"></label>
+                <label>Récompense en jetons classiques<input id="serviceMissionTokens" type="number" min="0" max="1000" value="0"></label><label>Probabilité de carte (%)<input id="serviceMissionChance" type="number" min="0" max="100" step="0.1" value="0"></label>
+                <label>Nombre de cartes en cas de réussite<input id="serviceMissionCardCount" type="number" min="1" max="5" value="1"></label><label>Cartes éligibles<select id="serviceMissionCardMode"><option value="all">Toutes les cartes distribuables</option><option value="categories">Catégories choisies</option><option value="cards">Cartes sélectionnées</option></select></label>
+                <label>Catégories (séparées par des virgules)<input id="serviceMissionCategories" placeholder="Unité, Véhicule"></label><label>Cartes éligibles<select id="serviceMissionCards" multiple size="5"></select></label>
+                <label>Illustration (PNG/JPG/WebP, max 5 Mo)<input id="serviceMissionImage" type="file" accept="image/png,image/jpeg,image/webp"></label><label>Activer la mission<input id="serviceMissionEnabled" type="checkbox" checked></label>
+            </div><p id="serviceMissionImageStatus" class="admin-note">Image facultative.</p><button id="serviceMissionSave" class="primary-button" type="submit">Enregistrer la mission</button><button id="serviceMissionCancel" class="secondary-button hidden" type="button">Annuler</button></form><p id="serviceAdminStatus" class="admin-status" role="status" aria-live="polite"></p></div>
         </div>
     </section>
 
@@ -2788,6 +2853,7 @@ import {
 
     signInWithEmailAndPassword,
     createUserWithEmailAndPassword,
+    sendPasswordResetEmail,
 
     signOut
 
@@ -2886,6 +2952,11 @@ const callOpenDailyBooster = httpsCallable(functions, "openDailyBooster");
 const callGetArchivesTaskStatus = httpsCallable(functions, "getArchivesTaskStatus");
 const callStartArchivesSorting = httpsCallable(functions, "startArchivesSorting");
 const callClaimArchivesSortingReward = httpsCallable(functions, "claimArchivesSortingReward");
+const callGetServiceMissions = httpsCallable(functions, "getServiceMissions");
+const callGetAdminServiceMissions = httpsCallable(functions, "getAdminServiceMissions");
+const callSaveServiceMission = httpsCallable(functions, "saveServiceMission");
+const callStartServiceMission = httpsCallable(functions, "startServiceMission");
+const callClaimServiceMissionReward = httpsCallable(functions, "claimServiceMissionReward");
 const callGetAdminGavSettings = httpsCallable(functions, "getAdminGavSettings");
 const callSaveAdminGavSettings = httpsCallable(functions, "saveAdminGavSettings");
 const callGetOwnedCardNumbers = httpsCallable(functions, "getOwnedCardNumbers");
@@ -2992,6 +3063,7 @@ const loginButton =
     document.getElementById(
         "loginButton"
     );
+const forgotPasswordButton = document.getElementById("forgotPasswordButton");
 
 
 const loginMessage =
@@ -3163,6 +3235,21 @@ const archivesHomeCountdown = document.getElementById("archivesHomeCountdown");
 const archivesStatus = document.getElementById("archivesStatus");
 const archivesMiningSelect = document.getElementById("archivesMiningSelect");
 const archivesMiningDescription = document.getElementById("archivesMiningDescription");
+const archivesMiningImage = document.getElementById("archivesMiningImage");
+const serviceHomeView = document.getElementById("serviceHomeView");
+const serviceMissionsView = document.getElementById("serviceMissionsView");
+const serviceActiveView = document.getElementById("serviceActiveView");
+const serviceLegacyView = document.getElementById("archivesLegacyView");
+const serviceMissionsList = document.getElementById("serviceMissionsList");
+const serviceStatus = document.getElementById("serviceStatus");
+let serviceMissions = [];
+let selectedServiceMissionId = "";
+let serviceActiveMission = null;
+let serviceCountdownInterval = null;
+let adminServiceMissions = [];
+let adminServiceCards = [];
+let editingServiceMissionId = "";
+let pendingServiceMission = null;
 let availableMinages = [];
 let archivesReadyAtMs = null;
 let archivesCountdownInterval = null;
@@ -3250,13 +3337,17 @@ const adminSections = {
     updates: document.getElementById("adminUpdatesSection"),
     rarities: document.getElementById("adminRaritiesSection"),
     cards: document.getElementById("adminCardsSection"),
-    gav: document.getElementById("adminGavSection")
+    gav: document.getElementById("adminGavSection"),
+    serviceMissions: document.getElementById("adminServiceMissionsSection")
 };
 const minageAdminSelect = document.getElementById("minageAdminSelect");
 const minageCreateButton = document.getElementById("minageCreateButton");
 const minageDeleteButton = document.getElementById("minageDeleteButton");
 const minageNameInput = document.getElementById("minageName");
 const minageDescriptionInput = document.getElementById("minageDescription");
+const minageImageFileInput = document.getElementById("minageImageFile");
+const minageImagePreview = document.getElementById("minageImagePreview");
+const minageImageStatus = document.getElementById("minageImageStatus");
 let adminMinages = [];
 let selectedAdminMinageId = "";
 const announcementsList = document.getElementById("announcementsList");
@@ -3537,6 +3628,7 @@ registerButton.addEventListener(
         isRegisterMode = !isRegisterMode;
         registerPseudoField.classList.toggle("hidden", !isRegisterMode);
         registerAvatarField.classList.toggle("hidden", !isRegisterMode);
+        forgotPasswordButton.classList.toggle("hidden", isRegisterMode);
         registerPseudo.required = isRegisterMode;
         loginTitle.textContent = isRegisterMode ? "Créer un compte" : "Connexion";
         loginSubtitle.textContent = isRegisterMode ? "Rejoins Cartes & Popote !" : "Heureux de vous revoir !";
@@ -3546,6 +3638,37 @@ registerButton.addEventListener(
         loginMessage.className = "message";
     }
 );
+
+forgotPasswordButton.addEventListener("click", async () => {
+    const email = document.getElementById("loginEmail").value.trim();
+    loginMessage.className = "message";
+    if (!email) {
+        loginMessage.textContent = "Saisis ton adresse e-mail pour recevoir le lien de réinitialisation.";
+        loginMessage.className = "message error";
+        document.getElementById("loginEmail").focus();
+        return;
+    }
+
+    forgotPasswordButton.disabled = true;
+    forgotPasswordButton.textContent = "Envoi en cours…";
+    try {
+        await sendPasswordResetEmail(auth, email);
+        loginMessage.textContent = "Si un compte correspond à cette adresse, un e-mail de réinitialisation vient d’être envoyé.";
+        loginMessage.className = "message success";
+    } catch (error) {
+        console.error("Erreur d’envoi du lien de réinitialisation :", error);
+        const resetMessages = {
+            "auth/invalid-email": "Cette adresse e-mail n’est pas valide.",
+            "auth/too-many-requests": "Trop de demandes. Réessaie un peu plus tard.",
+            "auth/network-request-failed": "Connexion impossible. Vérifie ta connexion puis réessaie."
+        };
+        loginMessage.textContent = resetMessages[error.code] || "Impossible d’envoyer le lien. Vérifie l’adresse e-mail puis réessaie.";
+        loginMessage.className = "message error";
+    } finally {
+        forgotPasswordButton.disabled = false;
+        forgotPasswordButton.textContent = "Mot de passe oublié ?";
+    }
+});
 
 
 
@@ -3632,6 +3755,7 @@ onAuthStateChanged(
         loadHomeAnnouncements();
         loadPublicCardCount();
         loadArchivesTaskStatus();
+        syncServiceMissionHomeCountdown();
 
 
 
@@ -3971,10 +4095,73 @@ async function openArchivesPage() {
     [termsPage, financePage, profilePage, leaderboardPage, statisticsPage, collectionPage, recyclingPage, adminPage, messagingPage, rulesPage, premiumPage].forEach((page) => page.classList.add("hidden"));
     bottomNav.classList.add("hidden");
     archivesPage.classList.remove("hidden");
-    await loadArchivesTaskStatus();
+    await loadServicePage();
 }
 
 archivesHomeButton.addEventListener("click", openArchivesPage);
+document.querySelectorAll("[data-service-type]").forEach((button) => button.addEventListener("click", () => {
+    renderServiceMissions(button.dataset.serviceType); setServiceView("missions");
+}));
+document.getElementById("serviceMissionsBack").addEventListener("click", () => setServiceView("home"));
+document.getElementById("serviceClaimButton").addEventListener("click", async () => {
+    const button = document.getElementById("serviceClaimButton"); button.disabled = true; serviceStatus.textContent = "Récupération de ta récompense…";
+    try {
+        const result = (await callClaimServiceMissionReward({ taskId: serviceActiveMission?.taskId })).data || {};
+        const details = [`${result.tokenReward || 0} jeton(s)`];
+        if (result.cardDropChance > 0 && !result.cardDropSucceeded) details.push("aucune carte n’a été obtenue cette fois");
+        (result.cards || []).forEach((card) => details.push(card.name || "une carte"));
+        serviceStatus.textContent = `Mission terminée ! Récompenses : ${details.join(" et ")}.`;
+        serviceActiveMission = null; if (serviceCountdownInterval) clearInterval(serviceCountdownInterval); serviceCountdownInterval = null;
+        archivesHomeCountdown.classList.add("hidden"); setServiceView("home");
+    } catch (error) { serviceStatus.textContent = error.message || "Impossible de récupérer la récompense."; }
+    finally { button.disabled = false; }
+});
+document.getElementById("serviceConfirmCancel").addEventListener("click", () => { pendingServiceMission = null; document.getElementById("serviceMissionConfirm").classList.add("hidden"); });
+document.getElementById("serviceConfirmStart").addEventListener("click", async () => {
+    const mission = pendingServiceMission; pendingServiceMission = null; document.getElementById("serviceMissionConfirm").classList.add("hidden");
+    if (mission) await launchSelectedServiceMission(mission);
+});
+document.getElementById("serviceAdminFilter").addEventListener("change", renderAdminServiceMissions);
+document.getElementById("serviceMissionCreateButton").addEventListener("click", () => {
+    document.getElementById("serviceMissionCancel").click(); document.getElementById("serviceMissionEditor").classList.remove("hidden");
+    document.getElementById("serviceMissionName").focus();
+});
+document.getElementById("serviceMissionCancel").addEventListener("click", () => {
+    editingServiceMissionId = ""; document.getElementById("serviceMissionForm").reset();
+    document.getElementById("serviceMissionHours").value = "2"; document.getElementById("serviceMissionMinutes").value = "0";
+    document.getElementById("serviceMissionCardMode").dispatchEvent(new Event("change"));
+    document.getElementById("serviceAdminFormTitle").textContent = "Créer une mission";
+    document.getElementById("serviceMissionCancel").classList.add("hidden"); document.getElementById("serviceMissionSave").textContent = "Enregistrer la mission";
+    document.getElementById("serviceMissionEditor").classList.add("hidden");
+});
+document.getElementById("serviceMissionForm").addEventListener("submit", async (event) => {
+    event.preventDefault(); const button = document.getElementById("serviceMissionSave"); const status = document.getElementById("serviceAdminStatus"); button.disabled = true; status.textContent = "Enregistrement…";
+    try {
+        const id = editingServiceMissionId || (crypto.randomUUID ? crypto.randomUUID() : `mission-${Date.now()}`);
+        const existing = adminServiceMissions.find((item) => item.id === editingServiceMissionId);
+        const data = { id, name: document.getElementById("serviceMissionName").value.trim(), description: document.getElementById("serviceMissionDescription").value.trim(),
+            serviceType: document.getElementById("serviceMissionType").value, durationMinutes: Number(document.getElementById("serviceMissionHours").value)*60+Number(document.getElementById("serviceMissionMinutes").value),
+            sortOrder: Number(document.getElementById("serviceMissionOrder").value)||0, tokenReward: Number(document.getElementById("serviceMissionTokens").value), dropChance: Number(document.getElementById("serviceMissionChance").value),
+            cardCount: Number(document.getElementById("serviceMissionCardCount").value), cardMode: document.getElementById("serviceMissionCardMode").value,
+            eligibleCardCategories: document.getElementById("serviceMissionCategories").value.split(",").map((v)=>v.trim()).filter(Boolean),
+            eligibleCardIds: [...document.getElementById("serviceMissionCards").selectedOptions].map((option)=>option.value), enabled: document.getElementById("serviceMissionEnabled").checked,
+            archived: false, imageUrl: existing?.imageUrl||"", imagePath: existing?.imagePath||"" };
+        const file = document.getElementById("serviceMissionImage").files?.[0];
+        if (file) {
+            if (!/^image\/(png|jpeg|webp)$/.test(file.type)||file.size>5*1024*1024) throw new Error("L’image doit être PNG, JPG ou WebP et ne pas dépasser 5 Mo.");
+            const extension=file.type==="image/jpeg"?"jpg":file.type==="image/webp"?"webp":"png";
+            data.imagePath=`serviceMissions/${auth.currentUser.uid}/${id}-${Date.now()}.${extension}`;
+            const uploaded=await uploadBytes(ref(storage,data.imagePath),file,{contentType:file.type}); data.imageUrl=await getDownloadURL(uploaded.ref);
+        }
+        await callSaveServiceMission(data); status.textContent="Mission enregistrée.";
+        document.getElementById("serviceMissionCancel").click(); await loadAdminServiceMissions();
+    } catch(error) { console.error("Enregistrement mission impossible :",error); status.textContent=error.message||"Impossible d’enregistrer la mission."; }
+    finally { button.disabled=false; }
+});
+document.getElementById("serviceMissionCardMode").addEventListener("change",(event)=>{
+    document.getElementById("serviceMissionCategories").closest("label").classList.toggle("hidden",event.target.value!=="categories");
+    document.getElementById("serviceMissionCards").closest("label").classList.toggle("hidden",event.target.value!=="cards");
+});
 archivesBackButton.addEventListener("click", showHomePage);
 sortArchivesButton.addEventListener("click", async () => {
     if (!auth.currentUser || sortArchivesButton.disabled) return;
@@ -6513,6 +6700,177 @@ async function showAdminSection(sectionName) {
         await loadCards();
     }
     if (sectionName === "gav") await loadAdminGavSettings();
+    if (sectionName === "serviceMissions") await loadAdminServiceMissions();
+}
+
+function serviceRewardSummary(mission) {
+    const rewards = [];
+    if (Number(mission.tokenReward) > 0) rewards.push(`${mission.tokenReward} jeton${mission.tokenReward > 1 ? "s" : ""}`);
+    if (Number(mission.dropChance) > 0) rewards.push(`${mission.dropChance}% de chance d’obtenir ${mission.cardCount || 1} carte(s)`);
+    return rewards.join(" + ") || "Aucune récompense";
+}
+
+function setServiceView(view) {
+    serviceHomeView.classList.toggle("hidden", view !== "home");
+    serviceMissionsView.classList.toggle("hidden", view !== "missions");
+    serviceActiveView.classList.toggle("hidden", view !== "active");
+    serviceLegacyView.classList.toggle("hidden", view !== "legacy");
+}
+
+function renderServiceMissions(type) {
+    serviceMissionsList.replaceChildren();
+    const items = serviceMissions.filter((mission) => mission.serviceType === type);
+    document.getElementById("serviceMissionsTitle").textContent = type === "external" ? "Service externe" : "Service interne";
+    if (!items.length) {
+        const empty = document.createElement("p"); empty.textContent = "Aucune mission disponible pour le moment.";
+        serviceMissionsList.append(empty); return;
+    }
+    items.forEach((mission) => {
+        const card = document.createElement("article"); card.className = "service-mission-card";
+        if (mission.imageUrl) { const img = document.createElement("img"); img.src = mission.imageUrl; img.alt = `Illustration : ${mission.name}`; card.append(img); }
+        const title = document.createElement("h3"); title.textContent = mission.name;
+        const description = document.createElement("p"); description.textContent = mission.description || "Aucune description.";
+        const duration = document.createElement("p"); duration.textContent = `Durée : ${Math.floor(mission.durationMinutes / 60)} h ${String(mission.durationMinutes % 60).padStart(2,"0")}`;
+        const reward = document.createElement("p"); reward.textContent = `Récompense : ${serviceRewardSummary(mission)}`;
+        const start = document.createElement("button"); start.className = "service-button"; start.type = "button"; start.textContent = "Choisir cette mission";
+        start.addEventListener("click", () => startSelectedServiceMission(mission));
+        card.append(title, description, duration, reward, start); serviceMissionsList.append(card);
+    });
+}
+
+function renderServiceActiveMission(active) {
+    serviceActiveMission = active;
+    if (!active) return;
+    document.getElementById("serviceActiveName").textContent = active.name;
+    document.getElementById("serviceActiveDescription").textContent = active.description || "";
+    const duration = Number(active.durationMinutes) || Math.round((Date.parse(active.readyAt) - Date.parse(active.startedAt)) / 60000);
+    document.getElementById("serviceActiveDuration").textContent = `${Math.floor(duration / 60)} h ${String(duration % 60).padStart(2,"0")}`;
+    document.getElementById("serviceActiveReward").textContent = serviceRewardSummary(active);
+    setServiceView("active"); updateServiceMissionCountdown();
+    if (serviceCountdownInterval) clearInterval(serviceCountdownInterval);
+    serviceCountdownInterval = setInterval(updateServiceMissionCountdown, 1000);
+}
+
+function updateServiceMissionCountdown() {
+    if (!serviceActiveMission) return;
+    const remaining = Math.max(0, Date.parse(serviceActiveMission.readyAt) - Date.now());
+    const seconds = Math.floor(remaining / 1000);
+    const text = `${Math.floor(seconds / 3600)}:${String(Math.floor(seconds % 3600 / 60)).padStart(2,"0")}:${String(seconds % 60).padStart(2,"0")}`;
+    document.getElementById("serviceActiveCountdown").textContent = remaining > 0 ? `Temps restant : ${text}` : "Mission terminée : récupère ta récompense.";
+    archivesHomeCountdown.textContent = remaining > 0 ? text : "Récompense Service prête";
+    archivesHomeCountdown.classList.remove("hidden");
+    document.getElementById("serviceClaimButton").classList.toggle("hidden", remaining > 0);
+}
+
+async function syncServiceMissionHomeCountdown() {
+    if (!auth.currentUser) return;
+    try {
+        const response = await callGetServiceMissions();
+        if (!response.data?.active) return;
+        serviceActiveMission = response.data.active;
+        updateServiceMissionCountdown();
+        if (serviceCountdownInterval) clearInterval(serviceCountdownInterval);
+        serviceCountdownInterval = setInterval(updateServiceMissionCountdown, 1000);
+    } catch (error) { console.warn("Le compte à rebours du Service sera actualisé à l’ouverture de la page.", error); }
+}
+
+async function loadServicePage() {
+    if (!auth.currentUser) return;
+    setServiceView("home"); serviceStatus.textContent = "Chargement des missions…";
+    try {
+        const [response, oldResponse] = await Promise.all([callGetServiceMissions(), callGetArchivesTaskStatus()]);
+        serviceMissions = Array.isArray(response.data?.missions) ? response.data.missions : [];
+        if (response.data?.active) { renderServiceActiveMission(response.data.active); serviceStatus.textContent = ""; return; }
+        const legacy = oldResponse.data || {};
+        if (legacy.readyAt) {
+            serviceLegacyView.classList.remove("hidden");
+            setServiceView("legacy");
+            await loadArchivesTaskStatus();
+        }
+        serviceStatus.textContent = "";
+    } catch (error) {
+        console.error("Chargement du Service impossible :", error);
+        serviceStatus.textContent = "Impossible de charger les missions. Vérifie que les fonctions Service sont déployées.";
+    }
+}
+
+async function startSelectedServiceMission(mission) {
+    const duration = `${Math.floor(mission.durationMinutes / 60)} h ${String(mission.durationMinutes % 60).padStart(2,"0")}`;
+    pendingServiceMission = mission;
+    document.getElementById("serviceConfirmTitle").textContent = "Démarrer cette mission ?";
+    document.getElementById("serviceConfirmDetails").textContent = `Mission : ${mission.name}\nDurée : ${duration}\nRécompense : ${serviceRewardSummary(mission)}`;
+    document.getElementById("serviceMissionConfirm").classList.remove("hidden");
+}
+
+async function launchSelectedServiceMission(mission) {
+    try {
+        if (mission.isLegacy) {
+            archivesMiningSelect.value = mission.id; serviceLegacyView.classList.remove("hidden"); setServiceView("legacy");
+            await callStartArchivesSorting({ minageId: mission.id });
+            await loadArchivesTaskStatus(false); serviceStatus.textContent = "Le minage a commencé et reste suivi par le système historique."; return;
+        }
+        const response = await callStartServiceMission({ missionId: mission.id });
+        renderServiceActiveMission(response.data.active); serviceStatus.textContent = "Mission commencée !";
+    } catch (error) {
+        serviceStatus.textContent = error.message || "Impossible de démarrer cette mission.";
+    }
+}
+
+async function loadAdminServiceMissions() {
+    const list = document.getElementById("serviceAdminList");
+    const status = document.getElementById("serviceAdminStatus");
+    status.textContent = "Chargement…";
+    try {
+        const response = await callGetAdminServiceMissions();
+        adminServiceMissions = response.data.missions || []; adminServiceCards = response.data.cards || [];
+        const cardSelect = document.getElementById("serviceMissionCards"); cardSelect.replaceChildren();
+        adminServiceCards.filter((card) => card.distributable).forEach((card) => cardSelect.add(new Option(`${card.name}${card.category ? ` — ${card.category}` : ""}`, card.id)));
+        renderAdminServiceMissions(); status.textContent = "";
+    } catch (error) { console.error("Missions admin non chargées :", error); status.textContent = "Impossible de charger la gestion des missions."; }
+}
+
+function renderAdminServiceMissions() {
+    const list = document.getElementById("serviceAdminList"); list.replaceChildren();
+    const header = document.createElement("div"); header.className="service-admin-row service-admin-header";
+    ["Mission","Type","Durée","Récompense","Statut","Ordre","Actions"].forEach((label)=>{const cell=document.createElement("span");cell.textContent=label;header.append(cell);}); list.append(header);
+    const filter = document.getElementById("serviceAdminFilter").value;
+    adminServiceMissions.filter((m) => filter === "all" || m.serviceType === filter).forEach((mission) => {
+        const row = document.createElement("article"); row.className = "service-admin-row";
+        const name = document.createElement("strong"); name.textContent = mission.name;
+        const type = document.createElement("span"); type.textContent = mission.serviceType === "external" ? "Service externe" : "Service interne";
+        const duration = document.createElement("span"); duration.textContent = `${Math.floor(mission.durationMinutes / 60)} h ${String(mission.durationMinutes % 60).padStart(2,"0")}`;
+        const reward = document.createElement("span"); reward.textContent = serviceRewardSummary(mission);
+        const state = document.createElement("span"); state.textContent = mission.archived ? "Archivée" : mission.enabled ? "Active" : "Inactive";
+        const order = document.createElement("span"); order.textContent = `Ordre ${mission.sortOrder || 0}`;
+        const actions = document.createElement("div"); actions.className = "service-row-actions";
+        [["Modifier", () => fillServiceMissionForm(mission)], [mission.archived ? "Restaurer" : mission.enabled ? "Désactiver" : "Activer", () => saveServiceMissionState(mission, mission.archived ? { archived:false, enabled:true } : { enabled: !mission.enabled })], ["Dupliquer", () => fillServiceMissionForm({ ...mission, id: "", name: `${mission.name} (copie)` })], ["Supprimer", () => saveServiceMissionState(mission, { archived: true, enabled: false }, true)]].forEach(([label, fn]) => { const button = document.createElement("button"); button.className="service-button"; button.type="button"; button.textContent=label; button.addEventListener("click",fn); actions.append(button); });
+        row.append(name,type,duration,reward,state,order,actions); list.append(row);
+    });
+}
+
+function fillServiceMissionForm(mission) {
+    document.getElementById("serviceMissionEditor").classList.remove("hidden");
+    editingServiceMissionId = mission.id || "";
+    document.getElementById("serviceAdminFormTitle").textContent = editingServiceMissionId ? "Modifier la mission" : "Créer une mission";
+    document.getElementById("serviceMissionName").value = mission.name || "";
+    document.getElementById("serviceMissionDescription").value = mission.description || "";
+    document.getElementById("serviceMissionType").value = mission.serviceType || "internal";
+    const mins = Number(mission.durationMinutes) || 120;
+    document.getElementById("serviceMissionHours").value = Math.floor(mins/60); document.getElementById("serviceMissionMinutes").value = mins%60;
+    document.getElementById("serviceMissionOrder").value = mission.sortOrder || 0; document.getElementById("serviceMissionTokens").value = mission.tokenReward || 0;
+    document.getElementById("serviceMissionChance").value = mission.dropChance || 0; document.getElementById("serviceMissionCardCount").value = mission.cardCount || 1;
+    document.getElementById("serviceMissionCardMode").value = mission.cardMode || "all"; document.getElementById("serviceMissionCategories").value = (mission.eligibleCardCategories || []).join(", ");
+    document.getElementById("serviceMissionCategories").closest("label").classList.toggle("hidden", (mission.cardMode || "all") !== "categories");
+    document.getElementById("serviceMissionCards").closest("label").classList.toggle("hidden", (mission.cardMode || "all") !== "cards");
+    document.getElementById("serviceMissionEnabled").checked = mission.enabled !== false;
+    [...document.getElementById("serviceMissionCards").options].forEach((option) => { option.selected = (mission.eligibleCardIds || []).includes(option.value); });
+    document.getElementById("serviceMissionCancel").classList.remove("hidden"); document.getElementById("serviceMissionSave").textContent = "Enregistrer les modifications";
+}
+
+async function saveServiceMissionState(mission, changes, deleting = false) {
+    if (deleting && !window.confirm(`Archiver la mission « ${mission.name} » ? Son historique sera conservé.`)) return;
+    try { await callSaveServiceMission({ ...mission, ...changes }); await loadAdminServiceMissions(); }
+    catch (error) { document.getElementById("serviceAdminStatus").textContent = error.message || "Modification impossible."; }
 }
 
 let adminGavWorkBaseMs = 0;
@@ -6542,8 +6900,45 @@ function renderAdminMinageOptions() {
     document.getElementById("gavDurationMinutes").value = selected ? Math.round(selected.workDurationMs / 60000) : 120;
     document.getElementById("gavTokenReward").value = selected ? selected.tokenReward : 1;
     document.getElementById("gavCardReward").value = selected?.cardRewardId || "";
+    minageImageFileInput.value = "";
+    setMinageImagePreview(selected?.imageUrl || "");
+    minageImageStatus.textContent = selected?.imageUrl ? "Image actuelle conservée. Choisis un fichier pour la remplacer." : "PNG, JPG ou WebP, 5 Mo maximum.";
     minageDeleteButton.classList.toggle("hidden", !selected);
 }
+
+function setMinageImagePreview(source) {
+    if (minageImagePreview.dataset.objectUrl) {
+        URL.revokeObjectURL(minageImagePreview.dataset.objectUrl);
+        delete minageImagePreview.dataset.objectUrl;
+    }
+    if (!source) {
+        minageImagePreview.removeAttribute("src");
+        minageImagePreview.classList.add("hidden");
+        return;
+    }
+    minageImagePreview.src = source;
+    minageImagePreview.classList.remove("hidden");
+    if (source.startsWith("blob:")) minageImagePreview.dataset.objectUrl = source;
+}
+
+minageImageFileInput.addEventListener("change", () => {
+    const file = minageImageFileInput.files?.[0];
+    if (!file) {
+        const selected = adminMinages.find((item) => item.id === selectedAdminMinageId);
+        setMinageImagePreview(selected?.imageUrl || "");
+        minageImageStatus.textContent = selected?.imageUrl ? "Image actuelle conservée. Choisis un fichier pour la remplacer." : "PNG, JPG ou WebP, 5 Mo maximum.";
+        return;
+    }
+    if (!/^image\/(png|jpeg|webp)$/.test(file.type) || file.size > 5 * 1024 * 1024) {
+        minageImageFileInput.value = "";
+        const selected = adminMinages.find((item) => item.id === selectedAdminMinageId);
+        setMinageImagePreview(selected?.imageUrl || "");
+        minageImageStatus.textContent = "Fichier refusé : utilise une image PNG, JPG ou WebP de 5 Mo maximum.";
+        return;
+    }
+    setMinageImagePreview(URL.createObjectURL(file));
+    minageImageStatus.textContent = file.name;
+});
 
 function renderArchivesMinageOptions(activeMinageId = "") {
     const previousChoice = activeMinageId || archivesMiningSelect.value;
@@ -6579,8 +6974,17 @@ function formatMinageReward(minage) {
 
 function showMinageDetails(minage) {
     if (!minage) {
+        archivesMiningImage.removeAttribute("src");
+        archivesMiningImage.classList.add("hidden");
         archivesMiningDescription.textContent = "Choisis un minage pour voir sa durée et sa récompense.";
         return;
+    }
+    if (minage.imageUrl) {
+        archivesMiningImage.src = minage.imageUrl;
+        archivesMiningImage.classList.remove("hidden");
+    } else {
+        archivesMiningImage.removeAttribute("src");
+        archivesMiningImage.classList.add("hidden");
     }
     const description = minage.description || "";
     archivesMiningDescription.textContent = `${description}${description ? "\n\n" : ""}Durée : ${formatMinageDuration(minage.workDurationMs)}\nRécompense : ${formatMinageReward(minage)}`;
@@ -6650,6 +7054,7 @@ document.getElementById("adminGavForm").addEventListener("submit", async (event)
     button.disabled = true;
     status.textContent = "Enregistrement…";
     try {
+        const existingMinage = adminMinages.find((item) => item.id === selectedAdminMinageId);
         const minage = {
             id: selectedAdminMinageId || ("minage-" + (crypto.randomUUID ? crypto.randomUUID() : Date.now().toString(36))),
             name: minageNameInput.value.trim(),
@@ -6657,10 +7062,25 @@ document.getElementById("adminGavForm").addEventListener("submit", async (event)
             workDurationMs: Number(document.getElementById("gavDurationMinutes").value) * 60000,
             tokenReward: Number(document.getElementById("gavTokenReward").value),
             cardRewardId: document.getElementById("gavCardReward").value || "",
+            imageUrl: existingMinage?.imageUrl || "",
+            storagePath: existingMinage?.storagePath || "",
         };
         if (!minage.name || !minage.description || !Number.isSafeInteger(minage.workDurationMs) || !Number.isSafeInteger(minage.tokenReward)) {
             status.textContent = "Renseigne le nom, la description, la durée et la récompense.";
             return;
+        }
+        const imageFile = minageImageFileInput.files?.[0];
+        if (imageFile) {
+            if (!/^image\/(png|jpeg|webp)$/.test(imageFile.type) || imageFile.size > 5 * 1024 * 1024) {
+                status.textContent = "Choisis une image PNG, JPG ou WebP de 5 Mo maximum.";
+                return;
+            }
+            const extension = imageFile.type === "image/jpeg" ? "jpg" : imageFile.type === "image/webp" ? "webp" : "png";
+            const storagePath = `minages/${auth.currentUser.uid}/${minage.id}-${Date.now()}.${extension}`;
+            const imageRef = ref(storage, storagePath);
+            const uploadedImage = await uploadBytes(imageRef, imageFile, { contentType: imageFile.type });
+            minage.imageUrl = await getDownloadURL(uploadedImage.ref);
+            minage.storagePath = storagePath;
         }
         const existingIndex = adminMinages.findIndex((item) => item.id === minage.id);
         if (existingIndex >= 0) adminMinages[existingIndex] = minage;
