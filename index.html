@@ -1875,6 +1875,8 @@ body {
 .event-booster-admin-item { display:flex; align-items:center; gap:12px; padding:10px; border:1px solid #d8c99f; border-radius:9px; background:#fffefa; }
 .event-booster-admin-item img { width:54px; height:64px; object-fit:contain; }
 .event-booster-admin-item div { display:grid; gap:3px; }
+.event-booster-admin-actions { display:flex !important; flex-direction:column; gap:6px !important; margin-left:auto; }
+.event-booster-admin-actions button { white-space:nowrap; }
 .event-booster-prompt-card { width:min(100%,460px); text-align:center; }
 .event-booster-prompt-card img { display:block; width:min(58vw,220px); max-height:240px; object-fit:contain; margin:14px auto; }
 .event-booster-prompt-card button { width:100%; }
@@ -2789,6 +2791,7 @@ body {
                     <div id="eventBoosterPlayersWrap" class="full-width hidden"><strong>Joueurs concernés</strong><div id="eventBoosterPlayers" class="event-booster-player-list"></div></div>
                 </div>
                 <button id="eventBoosterSaveButton" class="primary-button admin-submit" type="submit">Créer le booster évènementiel</button>
+                <button id="eventBoosterCancelEditButton" class="secondary-button hidden" type="button">Annuler la modification</button>
             </form>
             <p id="eventBoosterAdminStatus" class="admin-status" role="status" aria-live="polite"></p>
             <h3>Boosters programmés</h3>
@@ -3179,6 +3182,8 @@ const callAddEffectifMonth = httpsCallable(functions, "addEffectifMonth");
 const callSaveEffectifPlayer = httpsCallable(functions, "saveEffectifPlayer");
 const callGetAdminEventBoosters = httpsCallable(functions, "getAdminEventBoosters");
 const callSaveEventBooster = httpsCallable(functions, "saveEventBooster");
+const callUpdateEventBooster = httpsCallable(functions, "updateEventBooster");
+const callDeleteEventBooster = httpsCallable(functions, "deleteEventBooster");
 const callGetPendingEventBoosters = httpsCallable(functions, "getPendingEventBoosters");
 const callOpenEventBooster = httpsCallable(functions, "openEventBooster");
 const callStartServiceMission = httpsCallable(functions, "startServiceMission");
@@ -3627,6 +3632,8 @@ let pendingEventBoosterUid = "";
 let eventBoosterPlayers = [];
 let eventBoosterRarities = [];
 let eventBoosterImageUrl = "";
+let editingEventBooster = null;
+let adminEventBoosters = [];
 const ownedCardsStatus = document.getElementById("ownedCardsStatus");
 const ownedPlayerCardGrid = document.getElementById("ownedPlayerCardGrid");
 const collectionPageIndicator = document.getElementById("collectionPageIndicator");
@@ -7310,7 +7317,8 @@ async function loadAdminEventBoosters() {
             const text = document.createElement("span"); text.textContent = player.pseudo;
             label.append(checkbox, text); playerList.append(label);
         });
-        renderEventBoosterAdminList(Array.isArray(response.data?.events) ? response.data.events : []);
+        adminEventBoosters = Array.isArray(response.data?.events) ? response.data.events : [];
+        renderEventBoosterAdminList(adminEventBoosters);
         status.textContent = eventBoosterPlayers.length + " joueur" + (eventBoosterPlayers.length === 1 ? "" : "s") + " disponible" + (eventBoosterPlayers.length === 1 ? "" : "s") + " pour la sélection.";
     } catch (error) {
         console.error("Impossible de charger les paramètres des boosters évènementiels :", error);
@@ -7333,8 +7341,83 @@ function renderEventBoosterAdminList(events) {
         if (event.badge?.name) { const badge = document.createElement("small"); badge.textContent = "Badge attribué : " + event.badge.name; details.append(badge); }
         item.append(details);
         if (event.badge?.imageUrl) { const badgeImage = document.createElement("img"); badgeImage.src = event.badge.imageUrl; badgeImage.alt = "Badge : " + event.badge.name; badgeImage.title = badgeImage.alt; item.append(badgeImage); }
+        const actions = document.createElement("div"); actions.className = "event-booster-admin-actions";
+        if (event.availableOn > getParisDateKey() && event.enabled !== false) {
+            const edit = document.createElement("button"); edit.type = "button"; edit.className = "secondary-button"; edit.textContent = "Modifier";
+            edit.addEventListener("click", () => editEventBooster(event));
+            const remove = document.createElement("button"); remove.type = "button"; remove.className = "secondary-button"; remove.textContent = "Supprimer";
+            remove.addEventListener("click", () => deleteEventBooster(event));
+            actions.append(edit, remove);
+        } else {
+            const locked = document.createElement("small"); locked.textContent = "Date atteinte · verrouillé"; actions.append(locked);
+        }
+        item.append(actions);
         list.append(item);
     });
+}
+
+function resetEventBoosterForm() {
+    const form = document.getElementById("eventBoosterForm");
+    form.reset();
+    editingEventBooster = null;
+    document.getElementById("eventBoosterCardCount").value = "5";
+    document.getElementById("eventBoosterAllPlayers").checked = true;
+    document.getElementById("eventBoosterPlayersWrap").classList.add("hidden");
+    document.getElementById("eventBoosterSaveButton").textContent = "Créer le booster évènementiel";
+    document.getElementById("eventBoosterCancelEditButton").classList.add("hidden");
+    document.getElementById("eventBoosterImagePreview").classList.add("hidden");
+    document.getElementById("eventBoosterImagePreview").removeAttribute("src");
+    document.getElementById("eventBoosterBadgePreview").classList.add("hidden");
+    document.getElementById("eventBoosterBadgePreview").removeAttribute("src");
+    document.getElementById("eventBoosterHasBadge").checked = false;
+    document.getElementById("eventBoosterHasBadge").dispatchEvent(new Event("change"));
+    document.querySelectorAll("[data-event-recipient]").forEach((input) => { input.checked = false; });
+    renderEventBoosterRarityRows();
+}
+
+function editEventBooster(event) {
+    if (!event || event.availableOn <= getParisDateKey() || event.enabled === false) return;
+    editingEventBooster = event;
+    document.getElementById("eventBoosterName").value = event.name || "";
+    document.getElementById("eventBoosterDate").value = event.availableOn || "";
+    document.getElementById("eventBoosterCardCount").value = String(event.cardRarities?.length || 1);
+    renderEventBoosterRarityRows(event.cardRarities || []);
+    const imagePreview = document.getElementById("eventBoosterImagePreview");
+    if (event.imageUrl) { imagePreview.src = event.imageUrl; imagePreview.classList.remove("hidden"); }
+    else { imagePreview.removeAttribute("src"); imagePreview.classList.add("hidden"); }
+    const hasBadge = Boolean(event.badge?.name && event.badge?.imageUrl);
+    document.getElementById("eventBoosterHasBadge").checked = hasBadge;
+    document.getElementById("eventBoosterBadgeFields").classList.toggle("hidden", !hasBadge);
+    document.getElementById("eventBoosterBadgeName").value = hasBadge ? event.badge.name : "";
+    const badgePreview = document.getElementById("eventBoosterBadgePreview");
+    if (hasBadge) { badgePreview.src = event.badge.imageUrl; badgePreview.classList.remove("hidden"); }
+    else { badgePreview.removeAttribute("src"); badgePreview.classList.add("hidden"); }
+    document.getElementById("eventBoosterBadgeName").required = hasBadge;
+    document.getElementById("eventBoosterBadgeFile").required = false;
+    const allPlayers = event.allPlayers === true;
+    document.getElementById("eventBoosterAllPlayers").checked = allPlayers;
+    document.getElementById("eventBoosterPlayersWrap").classList.toggle("hidden", allPlayers);
+    const recipients = new Set(event.recipientUids || []);
+    document.querySelectorAll("[data-event-recipient]").forEach((input) => { input.checked = recipients.has(input.value); });
+    document.getElementById("eventBoosterSaveButton").textContent = "Enregistrer les modifications";
+    document.getElementById("eventBoosterCancelEditButton").classList.remove("hidden");
+    document.getElementById("eventBoosterAdminStatus").textContent = "Modification de « " + event.name + " » : possible jusqu’au " + event.availableOn + ".";
+    document.getElementById("eventBoosterAdminPage").scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
+async function deleteEventBooster(event) {
+    if (!event || event.availableOn <= getParisDateKey() || event.enabled === false) return;
+    if (!confirm("Supprimer le booster « " + event.name + " » ? Cette action est définitive.")) return;
+    const status = document.getElementById("eventBoosterAdminStatus");
+    try {
+        await callDeleteEventBooster({ eventId: event.id });
+        status.textContent = "Booster supprimé.";
+        if (editingEventBooster?.id === event.id) resetEventBoosterForm();
+        await loadAdminEventBoosters();
+    } catch (error) {
+        console.error("Suppression du booster évènementiel impossible :", error);
+        status.textContent = error.message || "Suppression refusée.";
+    }
 }
 
 document.getElementById("eventBoosterCardCount").addEventListener("input", () => renderEventBoosterRarityRows());
@@ -7354,7 +7437,7 @@ document.getElementById("eventBoosterHasBadge").addEventListener("change", (even
     const enabled = event.target.checked;
     document.getElementById("eventBoosterBadgeFields").classList.toggle("hidden", !enabled);
     document.getElementById("eventBoosterBadgeName").required = enabled;
-    document.getElementById("eventBoosterBadgeFile").required = enabled;
+    document.getElementById("eventBoosterBadgeFile").required = enabled && !editingEventBooster?.badge?.imageUrl;
 });
 document.getElementById("eventBoosterBadgeFile").addEventListener("change", (event) => {
     const file = event.target.files?.[0]; const preview = document.getElementById("eventBoosterBadgePreview");
@@ -7377,44 +7460,43 @@ document.getElementById("eventBoosterForm").addEventListener("submit", async (ev
     const cardRarities = Array.from(document.querySelectorAll("[data-event-card-rarity]"), (select) => select.value);
     if (!allPlayers && !recipientUids.length) { status.textContent = "Sélectionne au moins un joueur ou coche « Tous les joueurs »."; return; }
     if (cardRarities.some((rarity) => !rarity)) { status.textContent = "Choisis une rareté pour chaque carte du booster."; return; }
-    saveButton.disabled = true; status.textContent = "Création du booster évènementiel…";
+    saveButton.disabled = true; status.textContent = editingEventBooster ? "Enregistrement des modifications…" : "Création du booster évènementiel…";
     try {
-        const eventId = crypto.randomUUID();
+        const eventId = editingEventBooster?.id || crypto.randomUUID();
         const file = document.getElementById("eventBoosterImageFile").files?.[0];
-        let imageUrl = "";
+        let imageUrl = editingEventBooster?.imageUrl || "";
         if (file) {
             const extension = file.type === "image/jpeg" ? "jpg" : file.type === "image/webp" ? "webp" : "png";
             const imageRef = ref(storage, "eventBoosters/" + auth.currentUser.uid + "/" + eventId + "." + extension);
             const uploaded = await uploadBytes(imageRef, file, { contentType: file.type });
             imageUrl = await getDownloadURL(uploaded.ref);
         }
-        let badge = null;
+        let badge = hasBadge && editingEventBooster?.badge ? { ...editingEventBooster.badge, name: document.getElementById("eventBoosterBadgeName").value.trim() } : null;
         if (hasBadge) {
             const badgeFile = document.getElementById("eventBoosterBadgeFile").files?.[0];
-            if (!badgeFile) throw new Error("Ajoute l’image du badge associé.");
-            if (!/^image\/(png|jpeg|webp)$/.test(badgeFile.type) || badgeFile.size > 5 * 1024 * 1024) throw new Error("L’image du badge doit être PNG, JPG ou WebP et ne pas dépasser 5 Mo.");
-            const badgeExtension = badgeFile.type === "image/jpeg" ? "jpg" : badgeFile.type === "image/webp" ? "webp" : "png";
-            const badgeRef = ref(storage, "eventBadges/" + auth.currentUser.uid + "/" + eventId + "." + badgeExtension);
-            const badgeUpload = await uploadBytes(badgeRef, badgeFile, { contentType: badgeFile.type });
-            badge = { name: document.getElementById("eventBoosterBadgeName").value.trim(), imageUrl: await getDownloadURL(badgeUpload.ref) };
+            if (badgeFile) {
+                if (!/^image\/(png|jpeg|webp)$/.test(badgeFile.type) || badgeFile.size > 5 * 1024 * 1024) throw new Error("L’image du badge doit être PNG, JPG ou WebP et ne pas dépasser 5 Mo.");
+                const badgeExtension = badgeFile.type === "image/jpeg" ? "jpg" : badgeFile.type === "image/webp" ? "webp" : "png";
+                const badgeRef = ref(storage, "eventBadges/" + auth.currentUser.uid + "/" + eventId + "." + badgeExtension);
+                const badgeUpload = await uploadBytes(badgeRef, badgeFile, { contentType: badgeFile.type });
+                badge = { name: document.getElementById("eventBoosterBadgeName").value.trim(), imageUrl: await getDownloadURL(badgeUpload.ref) };
+            } else if (!badge?.imageUrl) throw new Error("Ajoute l’image du badge associé.");
         }
-        await callSaveEventBooster({ eventId, name: document.getElementById("eventBoosterName").value.trim(),
-            availableOn: document.getElementById("eventBoosterDate").value, cardRarities, imageUrl, badge, allPlayers, recipientUids });
-        document.getElementById("eventBoosterForm").reset();
-        document.getElementById("eventBoosterCardCount").value = "5";
-        document.getElementById("eventBoosterAllPlayers").checked = true;
-        document.getElementById("eventBoosterPlayersWrap").classList.add("hidden");
-        document.getElementById("eventBoosterImagePreview").classList.add("hidden");
-        document.getElementById("eventBoosterHasBadge").checked = false;
-        document.getElementById("eventBoosterHasBadge").dispatchEvent(new Event("change"));
-        document.getElementById("eventBoosterBadgePreview").classList.add("hidden");
-        renderEventBoosterRarityRows();
-        status.textContent = "Booster créé. Il sera proposé aux joueurs concernés à partir de la date choisie.";
+        const payload = { eventId, name: document.getElementById("eventBoosterName").value.trim(),
+            availableOn: document.getElementById("eventBoosterDate").value, cardRarities, imageUrl, badge, allPlayers, recipientUids };
+        if (editingEventBooster) await callUpdateEventBooster(payload); else await callSaveEventBooster(payload);
+        const wasEditing = Boolean(editingEventBooster);
+        resetEventBoosterForm();
+        status.textContent = wasEditing ? "Modifications enregistrées. Le booster reste modifiable jusqu’à sa date d’apparition." : "Booster créé. Il sera proposé aux joueurs concernés à partir de la date choisie.";
         await loadAdminEventBoosters();
     } catch (error) {
-        console.error("Impossible de créer le booster évènementiel :", error);
-        status.textContent = error.message || "Création refusée. Vérifie les fonctions Booster et les règles Storage.";
+        console.error("Impossible d’enregistrer le booster évènementiel :", error);
+        status.textContent = error.message || "Enregistrement refusé. Vérifie les fonctions Booster et les règles Storage.";
     } finally { saveButton.disabled = false; }
+});
+document.getElementById("eventBoosterCancelEditButton").addEventListener("click", () => {
+    resetEventBoosterForm();
+    document.getElementById("eventBoosterAdminStatus").textContent = "Modification annulée.";
 });
 
 eventBoostersMenuButton.addEventListener("click", async () => {
