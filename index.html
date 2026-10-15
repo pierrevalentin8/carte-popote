@@ -1526,13 +1526,34 @@ body {
 .booster-pack-reveal.is-opening::before { position: absolute; inset: 15%; border-radius: 50%; background: #ffd95a; content: ""; opacity: 0; animation: booster-flash .95s ease-out both; }
 .booster-result-grid { grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 9px; }
 .booster-card-reveal { opacity: 0; transform: rotateY(65deg) scale(.88); animation: booster-card-reveal .55s cubic-bezier(.2,.8,.2,1) both; animation-delay: var(--card-reveal-delay, 0ms); }
+.booster-card-stage { position: relative; display: grid; place-items: center; min-height: 330px; margin: 14px 0 8px; padding: 18px; overflow: hidden; border-radius: 18px; background: radial-gradient(ellipse at 50% 45%, #fff9e8, #e9eef8 75%); }
+.booster-card-stage[hidden] { display: none; }
+.booster-card-stage-card { position: relative; display: grid; place-items: center; width: min(58vw, 220px); min-height: 290px; cursor: grab; touch-action: pan-y; user-select: none; }
+.booster-card-stack-back { position: absolute; z-index: 0; width: 94%; height: 90%; border: 3px solid #d5a83c; border-radius: 12px; background: linear-gradient(145deg, #174b93, #071c48 72%); box-shadow: 0 8px 15px rgba(10,28,57,.25); pointer-events: none; }
+.booster-card-stack-back::after { position: absolute; inset: 10px; display: grid; place-items: center; border: 1px solid rgba(255,220,120,.55); border-radius: 7px; color: #ffd45e; content: "✦"; font-size: 36px; }
+.booster-card-stage-card .player-card { position: relative; z-index: 2; }
+.booster-card-stage-card:active { cursor: grabbing; }
+.booster-card-stage-card .player-card { width: 100%; min-height: 290px; }
+.booster-card-stage-card .player-card-image, .booster-card-stage-card .player-card-placeholder { aspect-ratio: 2 / 3; }
+.booster-card-stage-card.is-swiping { transition: transform .24s ease, opacity .24s ease; }
+.booster-card-stage-card.is-dismissed { opacity: 0; transform: translate(var(--swipe-x, 120%), var(--swipe-y, -10%)) rotate(var(--swipe-rotate, 14deg)) scale(.84); }
+.booster-reveal-progress { margin: 0; color: #173b52; font-size: 13px; font-weight: 800; text-align: center; }
+.booster-next-card-button { display: block; margin: 8px auto 0; }
+.booster-sparkles { position: absolute; z-index: 4; inset: -14px; pointer-events: none; }
+.booster-sparkles::before, .booster-sparkles::after { position: absolute; color: var(--sparkle-color); content: "✦  ✧  ✦"; font-size: 24px; letter-spacing: 14px; text-shadow: 0 0 12px currentColor; animation: booster-sparkle-burst .85s ease-out both; }
+.booster-sparkles::before { top: 10%; left: 0; }
+.booster-sparkles::after { right: 0; bottom: 12%; animation-delay: .1s; }
+.booster-sparkles.is-gold { --sparkle-color: #f4b900; }
+.booster-sparkles.is-violet { --sparkle-color: #a855f7; }
 @keyframes booster-opening { 0%, 100% { transform: rotate(0) scale(1); } 15% { transform: rotate(-7deg) translateX(-5px); } 30% { transform: rotate(7deg) translateX(5px); } 45% { transform: rotate(-5deg); } 60% { transform: rotate(5deg); } 78% { transform: translateY(-10px) scale(1.08); } }
 @keyframes booster-flash { 25% { opacity: .2; transform: scale(.65); } 68% { opacity: .9; transform: scale(1.25); } 100% { opacity: 0; transform: scale(1.8); } }
 @keyframes booster-card-reveal { to { opacity: 1; transform: rotateY(0) scale(1); } }
+@keyframes booster-sparkle-burst { 0% { opacity: 0; transform: scale(.35) rotate(-18deg); } 35% { opacity: 1; } 100% { opacity: 0; transform: scale(1.25) rotate(18deg); } }
 .booster-modal-actions { display: flex; gap: 10px; margin-top: 16px; }
 .booster-modal-actions button { flex: 1; }
 @media (max-width: 600px) { .booster-modal-actions { flex-direction: column; } }
-@media (prefers-reduced-motion: reduce) { .booster-pack-reveal.is-opening img, .booster-pack-reveal.is-opening::before, .booster-card-reveal { animation-duration: .01ms; animation-delay: 0ms; } }
+@media (max-width: 600px) { .booster-card-stage { min-height: 290px; padding: 12px; } .booster-card-stage-card { width: min(64vw, 205px); min-height: 255px; } .booster-card-stage-card .player-card { min-height: 255px; } }
+@media (prefers-reduced-motion: reduce) { .booster-pack-reveal.is-opening img, .booster-pack-reveal.is-opening::before, .booster-card-reveal, .booster-sparkles::before, .booster-sparkles::after { animation-duration: .01ms; animation-delay: 0ms; } }
 .owned-card-grid { margin-bottom: 24px; }
 
 /* Écran de connexion : thème bleu nuit et or, conçu d’abord pour mobile. */
@@ -2626,6 +2647,11 @@ body {
                 <img id="boosterRevealImage" src="./Booster%20normal.png" alt="Booster en cours d’ouverture">
                 <p id="boosterRevealLabel">Le booster s’ouvre…</p>
             </div>
+            <div id="boosterCardStage" class="booster-card-stage" hidden aria-live="polite">
+                <div id="boosterStageCard" class="booster-card-stage-card" aria-label="Fais glisser la carte pour découvrir la suivante"></div>
+            </div>
+            <p id="boosterRevealProgress" class="booster-reveal-progress hidden"></p>
+            <button id="boosterNextCardButton" class="secondary-button booster-next-card-button hidden" type="button">Découvrir la carte suivante →</button>
             <div id="boosterResultGrid" class="player-card-grid booster-result-grid hidden"></div>
             <div class="booster-modal-actions">
                 <button id="closeBoosterResultButton" class="secondary-button" type="button">Fermer</button>
@@ -3312,6 +3338,10 @@ const openDailyBoosterButton = document.getElementById("openDailyBoosterButton")
 const boosterPurchaseStatus = document.getElementById("boosterPurchaseStatus");
 const boosterResultModal = document.getElementById("boosterResultModal");
 const boosterResultGrid = document.getElementById("boosterResultGrid");
+const boosterCardStage = document.getElementById("boosterCardStage");
+const boosterStageCard = document.getElementById("boosterStageCard");
+const boosterRevealProgress = document.getElementById("boosterRevealProgress");
+const boosterNextCardButton = document.getElementById("boosterNextCardButton");
 const openNextBoosterButton = document.getElementById("openNextBoosterButton");
 const boosterPackReveal = document.getElementById("boosterPackReveal");
 const boosterRevealImage = document.getElementById("boosterRevealImage");
@@ -3319,6 +3349,11 @@ const boosterRevealLabel = document.getElementById("boosterRevealLabel");
 const boosterResultTitle = document.getElementById("boosterResultTitle");
 const boosterResultDescription = document.getElementById("boosterResultDescription");
 const viewOwnedCardsButton = document.getElementById("viewOwnedCardsButton");
+let boosterRevealQueue = [];
+let boosterRevealIndex = 0;
+let boosterRevealBusy = false;
+let boosterSwipeStart = null;
+let ignoreBoosterCardClick = false;
 const ownedCardsStatus = document.getElementById("ownedCardsStatus");
 const ownedPlayerCardGrid = document.getElementById("ownedPlayerCardGrid");
 const collectionPageIndicator = document.getElementById("collectionPageIndicator");
@@ -6088,17 +6123,34 @@ function wait(milliseconds) {
 }
 
 async function showBoosterResults(cards, boostersOfferts = 0, boosterType = "classique") {
-    const groupedCards = groupCardCopies(cards);
+    const cardRarityRank = (card) => {
+        const rarity = normalizeCardCategory(card.rarity);
+        if (rarity.includes("myst")) return 3;
+        if (rarity.includes("legend")) return 2;
+        if (rarity.includes("rare")) return 1;
+        if (rarity.includes("comm")) return 0;
+        return 1;
+    };
+    const orderedCards = [...cards].sort((a, b) => cardRarityRank(a) - cardRarityRank(b));
     boosterResultGrid.replaceChildren();
+    boosterStageCard.replaceChildren();
+    boosterRevealProgress.classList.add("hidden");
+    boosterNextCardButton.classList.add("hidden");
+    boosterCardStage.hidden = true;
+    boosterRevealQueue = orderedCards;
+    boosterRevealIndex = 0;
+    boosterRevealBusy = false;
     boosterResultTitle.textContent = "🎁 Ton booster arrive !";
-    boosterResultDescription.textContent = "Le booster s’ouvre…";
+    boosterResultDescription.textContent = "Les cartes apparaîtront de la moins rare à la plus rare.";
     boosterRevealImage.src = boosterType === "journalier" ? "./Booster%20Journalier.png" : "./Booster%20normal.png";
     boosterRevealImage.alt = boosterType === "journalier" ? "Booster journalier en cours d’ouverture" : "Booster classique en cours d’ouverture";
     boosterRevealLabel.textContent = "Le booster s’ouvre…";
     boosterPackReveal.classList.remove("hidden", "is-opening");
     boosterResultGrid.classList.add("hidden");
     viewOwnedCardsButton.disabled = true;
+    viewOwnedCardsButton.classList.add("hidden");
     openNextBoosterButton.disabled = true;
+    openNextBoosterButton.classList.add("hidden");
     boosterResultModal.classList.remove("hidden");
 
     if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
@@ -6108,28 +6160,111 @@ async function showBoosterResults(cards, boostersOfferts = 0, boosterType = "cla
 
     boosterPackReveal.classList.add("hidden");
     boosterPackReveal.classList.remove("is-opening");
-    groupedCards.forEach((card, index) => {
-        const element = createPlayerCardElement(card, card.quantity);
-        element.classList.add("booster-card-reveal");
-        element.style.setProperty("--card-reveal-delay", (index * 160) + "ms");
-        boosterResultGrid.append(element);
-    });
-    boosterResultGrid.classList.remove("hidden");
-    boosterRevealLabel.textContent = "Cartes révélées !";
-    const revealDuration = window.matchMedia("(prefers-reduced-motion: reduce)").matches
-        ? 20
-        : Math.max(550, (groupedCards.length - 1) * 160 + 550);
-    await wait(revealDuration);
+    if (!orderedCards.length) {
+        boosterResultGrid.classList.remove("hidden");
+    } else {
+        boosterRevealIndex = 0;
+        renderBoosterRevealCard();
+    }
 
     const cardMessage = cards.length + (cards.length > 1 ? " cartes ont été ajoutées à ta collection." : " carte a été ajoutée à ta collection.");
     const rewardMessage = Number(boostersOfferts) > 0
         ? " 🎉 Nouveau palier atteint : " + boostersOfferts + (Number(boostersOfferts) > 1 ? " boosters classiques t’ont été offerts !" : " booster classique t’a été offert !")
         : "";
-    boosterResultTitle.textContent = "🎉 Booster ouvert !";
-    boosterResultDescription.textContent = cardMessage + rewardMessage;
-    viewOwnedCardsButton.disabled = false;
-    openNextBoosterButton.disabled = false;
+    boosterResultDescription.dataset.finalMessage = cardMessage + rewardMessage;
 }
+
+function renderBoosterRevealCard() {
+    const card = boosterRevealQueue[boosterRevealIndex];
+    if (!card) return;
+    boosterStageCard.replaceChildren();
+    const backsToShow = Math.min(3, boosterRevealQueue.length - boosterRevealIndex - 1);
+    for (let index = backsToShow; index > 0; index -= 1) {
+        const back = document.createElement("span");
+        back.className = "booster-card-stack-back";
+        back.setAttribute("aria-hidden", "true");
+        back.style.transform = `translate(${index * 6}px, ${index * -5}px) rotate(${index * 2}deg)`;
+        boosterStageCard.append(back);
+    }
+    const cardElement = createPlayerCardElement(card, 1);
+    cardElement.classList.add("booster-card-reveal");
+    cardElement.addEventListener("click", (event) => {
+        if (ignoreBoosterCardClick) {
+            event.preventDefault();
+            event.stopImmediatePropagation();
+            ignoreBoosterCardClick = false;
+        }
+    }, true);
+    const rarity = normalizeCardCategory(card.rarity);
+    if (rarity.includes("legend") || rarity.includes("myst")) {
+        const sparkles = document.createElement("span");
+        sparkles.className = "booster-sparkles " + (rarity.includes("myst") ? "is-violet" : "is-gold");
+        sparkles.setAttribute("aria-hidden", "true");
+        cardElement.append(sparkles);
+    }
+    boosterStageCard.append(cardElement);
+    boosterCardStage.hidden = false;
+    boosterRevealProgress.textContent = `Carte ${boosterRevealIndex + 1} sur ${boosterRevealQueue.length} — fais-la glisser pour découvrir la suivante`;
+    boosterRevealProgress.classList.remove("hidden");
+    boosterNextCardButton.textContent = boosterRevealIndex + 1 >= boosterRevealQueue.length ? "Terminer la découverte ✓" : "Découvrir la carte suivante →";
+    boosterNextCardButton.classList.remove("hidden");
+    boosterRevealLabel.textContent = "Carte " + (boosterRevealIndex + 1) + " révélée";
+}
+
+async function advanceBoosterReveal(direction = 1) {
+    if (boosterRevealBusy || !boosterRevealQueue.length) return;
+    boosterRevealBusy = true;
+    const card = boosterStageCard.querySelector(".player-card");
+    if (card) {
+        card.classList.add("is-swiping", "is-dismissed");
+        card.style.setProperty("--swipe-x", direction < 0 ? "-130%" : "130%");
+        card.style.setProperty("--swipe-y", direction < 0 ? "-8%" : "8%");
+        card.style.setProperty("--swipe-rotate", direction < 0 ? "-15deg" : "15deg");
+        await wait(window.matchMedia("(prefers-reduced-motion: reduce)").matches ? 0 : 240);
+    }
+    boosterRevealIndex += 1;
+    if (boosterRevealIndex < boosterRevealQueue.length) {
+        renderBoosterRevealCard();
+        boosterRevealBusy = false;
+        return;
+    }
+
+    boosterCardStage.hidden = true;
+    boosterRevealProgress.classList.add("hidden");
+    boosterNextCardButton.classList.add("hidden");
+    boosterResultGrid.replaceChildren();
+    groupCardCopies(boosterRevealQueue).forEach((group) => {
+        const element = createPlayerCardElement(group, group.quantity);
+        boosterResultGrid.append(element);
+    });
+    boosterResultGrid.classList.remove("hidden");
+    boosterResultTitle.textContent = "🎉 Booster ouvert !";
+    boosterResultDescription.textContent = boosterResultDescription.dataset.finalMessage || "Cartes révélées !";
+    boosterRevealLabel.textContent = "Cartes révélées !";
+    viewOwnedCardsButton.disabled = false;
+    viewOwnedCardsButton.classList.remove("hidden");
+    openNextBoosterButton.disabled = false;
+    openNextBoosterButton.classList.toggle("hidden", openNormalBoosterButton.disabled);
+    boosterRevealBusy = false;
+}
+
+boosterNextCardButton.addEventListener("click", () => advanceBoosterReveal());
+boosterStageCard.addEventListener("pointerdown", (event) => {
+    if (boosterRevealBusy || boosterCardStage.hidden) return;
+    boosterSwipeStart = { x: event.clientX, y: event.clientY, pointerId: event.pointerId };
+    boosterStageCard.setPointerCapture(event.pointerId);
+});
+boosterStageCard.addEventListener("pointerup", (event) => {
+    if (!boosterSwipeStart || boosterSwipeStart.pointerId !== event.pointerId) return;
+    const deltaX = event.clientX - boosterSwipeStart.x;
+    const deltaY = event.clientY - boosterSwipeStart.y;
+    boosterSwipeStart = null;
+    if (Math.abs(deltaX) > 65 || Math.abs(deltaY) > 85) {
+        ignoreBoosterCardClick = true;
+        advanceBoosterReveal(deltaX < 0 ? -1 : 1);
+    }
+});
+boosterStageCard.addEventListener("pointercancel", () => { boosterSwipeStart = null; });
 
 document.getElementById("closeBoosterResultButton").addEventListener("click", () => {
     boosterResultModal.classList.add("hidden");
