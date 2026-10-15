@@ -2983,8 +2983,12 @@ body {
                 <label>Illustration (PNG/JPG/WebP, max 5 Mo)<input id="serviceMissionImage" type="file" accept="image/png,image/jpeg,image/webp"></label><label>Activer la mission<input id="serviceMissionEnabled" type="checkbox" checked></label>
             </div><p id="serviceMissionImageStatus" class="admin-note">Image facultative.</p><button id="serviceMissionSave" class="primary-button" type="submit">Enregistrer la mission</button><button id="serviceMissionCancel" class="secondary-button hidden" type="button">Annuler</button></form><p id="serviceAdminStatus" class="admin-status" role="status" aria-live="polite"></p></div>
         </div>
-        <div id="adminEffectifSection" class="admin-panel admin-section hidden" style="margin-bottom:16px">
-            <h3>👥 Effectif</h3>
+    </section>
+
+    <section id="effectifPage" class="admin-page hidden" aria-labelledby="effectifPageTitle">
+        <button id="effectifBackButton" class="admin-back" type="button">← Retour à l’accueil</button>
+        <div class="admin-panel">
+            <h2 id="effectifPageTitle">👥 Effectif</h2>
             <p class="admin-note"><img src="./Jeton.png" alt="Jeton classique" style="width:18px;height:18px;vertical-align:middle;object-fit:contain"> Montant mensuel à attribuer aux joueurs. Coche la case pour autoriser le joueur à récupérer les futures récompenses collectives.</p>
             <div class="effectif-toolbar">
                 <label for="effectifMonthInput">Nouveau mois<input id="effectifMonthInput" type="month"></label>
@@ -3529,6 +3533,8 @@ let archivesClaimInProgress = false;
 
 const adminButton = document.getElementById("adminButton");
 const effectifMenuButton = document.getElementById("effectifMenuButton");
+const effectifPage = document.getElementById("effectifPage");
+const effectifBackButton = document.getElementById("effectifBackButton");
 const eventBoostersMenuButton = document.getElementById("eventBoostersMenuButton");
 const eventBoostersAdminPage = document.getElementById("eventBoostersAdminPage");
 const eventBoostersBackButton = document.getElementById("eventBoostersBackButton");
@@ -3639,8 +3645,7 @@ const adminSections = {
     rarities: document.getElementById("adminRaritiesSection"),
     cards: document.getElementById("adminCardsSection"),
     gav: document.getElementById("adminGavSection"),
-    serviceMissions: document.getElementById("adminServiceMissionsSection"),
-    effectif: document.getElementById("adminEffectifSection")
+    serviceMissions: document.getElementById("adminServiceMissionsSection")
 };
 const minageAdminSelect = document.getElementById("minageAdminSelect");
 const minageCreateButton = document.getElementById("minageCreateButton");
@@ -4020,7 +4025,9 @@ onAuthStateChanged(
             collectionPage.classList.add("hidden");
     recyclingPage.classList.add("hidden");
             adminPage.classList.add("hidden");
+    effectifPage.classList.add("hidden");
             eventBoostersAdminPage.classList.add("hidden");
+    effectifPage.classList.add("hidden");
             eventBoosterPromptModal.classList.add("hidden");
             eventBoosterPromptModal.setAttribute("aria-hidden", "true");
             boosterResultModal.classList.add("hidden");
@@ -4260,12 +4267,15 @@ function showHomePage() {
     collectionPage.classList.add("hidden");
     recyclingPage.classList.add("hidden");
     adminPage.classList.add("hidden");
+    effectifPage.classList.add("hidden");
     eventBoostersAdminPage.classList.add("hidden");
+    effectifPage.classList.add("hidden");
     messagingPage.classList.add("hidden");
     rulesPage.classList.add("hidden");
     premiumPage.classList.add("hidden");
     archivesPage.classList.add("hidden");
     eventBoostersAdminPage.classList.add("hidden");
+    effectifPage.classList.add("hidden");
     bottomNav.classList.remove("hidden");
     collectionNavButton.classList.remove("active");
     recyclingNavButton.classList.remove("active");
@@ -4276,7 +4286,7 @@ async function showDrawnCardsPage() {
     if (!auth.currentUser || (auth.currentUser.email || "").toLowerCase() !== ADMIN_EMAIL || isPlayerPreview) return;
     dropdownMenu.classList.add("hidden");
     document.querySelector(".app-content").classList.add("hidden");
-    [termsPage, financePage, profilePage, leaderboardPage, statisticsPage, collectionPage, recyclingPage, adminPage, eventBoostersAdminPage, messagingPage, rulesPage, premiumPage, archivesPage].forEach((page) => page.classList.add("hidden"));
+    [termsPage, financePage, profilePage, leaderboardPage, statisticsPage, collectionPage, recyclingPage, adminPage, eventBoostersAdminPage, effectifPage, messagingPage, rulesPage, premiumPage, archivesPage].forEach((page) => page.classList.add("hidden"));
     drawnCardsPage.classList.remove("hidden");
     bottomNav.classList.add("hidden");
     drawnCardsTotal.textContent = "Chargement du total…";
@@ -4417,7 +4427,7 @@ async function openArchivesPage() {
     if (!auth.currentUser) return;
     dropdownMenu.classList.add("hidden");
     document.querySelector(".app-content").classList.add("hidden");
-    [termsPage, financePage, profilePage, leaderboardPage, statisticsPage, collectionPage, recyclingPage, adminPage, eventBoostersAdminPage, messagingPage, rulesPage, premiumPage].forEach((page) => page.classList.add("hidden"));
+    [termsPage, financePage, profilePage, leaderboardPage, statisticsPage, collectionPage, recyclingPage, adminPage, eventBoostersAdminPage, effectifPage, messagingPage, rulesPage, premiumPage].forEach((page) => page.classList.add("hidden"));
     bottomNav.classList.add("hidden");
     archivesPage.classList.remove("hidden");
     await loadServicePage();
@@ -5026,7 +5036,7 @@ financeMenuButton.addEventListener("click", async () => {
     if (!isCurrentUserAdmin() || isPlayerPreview) return;
     dropdownMenu.classList.add("hidden");
     document.querySelector(".app-content").classList.add("hidden");
-    [premiumPage, profilePage, leaderboardPage, statisticsPage, collectionPage, recyclingPage, adminPage, eventBoostersAdminPage, messagingPage, rulesPage].forEach((page) => page.classList.add("hidden"));
+    [premiumPage, profilePage, leaderboardPage, statisticsPage, collectionPage, recyclingPage, adminPage, eventBoostersAdminPage, effectifPage, messagingPage, rulesPage].forEach((page) => page.classList.add("hidden"));
     bottomNav.classList.add("hidden");
     archivesPage.classList.add("hidden");
     financePage.classList.remove("hidden");
@@ -5097,7 +5107,9 @@ async function openPremiumPage() {
     collectionPage.classList.add("hidden");
     recyclingPage.classList.add("hidden");
     adminPage.classList.add("hidden");
+    effectifPage.classList.add("hidden");
     eventBoostersAdminPage.classList.add("hidden");
+    effectifPage.classList.add("hidden");
     messagingPage.classList.add("hidden");
     rulesPage.classList.add("hidden");
     bottomNav.classList.add("hidden");
@@ -5406,7 +5418,7 @@ function setPlayerPreview(enabled) {
     premiumAdminPanel.classList.toggle("hidden", enabled);
     playerPreviewBanner.classList.toggle("hidden", !enabled);
     playerPreviewToggle.textContent = enabled ? "🛡️ Revenir au mode Admin" : "👤 Joueur normal";
-    if (enabled && (!adminPage.classList.contains("hidden") || !messagingPage.classList.contains("hidden") || !eventBoostersAdminPage.classList.contains("hidden"))) showHomePage();
+    if (enabled && (!adminPage.classList.contains("hidden") || !messagingPage.classList.contains("hidden") || !eventBoostersAdminPage.classList.contains("hidden") || !effectifPage.classList.contains("hidden"))) showHomePage();
     if (!premiumPage.classList.contains("hidden")) loadPremiumWheel();
 }
 
@@ -5664,7 +5676,9 @@ playerProfileHomeButton.addEventListener("click", async () => {
     collectionPage.classList.add("hidden");
     recyclingPage.classList.add("hidden");
     adminPage.classList.add("hidden");
+    effectifPage.classList.add("hidden");
     eventBoostersAdminPage.classList.add("hidden");
+    effectifPage.classList.add("hidden");
     messagingPage.classList.add("hidden");
     rulesPage.classList.add("hidden");
     bottomNav.classList.add("hidden");
@@ -5896,7 +5910,9 @@ statisticsMenuButton.addEventListener("click", async () => {
     collectionPage.classList.add("hidden");
     recyclingPage.classList.add("hidden");
     adminPage.classList.add("hidden");
+    effectifPage.classList.add("hidden");
     eventBoostersAdminPage.classList.add("hidden");
+    effectifPage.classList.add("hidden");
     messagingPage.classList.add("hidden");
     rulesPage.classList.add("hidden");
     bottomNav.classList.add("hidden");
@@ -5916,7 +5932,9 @@ leaderboardMenuButton.addEventListener("click", async () => {
     collectionPage.classList.add("hidden");
     recyclingPage.classList.add("hidden");
     adminPage.classList.add("hidden");
+    effectifPage.classList.add("hidden");
     eventBoostersAdminPage.classList.add("hidden");
+    effectifPage.classList.add("hidden");
     messagingPage.classList.add("hidden");
     rulesPage.classList.add("hidden");
     bottomNav.classList.add("hidden");
@@ -6715,6 +6733,7 @@ document.getElementById("viewOwnedCardsButton").addEventListener("click", async 
     boosterResultModal.classList.add("hidden");
     document.querySelector(".app-content").classList.add("hidden");
     adminPage.classList.add("hidden");
+    effectifPage.classList.add("hidden");
     messagingPage.classList.add("hidden");
     rulesPage.classList.add("hidden");
     archivesPage.classList.add("hidden");
@@ -6903,6 +6922,7 @@ collectionNavButton.addEventListener("click", async () => {
     leaderboardPage.classList.add("hidden");
     statisticsPage.classList.add("hidden");
     adminPage.classList.add("hidden");
+    effectifPage.classList.add("hidden");
     messagingPage.classList.add("hidden");
     rulesPage.classList.add("hidden");
     recyclingPage.classList.add("hidden");
@@ -6922,6 +6942,7 @@ recyclingNavButton.addEventListener("click", async () => {
     statisticsPage.classList.add("hidden");
     collectionPage.classList.add("hidden");
     adminPage.classList.add("hidden");
+    effectifPage.classList.add("hidden");
     messagingPage.classList.add("hidden");
     rulesPage.classList.add("hidden");
     archivesPage.classList.add("hidden");
@@ -7398,7 +7419,7 @@ eventBoostersMenuButton.addEventListener("click", async () => {
     if (!isCurrentUserAdmin() || isPlayerPreview) return;
     dropdownMenu.classList.add("hidden");
     [termsPage, financePage, profilePage, leaderboardPage, statisticsPage, drawnCardsPage, collectionPage, recyclingPage,
-        adminPage, messagingPage, rulesPage, premiumPage, archivesPage].forEach((page) => page.classList.add("hidden"));
+        adminPage, effectifPage, messagingPage, rulesPage, premiumPage, archivesPage].forEach((page) => page.classList.add("hidden"));
     document.querySelector(".app-content").classList.add("hidden");
     bottomNav.classList.add("hidden");
     eventBoostersAdminPage.classList.remove("hidden");
@@ -7428,7 +7449,6 @@ async function showAdminSection(sectionName) {
     }
     if (sectionName === "gav") await loadAdminGavSettings();
     if (sectionName === "serviceMissions") await loadAdminServiceMissions();
-    if (sectionName === "effectif") await loadAdminEffectif();
 }
 
 let adminEffectifMonths = [];
@@ -8546,20 +8566,14 @@ adminButton.addEventListener("click", async () => {
 effectifMenuButton.addEventListener("click", async () => {
     if (!auth.currentUser || (auth.currentUser.email || "").toLowerCase() !== ADMIN_EMAIL || isPlayerPreview) return;
     dropdownMenu.classList.add("hidden");
-    premiumPage.classList.add("hidden");
+    [termsPage, financePage, premiumPage, profilePage, leaderboardPage, statisticsPage, drawnCardsPage, collectionPage,
+        recyclingPage, adminPage, eventBoostersAdminPage, effectifPage, messagingPage, rulesPage, archivesPage].forEach((page) => page.classList.add("hidden"));
     document.querySelector(".app-content").classList.add("hidden");
-    profilePage.classList.add("hidden");
-    leaderboardPage.classList.add("hidden");
-    statisticsPage.classList.add("hidden");
-    collectionPage.classList.add("hidden");
-    recyclingPage.classList.add("hidden");
-    messagingPage.classList.add("hidden");
-    rulesPage.classList.add("hidden");
     bottomNav.classList.add("hidden");
-    archivesPage.classList.add("hidden");
-    adminPage.classList.remove("hidden");
-    await showAdminSection("effectif");
+    effectifPage.classList.remove("hidden");
+    await loadAdminEffectif();
 });
+effectifBackButton.addEventListener("click", showHomePage);
 
 adminMessagesMenuButton.addEventListener("click", async () => {
     if (!auth.currentUser || (auth.currentUser.email || "").toLowerCase() !== ADMIN_EMAIL) return;
@@ -8572,6 +8586,7 @@ adminMessagesMenuButton.addEventListener("click", async () => {
     collectionPage.classList.add("hidden");
     recyclingPage.classList.add("hidden");
     adminPage.classList.add("hidden");
+    effectifPage.classList.add("hidden");
     rulesPage.classList.add("hidden");
     bottomNav.classList.add("hidden");
     archivesPage.classList.add("hidden");
