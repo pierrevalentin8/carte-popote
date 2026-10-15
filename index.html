@@ -1840,6 +1840,24 @@ body {
 .admin-menu-button:hover { transform: translateY(-1px); background: #183966; }
 .admin-menu-button[aria-pressed="true"] { background: linear-gradient(135deg, var(--theme-gold-light), #edb52b); color: var(--theme-navy); }
 .admin-section { scroll-margin-top: 82px; }
+.effectif-toolbar { display:flex; flex-wrap:wrap; align-items:end; gap:10px; margin:12px 0; }
+.effectif-toolbar label { display:grid; gap:5px; color:var(--theme-ink); font-size:12px; font-weight:700; }
+.effectif-toolbar input { min-height:40px; padding:7px 9px; border:1px solid #d8c99f; border-radius:8px; background:#fffefa; color:var(--theme-ink); font:inherit; }
+.effectif-add-month { width:42px; min-width:42px; height:42px; padding:0; font-size:24px; line-height:1; }
+.effectif-table-wrap { width:100%; overflow:auto; border:1px solid #d8c99f; border-radius:10px; background:#fffefa; }
+.effectif-table { width:100%; min-width:640px; border-collapse:collapse; color:var(--theme-ink); }
+.effectif-table th,.effectif-table td { padding:9px 8px; border-bottom:1px solid #e8dfca; text-align:center; }
+.effectif-table th { position:sticky; top:0; z-index:1; background:#10264a; color:#fff; font-size:12px; }
+.effectif-table th:first-child,.effectif-table td:first-child { position:sticky; left:0; z-index:2; min-width:150px; text-align:left; }
+.effectif-table td:first-child { background:#fffefa; font-weight:800; }
+.effectif-table td:last-child { min-width:160px; }
+.effectif-month-heading { display:grid; justify-items:center; gap:3px; }
+.effectif-month-heading img { width:20px; height:20px; object-fit:contain; }
+.effectif-token-input { width:90px; max-width:100%; padding:7px; border:1px solid #d8c99f; border-radius:7px; text-align:center; font:inherit; }
+.effectif-eligibility { display:inline-flex; align-items:center; justify-content:center; gap:6px; white-space:nowrap; font-size:12px; font-weight:700; }
+.effectif-eligibility input { width:18px; height:18px; accent-color:#19753c; }
+.effectif-row-save { width:auto; min-width:82px; height:34px; margin:5px 0 0; padding:6px 9px; border-radius:7px; font-size:12px; }
+.effectif-status { min-height:22px; margin:8px 0; color:var(--theme-muted); font-size:12px; }
 .admin-page > .admin-note, .player-collection .admin-note, .player-collection .admin-status { color: #c6d2e5; }
 .admin-panel h3 { color: var(--theme-ink); }
 .admin-panel .secondary-button, .booster-modal-actions .secondary-button, .admin-back {
@@ -2775,6 +2793,7 @@ body {
             <button class="admin-menu-button" type="button" data-admin-section="rarities" aria-controls="adminRaritiesSection" aria-pressed="false">⭐ Catégories de rareté</button>
             <button class="admin-menu-button" type="button" data-admin-section="cards" aria-controls="adminCardsSection" aria-pressed="false">🃏 Création de cartes</button>
             <button class="admin-menu-button" type="button" data-admin-section="serviceMissions" aria-controls="adminServiceMissionsSection" aria-pressed="false">📋 Gestion des missions</button>
+            <button class="admin-menu-button" type="button" data-admin-section="effectif" aria-controls="adminEffectifSection" aria-pressed="false">👥 Effectif</button>
         </nav>
         <p id="adminSectionHint" class="admin-note">Choisis une rubrique pour afficher son contenu.</p>
         <div id="adminJournalSection" class="admin-panel admin-section hidden" style="margin-bottom:16px">
@@ -2896,6 +2915,16 @@ body {
                 <label>Catégories (séparées par des virgules)<input id="serviceMissionCategories" placeholder="Unité, Véhicule"></label><label>Cartes éligibles<select id="serviceMissionCards" multiple size="5"></select></label>
                 <label>Illustration (PNG/JPG/WebP, max 5 Mo)<input id="serviceMissionImage" type="file" accept="image/png,image/jpeg,image/webp"></label><label>Activer la mission<input id="serviceMissionEnabled" type="checkbox" checked></label>
             </div><p id="serviceMissionImageStatus" class="admin-note">Image facultative.</p><button id="serviceMissionSave" class="primary-button" type="submit">Enregistrer la mission</button><button id="serviceMissionCancel" class="secondary-button hidden" type="button">Annuler</button></form><p id="serviceAdminStatus" class="admin-status" role="status" aria-live="polite"></p></div>
+        </div>
+        <div id="adminEffectifSection" class="admin-panel admin-section hidden" style="margin-bottom:16px">
+            <h3>👥 Effectif</h3>
+            <p class="admin-note"><img src="./Jeton.png" alt="Jeton classique" style="width:18px;height:18px;vertical-align:middle;object-fit:contain"> Montant mensuel à attribuer aux joueurs. Coche la case pour autoriser le joueur à récupérer les futures récompenses collectives.</p>
+            <div class="effectif-toolbar">
+                <label for="effectifMonthInput">Nouveau mois<input id="effectifMonthInput" type="month"></label>
+                <button id="effectifAddMonthButton" class="primary-button effectif-add-month" type="button" aria-label="Ajouter le mois au tableau" title="Ajouter le mois">+</button>
+            </div>
+            <p id="effectifStatus" class="effectif-status" role="status" aria-live="polite"></p>
+            <div class="effectif-table-wrap"><table class="effectif-table"><thead id="effectifTableHead"></thead><tbody id="effectifTableBody"></tbody></table></div>
         </div>
     </section>
 
@@ -3074,6 +3103,9 @@ const callClaimArchivesSortingReward = httpsCallable(functions, "claimArchivesSo
 const callGetServiceMissions = httpsCallable(functions, "getServiceMissions");
 const callGetAdminServiceMissions = httpsCallable(functions, "getAdminServiceMissions");
 const callSaveServiceMission = httpsCallable(functions, "saveServiceMission");
+const callGetAdminEffectif = httpsCallable(functions, "getAdminEffectif");
+const callAddEffectifMonth = httpsCallable(functions, "addEffectifMonth");
+const callSaveEffectifPlayer = httpsCallable(functions, "saveEffectifPlayer");
 const callStartServiceMission = httpsCallable(functions, "startServiceMission");
 const callClaimServiceMissionReward = httpsCallable(functions, "claimServiceMissionReward");
 const callGetAdminGavSettings = httpsCallable(functions, "getAdminGavSettings");
@@ -3516,7 +3548,8 @@ const adminSections = {
     rarities: document.getElementById("adminRaritiesSection"),
     cards: document.getElementById("adminCardsSection"),
     gav: document.getElementById("adminGavSection"),
-    serviceMissions: document.getElementById("adminServiceMissionsSection")
+    serviceMissions: document.getElementById("adminServiceMissionsSection"),
+    effectif: document.getElementById("adminEffectifSection")
 };
 const minageAdminSelect = document.getElementById("minageAdminSelect");
 const minageCreateButton = document.getElementById("minageCreateButton");
@@ -6985,6 +7018,106 @@ async function showAdminSection(sectionName) {
     }
     if (sectionName === "gav") await loadAdminGavSettings();
     if (sectionName === "serviceMissions") await loadAdminServiceMissions();
+    if (sectionName === "effectif") await loadAdminEffectif();
+}
+
+let adminEffectifMonths = [];
+let adminEffectifPlayers = [];
+
+function formatEffectifMonth(month) {
+    const date = new Date(`${month}-01T00:00:00Z`);
+    return Number.isFinite(date.getTime())
+        ? new Intl.DateTimeFormat("fr-FR", { month: "long", year: "numeric", timeZone: "UTC" }).format(date)
+        : month;
+}
+
+async function loadAdminEffectif() {
+    const status = document.getElementById("effectifStatus");
+    status.textContent = "Chargement de l’effectif…";
+    try {
+        const response = await callGetAdminEffectif();
+        adminEffectifMonths = Array.isArray(response.data?.months) ? response.data.months : [];
+        adminEffectifPlayers = Array.isArray(response.data?.players) ? response.data.players : [];
+        renderAdminEffectif();
+        status.textContent = `${adminEffectifPlayers.length} joueur${adminEffectifPlayers.length === 1 ? "" : "s"} dans le tableau.`;
+    } catch (error) {
+        console.error("Impossible de charger l’effectif :", error);
+        status.textContent = error.message || "Impossible de charger l’effectif. Vérifie que les fonctions Effectif sont déployées.";
+    }
+}
+
+function renderAdminEffectif() {
+    const head = document.getElementById("effectifTableHead");
+    const body = document.getElementById("effectifTableBody");
+    head.replaceChildren(); body.replaceChildren();
+    const header = document.createElement("tr");
+    const playerHeading = document.createElement("th"); playerHeading.scope = "col"; playerHeading.textContent = "Joueur"; header.append(playerHeading);
+    adminEffectifMonths.forEach((month) => {
+        const cell = document.createElement("th"); cell.scope = "col";
+        const label = document.createElement("span"); label.className = "effectif-month-heading";
+        const name = document.createElement("span"); name.textContent = formatEffectifMonth(month);
+        const icon = document.createElement("img"); icon.src = "./Jeton.png"; icon.alt = "Jetons classiques";
+        label.append(name, icon); cell.append(label); header.append(cell);
+    });
+    const rewardsHeading = document.createElement("th"); rewardsHeading.scope = "col"; rewardsHeading.textContent = "Récompenses collectives"; header.append(rewardsHeading);
+    head.append(header);
+    if (!adminEffectifPlayers.length) {
+        const row = document.createElement("tr"); const cell = document.createElement("td");
+        cell.colSpan = adminEffectifMonths.length + 2; cell.textContent = "Aucun joueur inscrit."; row.append(cell); body.append(row); return;
+    }
+    adminEffectifPlayers.forEach((player) => {
+        const row = document.createElement("tr"); row.dataset.playerId = player.id;
+        const name = document.createElement("td"); name.textContent = player.pseudo || "Joueur"; row.append(name);
+        const amountInputs = new Map();
+        adminEffectifMonths.forEach((month) => {
+            const cell = document.createElement("td");
+            const input = document.createElement("input"); input.className = "effectif-token-input"; input.type = "number";
+            input.min = "0"; input.max = "1000000"; input.step = "1"; input.inputMode = "numeric";
+            input.setAttribute("aria-label", `${player.pseudo || "Joueur"}, jetons classiques pour ${formatEffectifMonth(month)}`);
+            input.placeholder = "0"; input.value = player.monthlyTokenAmounts?.[month] ?? "";
+            amountInputs.set(month, input); cell.append(input); row.append(cell);
+        });
+        const eligibilityCell = document.createElement("td");
+        const eligibilityLabel = document.createElement("label"); eligibilityLabel.className = "effectif-eligibility";
+        const eligibility = document.createElement("input"); eligibility.type = "checkbox"; eligibility.checked = player.collectiveRewardsEnabled !== false;
+        eligibility.setAttribute("aria-label", `Autoriser ${player.pseudo || "ce joueur"} à récupérer les récompenses collectives`);
+        const eligibilityText = document.createElement("span"); eligibilityText.textContent = "Autorisé";
+        eligibility.addEventListener("change", () => { eligibilityText.textContent = eligibility.checked ? "Autorisé" : "Bloqué"; });
+        eligibilityLabel.append(eligibility, eligibilityText);
+        const save = document.createElement("button"); save.type = "button"; save.className = "primary-button effectif-row-save"; save.textContent = "Enregistrer";
+        save.addEventListener("click", async () => {
+            save.disabled = true;
+            const status = document.getElementById("effectifStatus"); status.textContent = `Enregistrement de ${player.pseudo || "ce joueur"}…`;
+            try {
+                const monthlyTokenAmounts = Object.fromEntries([...amountInputs].map(([month, input]) => [month, input.value === "" ? 0 : Number(input.value)]));
+                await callSaveEffectifPlayer({ playerId: player.id, collectiveRewardsEnabled: eligibility.checked, monthlyTokenAmounts });
+                player.monthlyTokenAmounts = monthlyTokenAmounts; player.collectiveRewardsEnabled = eligibility.checked;
+                status.textContent = `Effectif de ${player.pseudo || "ce joueur"} enregistré.`;
+            } catch (error) {
+                console.error("Impossible d’enregistrer l’effectif du joueur :", error);
+                status.textContent = error.message || "Enregistrement refusé. Vérifie que les fonctions Effectif sont déployées.";
+            } finally { save.disabled = false; }
+        });
+        eligibilityCell.append(eligibilityLabel, document.createElement("br"), save); row.append(eligibilityCell); body.append(row);
+    });
+}
+
+async function addAdminEffectifMonth() {
+    const input = document.getElementById("effectifMonthInput");
+    const status = document.getElementById("effectifStatus");
+    if (!input.value) { status.textContent = "Choisis un mois à ajouter."; input.focus(); return; }
+    const button = document.getElementById("effectifAddMonthButton"); button.disabled = true;
+    status.textContent = "Ajout du mois…";
+    try {
+        const response = await callAddEffectifMonth({ month: input.value });
+        adminEffectifMonths = Array.isArray(response.data?.months) ? response.data.months : adminEffectifMonths;
+        renderAdminEffectif();
+        status.textContent = `${formatEffectifMonth(input.value)} ajouté au tableau.`;
+        input.value = "";
+    } catch (error) {
+        console.error("Impossible d’ajouter un mois à l’effectif :", error);
+        status.textContent = error.message || "Impossible d’ajouter le mois. Vérifie que les fonctions Effectif sont déployées.";
+    } finally { button.disabled = false; }
 }
 
 function serviceRewardSummary(mission) {
@@ -8023,6 +8156,7 @@ messagingBackButton.addEventListener("click", showHomePage);
 document.querySelectorAll(".admin-menu-button").forEach((button) => {
     button.addEventListener("click", () => showAdminSection(button.dataset.adminSection));
 });
+document.getElementById("effectifAddMonthButton").addEventListener("click", addAdminEffectifMonth);
 
 adminBackButton.addEventListener("click", closeAdminPage);
 
