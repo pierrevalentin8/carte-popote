@@ -2718,7 +2718,6 @@ body {
             <button class="admin-menu-button" type="button" data-admin-section="updates" aria-controls="adminUpdatesSection" aria-pressed="false">📢 Annonce MAJ</button>
             <button class="admin-menu-button" type="button" data-admin-section="rarities" aria-controls="adminRaritiesSection" aria-pressed="false">⭐ Catégories de rareté</button>
             <button class="admin-menu-button" type="button" data-admin-section="cards" aria-controls="adminCardsSection" aria-pressed="false">🃏 Création de cartes</button>
-            <button class="admin-menu-button" type="button" data-admin-section="gav" aria-controls="adminGavSection" aria-pressed="false">⛏️ Minage</button>
             <button class="admin-menu-button" type="button" data-admin-section="serviceMissions" aria-controls="adminServiceMissionsSection" aria-pressed="false">📋 Gestion des missions</button>
         </nav>
         <p id="adminSectionHint" class="admin-note">Choisis une rubrique pour afficher son contenu.</p>
@@ -7014,10 +7013,10 @@ function renderAdminServiceMissions() {
         const type = document.createElement("span"); type.textContent = mission.serviceType === "external" ? "Service externe" : "Service interne";
         const duration = document.createElement("span"); duration.textContent = `${Math.floor(mission.durationMinutes / 60)} h ${String(mission.durationMinutes % 60).padStart(2,"0")}`;
         const reward = document.createElement("span"); reward.textContent = serviceRewardSummary(mission);
-        const state = document.createElement("span"); state.textContent = mission.archived ? "Archivée" : mission.enabled ? "Active" : "Inactive";
+        const state = document.createElement("span"); state.textContent = mission.isLegacy ? "Ancienne mission" : mission.archived ? "Archivée" : mission.enabled ? "Active" : "Inactive";
         const order = document.createElement("span"); order.textContent = `Ordre ${mission.sortOrder || 0}`;
         const actions = document.createElement("div"); actions.className = "service-row-actions";
-        [["Modifier", () => fillServiceMissionForm(mission)], [mission.archived ? "Restaurer" : mission.enabled ? "Désactiver" : "Activer", () => saveServiceMissionState(mission, mission.archived ? { archived:false, enabled:true } : { enabled: !mission.enabled })], ["Dupliquer", () => fillServiceMissionForm({ ...mission, id: "", name: `${mission.name} (copie)` })], ["Supprimer", () => saveServiceMissionState(mission, { archived: true, enabled: false }, true)]].forEach(([label, fn]) => { const button = document.createElement("button"); button.className="service-button"; button.type="button"; button.textContent=label; button.addEventListener("click",fn); actions.append(button); });
+        [["✏️ Modifier", () => fillServiceMissionForm(mission)], [mission.archived ? "Restaurer" : mission.enabled ? "Désactiver" : "Activer", () => saveServiceMissionState(mission, mission.archived ? { archived:false, enabled:true } : { enabled: !mission.enabled })], ["Dupliquer", () => fillServiceMissionForm({ ...mission, id: "", name: `${mission.name} (copie)` })], ["Supprimer", () => saveServiceMissionState(mission, { archived: true, enabled: false }, true)]].forEach(([label, fn]) => { const button = document.createElement("button"); button.className="service-button"; button.type="button"; button.textContent=label; button.addEventListener("click",fn); actions.append(button); });
         row.append(name,type,duration,reward,state,order,actions); list.append(row);
     });
 }
@@ -7039,6 +7038,8 @@ function fillServiceMissionForm(mission) {
     document.getElementById("serviceMissionEnabled").checked = mission.enabled !== false;
     [...document.getElementById("serviceMissionCards").options].forEach((option) => { option.selected = (mission.eligibleCardIds || []).includes(option.value); });
     document.getElementById("serviceMissionCancel").classList.remove("hidden"); document.getElementById("serviceMissionSave").textContent = "Enregistrer les modifications";
+    document.getElementById("serviceMissionEditor").scrollIntoView({ behavior: "smooth", block: "start" });
+    document.getElementById("serviceMissionName").focus({ preventScroll: true });
 }
 
 async function saveServiceMissionState(mission, changes, deleting = false) {
