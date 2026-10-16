@@ -2370,7 +2370,6 @@ body {
             <button class="admin-menu-button" type="button" data-admin-section="cards" aria-controls="adminCardsSection" aria-pressed="false">🃏 Création de cartes</button>
             <button class="admin-menu-button" type="button" data-admin-section="serviceMissions" aria-controls="adminServiceMissionsSection" aria-pressed="false">📋 Gestion des missions</button>
             <button class="admin-menu-button" type="button" data-admin-section="cooperations" aria-controls="adminCooperationsSection" aria-pressed="false">🤝 Coopérations</button>
-            <button class="admin-menu-button" type="button" data-admin-section="cooperationRewards" aria-controls="adminCooperationRewardsSection" aria-pressed="false">🎁 Récompense collective</button>
             <button class="admin-hub-card" type="button" data-admin-hub-action="effectif"><span class="admin-hub-card-icon">👥</span><span><strong>Effectif</strong><small>Suivi mensuel des joueurs</small></span></button>
             <button class="admin-hub-card" type="button" data-admin-hub-action="boosters"><span class="admin-hub-card-icon">🎁</span><span><strong>Boosters évènementiels</strong><small>Programmation et attribution</small></span></button>
             <button class="admin-hub-card" type="button" data-admin-hub-action="messagerie"><span class="admin-hub-card-icon">💬</span><span><strong>Messagerie</strong><small>Idées, problèmes et archives</small></span></button>
@@ -3149,14 +3148,12 @@ body {
         </div>
         <div id="adminCooperationsSection" class="admin-panel admin-section hidden" style="margin-bottom:16px">
             <h3>🤝 Paramètres des coopérations</h3>
-            <p class="admin-note">Définis les objectifs et active ou suspends chaque jauge. Les progressions sont collectives.</p>
+            <p class="admin-note">Définis les objectifs, active les jauges et choisis leurs récompenses. Les progressions sont communes à tous les joueurs.</p>
             <div id="cooperationAdminList" class="cooperation-admin-list"></div>
             <button id="saveCooperationSettingsButton" class="primary-button admin-submit" type="button">Enregistrer les paramètres</button>
             <p id="cooperationAdminStatus" class="admin-status" role="status" aria-live="polite"></p>
-        </div>
-        <div id="adminCooperationRewardsSection" class="admin-panel admin-section hidden" style="margin-bottom:16px">
-            <h3>🎁 Récompenses collectives</h3>
-            <p class="admin-note">Choisis une récompense par jauge. Les joueurs autorisés dans Effectif pourront la réclamer lorsque l’objectif sera atteint.</p>
+            <h4>🎁 Récompenses collectives par jauge</h4>
+            <p class="admin-note">Choisis les jetons classiques, les jetons Premium et/ou une carte. Les joueurs autorisés dans Effectif pourront réclamer la récompense lorsque l’objectif sera atteint.</p>
             <div id="cooperationRewardAdminList" class="cooperation-admin-rewards"></div>
             <button id="saveCooperationRewardsButton" class="primary-button admin-submit" type="button">Enregistrer les récompenses</button>
             <p id="cooperationRewardsAdminStatus" class="admin-status" role="status" aria-live="polite"></p>
@@ -3860,7 +3857,6 @@ const adminSections = {
     gav: document.getElementById("adminGavSection"),
     serviceMissions: document.getElementById("adminServiceMissionsSection"),
     cooperations: document.getElementById("adminCooperationsSection"),
-    cooperationRewards: document.getElementById("adminCooperationRewardsSection")
 };
 const minageAdminSelect = document.getElementById("minageAdminSelect");
 const minageCreateButton = document.getElementById("minageCreateButton");
@@ -6989,6 +6985,7 @@ async function loadAdminCooperations() {
         });
         updateCooperationAdminProgress();
         cooperationAdminStatus.textContent = "Paramètres chargés. Les valeurs de progression sont communes à tous les joueurs.";
+        await loadAdminCooperationRewards();
     } catch (error) {
         console.error("Impossible de charger les paramètres Coopérations :", error);
         cooperationAdminStatus.textContent = error.message || "Chargement refusé. Vérifie que getAdminCooperationSettings est déployée.";
@@ -8090,7 +8087,6 @@ async function showAdminSection(sectionName) {
     if (sectionName === "gav") await loadAdminGavSettings();
     if (sectionName === "serviceMissions") await loadAdminServiceMissions();
     if (sectionName === "cooperations") await loadAdminCooperations();
-    if (sectionName === "cooperationRewards") await loadAdminCooperationRewards();
 }
 
 let adminEffectifMonths = [];
