@@ -492,7 +492,7 @@ body {
 }
 .admin-hub-open-button img { display: block; width: 100%; height: 100%; object-fit: contain; }
 .admin-hub-open-button:focus-visible { outline: 3px solid var(--theme-gold-light, #f7d46b); outline-offset: 2px; border-radius: 8px; }
-.home-maintenance-admin-toggle { position:absolute; top:50%; right:104px; display:flex; align-items:center; gap:7px; padding:7px 9px; border:1px solid rgba(243,191,56,.65); border-radius:999px; background:linear-gradient(135deg,#17365c,#0b1b36); color:#fff4d3; font-size:11px; font-weight:800; cursor:pointer; transform:translateY(-50%); box-shadow:0 3px 9px rgba(0,0,0,.24),inset 0 1px rgba(255,255,255,.18); }
+.home-maintenance-admin-toggle { position:absolute; top:50%; left:14px; display:flex; align-items:center; gap:7px; padding:7px 9px; border:1px solid rgba(243,191,56,.65); border-radius:999px; background:linear-gradient(135deg,#17365c,#0b1b36); color:#fff4d3; font-size:11px; font-weight:800; cursor:pointer; transform:translateY(-50%); box-shadow:0 3px 9px rgba(0,0,0,.24),inset 0 1px rgba(255,255,255,.18); }
 .home-maintenance-admin-toggle input { appearance:none; position:relative; width:31px; height:17px; flex:0 0 31px; border:1px solid #8c99a8; border-radius:999px; background:#596678; cursor:pointer; transition:background .2s ease,border-color .2s ease; }
 .home-maintenance-admin-toggle input::after { position:absolute; top:2px; left:2px; width:11px; height:11px; border-radius:50%; background:#fff; content:""; transition:transform .2s ease; }
 .home-maintenance-admin-toggle input:checked { border-color:#f4cd63; background:#ba7d11; }
@@ -921,7 +921,7 @@ body {
 .cooperation-admin-row input[type="number"] { width:100%; min-width:72px; }
 .cooperation-admin-row input[type="checkbox"] { width:19px; height:19px; accent-color:#19753c; }
 @media (max-width:520px) { #cooperationCard { min-height:320px; padding:12px 6px 9px; } .cooperation-gauges { gap:3px; } .cooperation-gauge { grid-template-rows:48px auto minmax(0,1fr) auto auto; gap:5px; } .cooperation-gauge img { width:46px; height:46px; } .cooperation-gauge-track { width:32px; } .cooperation-gauge-label,.cooperation-gauge-value { font-size:9px; } .cooperation-claim-button { padding:4px 3px; font-size:8px; } .cooperation-reward-note { font-size:9px; } .cooperation-admin-row { grid-template-columns:1fr 72px; } .cooperation-admin-progress { text-align:left; } }
-@media (max-width:600px) { .home-maintenance-admin-toggle { right:91px; gap:4px; padding:6px; font-size:0; } .home-maintenance-admin-toggle::before { content:"🛠"; font-size:15px; } .home-maintenance-admin-toggle input { width:27px; height:15px; flex-basis:27px; } .home-maintenance-admin-toggle input::after { width:9px; height:9px; } .home-maintenance-admin-toggle input:checked::after { transform:translateX(12px); } .cooperation-admin-reward-row { grid-template-columns:1fr 1fr; } .cooperation-admin-reward-title { grid-column:1 / -1; } }
+@media (max-width:600px) { .home-maintenance-admin-toggle { left:8px; right:auto; gap:4px; padding:6px; font-size:0; } .home-maintenance-admin-toggle::before { content:"🛠"; font-size:15px; } .home-maintenance-admin-toggle input { width:27px; height:15px; flex-basis:27px; } .home-maintenance-admin-toggle input::after { width:9px; height:9px; } .home-maintenance-admin-toggle input:checked::after { transform:translateX(12px); } .cooperation-admin-reward-row { grid-template-columns:1fr 1fr; } .cooperation-admin-reward-title { grid-column:1 / -1; } }
 @media (prefers-reduced-motion:reduce) { .cooperation-gauge-fill,.cooperation-gauge-fill::before,.cooperation-gauge-fill::after { transition:none; animation:none; } #cooperationCard.is-celebrating { animation:none; } }
 
 
@@ -2386,7 +2386,7 @@ body {
 
     <main class="app-content">
 
-        <p id="homeMaintenanceNotice" class="home-maintenance-notice hidden" role="status">🛠 Travaux</p>
+        <p id="homeMaintenanceNotice" class="home-maintenance-notice hidden" role="status">Le Popotier fait des travaux sur le site. Il y aura peut-être quelques problèmes !</p>
 
 
         <!-- PROFIL -->
