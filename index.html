@@ -879,13 +879,13 @@ body {
     gap: 10px;
 }
 
-#cooperationCard { grid-column:auto; min-width:0; min-height:280px; padding:13px 9px; overflow:hidden; border:2px solid #e2ad3c; background:radial-gradient(ellipse at 50% 0%,#173d72 0%,#0b1e3c 72%); color:#f8f2df; box-shadow:inset 0 0 0 2px rgba(255,218,126,.13),0 5px 13px rgba(5,15,33,.22); }
+#cooperationCard { grid-column:auto; min-width:0; min-height:320px; padding:13px 9px 10px; overflow:hidden; border:2px solid #e2ad3c; background:radial-gradient(ellipse at 50% 0%,#173d72 0%,#0b1e3c 72%); color:#f8f2df; box-shadow:inset 0 0 0 2px rgba(255,218,126,.13),0 5px 13px rgba(5,15,33,.22); }
 #cooperationCard h4 { margin:0 0 12px; color:#ffd66b; font-size:16px; letter-spacing:.04em; text-align:center; text-shadow:0 0 9px rgba(255,193,54,.48); }
 .cooperation-gauges { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:6px; align-items:stretch; }
-.cooperation-gauge { display:grid; min-width:0; grid-template-rows:56px auto 108px auto; justify-items:center; align-content:start; gap:6px; text-align:center; }
+.cooperation-gauge { display:grid; min-width:0; grid-template-rows:56px auto 138px auto; justify-items:center; align-content:start; gap:6px; text-align:center; }
 .cooperation-gauge img { width:54px; height:54px; object-fit:contain; filter:drop-shadow(0 0 7px var(--gauge-color)); }
 .cooperation-gauge-label { min-height:27px; color:#fff5da; font-size:10px; font-weight:800; line-height:1.2; }
-.cooperation-gauge-track { position:relative; display:flex; width:34px; height:108px; align-items:flex-end; overflow:hidden; border:2px solid #cda64f; border-radius:999px; background:linear-gradient(90deg,#08162b,#183458 48%,#08162b); box-shadow:inset 0 0 7px #020914,0 0 5px rgba(255,210,95,.24); }
+.cooperation-gauge-track { position:relative; display:flex; width:34px; height:138px; align-items:flex-end; overflow:hidden; border:2px solid #cda64f; border-radius:999px; background:linear-gradient(90deg,#08162b,#183458 48%,#08162b); box-shadow:inset 0 0 7px #020914,0 0 5px rgba(255,210,95,.24); }
 .cooperation-gauge-fill { width:100%; height:0%; border-radius:999px; background:linear-gradient(90deg,rgba(255,255,255,.42),var(--gauge-color) 55%,rgba(0,0,0,.28)); box-shadow:0 0 10px var(--gauge-color),inset 0 0 6px rgba(255,255,255,.55); transition:height .85s cubic-bezier(.2,.8,.2,1); }
 .cooperation-gauge-track.is-complete { box-shadow:inset 0 0 7px #020914,0 0 11px var(--gauge-color); }
 .cooperation-gauge-disabled { opacity:.48; }
@@ -898,7 +898,7 @@ body {
 .cooperation-admin-progress { color:var(--theme-muted); font-size:12px; text-align:center; }
 .cooperation-admin-row input[type="number"] { width:100%; min-width:72px; }
 .cooperation-admin-row input[type="checkbox"] { width:19px; height:19px; accent-color:#19753c; }
-@media (max-width:520px) { #cooperationCard { min-height:260px; padding:12px 6px; } .cooperation-gauges { gap:3px; } .cooperation-gauge { grid-template-rows:48px auto 100px auto; gap:5px; } .cooperation-gauge img { width:46px; height:46px; } .cooperation-gauge-track { width:30px; height:100px; } .cooperation-gauge-label,.cooperation-gauge-value { font-size:9px; } .cooperation-admin-row { grid-template-columns:1fr 72px; } .cooperation-admin-progress { text-align:left; } }
+@media (max-width:520px) { #cooperationCard { min-height:290px; padding:12px 6px 9px; } .cooperation-gauges { gap:3px; } .cooperation-gauge { grid-template-rows:48px auto 120px auto; gap:5px; } .cooperation-gauge img { width:46px; height:46px; } .cooperation-gauge-track { width:30px; height:120px; } .cooperation-gauge-label,.cooperation-gauge-value { font-size:9px; } .cooperation-admin-row { grid-template-columns:1fr 72px; } .cooperation-admin-progress { text-align:left; } }
 @media (prefers-reduced-motion:reduce) { .cooperation-gauge-fill { transition:none; } #cooperationCard.is-celebrating { animation:none; } }
 
 
@@ -6658,7 +6658,8 @@ function renderCooperationGauges() {
         const fill = root.querySelector(".cooperation-gauge-fill");
         const value = root.querySelector(".cooperation-gauge-value");
         const wasComplete = track.classList.contains("is-complete");
-        fill.style.width = `${percent}%`;
+        fill.style.width = "100%";
+        fill.style.height = `${percent}%`;
         track.setAttribute("aria-valuenow", String(Math.round(percent)));
         track.setAttribute("aria-valuetext", hasGoal ? `${current} sur ${goal}` : "Objectif non défini");
         value.textContent = hasGoal ? `${current.toLocaleString("fr-FR")} / ${goal.toLocaleString("fr-FR")}` : `${current.toLocaleString("fr-FR")} / —`;
