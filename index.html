@@ -6711,7 +6711,6 @@ function startCooperationListeners() {
     const applyLatest = () => {
         if (latestStats === null || latestSettings === null) return;
         applyCooperationProgress({ counters: latestStats, gauges: latestSettings.gauges || {} });
-        if (!Object.keys(latestSettings.gauges || {}).length) refreshCooperationProgress();
     };
     cooperationUnsubscribers.push(onSnapshot(statsRef, (snapshot) => {
         latestStats = snapshot.exists() ? snapshot.data() : {};
@@ -6727,6 +6726,9 @@ function startCooperationListeners() {
         console.warn("Réglages temps réel des coopérations indisponibles; chargement via Firebase Functions.", error);
         refreshCooperationProgress();
     }));
+    // Also call the server on every signed-in session. It performs the one-time
+    // migration from lifetime player totals and refreshes the collective goals.
+    refreshCooperationProgress();
 }
 
 async function loadAdminCooperations() {
