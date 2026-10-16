@@ -967,9 +967,9 @@ body {
     background: linear-gradient(155deg, #f8edcf 0%, #e8f0fb 52%, #d4e2f5 100%);
     box-shadow: 0 12px 28px rgba(7, 26, 57, .18), inset 0 1px 0 rgba(255,255,255,.95), inset 0 -5px 14px rgba(35, 74, 124, .09);
 }
-.booster-classic::before, .booster-classic::after { position: absolute; z-index: 0; inset: -34% -45%; border: 0; border-radius: 50%; content: ""; filter: blur(25px); pointer-events: none; }
-.booster-classic::before { background: radial-gradient(ellipse at 28% 42%, rgba(74, 174, 255, .56) 0%, rgba(116, 202, 255, .23) 28%, transparent 59%), radial-gradient(ellipse at 75% 66%, rgba(57, 144, 240, .42) 0%, rgba(150, 218, 255, .17) 32%, transparent 61%); animation: classicBoosterMist 13s ease-in-out infinite alternate; }
-.booster-classic::after { background: radial-gradient(ellipse at 72% 35%, rgba(164, 226, 255, .48) 0%, rgba(105, 183, 255, .18) 33%, transparent 63%), radial-gradient(ellipse at 27% 75%, rgba(71, 150, 248, .32) 0%, transparent 58%); animation: classicBoosterMist 17s ease-in-out infinite alternate-reverse; }
+.booster-classic::before, .booster-classic::after { position: absolute; z-index: 0; inset: -42% -20%; border: 0; border-radius: 50%; content: ""; filter: blur(27px); pointer-events: none; }
+.booster-classic::before { background: radial-gradient(ellipse 17% 48% at 24% 83%, rgba(74, 174, 255, .58) 0%, rgba(116, 202, 255, .23) 45%, transparent 78%), radial-gradient(ellipse 23% 57% at 57% 96%, rgba(57, 144, 240, .43) 0%, rgba(150, 218, 255, .18) 48%, transparent 80%), radial-gradient(ellipse 16% 45% at 83% 76%, rgba(104, 194, 255, .4) 0%, transparent 78%); animation: classicBoosterSmokeRise 9s linear infinite; }
+.booster-classic::after { background: radial-gradient(ellipse 20% 52% at 38% 100%, rgba(164, 226, 255, .48) 0%, rgba(105, 183, 255, .2) 48%, transparent 80%), radial-gradient(ellipse 16% 45% at 76% 94%, rgba(71, 150, 248, .35) 0%, transparent 78%), radial-gradient(ellipse 14% 42% at 7% 78%, rgba(113, 199, 255, .34) 0%, transparent 80%); animation: classicBoosterSmokeRise 13s linear -5s infinite; }
 .booster-classic > * { position: relative; z-index: 1; }
 .booster-classic .booster-visual { filter: drop-shadow(0 8px 8px rgba(13, 37, 76, .17)); }
 .booster-classic .booster-image { border: 0; background: transparent; box-shadow: none; }
@@ -977,7 +977,7 @@ body {
 .booster-classic button { position: relative; z-index: 1; }
 .booster-classic #openNormalBoosterButton { background: linear-gradient(135deg, #153d70, #0b2146); border-color: #d8ad47; color: #fff6d8; box-shadow: 0 5px 12px rgba(9, 28, 58, .28), inset 0 1px 0 rgba(255,255,255,.22); }
 .booster-classic #openNormalBoosterButton:disabled { background: #d8d5cc; border-color: #c6c1b5; color: #696b70; box-shadow: none; }
-@keyframes classicBoosterMist { 0% { transform: translate3d(-5%, -2%, 0) rotate(-7deg) scale(1); } 50% { transform: translate3d(4%, 3%, 0) rotate(4deg) scale(1.08); } 100% { transform: translate3d(-1%, 5%, 0) rotate(9deg) scale(1.03); } }
+@keyframes classicBoosterSmokeRise { 0% { opacity: .38; transform: translate3d(-2%, 12%, 0) scale(.94) skewX(-3deg); } 35% { opacity: .72; transform: translate3d(2%, 2%, 0) scale(1.02) skewX(4deg); } 70% { opacity: .58; transform: translate3d(-1%, -9%, 0) scale(1.08) skewX(-4deg); } 100% { opacity: .28; transform: translate3d(2%, -23%, 0) scale(1.14) skewX(3deg); } }
 @media (prefers-reduced-motion: reduce) { .booster-classic::before, .booster-classic::after { animation: none; } }
 
 
