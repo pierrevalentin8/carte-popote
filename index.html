@@ -1888,6 +1888,10 @@ body {
 .effectif-month-heading { display:grid; min-width:108px; justify-items:center; gap:4px; }
 .effectif-month-heading img { width:20px; height:20px; object-fit:contain; }
 .effectif-month-cell { min-width:120px; }
+.effectif-month-controls { display:flex; align-items:center; justify-content:center; gap:4px; white-space:nowrap; }
+.effectif-month-controls .effectif-token-input { width:54px; min-width:42px; padding:6px 3px; }
+.effectif-month-step { display:grid; width:27px; min-width:27px; height:30px; place-items:center; padding:0 !important; font-size:16px; line-height:1; }
+.effectif-month-step:disabled { opacity:.45; cursor:not-allowed; }
 .effectif-token-input { width:82px; max-width:100%; padding:8px 6px; border:1px solid #c9b77e; border-radius:7px; background:#fffefa; color:var(--theme-ink); text-align:center; font:inherit; font-weight:700; }
 .effectif-token-input:focus { outline:2px solid #d9a52b; outline-offset:1px; }
 .effectif-token-input.effectif-token-locked,.effectif-token-input:disabled { border-color:#d4d0c6; background:#e8e6e1; color:#77756f; cursor:not-allowed; opacity:1; }
@@ -1915,6 +1919,9 @@ body {
     .effectif-table th:last-child,.effectif-table td:last-child { width:clamp(160px,14vw,195px); min-width:0; }
     .effectif-month-heading { min-width:0; font-size:11px; }
     .effectif-month-cell { width:auto; min-width:0; }
+    .effectif-month-controls { gap:2px; }
+    .effectif-month-controls .effectif-token-input { width:min(100%,54px); min-width:34px; }
+    .effectif-month-step { width:23px; min-width:23px; height:28px; }
     .effectif-token-input { width:min(100%,72px); padding:7px 3px; }
     .effectif-balance { min-width:0; }
     .effectif-token-controls { flex-wrap:nowrap; }
@@ -7643,7 +7650,7 @@ function renderAdminEffectif() {
     head.replaceChildren(); body.replaceChildren();
     const header = document.createElement("tr");
     const playerHeading = document.createElement("th"); playerHeading.scope = "col"; playerHeading.textContent = "Joueur"; header.append(playerHeading);
-    const balanceHeading = document.createElement("th"); balanceHeading.scope = "col"; balanceHeading.textContent = "Jetons classiques disponibles"; header.append(balanceHeading);
+    const balanceHeading = document.createElement("th"); balanceHeading.scope = "col"; balanceHeading.textContent = "Septembre 2026"; header.append(balanceHeading);
     adminEffectifMonths.forEach((month) => {
         const cell = document.createElement("th"); cell.scope = "col";
         const label = document.createElement("span"); label.className = "effectif-month-heading";
@@ -7703,13 +7710,28 @@ function renderAdminEffectif() {
             input.placeholder = "0"; input.value = player.monthlyTokenAmounts?.[month] ?? "";
             const monthLocked = player.monthlyTokenValidated?.[month] === true;
             input.disabled = monthLocked;
+            const monthControls = document.createElement("div"); monthControls.className = "effectif-month-controls";
+            const decrement = document.createElement("button"); decrement.type = "button"; decrement.className = "admin-danger effectif-month-step"; decrement.textContent = "−";
+            decrement.title = `Diminuer le montant de ${formatEffectifMonth(month)}`; decrement.setAttribute("aria-label", decrement.title);
+            const increment = document.createElement("button"); increment.type = "button"; increment.className = "primary-button effectif-month-step"; increment.textContent = "+";
+            increment.title = `Augmenter le montant de ${formatEffectifMonth(month)}`; increment.setAttribute("aria-label", increment.title);
+            const adjustMonthAmount = (delta) => {
+                if (input.disabled) return;
+                const current = input.value === "" ? 0 : Number(input.value);
+                const next = Math.max(0, Math.min(1_000_000, (Number.isSafeInteger(current) ? current : 0) + delta));
+                input.value = String(next); input.dispatchEvent(new Event("input", { bubbles:true }));
+            };
+            decrement.addEventListener("click", () => adjustMonthAmount(-1));
+            increment.addEventListener("click", () => adjustMonthAmount(1));
+            monthControls.append(decrement, input, increment);
             if (monthLocked) {
                 input.classList.add("effectif-token-locked"); input.title = "Montant validé et verrouillé";
+                decrement.disabled = true; increment.disabled = true;
                 const lockLabel = document.createElement("small"); lockLabel.className = "effectif-cell-locked"; lockLabel.textContent = "Validé";
-                cell.append(input, lockLabel);
+                cell.append(monthControls, lockLabel);
             } else {
                 input.title = "Saisis le montant puis valide la ligne";
-                amountInputs.set(month, input); cell.append(input);
+                amountInputs.set(month, input); cell.append(monthControls);
             }
             row.append(cell);
         });
