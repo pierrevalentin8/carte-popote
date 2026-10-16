@@ -2278,7 +2278,6 @@ body {
         <h2 id="adminHubTitle">Menu Admin</h2>
         <p class="admin-note">Accède ici à toutes les fonctions réservées à l’administration.</p>
         <div class="admin-hub-grid" aria-label="Fonctionnalités Admin">
-            <button class="admin-menu-button" type="button" data-admin-section="players" aria-controls="adminPlayersSection" aria-pressed="false">👥 Joueurs</button>
             <button class="admin-menu-button" type="button" data-admin-section="journal" aria-controls="adminJournalSection" aria-pressed="false">📰 Journal</button>
             <button class="admin-menu-button" type="button" data-admin-section="updates" aria-controls="adminUpdatesSection" aria-pressed="false">📢 Annonce MAJ</button>
             <button class="admin-menu-button" type="button" data-admin-section="rarities" aria-controls="adminRaritiesSection" aria-pressed="false">⭐ Catégories de rareté</button>
@@ -2943,15 +2942,6 @@ body {
             </form>
             <p id="siteUpdateStatus" class="admin-status" role="status" aria-live="polite"></p>
         </div>
-        <div id="adminPlayersSection" class="admin-panel admin-section hidden" style="margin-bottom:16px">
-            <h3>👥 Joueurs</h3>
-            <p class="admin-note">Tu peux ajouter ou retirer des jetons. Un achat de booster débite uniquement le prix prévu par les règles du jeu.</p>
-            <button id="downloadPlayersBackupButton" class="secondary-button admin-backup-button" type="button">Télécharger le tableau de sauvegarde des joueurs (Excel)</button>
-            <p id="playersBackupStatus" class="admin-status" role="status" aria-live="polite"></p>
-            <p id="playersCount" class="admin-note">Nombre de joueurs inscrits : —</p>
-            <p id="playersStatus" class="admin-status" role="status"></p>
-            <div id="playersList"></div>
-        </div>
         <div id="adminRaritiesSection" class="admin-panel admin-section hidden" style="margin-bottom:16px">
             <h3>Catégories de rareté et apparition</h3>
             <p class="admin-note">Les pourcentages définissent la chance d’apparition. Leur total ne peut pas dépasser 100 %.</p>
@@ -3044,13 +3034,22 @@ body {
         <button id="effectifBackButton" class="admin-back" type="button">← Retour à l’accueil</button>
         <div class="admin-panel">
             <h2 id="effectifPageTitle">👥 Effectif</h2>
-            <p class="admin-note"><img loading="lazy" decoding="async" src="./Jeton.png" alt="Jeton classique" style="width:18px;height:18px;vertical-align:middle;object-fit:contain"> Montant mensuel à attribuer aux joueurs. Coche la case pour autoriser le joueur à récupérer les futures récompenses collectives.</p>
+            <p class="admin-note"><img loading="lazy" decoding="async" src="./Jeton.png" alt="Jeton classique" style="width:18px;height:18px;vertical-align:middle;object-fit:contain"> Montant mensuel à attribuer aux joueurs. À l’enregistrement, seule la différence encore non versée est créditée. Un montant déjà attribué ne peut pas être diminué ici.</p>
             <div class="effectif-toolbar">
                 <label for="effectifMonthInput">Nouveau mois<input id="effectifMonthInput" type="month"></label>
                 <button id="effectifAddMonthButton" class="primary-button effectif-add-month" type="button" aria-label="Ajouter le mois au tableau" title="Ajouter le mois">+</button>
             </div>
             <p id="effectifStatus" class="effectif-status" role="status" aria-live="polite"></p>
             <div class="effectif-table-wrap"><table class="effectif-table"><thead id="effectifTableHead"></thead><tbody id="effectifTableBody"></tbody></table></div>
+        </div>
+        <div class="admin-panel" style="margin-top:16px">
+            <h3>👥 Gestion des joueurs</h3>
+            <p class="admin-note">Consulte les comptes et attribue ou retire des jetons classiques. Une sauvegarde Excel contient une feuille par joueur.</p>
+            <button id="downloadPlayersBackupButton" class="secondary-button admin-backup-button" type="button">Télécharger le tableau de sauvegarde des joueurs (Excel)</button>
+            <p id="playersBackupStatus" class="admin-status" role="status" aria-live="polite"></p>
+            <p id="playersCount" class="admin-note">Nombre de joueurs inscrits : —</p>
+            <p id="playersStatus" class="admin-status" role="status"></p>
+            <div id="playersList"></div>
         </div>
     </section>
 
@@ -3702,7 +3701,6 @@ const cardZoomRarity = document.getElementById("cardZoomRarity");
 const adminPage = document.getElementById("adminPage");
 const adminSectionHint = document.getElementById("adminSectionHint");
 const adminSections = {
-    players: document.getElementById("adminPlayersSection"),
     journal: document.getElementById("adminJournalSection"),
     updates: document.getElementById("adminUpdatesSection"),
     rarities: document.getElementById("adminRaritiesSection"),
@@ -7664,9 +7662,13 @@ function renderAdminEffectif() {
             const status = document.getElementById("effectifStatus"); status.textContent = `Enregistrement de ${player.pseudo || "ce joueur"}…`;
             try {
                 const monthlyTokenAmounts = Object.fromEntries([...amountInputs].map(([month, input]) => [month, input.value === "" ? 0 : Number(input.value)]));
-                await callSaveEffectifPlayer({ playerId: player.id, collectiveRewardsEnabled: eligibility.checked, monthlyTokenAmounts });
+                const result = await callSaveEffectifPlayer({ playerId: player.id, collectiveRewardsEnabled: eligibility.checked, monthlyTokenAmounts });
                 player.monthlyTokenAmounts = monthlyTokenAmounts; player.collectiveRewardsEnabled = eligibility.checked;
-                status.textContent = `Effectif de ${player.pseudo || "ce joueur"} enregistré.`;
+                await loadPlayers();
+                const tokensAdded = Number(result.data?.tokensAdded) || 0;
+                status.textContent = tokensAdded > 0
+                    ? `Effectif de ${player.pseudo || "ce joueur"} enregistré : ${tokensAdded} jeton${tokensAdded === 1 ? "" : "s"} classique${tokensAdded === 1 ? "" : "s"} ajouté${tokensAdded === 1 ? "" : "s"}.`
+                    : `Effectif de ${player.pseudo || "ce joueur"} enregistré. Aucun nouveau jeton à attribuer.`;
             } catch (error) {
                 console.error("Impossible d’enregistrer l’effectif du joueur :", error);
                 status.textContent = error.message || "Enregistrement refusé. Vérifie que les fonctions Effectif sont déployées.";
@@ -8745,9 +8747,9 @@ effectifMenuButton.addEventListener("click", async () => {
     document.querySelector(".app-content").classList.add("hidden");
     bottomNav.classList.add("hidden");
     effectifPage.classList.remove("hidden");
-    await loadAdminEffectif();
+    await Promise.all([loadAdminEffectif(), loadPlayers()]);
 });
-effectifBackButton.addEventListener("click", showHomePage);
+effectifBackButton.addEventListener("click", openAdminHub);
 
 adminMessagesMenuButton.addEventListener("click", async () => {
     if (!auth.currentUser || (auth.currentUser.email || "").toLowerCase() !== ADMIN_EMAIL) return;
