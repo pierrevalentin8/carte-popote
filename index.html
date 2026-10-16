@@ -1896,12 +1896,12 @@ body {
 .effectif-eligibility input { width:18px; height:18px; accent-color:#19753c; }
 .effectif-row-save { width:auto; min-width:82px; height:34px; margin:5px 0 0; padding:6px 9px; border-radius:7px; font-size:12px; }
 .effectif-row-actions { display:flex; flex-direction:column; align-items:center; gap:5px; }
-.effectif-balance { min-width:230px; }
-.effectif-balance-total { display:flex; align-items:center; justify-content:center; gap:5px; margin-bottom:7px; font-size:15px; }
+.effectif-balance { min-width:250px; }
+.effectif-balance-total { display:flex; flex:0 0 auto; align-items:center; justify-content:center; gap:4px; margin:0; font-size:14px; white-space:nowrap; }
 .effectif-balance-total img { width:21px; height:21px; object-fit:contain; }
-.effectif-token-controls { justify-content:center; gap:5px; }
-.effectif-token-controls .player-token-input { width:72px; padding:6px; }
-.effectif-token-controls button { padding:7px 8px !important; font-size:11px; }
+.effectif-token-controls { flex-wrap:nowrap; justify-content:center; gap:5px; }
+.effectif-token-controls .player-token-input { width:58px; min-width:48px; padding:6px 3px; }
+.player-token-controls .effectif-token-compact-button { display:grid; width:34px; min-width:34px; height:32px; place-items:center; padding:0 !important; font-size:17px; line-height:1; }
 .effectif-player-email { display:block; margin-top:4px; color:var(--theme-muted); font-size:11px; font-weight:400; }
 .effectif-status { min-height:22px; margin:8px 0; color:var(--theme-muted); font-size:12px; }
 @media (min-width:1000px) and (orientation:landscape) {
@@ -1911,15 +1911,14 @@ body {
     .effectif-table { width:100%; min-width:0; table-layout:fixed; }
     .effectif-table th,.effectif-table td { padding:9px 6px; }
     .effectif-table th:first-child,.effectif-table td:first-child { width:150px; min-width:0; }
-    .effectif-table th:nth-child(2),.effectif-table td:nth-child(2) { width:clamp(230px,18vw,290px); }
+    .effectif-table th:nth-child(2),.effectif-table td:nth-child(2) { width:clamp(250px,21vw,320px); }
     .effectif-table th:last-child,.effectif-table td:last-child { width:clamp(160px,14vw,195px); min-width:0; }
     .effectif-month-heading { min-width:0; font-size:11px; }
     .effectif-month-cell { width:auto; min-width:0; }
     .effectif-token-input { width:min(100%,72px); padding:7px 3px; }
     .effectif-balance { min-width:0; }
     .effectif-token-controls { flex-wrap:nowrap; }
-    .effectif-token-controls .player-token-input { width:64px; min-width:48px; }
-    .effectif-token-controls button { padding:6px 5px !important; font-size:10px; }
+    .effectif-token-controls .player-token-input { width:58px; min-width:48px; }
     .effectif-row-actions { gap:4px; }
 }
 .event-booster-admin { width:min(100%, 980px); margin:0 auto; }
@@ -7671,8 +7670,8 @@ function renderAdminEffectif() {
         const tokenControls = document.createElement("div"); tokenControls.className = "player-token-controls effectif-token-controls";
         const tokenAmount = document.createElement("input"); tokenAmount.className = "player-token-input"; tokenAmount.type = "number"; tokenAmount.min = "1"; tokenAmount.max = "1000000"; tokenAmount.step = "1"; tokenAmount.placeholder = "Montant"; tokenAmount.inputMode = "numeric";
         tokenAmount.setAttribute("aria-label", `Montant de jetons classiques à modifier pour ${player.pseudo || "ce joueur"}`);
-        const grantButton = document.createElement("button"); grantButton.type = "button"; grantButton.className = "primary-button"; grantButton.textContent = "Ajouter";
-        const removeButton = document.createElement("button"); removeButton.type = "button"; removeButton.className = "admin-danger"; removeButton.textContent = "Retirer";
+        const grantButton = document.createElement("button"); grantButton.type = "button"; grantButton.className = "primary-button effectif-token-compact-button"; grantButton.textContent = "+"; grantButton.title = `Ajouter des jetons à ${player.pseudo || "ce joueur"}`; grantButton.setAttribute("aria-label", grantButton.title);
+        const removeButton = document.createElement("button"); removeButton.type = "button"; removeButton.className = "admin-danger effectif-token-compact-button"; removeButton.textContent = "−"; removeButton.title = `Retirer des jetons disponibles à ${player.pseudo || "ce joueur"}`; removeButton.setAttribute("aria-label", removeButton.title);
         const changeTokens = async (direction) => {
             const amount = Number(tokenAmount.value);
             const status = document.getElementById("effectifStatus");
@@ -7694,7 +7693,7 @@ function renderAdminEffectif() {
             } finally { grantButton.disabled = false; removeButton.disabled = false; }
         };
         grantButton.addEventListener("click", () => changeTokens(1)); removeButton.addEventListener("click", () => changeTokens(-1));
-        tokenControls.append(tokenAmount, grantButton, removeButton); balanceCell.append(balanceTotal, tokenControls); row.append(balanceCell);
+        tokenControls.append(balanceTotal, tokenAmount, grantButton, removeButton); balanceCell.append(tokenControls); row.append(balanceCell);
         const amountInputs = new Map();
         adminEffectifMonths.forEach((month) => {
             const cell = document.createElement("td"); cell.className = "effectif-month-cell";
