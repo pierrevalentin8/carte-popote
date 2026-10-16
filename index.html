@@ -1904,6 +1904,24 @@ body {
 .effectif-token-controls button { padding:7px 8px !important; font-size:11px; }
 .effectif-player-email { display:block; margin-top:4px; color:var(--theme-muted); font-size:11px; font-weight:400; }
 .effectif-status { min-height:22px; margin:8px 0; color:var(--theme-muted); font-size:12px; }
+@media (min-width:1000px) and (orientation:landscape) {
+    .admin-page#effectifPage { width:100%; max-width:1900px; padding:18px 24px 40px; }
+    #effectifPage > .admin-panel { width:100%; padding:20px 22px; }
+    .effectif-table-wrap { overflow-x:hidden; }
+    .effectif-table { width:100%; min-width:0; table-layout:fixed; }
+    .effectif-table th,.effectif-table td { padding:9px 6px; }
+    .effectif-table th:first-child,.effectif-table td:first-child { width:150px; min-width:0; }
+    .effectif-table th:nth-child(2),.effectif-table td:nth-child(2) { width:clamp(230px,18vw,290px); }
+    .effectif-table th:last-child,.effectif-table td:last-child { width:clamp(160px,14vw,195px); min-width:0; }
+    .effectif-month-heading { min-width:0; font-size:11px; }
+    .effectif-month-cell { width:auto; min-width:0; }
+    .effectif-token-input { width:min(100%,72px); padding:7px 3px; }
+    .effectif-balance { min-width:0; }
+    .effectif-token-controls { flex-wrap:nowrap; }
+    .effectif-token-controls .player-token-input { width:64px; min-width:48px; }
+    .effectif-token-controls button { padding:6px 5px !important; font-size:10px; }
+    .effectif-row-actions { gap:4px; }
+}
 .event-booster-admin { width:min(100%, 980px); margin:0 auto; }
 .event-booster-form-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; }
 .event-booster-form-grid label { display:grid; gap:5px; color:var(--theme-ink); font-weight:700; }
