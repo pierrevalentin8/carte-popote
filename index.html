@@ -1890,7 +1890,7 @@ body {
 .effectif-month-cell { min-width:120px; }
 .effectif-month-controls { display:flex; align-items:center; justify-content:center; gap:4px; white-space:nowrap; }
 .effectif-month-controls .effectif-token-input { width:54px; min-width:42px; padding:6px 3px; }
-.effectif-month-step { display:grid; width:27px; min-width:27px; height:30px; place-items:center; padding:0 !important; font-size:16px; line-height:1; }
+.effectif-month-step { display:grid; width:34px; min-width:34px; height:32px; place-items:center; padding:0 !important; font-size:17px; line-height:1; }
 .effectif-month-step:disabled { opacity:.45; cursor:not-allowed; }
 .effectif-token-input { width:82px; max-width:100%; padding:8px 6px; border:1px solid #c9b77e; border-radius:7px; background:#fffefa; color:var(--theme-ink); text-align:center; font:inherit; font-weight:700; }
 .effectif-token-input:focus { outline:2px solid #d9a52b; outline-offset:1px; }
@@ -1921,7 +1921,7 @@ body {
     .effectif-month-cell { width:auto; min-width:0; }
     .effectif-month-controls { gap:2px; }
     .effectif-month-controls .effectif-token-input { width:min(100%,54px); min-width:34px; }
-    .effectif-month-step { width:23px; min-width:23px; height:28px; }
+    .effectif-month-step { width:34px; min-width:34px; height:32px; }
     .effectif-token-input { width:min(100%,72px); padding:7px 3px; }
     .effectif-balance { min-width:0; }
     .effectif-token-controls { flex-wrap:nowrap; }
@@ -7711,9 +7711,9 @@ function renderAdminEffectif() {
             const monthLocked = player.monthlyTokenValidated?.[month] === true;
             input.disabled = monthLocked;
             const monthControls = document.createElement("div"); monthControls.className = "effectif-month-controls";
-            const decrement = document.createElement("button"); decrement.type = "button"; decrement.className = "admin-danger effectif-month-step"; decrement.textContent = "−";
+            const decrement = document.createElement("button"); decrement.type = "button"; decrement.className = "admin-danger effectif-token-compact-button effectif-month-step"; decrement.textContent = "−";
             decrement.title = `Diminuer le montant de ${formatEffectifMonth(month)}`; decrement.setAttribute("aria-label", decrement.title);
-            const increment = document.createElement("button"); increment.type = "button"; increment.className = "primary-button effectif-month-step"; increment.textContent = "+";
+            const increment = document.createElement("button"); increment.type = "button"; increment.className = "primary-button effectif-token-compact-button effectif-month-step"; increment.textContent = "+";
             increment.title = `Augmenter le montant de ${formatEffectifMonth(month)}`; increment.setAttribute("aria-label", increment.title);
             const adjustMonthAmount = (delta) => {
                 if (input.disabled) return;
