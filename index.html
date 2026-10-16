@@ -475,6 +475,33 @@ body {
     cursor: pointer;
 }
 
+.admin-hub-open-button {
+    position: absolute;
+    top: 50%;
+    right: 70px;
+    display: flex;
+    width: 72px;
+    height: 50px;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    cursor: pointer;
+    transform: translateY(-50%);
+}
+.admin-hub-open-button img { display: block; width: 100%; height: 100%; object-fit: contain; }
+.admin-hub-open-button:focus-visible { outline: 3px solid var(--theme-gold-light, #f7d46b); outline-offset: 2px; border-radius: 8px; }
+.admin-hub-page { max-width: 1050px; }
+.admin-hub-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 13px; margin-top: 20px; }
+.admin-hub-card { display: flex; min-height: 82px; align-items: center; gap: 12px; padding: 13px 15px; border: 1px solid rgba(243,191,56,.72); border-radius: 13px; background: #10264a; color: var(--theme-cream); font: inherit; text-align: left; cursor: pointer; transition: transform .16s ease, background .16s ease; }
+.admin-hub-card:hover { transform: translateY(-2px); background: #183966; }
+.admin-hub-card:focus-visible { outline: 3px solid var(--theme-gold-light); outline-offset: 2px; }
+.admin-hub-card-icon { display: grid; width: 42px; height: 42px; flex: 0 0 42px; place-items: center; border-radius: 10px; background: rgba(255,255,255,.1); font-size: 24px; }
+.admin-hub-card span:last-child { display: grid; gap: 3px; }
+.admin-hub-card strong { color: var(--theme-gold-light); }
+.admin-hub-card small { color: #d7e1ee; font-size: 12px; line-height: 1.3; }
+
 .player-logout-button { width: 40px; height: 40px; border: 1px solid rgba(243,191,56,.55); border-radius: 12px; background: #10264a; color: var(--theme-gold-light); font-size: 22px; cursor: pointer; }
 
 
@@ -2019,6 +2046,8 @@ body {
 .nav-unlock-notice { position: fixed; z-index: 120; right: 16px; bottom: 82px; left: 16px; width: fit-content; max-width: 440px; margin: 0 auto; padding: 11px 16px; border: 1px solid rgba(243, 191, 56, .7); border-radius: 12px; background: #10264a; color: #fbfaf5; font-size: 13px; line-height: 1.4; text-align: center; box-shadow: 0 8px 24px rgba(0, 0, 0, .32); }
 @media (max-width: 380px) {
     .app-content { padding-left: 11px; padding-right: 11px; }
+    .admin-hub-open-button { right: 66px; width: 64px; height: 44px; }
+    .header-logo { width: min(40vw, 148px); }
     .boosters { gap: 8px; }
     .booster { padding: 11px 8px; }
     .booster button { font-size: 12px; }
@@ -2189,6 +2218,10 @@ body {
             ☰
         </button>
 
+        <button id="adminHubOpenButton" class="admin-hub-open-button hidden" type="button" aria-label="Ouvrir le menu Admin" title="Admin">
+            <img src="./Admin.png" alt="Admin">
+        </button>
+
         <button id="playerLogoutButton" class="player-logout-button hidden" type="button" aria-label="Déconnexion" title="Déconnexion">↪</button>
 
 
@@ -2233,6 +2266,22 @@ body {
         <span>Aperçu joueur normal : les boutons réservés à l’Admin sont masqués.</span>
         <button id="playerPreviewExitButton" type="button">Revenir au mode Admin</button>
     </div>
+
+    <section id="adminHubPage" class="admin-page admin-hub-page hidden" aria-labelledby="adminHubTitle">
+        <button id="adminHubBackButton" class="admin-back" type="button">← Retour à l’accueil</button>
+        <h2 id="adminHubTitle">Menu Admin</h2>
+        <p class="admin-note">Accède ici à toutes les fonctions réservées à l’administration.</p>
+        <div class="admin-hub-grid" aria-label="Fonctionnalités Admin">
+            <button class="admin-hub-card" type="button" data-admin-hub-action="administration"><span class="admin-hub-card-icon">🛠️</span><span><strong>Administration</strong><small>Joueurs, journal, cartes et missions</small></span></button>
+            <button class="admin-hub-card" type="button" data-admin-hub-action="effectif"><span class="admin-hub-card-icon">👥</span><span><strong>Effectif</strong><small>Suivi mensuel des joueurs</small></span></button>
+            <button class="admin-hub-card" type="button" data-admin-hub-action="boosters"><span class="admin-hub-card-icon">🎁</span><span><strong>Boosters évènementiels</strong><small>Programmation et attribution</small></span></button>
+            <button class="admin-hub-card" type="button" data-admin-hub-action="messagerie"><span class="admin-hub-card-icon">💬</span><span><strong>Messagerie</strong><small>Idées, problèmes et archives</small></span></button>
+            <button class="admin-hub-card" type="button" data-admin-hub-action="statistiques"><span class="admin-hub-card-icon">📊</span><span><strong>Statistiques</strong><small>Activité des joueurs</small></span></button>
+            <button class="admin-hub-card" type="button" data-admin-hub-action="finance"><span class="admin-hub-card-icon">💶</span><span><strong>Finance</strong><small>Suivi des paiements Premium</small></span></button>
+            <button class="admin-hub-card" type="button" data-admin-hub-action="preview"><span class="admin-hub-card-icon">👤</span><span><strong>Joueur normal</strong><small>Prévisualiser le site côté joueur</small></span></button>
+            <button class="admin-hub-card" type="button" data-admin-hub-action="logout"><span class="admin-hub-card-icon">🚪</span><span><strong>Déconnexion</strong><small>Quitter la session Admin</small></span></button>
+        </div>
+    </section>
 
 
 
@@ -3537,6 +3586,9 @@ let archivesCountdownInterval = null;
 let archivesClaimInProgress = false;
 
 const adminButton = document.getElementById("adminButton");
+const adminHubOpenButton = document.getElementById("adminHubOpenButton");
+const adminHubPage = document.getElementById("adminHubPage");
+const adminHubBackButton = document.getElementById("adminHubBackButton");
 const effectifMenuButton = document.getElementById("effectifMenuButton");
 const effectifPage = document.getElementById("effectifPage");
 const effectifBackButton = document.getElementById("effectifBackButton");
@@ -4018,6 +4070,8 @@ onAuthStateChanged(
             archivesPage.classList.add("hidden");
             isPlayerPreview = false;
             adminButton.classList.add("hidden");
+            adminHubOpenButton.classList.add("hidden");
+            adminHubPage.classList.add("hidden");
             eventBoostersMenuButton.classList.add("hidden");
             adminMessagesMenuButton.classList.add("hidden");
             playerPreviewToggle.classList.add("hidden");
@@ -4074,6 +4128,7 @@ onAuthStateChanged(
         const isAdminAccount = (user.email || "").toLowerCase() === ADMIN_EMAIL;
         if (!isAdminAccount) isPlayerPreview = false;
         menuButton.classList.toggle("hidden", !isAdminAccount || isPlayerPreview);
+        adminHubOpenButton.classList.toggle("hidden", !isAdminAccount || isPlayerPreview);
         homeCardCountButton.disabled = !isAdminAccount || isPlayerPreview;
         dropdownMenu.classList.add("hidden");
         playerLogoutButton.classList.toggle("hidden", isAdminAccount);
@@ -4266,6 +4321,7 @@ buyNormalBoosterButton.addEventListener("click", async () => {
 
 function showHomePage() {
     document.querySelector(".app-content").classList.remove("hidden");
+    adminHubPage.classList.add("hidden");
     termsPage.classList.add("hidden");
     financePage.classList.add("hidden");
     profilePage.classList.add("hidden");
@@ -5416,6 +5472,7 @@ function setPlayerPreview(enabled) {
     if (!isCurrentUserAdmin()) return;
     isPlayerPreview = enabled;
     menuButton.classList.toggle("hidden", enabled);
+    adminHubOpenButton.classList.toggle("hidden", enabled);
     homeCardCountButton.disabled = enabled;
     dropdownMenu.classList.add("hidden");
     adminButton.classList.toggle("hidden", enabled);
@@ -5426,7 +5483,7 @@ function setPlayerPreview(enabled) {
     premiumAdminPanel.classList.toggle("hidden", enabled);
     playerPreviewBanner.classList.toggle("hidden", !enabled);
     playerPreviewToggle.textContent = enabled ? "🛡️ Revenir au mode Admin" : "👤 Joueur normal";
-    if (enabled && (!adminPage.classList.contains("hidden") || !messagingPage.classList.contains("hidden") || !eventBoostersAdminPage.classList.contains("hidden") || !effectifPage.classList.contains("hidden"))) showHomePage();
+    if (enabled && (!adminHubPage.classList.contains("hidden") || !adminPage.classList.contains("hidden") || !messagingPage.classList.contains("hidden") || !eventBoostersAdminPage.classList.contains("hidden") || !effectifPage.classList.contains("hidden"))) showHomePage();
     if (!premiumPage.classList.contains("hidden")) loadPremiumWheel();
 }
 
@@ -8626,6 +8683,37 @@ async function loadPlayers() {
             : "Impossible de charger les joueurs. Déploie les fonctions Firebase mises à jour.";
     }
 }
+
+function openAdminHub() {
+    if (!isCurrentUserAdmin() || isPlayerPreview) return;
+    dropdownMenu.classList.add("hidden");
+    document.querySelector(".app-content").classList.add("hidden");
+    [termsPage, financePage, profilePage, leaderboardPage, statisticsPage, drawnCardsPage, collectionPage, recyclingPage,
+        adminPage, effectifPage, eventBoostersAdminPage, messagingPage, rulesPage, premiumPage, archivesPage].forEach((page) => page.classList.add("hidden"));
+    adminHubPage.classList.remove("hidden");
+    bottomNav.classList.add("hidden");
+}
+
+adminHubOpenButton.addEventListener("click", openAdminHub);
+adminHubBackButton.addEventListener("click", showHomePage);
+document.querySelectorAll("[data-admin-hub-action]").forEach((button) => {
+    button.addEventListener("click", () => {
+        const action = button.dataset.adminHubAction;
+        if (action === "preview") { playerPreviewToggle.click(); return; }
+        if (action === "logout") { logoutButton.click(); return; }
+        const destination = {
+            administration: adminButton,
+            effectif: effectifMenuButton,
+            boosters: eventBoostersMenuButton,
+            messagerie: adminMessagesMenuButton,
+            statistiques: statisticsMenuButton,
+            finance: financeMenuButton
+        }[action];
+        if (!destination) return;
+        adminHubPage.classList.add("hidden");
+        destination.click();
+    });
+});
 
 adminButton.addEventListener("click", async () => {
     if (!auth.currentUser || (auth.currentUser.email || "").toLowerCase() !== ADMIN_EMAIL) return;
