@@ -2694,7 +2694,7 @@ body {
     </section>
 
     <section id="financePage" class="statistics-page hidden" aria-labelledby="financeTitle">
-        <button id="financeBackButton" class="admin-back" type="button">← Retour à l’accueil</button>
+        <button id="financeBackButton" class="admin-back" type="button">← Retour au menu Admin</button>
         <h2 id="financeTitle">💶 Finance — ventes Premium</h2>
         <p class="statistics-intro">Suivi des montants payés par joueur et par mois pour les jetons Premium.</p>
         <form id="financeHistoricalPaymentForm" class="finance-history-form">
@@ -2722,7 +2722,7 @@ body {
     </section>
 
     <section id="statisticsPage" class="statistics-page hidden" aria-labelledby="statisticsTitle">
-        <button id="statisticsBackButton" class="admin-back" type="button">← Retour à l’accueil</button>
+        <button id="statisticsBackButton" class="admin-back" type="button">← Retour au menu Admin</button>
         <h2 id="statisticsTitle">📊 Statistiques des joueurs</h2>
         <p class="statistics-intro">Vue d’ensemble des joueurs et de leur activité dans Cartes & Popote.</p>
         <p id="statisticsStatus" class="statistics-status" role="status" aria-live="polite">Chargement des statistiques…</p>
@@ -2747,7 +2747,7 @@ body {
     </section>
 
     <section id="drawnCardsPage" class="statistics-page hidden" aria-labelledby="drawnCardsTitle">
-        <button id="drawnCardsBackButton" class="admin-back" type="button">← Retour à l’accueil</button>
+        <button id="drawnCardsBackButton" class="admin-back" type="button">← Retour au menu Admin</button>
         <h2 id="drawnCardsTitle">🃏 Cartes tirées par les joueurs</h2>
         <p class="statistics-intro">Total de toutes les cartes tirées par les joueurs, doublons compris.</p>
         <p id="drawnCardsTotal" class="statistics-status" role="status" aria-live="polite">Chargement du total…</p>
@@ -2951,7 +2951,7 @@ body {
     </section>
 
     <section id="eventBoostersAdminPage" class="admin-page hidden" aria-labelledby="eventBoostersAdminTitle">
-        <button id="eventBoostersBackButton" class="admin-back" type="button">← Retour à l’accueil</button>
+        <button id="eventBoostersBackButton" class="admin-back" type="button">← Retour au menu Admin</button>
         <div class="admin-panel event-booster-admin">
             <h2 id="eventBoostersAdminTitle">🎁 Boosters évènementiels</h2>
             <p class="admin-note">Le booster apparaîtra à la connexion du jour choisi. Le joueur devra l’ouvrir et découvrir toutes ses cartes avant d’accéder au site.</p>
@@ -3182,7 +3182,7 @@ body {
     </section>
 
     <section id="messagingPage" class="admin-page messaging-page hidden" aria-labelledby="messagingPageTitle">
-        <button id="messagingBackButton" class="admin-back" type="button">← Retour à l’accueil</button>
+        <button id="messagingBackButton" class="admin-back" type="button">← Retour au menu Admin</button>
         <h2 id="messagingPageTitle">💬 Messagerie</h2>
         <p class="admin-note">Les messages des joueurs sont rangés par sujet.</p>
         <div id="adminMessagesSection" class="admin-panel" style="margin-bottom:16px">
@@ -4487,6 +4487,7 @@ buyNormalBoosterButton.addEventListener("click", async () => {
 });
 
 function showHomePage() {
+    adminHubReturnPending = false;
     document.querySelector(".app-content").classList.remove("hidden");
     adminHubPage.classList.add("hidden");
     termsPage.classList.add("hidden");
@@ -4530,7 +4531,7 @@ async function showDrawnCardsPage() {
     }
 }
 
-drawnCardsBackButton.addEventListener("click", showHomePage);
+drawnCardsBackButton.addEventListener("click", returnToAdminHubOrHome);
 document.addEventListener("click", (event) => {
     if (event.target.closest("button, a, [role='button']") && !event.target.closest("#drawnCardsPage") && !event.target.closest('[data-admin-hub-action="tirages"]')) {
         drawnCardsPage.classList.add("hidden");
@@ -5274,7 +5275,7 @@ financeMenuButton.addEventListener("click", async () => {
     financePage.classList.remove("hidden");
     await renderMonthlyPremiumReport(financeTableBody, financeStatus, financeTotal, true);
 });
-financeBackButton.addEventListener("click", showHomePage);
+financeBackButton.addEventListener("click", returnToAdminHubOrHome);
 
 financeHistoricalPaymentForm.addEventListener("submit", async (event) => {
     event.preventDefault();
@@ -6155,7 +6156,7 @@ statisticsMenuButton.addEventListener("click", async () => {
     await loadStatistics();
 });
 
-statisticsBackButton.addEventListener("click", showHomePage);
+statisticsBackButton.addEventListener("click", returnToAdminHubOrHome);
 
 leaderboardMenuButton.addEventListener("click", async () => {
     dropdownMenu.classList.add("hidden");
@@ -8146,7 +8147,7 @@ eventBoostersMenuButton.addEventListener("click", async () => {
     eventBoostersAdminPage.classList.remove("hidden");
     await loadAdminEventBoosters();
 });
-eventBoostersBackButton.addEventListener("click", showHomePage);
+eventBoostersBackButton.addEventListener("click", returnToAdminHubOrHome);
 
 function closeAdminPage() {
     showHomePage();
@@ -9217,12 +9218,23 @@ downloadPlayersBackupButton.addEventListener("click", async () => {
 
 function openAdminHub() {
     if (!isCurrentUserAdmin() || isPlayerPreview) return;
+    adminHubReturnPending = false;
     dropdownMenu.classList.add("hidden");
     document.querySelector(".app-content").classList.add("hidden");
     [termsPage, financePage, profilePage, leaderboardPage, statisticsPage, drawnCardsPage, collectionPage, recyclingPage,
         adminPage, effectifPage, eventBoostersAdminPage, messagingPage, rulesPage, premiumPage, archivesPage].forEach((page) => page.classList.add("hidden"));
     adminHubPage.classList.remove("hidden");
     bottomNav.classList.add("hidden");
+}
+
+let adminHubReturnPending = false;
+function returnToAdminHubOrHome() {
+    if (adminHubReturnPending && isCurrentUserAdmin() && !isPlayerPreview) {
+        adminHubReturnPending = false;
+        openAdminHub();
+        return;
+    }
+    showHomePage();
 }
 
 adminHubOpenButton.addEventListener("click", openAdminHub);
@@ -9232,7 +9244,7 @@ document.querySelectorAll("[data-admin-hub-action]").forEach((button) => {
         const action = button.dataset.adminHubAction;
         if (action === "preview") { playerPreviewToggle.click(); return; }
         if (action === "logout") { logoutButton.click(); return; }
-        if (action === "tirages") { adminHubPage.classList.add("hidden"); void showDrawnCardsPage(); return; }
+        if (action === "tirages") { adminHubReturnPending = true; adminHubPage.classList.add("hidden"); void showDrawnCardsPage(); return; }
         const destination = {
             effectif: effectifMenuButton,
             boosters: eventBoostersMenuButton,
@@ -9241,6 +9253,7 @@ document.querySelectorAll("[data-admin-hub-action]").forEach((button) => {
             finance: financeMenuButton
         }[action];
         if (!destination) return;
+        adminHubReturnPending = true;
         adminHubPage.classList.add("hidden");
         destination.click();
     });
@@ -9297,7 +9310,7 @@ adminMessagesMenuButton.addEventListener("click", async () => {
     await loadAdminMessages("idee");
 });
 
-messagingBackButton.addEventListener("click", showHomePage);
+messagingBackButton.addEventListener("click", returnToAdminHubOrHome);
 
 document.querySelectorAll(".admin-menu-button").forEach((button) => {
     button.addEventListener("click", () => {
