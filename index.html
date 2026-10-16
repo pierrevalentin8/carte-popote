@@ -514,6 +514,20 @@ body {
 .admin-hub-card span:last-child { display: grid; gap: 3px; }
 .admin-hub-card strong { color: var(--theme-gold-light); }
 .admin-hub-card small { color: #d7e1ee; font-size: 12px; line-height: 1.3; }
+.poll-admin-list { display:grid; gap:9px; margin:14px 0; }
+.poll-admin-list button { width:100%; padding:13px; border:1px solid #d5a638; border-radius:10px; background:linear-gradient(145deg,#294d78,#0b1b36); color:#fff4d3; text-align:left; cursor:pointer; }
+.poll-admin-list button:hover { filter:brightness(1.12); }
+.poll-admin-list strong,.poll-admin-list small { display:block; }
+.poll-admin-list small { margin-top:4px; color:#d7e1ee; }
+.poll-results-panel { margin-top:16px; padding:14px; border:1px solid #d5bf8a; border-radius:12px; background:#fffdf7; color:#10264a; }
+.poll-results-panel h3 { margin-top:0; }
+.poll-results-table { width:100%; border-collapse:collapse; }
+.poll-results-table th,.poll-results-table td { padding:8px; border-bottom:1px solid #e8dfca; text-align:left; vertical-align:top; }
+.poll-answer-question { white-space:pre-wrap; line-height:1.5; }
+.poll-prompt-question { white-space:pre-wrap; padding:12px; border-radius:10px; background:#f3ead4; line-height:1.55; }
+.poll-answer-input { display:block; width:100%; min-height:100px; margin:12px 0; padding:11px; border:1px solid #cbbd9d; border-radius:10px; font:inherit; resize:vertical; }
+.poll-prompt-actions { display:flex; gap:9px; justify-content:flex-end; flex-wrap:wrap; margin-top:14px; }
+@media(max-width:520px){.poll-prompt-actions{flex-direction:column-reverse}.poll-prompt-actions button{width:100%}.poll-results-table th,.poll-results-table td{padding:6px;font-size:13px}}
 
 .player-logout-button { width: 40px; height: 40px; border: 1px solid rgba(243,191,56,.55); border-radius: 12px; background: #10264a; color: var(--theme-gold-light); font-size: 22px; cursor: pointer; }
 
@@ -2386,10 +2400,33 @@ body {
             <button class="admin-hub-card" type="button" data-admin-hub-action="effectif"><span class="admin-hub-card-icon">👥</span><span><strong>Effectif</strong><small>Suivi mensuel des joueurs</small></span></button>
             <button class="admin-hub-card" type="button" data-admin-hub-action="boosters"><span class="admin-hub-card-icon">🎁</span><span><strong>Boosters évènementiels</strong><small>Programmation et attribution</small></span></button>
             <button class="admin-hub-card" type="button" data-admin-hub-action="messagerie"><span class="admin-hub-card-icon">💬</span><span><strong>Messagerie</strong><small>Idées, problèmes et archives</small></span></button>
+            <button class="admin-hub-card" type="button" data-admin-hub-action="polls"><span class="admin-hub-card-icon">🗳️</span><span><strong>Sondage</strong><small>Poser une question et consulter les réponses</small></span></button>
             <button class="admin-hub-card" type="button" data-admin-hub-action="statistiques"><span class="admin-hub-card-icon">📊</span><span><strong>Statistiques</strong><small>Activité des joueurs</small></span></button>
             <button class="admin-hub-card" type="button" data-admin-hub-action="finance"><span class="admin-hub-card-icon">💶</span><span><strong>Finance</strong><small>Suivi des paiements Premium</small></span></button>
             <button class="admin-hub-card" type="button" data-admin-hub-action="preview"><span class="admin-hub-card-icon">👤</span><span><strong>Joueur normal</strong><small>Prévisualiser le site côté joueur</small></span></button>
             <button class="admin-hub-card" type="button" data-admin-hub-action="logout"><span class="admin-hub-card-icon">🚪</span><span><strong>Déconnexion</strong><small>Quitter la session Admin</small></span></button>
+        </div>
+    </section>
+
+    <section id="pollsAdminPage" class="admin-page hidden" aria-labelledby="pollsAdminTitle">
+        <button id="pollsAdminBackButton" class="admin-back" type="button">← Retour au menu Admin</button>
+        <div class="admin-panel">
+            <h2 id="pollsAdminTitle">🗳️ Sondages</h2>
+            <p class="admin-note">Le sondage s’affichera à la prochaine connexion de chaque joueur qui n’y a pas encore répondu.</p>
+            <form id="pollCreateForm">
+                <label for="pollTitleInput">Titre du sondage</label>
+                <input id="pollTitleInput" class="admin-field" type="text" maxlength="100" required>
+                <label for="pollQuestionInput">Question ou texte de présentation</label>
+                <textarea id="pollQuestionInput" class="admin-field" rows="5" maxlength="2000" required></textarea>
+                <label for="pollResponseTypeInput">Type de réponse</label>
+                <select id="pollResponseTypeInput" class="admin-field"><option value="yesno">Oui ou non</option><option value="text">Texte libre</option></select>
+                <button id="pollCreateButton" class="primary-button admin-submit" type="submit">Créer le sondage</button>
+            </form>
+            <p id="pollAdminStatus" class="admin-status" role="status" aria-live="polite"></p>
+            <h3>Sondages créés</h3>
+            <p class="admin-note">Clique sur le nom d’un sondage pour afficher ses résultats.</p>
+            <div id="pollAdminList" class="poll-admin-list"></div>
+            <div id="pollResultsPanel" class="poll-results-panel hidden" aria-live="polite"></div>
         </div>
     </section>
 
@@ -3043,6 +3080,24 @@ body {
         </div>
     </section>
 
+    <section id="pollPromptModal" class="site-updates-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="pollPromptTitle" aria-hidden="true">
+        <div class="site-updates-card">
+            <h2 id="pollPromptTitle">🗳️ Sondage</h2>
+            <p id="pollPromptQuestion" class="poll-prompt-question"></p>
+            <div id="pollYesNoActions" class="poll-prompt-actions hidden">
+                <button id="pollNoButton" class="secondary-button" type="button">Non</button>
+                <button id="pollYesButton" class="primary-button" type="button">Oui</button>
+            </div>
+            <div id="pollTextActions" class="hidden">
+                <label for="pollPlayerAnswer">Ta réponse</label>
+                <textarea id="pollPlayerAnswer" class="poll-answer-input" maxlength="1000" rows="4"></textarea>
+                <div class="poll-prompt-actions"><button id="pollTextSubmitButton" class="primary-button" type="button">Envoyer ma réponse</button></div>
+            </div>
+            <p id="pollPromptStatus" class="admin-status" role="status" aria-live="polite"></p>
+            <div class="poll-prompt-actions"><button id="pollLaterButton" class="secondary-button" type="button">Répondre plus tard</button></div>
+        </div>
+    </section>
+
     <section id="adminPage" class="admin-page hidden">
         <button id="adminBackButton" class="admin-back" type="button">← Retour au menu Admin</button>
         <h2>🛡️ Administration</h2>
@@ -3409,10 +3464,34 @@ const callResetCooperationGauge = httpsCallable(functions, "resetCooperationGaug
 const callGetHomeMaintenanceStatus = httpsCallable(functions, "getHomeMaintenanceStatus");
 const callSetHomeMaintenanceStatus = httpsCallable(functions, "setHomeMaintenanceStatus");
 const callDownloadPlayerBackup = httpsCallable(functions, "downloadPlayerBackup");
+const callCreatePoll = httpsCallable(functions, "createPoll");
+const callGetAdminPolls = httpsCallable(functions, "getAdminPolls");
+const callGetPollResults = httpsCallable(functions, "getPollResults");
+const callGetPendingPolls = httpsCallable(functions, "getPendingPolls");
+const callSubmitPollResponse = httpsCallable(functions, "submitPollResponse");
 
 const siteUpdatesModal = document.getElementById("siteUpdatesModal");
 const siteUpdatesList = document.getElementById("siteUpdatesList");
 const siteUpdatesCloseButton = document.getElementById("siteUpdatesCloseButton");
+const pollPromptModal = document.getElementById("pollPromptModal");
+const pollPromptTitle = document.getElementById("pollPromptTitle");
+const pollPromptQuestion = document.getElementById("pollPromptQuestion");
+const pollPromptStatus = document.getElementById("pollPromptStatus");
+const pollYesNoActions = document.getElementById("pollYesNoActions");
+const pollTextActions = document.getElementById("pollTextActions");
+const pollPlayerAnswer = document.getElementById("pollPlayerAnswer");
+const pollYesButton = document.getElementById("pollYesButton");
+const pollNoButton = document.getElementById("pollNoButton");
+const pollTextSubmitButton = document.getElementById("pollTextSubmitButton");
+const pollLaterButton = document.getElementById("pollLaterButton");
+const pollCreateForm = document.getElementById("pollCreateForm");
+const pollTitleInput = document.getElementById("pollTitleInput");
+const pollQuestionInput = document.getElementById("pollQuestionInput");
+const pollResponseTypeInput = document.getElementById("pollResponseTypeInput");
+const pollCreateButton = document.getElementById("pollCreateButton");
+const pollAdminStatus = document.getElementById("pollAdminStatus");
+const pollAdminList = document.getElementById("pollAdminList");
+const pollResultsPanel = document.getElementById("pollResultsPanel");
 const serviceReadyModal = document.getElementById("serviceReadyModal");
 const serviceReadyMessage = document.getElementById("serviceReadyMessage");
 const serviceReadyImage = document.getElementById("serviceReadyImage");
@@ -3422,6 +3501,84 @@ let pendingSiteUpdateIds = [];
 let pendingServiceReadyMission = null;
 let announcementsWaitingForServiceModal = [];
 let lastNotifiedServiceTaskId = "";
+let pendingPolls = [];
+let activePoll = null;
+let pollDeferredThisSession = false;
+let pollSubmissionBusy = false;
+
+function tryShowPendingPoll() {
+    if (!auth.currentUser || isPlayerPreview || activePoll || pollDeferredThisSession || !pendingPolls.length) return;
+    const blocked = [eventBoosterPromptModal, boosterResultModal, siteUpdatesModal, serviceReadyModal]
+        .some((modal) => modal && !modal.classList.contains("hidden"));
+    if (blocked) return;
+    activePoll = pendingPolls[0];
+    pollPromptTitle.textContent = "🗳️ " + (activePoll.title || "Sondage");
+    pollPromptQuestion.textContent = activePoll.question || "";
+    pollPromptStatus.textContent = "";
+    pollPlayerAnswer.value = "";
+    const isYesNo = activePoll.responseType === "yesno";
+    pollYesNoActions.classList.toggle("hidden", !isYesNo);
+    pollTextActions.classList.toggle("hidden", isYesNo);
+    pollLaterButton.disabled = false;
+    pollPromptModal.classList.remove("hidden");
+    pollPromptModal.setAttribute("aria-hidden", "false");
+    (isYesNo ? pollYesButton : pollPlayerAnswer).focus();
+}
+
+async function loadPendingPolls() {
+    if (!auth.currentUser) return;
+    try {
+        const response = await callGetPendingPolls();
+        pendingPolls = Array.isArray(response.data?.polls) ? response.data.polls : [];
+        activePoll = null;
+        tryShowPendingPoll();
+    } catch (error) {
+        console.warn("Impossible de charger les sondages en attente :", error);
+    }
+}
+
+function continueStartupNoticesAfterPoll() {
+    if (announcementsWaitingForServiceModal.length && serviceReadyModal.classList.contains("hidden") && siteUpdatesModal.classList.contains("hidden")) {
+        const updates = announcementsWaitingForServiceModal;
+        announcementsWaitingForServiceModal = [];
+        showSiteUpdatesIfNeeded(updates);
+        if (!siteUpdatesModal.classList.contains("hidden")) return;
+    }
+    if (pendingServiceReadyMission && serviceReadyModal.classList.contains("hidden")) showPendingServiceReadyNotification();
+    tryShowPendingPoll();
+}
+
+async function submitCurrentPollResponse(answer) {
+    if (!activePoll || pollSubmissionBusy) return;
+    pollSubmissionBusy = true;
+    [pollYesButton, pollNoButton, pollTextSubmitButton, pollLaterButton].forEach((button) => { button.disabled = true; });
+    pollPromptStatus.textContent = "Enregistrement de ta réponse…";
+    try {
+        await callSubmitPollResponse({ pollId: activePoll.id, answer });
+        pendingPolls = pendingPolls.filter((poll) => poll.id !== activePoll.id);
+        activePoll = null;
+        pollPromptModal.classList.add("hidden");
+        pollPromptModal.setAttribute("aria-hidden", "true");
+        continueStartupNoticesAfterPoll();
+    } catch (error) {
+        console.error("Enregistrement de la réponse au sondage impossible :", error);
+        pollPromptStatus.textContent = error.code === "functions/already-exists"
+            ? "Ta réponse est déjà enregistrée. Actualise la page pour continuer."
+            : "Impossible d’enregistrer la réponse. Vérifie ta connexion puis réessaie.";
+    } finally {
+        pollSubmissionBusy = false;
+        [pollYesButton, pollNoButton, pollTextSubmitButton, pollLaterButton].forEach((button) => { button.disabled = false; });
+    }
+}
+
+function deferCurrentPoll() {
+    if (!activePoll) return;
+    pollDeferredThisSession = true;
+    activePoll = null;
+    pollPromptModal.classList.add("hidden");
+    pollPromptModal.setAttribute("aria-hidden", "true");
+    continueStartupNoticesAfterPoll();
+}
 
 function closeSiteUpdates() {
     const userId = auth.currentUser?.uid;
@@ -3430,6 +3587,7 @@ function closeSiteUpdates() {
     siteUpdatesModal.setAttribute("aria-hidden", "true");
     pendingSiteUpdateIds = [];
     showPendingServiceReadyNotification();
+    if (serviceReadyModal.classList.contains("hidden")) tryShowPendingPoll();
 }
 
 function closeServiceReadyNotification() {
@@ -3439,14 +3597,16 @@ function closeServiceReadyNotification() {
         const announcements = announcementsWaitingForServiceModal;
         announcementsWaitingForServiceModal = [];
         showSiteUpdatesIfNeeded(announcements);
+        if (siteUpdatesModal.classList.contains("hidden")) tryShowPendingPoll();
     } else {
         archivesHomeButton.focus({ preventScroll: true });
+        tryShowPendingPoll();
     }
 }
 
 function showPendingServiceReadyNotification() {
     const mission = pendingServiceReadyMission;
-    if (!mission || !siteUpdatesModal.classList.contains("hidden")) return;
+    if (!mission || !siteUpdatesModal.classList.contains("hidden") || !pollPromptModal.classList.contains("hidden")) return;
     pendingServiceReadyMission = null;
     serviceReadyMessage.textContent = `La mission « ${mission.name || "Service"} » est terminée. Récompense : ${serviceRewardSummary(mission)}. Tu peux la récupérer dans Service.`;
     if (mission.imageUrl) {
@@ -3477,8 +3637,8 @@ function markSiteUpdatesSeen(ids, userId = auth.currentUser?.uid) {
 function showSiteUpdatesIfNeeded(updates) {
     const userId = auth.currentUser?.uid;
     if (!userId || updates.length === 0) return;
-    if (!serviceReadyModal.classList.contains("hidden")) {
-        announcementsWaitingForServiceModal = updates;
+    if (!serviceReadyModal.classList.contains("hidden") || !pollPromptModal.classList.contains("hidden")) {
+        announcementsWaitingForServiceModal = [...announcementsWaitingForServiceModal, ...updates];
         return;
     }
     let seen = [];
@@ -3511,6 +3671,15 @@ serviceReadyOpenButton.addEventListener("click", async () => {
     closeServiceReadyNotification();
     await openArchivesPage();
 });
+
+pollYesButton.addEventListener("click", () => submitCurrentPollResponse("oui"));
+pollNoButton.addEventListener("click", () => submitCurrentPollResponse("non"));
+pollTextSubmitButton.addEventListener("click", () => {
+    const answer = pollPlayerAnswer.value.trim();
+    if (!answer) { pollPromptStatus.textContent = "Écris une réponse avant de l’envoyer."; return; }
+    submitCurrentPollResponse(answer);
+});
+pollLaterButton.addEventListener("click", deferCurrentPoll);
 
 
 
@@ -3735,6 +3904,8 @@ const adminButton = document.getElementById("adminButton");
 const adminHubOpenButton = document.getElementById("adminHubOpenButton");
 const adminHubPage = document.getElementById("adminHubPage");
 const adminHubBackButton = document.getElementById("adminHubBackButton");
+const pollsAdminPage = document.getElementById("pollsAdminPage");
+const pollsAdminBackButton = document.getElementById("pollsAdminBackButton");
 const effectifMenuButton = document.getElementById("effectifMenuButton");
 const effectifPage = document.getElementById("effectifPage");
 const effectifBackButton = document.getElementById("effectifBackButton");
@@ -4235,6 +4406,12 @@ onAuthStateChanged(
             playerLogoutButton.classList.add("hidden");
             serviceReadyModal.classList.add("hidden");
             serviceReadyModal.setAttribute("aria-hidden", "true");
+            pollPromptModal.classList.add("hidden");
+            pollPromptModal.setAttribute("aria-hidden", "true");
+            pendingPolls = [];
+            activePoll = null;
+            pollDeferredThisSession = false;
+            pollSubmissionBusy = false;
             pendingServiceReadyMission = null;
             announcementsWaitingForServiceModal = [];
             lastNotifiedServiceTaskId = "";
@@ -4244,6 +4421,7 @@ onAuthStateChanged(
             adminButton.classList.add("hidden");
             adminHubOpenButton.classList.add("hidden");
             adminHubPage.classList.add("hidden");
+            pollsAdminPage.classList.add("hidden");
             eventBoostersMenuButton.classList.add("hidden");
             adminMessagesMenuButton.classList.add("hidden");
             playerPreviewToggle.classList.add("hidden");
@@ -4459,6 +4637,7 @@ onAuthStateChanged(
         }
 
         await checkPendingEventBoosters(user.uid);
+        await loadPendingPolls();
 
     }
 
@@ -4498,6 +4677,7 @@ function showHomePage() {
     adminHubReturnPending = false;
     document.querySelector(".app-content").classList.remove("hidden");
     adminHubPage.classList.add("hidden");
+    pollsAdminPage.classList.add("hidden");
     termsPage.classList.add("hidden");
     financePage.classList.add("hidden");
     profilePage.classList.add("hidden");
@@ -7206,6 +7386,7 @@ async function checkPendingEventBoosters(uid) {
         else {
             eventBoosterPromptModal.classList.add("hidden");
             eventBoosterPromptModal.setAttribute("aria-hidden", "true");
+            tryShowPendingPoll();
         }
     } catch (error) {
         console.warn("Impossible de vérifier les boosters évènementiels en attente :", error);
@@ -7221,6 +7402,7 @@ function showNextEventBoosterPrompt() {
     if (!activeEventBooster) {
         eventBoosterPromptModal.classList.add("hidden");
         eventBoosterPromptModal.setAttribute("aria-hidden", "true");
+        tryShowPendingPoll();
         return;
     }
     eventBoosterPromptTitle.textContent = `🎁 ${activeEventBooster.name || "Un booster t’attend !"}`;
@@ -7405,7 +7587,7 @@ document.getElementById("viewOwnedCardsButton").addEventListener("click", async 
         boosterResultModal.classList.remove("event-booster-mandatory");
         mandatoryEventBoosterOpen = false;
         if (pendingEventBoosterQueue.length) showNextEventBoosterPrompt();
-        else activeEventBooster = null;
+        else { activeEventBooster = null; tryShowPendingPoll(); }
         return;
     }
     boosterResultModal.classList.add("hidden");
@@ -9251,11 +9433,129 @@ downloadPlayersBackupButton.addEventListener("click", async () => {
     }
 });
 
+async function loadPollResults(pollId) {
+    pollResultsPanel.classList.remove("hidden");
+    pollResultsPanel.textContent = "Chargement des résultats…";
+    try {
+        const response = await callGetPollResults({ pollId });
+        const data = response.data || {};
+        const poll = data.poll || {};
+        const answers = Array.isArray(data.responses) ? data.responses : [];
+        pollResultsPanel.replaceChildren();
+        const heading = document.createElement("h3");
+        heading.textContent = "Résultats : " + (poll.title || "Sondage");
+        const question = document.createElement("p");
+        question.className = "poll-answer-question";
+        question.textContent = poll.question || "";
+        pollResultsPanel.append(heading, question);
+        if (poll.responseType === "yesno") {
+            const summary = document.createElement("p");
+            summary.textContent = `Oui : ${Number(data.summary?.yes) || 0} • Non : ${Number(data.summary?.no) || 0} • Réponses : ${Number(data.summary?.total) || 0}`;
+            pollResultsPanel.append(summary);
+        } else {
+            const total = document.createElement("p");
+            total.textContent = `Réponses reçues : ${answers.length}`;
+            pollResultsPanel.append(total);
+        }
+        if (!answers.length) {
+            const empty = document.createElement("p");
+            empty.className = "admin-note";
+            empty.textContent = "Aucune réponse pour le moment.";
+            pollResultsPanel.append(empty);
+        } else {
+            const table = document.createElement("table");
+            table.className = "poll-results-table";
+            const head = document.createElement("thead");
+            const headRow = document.createElement("tr");
+            ["Joueur", "Réponse", "Date"].forEach((label) => {
+                const cell = document.createElement("th"); cell.scope = "col"; cell.textContent = label; headRow.append(cell);
+            });
+            head.append(headRow);
+            const body = document.createElement("tbody");
+            answers.forEach((answer) => {
+                const row = document.createElement("tr");
+                const pseudo = document.createElement("td"); pseudo.textContent = answer.pseudo || "Joueur";
+                const value = document.createElement("td"); value.textContent = answer.answer || "";
+                const date = document.createElement("td"); date.textContent = answer.answeredAt ? new Date(answer.answeredAt).toLocaleString("fr-FR") : "—";
+                row.append(pseudo, value, date); body.append(row);
+            });
+            table.append(head, body); pollResultsPanel.append(table);
+        }
+        pollResultsPanel.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    } catch (error) {
+        console.error("Impossible de charger les résultats du sondage :", error);
+        pollResultsPanel.textContent = "Impossible de charger les résultats. Vérifie que les fonctions Sondage sont déployées.";
+    }
+}
+
+async function loadAdminPolls() {
+    pollAdminStatus.textContent = "Chargement des sondages…";
+    pollAdminList.replaceChildren();
+    pollResultsPanel.classList.add("hidden");
+    try {
+        const response = await callGetAdminPolls();
+        const polls = Array.isArray(response.data?.polls) ? response.data.polls : [];
+        if (!polls.length) {
+            pollAdminStatus.textContent = "Aucun sondage créé pour le moment.";
+            return;
+        }
+        pollAdminStatus.textContent = polls.length + (polls.length > 1 ? " sondages créés." : " sondage créé.");
+        polls.forEach((poll) => {
+            const button = document.createElement("button");
+            button.type = "button";
+            const title = document.createElement("strong"); title.textContent = poll.title || "Sondage sans titre";
+            const detail = document.createElement("small");
+            detail.textContent = `${poll.responseType === "yesno" ? "Réponse oui/non" : "Réponse libre"} • ${Number(poll.responseCount) || 0} réponse${Number(poll.responseCount) === 1 ? "" : "s"}`;
+            button.append(title, detail);
+            button.addEventListener("click", () => loadPollResults(poll.id));
+            pollAdminList.append(button);
+        });
+    } catch (error) {
+        console.error("Impossible de charger les sondages Admin :", error);
+        pollAdminStatus.textContent = "Impossible de charger les sondages. Vérifie que les fonctions Firebase sont déployées.";
+    }
+}
+
+pollCreateForm.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    if (!isCurrentUserAdmin() || isPlayerPreview) return;
+    pollCreateButton.disabled = true;
+    pollAdminStatus.textContent = "Création du sondage…";
+    try {
+        await callCreatePoll({
+            title: pollTitleInput.value.trim(),
+            question: pollQuestionInput.value.trim(),
+            responseType: pollResponseTypeInput.value,
+        });
+        pollCreateForm.reset();
+        pollAdminStatus.textContent = "Sondage créé. Il sera proposé à la prochaine connexion des joueurs.";
+        await loadAdminPolls();
+    } catch (error) {
+        console.error("Création du sondage impossible :", error);
+        pollAdminStatus.textContent = "Impossible de créer le sondage. Vérifie les champs et que la fonction createPoll est déployée.";
+    } finally {
+        pollCreateButton.disabled = false;
+    }
+});
+
+async function openPollAdminPage() {
+    if (!isCurrentUserAdmin() || isPlayerPreview) return;
+    adminHubReturnPending = true;
+    adminHubPage.classList.add("hidden");
+    document.querySelector(".app-content").classList.add("hidden");
+    [termsPage, financePage, profilePage, leaderboardPage, statisticsPage, drawnCardsPage, collectionPage, recyclingPage,
+        adminPage, effectifPage, eventBoostersAdminPage, messagingPage, rulesPage, premiumPage, archivesPage].forEach((page) => page.classList.add("hidden"));
+    pollsAdminPage.classList.remove("hidden");
+    bottomNav.classList.add("hidden");
+    await loadAdminPolls();
+}
+
 function openAdminHub() {
     if (!isCurrentUserAdmin() || isPlayerPreview) return;
     adminHubReturnPending = false;
     dropdownMenu.classList.add("hidden");
     document.querySelector(".app-content").classList.add("hidden");
+    pollsAdminPage.classList.add("hidden");
     [termsPage, financePage, profilePage, leaderboardPage, statisticsPage, drawnCardsPage, collectionPage, recyclingPage,
         adminPage, effectifPage, eventBoostersAdminPage, messagingPage, rulesPage, premiumPage, archivesPage].forEach((page) => page.classList.add("hidden"));
     adminHubPage.classList.remove("hidden");
@@ -9274,11 +9574,13 @@ function returnToAdminHubOrHome() {
 
 adminHubOpenButton.addEventListener("click", openAdminHub);
 adminHubBackButton.addEventListener("click", showHomePage);
+pollsAdminBackButton.addEventListener("click", openAdminHub);
 document.querySelectorAll("[data-admin-hub-action]").forEach((button) => {
     button.addEventListener("click", () => {
         const action = button.dataset.adminHubAction;
         if (action === "preview") { playerPreviewToggle.click(); return; }
         if (action === "logout") { logoutButton.click(); return; }
+        if (action === "polls") { void openPollAdminPage(); return; }
         if (action === "tirages") { adminHubReturnPending = true; adminHubPage.classList.add("hidden"); void showDrawnCardsPage(); return; }
         const destination = {
             effectif: effectifMenuButton,
@@ -9297,6 +9599,7 @@ document.querySelectorAll("[data-admin-hub-action]").forEach((button) => {
 adminButton.addEventListener("click", async () => {
     if (!auth.currentUser || (auth.currentUser.email || "").toLowerCase() !== ADMIN_EMAIL) return;
     dropdownMenu.classList.add("hidden");
+    pollsAdminPage.classList.add("hidden");
     premiumPage.classList.add("hidden");
     document.querySelector(".app-content").classList.add("hidden");
     profilePage.classList.add("hidden");
