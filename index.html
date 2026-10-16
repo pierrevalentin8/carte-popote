@@ -1086,6 +1086,14 @@ body {
 .journal-column h4 { margin: 2px 0 8px; color: #173b52; font-size: 14px; }
 .journal-column .journal-item { overflow-wrap: anywhere; }
 .journal-column .announcement-item p { white-space: pre-line; }
+.home-journal-disclosure { margin-top: 25px; }
+.home-journal-summary { display: inline-flex; width: fit-content; align-items: center; justify-content: flex-start; margin: 0 0 12px; padding: 8px 13px; border: 1px solid rgba(243,191,56,.65); border-radius: 12px; background: linear-gradient(145deg, rgba(35,67,108,.94), rgba(12,29,56,.96)); box-shadow: 0 4px 0 #071327, 0 7px 13px rgba(0,0,0,.24), inset 0 1px 0 rgba(255,255,255,.18); cursor: pointer; list-style: none; user-select: none; transition: transform .16s ease, filter .16s ease, box-shadow .16s ease; }
+.home-journal-summary::-webkit-details-marker { display: none; }
+.home-journal-summary h3 { display: flex; align-items: center; gap: 9px; margin: 0; color: #ffe181; font-size: 17px; }
+.home-journal-summary:hover { transform: translateY(-2px); filter: brightness(1.12); box-shadow: 0 6px 0 #071327, 0 10px 17px rgba(0,0,0,.34), inset 0 1px 0 rgba(255,255,255,.28); }
+.home-journal-summary:active { transform: translateY(2px); box-shadow: 0 2px 0 #071327, 0 4px 8px rgba(0,0,0,.28); }
+.home-journal-disclosure > .journal { animation: homeJournalOpen .22s ease-out; }
+@keyframes homeJournalOpen { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
 @media (max-width: 600px) { .journal-columns { grid-template-columns: 1fr; } }
 
 
@@ -2584,15 +2592,10 @@ body {
 
         <!-- JOURNAL -->
 
-        <div class="section-title">
-
-            <h3>
-                📰 Journal
-            </h3>
-
-        </div>
-
-
+        <details class="home-journal-disclosure">
+        <summary class="section-title home-journal-summary">
+            <h3>📰 Journal</h3>
+        </summary>
         <section class="journal journal-columns">
             <div class="journal-column">
                 <h4>Annonces</h4>
@@ -2603,6 +2606,7 @@ body {
                 <div id="newPlayersList"></div>
             </div>
         </section>
+        </details>
 
         <div class="message-compose-card">
             <button id="feedbackToggleButton" class="message-compose-toggle" type="button" aria-expanded="false" aria-controls="feedbackFormPanel" aria-label="Envoyer un message à l’Admin">
