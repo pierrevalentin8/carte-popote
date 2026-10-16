@@ -1,5 +1,5 @@
-const CACHE_NAME = "cartes-popote-app-v96";
-const APP_SHELL = ["./","./index.html","./manifest.webmanifest","./icon-192.png","./icon-512.png","./icon-maskable-512.png","./apple-touch-icon.png","./optimized/Logo.png","./optimized/Jeton.png","./optimized/Jeton%20premium.png"];
+const CACHE_NAME = "cartes-popote-app-v97";
+const APP_SHELL = ["./","./index.html","./manifest.webmanifest","./icon-192.png","./icon-512.png","./icon-maskable-512.png","./apple-touch-icon.png","./Logo.png","./Jeton.png","./Jeton%20premium.png"];
 self.addEventListener("install", (event) => {
   event.waitUntil(caches.open(CACHE_NAME).then(async (cache) => {
     await Promise.all(APP_SHELL.map(async (path) => {
@@ -31,7 +31,7 @@ self.addEventListener("fetch", (event) => {
     event.respondWith(caches.match(request).then((cached) => cached || fetch(request)));
     return;
   }
-  if (url.pathname.includes("/optimized/")) {
+  if (url.pathname.toLowerCase().endsWith(".png")) {
     event.respondWith(caches.match(request).then(async (cached) => {
       if (cached) return cached;
       const response = await fetch(request);
