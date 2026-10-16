@@ -879,6 +879,28 @@ body {
     gap: 10px;
 }
 
+#cooperationCard { min-width:0; padding:12px 9px; overflow:hidden; border:2px solid #e2ad3c; background:radial-gradient(ellipse at 50% 0%,#173d72 0%,#0b1e3c 72%); color:#f8f2df; box-shadow:inset 0 0 0 2px rgba(255,218,126,.13),0 5px 13px rgba(5,15,33,.22); }
+#cooperationCard h4 { margin:0 0 10px; color:#ffd66b; font-size:16px; letter-spacing:.04em; text-align:center; text-shadow:0 0 9px rgba(255,193,54,.48); }
+.cooperation-gauges { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:7px; align-items:end; }
+.cooperation-gauge { display:grid; min-width:0; justify-items:center; gap:5px; text-align:center; }
+.cooperation-gauge img { width:30px; height:30px; object-fit:contain; filter:drop-shadow(0 0 5px var(--gauge-color)); }
+.cooperation-gauge-label { min-height:26px; color:#fff5da; font-size:10px; font-weight:800; line-height:1.2; }
+.cooperation-gauge-track { position:relative; display:flex; width:30px; height:76px; align-items:flex-end; overflow:hidden; border:2px solid #cda64f; border-radius:9px; background:linear-gradient(90deg,#08162b,#183458 48%,#08162b); box-shadow:inset 0 0 7px #020914,0 0 5px rgba(255,210,95,.24); }
+.cooperation-gauge-fill { width:100%; height:0%; border-radius:5px 5px 7px 7px; background:linear-gradient(90deg,rgba(255,255,255,.42),var(--gauge-color) 55%,rgba(0,0,0,.28)); box-shadow:0 0 10px var(--gauge-color),inset 0 0 6px rgba(255,255,255,.55); transition:height .85s cubic-bezier(.2,.8,.2,1); }
+.cooperation-gauge-track.is-complete { box-shadow:inset 0 0 7px #020914,0 0 11px var(--gauge-color); }
+.cooperation-gauge-disabled { opacity:.48; }
+.cooperation-gauge-value { max-width:100%; color:#fff; font-size:10px; font-weight:800; line-height:1.15; white-space:normal; overflow-wrap:anywhere; font-variant-numeric:tabular-nums; }
+#cooperationCard.is-celebrating { animation:cooperationComplete .9s ease-in-out 2; }
+@keyframes cooperationComplete { 50% { box-shadow:inset 0 0 0 2px rgba(255,255,255,.55),0 0 24px #ffe17a; } }
+.cooperation-admin-list { display:grid; gap:10px; margin:12px 0; }
+.cooperation-admin-row { display:grid; grid-template-columns:minmax(100px,1.3fr) minmax(86px,.7fr) minmax(120px,1fr) auto auto; gap:9px; align-items:center; padding:10px; border:1px solid #d8c99f; border-radius:9px; background:#fffefa; }
+.cooperation-admin-row strong { color:var(--theme-ink); }
+.cooperation-admin-progress { color:var(--theme-muted); font-size:12px; text-align:center; }
+.cooperation-admin-row input[type="number"] { width:100%; min-width:72px; }
+.cooperation-admin-row input[type="checkbox"] { width:19px; height:19px; accent-color:#19753c; }
+@media (max-width:520px) { #cooperationCard { padding:10px 6px; } .cooperation-gauges { gap:4px; } .cooperation-gauge img { width:26px; height:26px; } .cooperation-gauge-track { width:26px; height:68px; } .cooperation-gauge-label,.cooperation-gauge-value { font-size:9px; } .cooperation-admin-row { grid-template-columns:1fr 72px; } .cooperation-admin-progress { text-align:left; } }
+@media (prefers-reduced-motion:reduce) { .cooperation-gauge-fill { transition:none; } #cooperationCard.is-celebrating { animation:none; } }
+
 
 .booster {
 
@@ -2320,6 +2342,7 @@ body {
             <button class="admin-menu-button" type="button" data-admin-section="rarities" aria-controls="adminRaritiesSection" aria-pressed="false">⭐ Catégories de rareté</button>
             <button class="admin-menu-button" type="button" data-admin-section="cards" aria-controls="adminCardsSection" aria-pressed="false">🃏 Création de cartes</button>
             <button class="admin-menu-button" type="button" data-admin-section="serviceMissions" aria-controls="adminServiceMissionsSection" aria-pressed="false">📋 Gestion des missions</button>
+            <button class="admin-menu-button" type="button" data-admin-section="cooperations" aria-controls="adminCooperationsSection" aria-pressed="false">🤝 Coopérations</button>
             <button class="admin-hub-card" type="button" data-admin-hub-action="effectif"><span class="admin-hub-card-icon">👥</span><span><strong>Effectif</strong><small>Suivi mensuel des joueurs</small></span></button>
             <button class="admin-hub-card" type="button" data-admin-hub-action="boosters"><span class="admin-hub-card-icon">🎁</span><span><strong>Boosters évènementiels</strong><small>Programmation et attribution</small></span></button>
             <button class="admin-hub-card" type="button" data-admin-hub-action="messagerie"><span class="admin-hub-card-icon">💬</span><span><strong>Messagerie</strong><small>Idées, problèmes et archives</small></span></button>
@@ -2403,6 +2426,31 @@ body {
                     Ouvrir le booster journalier
                 </button>
 
+            </article>
+
+
+            <article id="cooperationCard" class="booster cooperation-card hidden" aria-labelledby="cooperationCardTitle">
+                <h4 id="cooperationCardTitle">✦ Coopérations ✦</h4>
+                <div class="cooperation-gauges" id="cooperationGauges">
+                    <div class="cooperation-gauge" data-cooperation-gauge="recycling" style="--gauge-color:#62f078">
+                        <img src="./Recyclage.png" alt="" loading="lazy" decoding="async">
+                        <span class="cooperation-gauge-label">Recyclage</span>
+                        <div class="cooperation-gauge-track" role="progressbar" aria-label="Progression collective du recyclage" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><div class="cooperation-gauge-fill"></div></div>
+                        <span class="cooperation-gauge-value">0 / 0</span>
+                    </div>
+                    <div class="cooperation-gauge" data-cooperation-gauge="cardsDrawn" style="--gauge-color:#45d9ff">
+                        <img src="./Dos%20cartes.png" alt="" loading="lazy" decoding="async">
+                        <span class="cooperation-gauge-label">Cartes tirées</span>
+                        <div class="cooperation-gauge-track" role="progressbar" aria-label="Progression collective des cartes tirées" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><div class="cooperation-gauge-fill"></div></div>
+                        <span class="cooperation-gauge-value">0 / 0</span>
+                    </div>
+                    <div class="cooperation-gauge" data-cooperation-gauge="boostersOpened" style="--gauge-color:#c17bff">
+                        <img src="./Booster%20normal.png" alt="" loading="lazy" decoding="async">
+                        <span class="cooperation-gauge-label">Boosters ouverts</span>
+                        <div class="cooperation-gauge-track" role="progressbar" aria-label="Progression collective des boosters ouverts" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><div class="cooperation-gauge-fill"></div></div>
+                        <span class="cooperation-gauge-value">0 / 0</span>
+                    </div>
+                </div>
             </article>
 
 
@@ -3065,6 +3113,13 @@ body {
                 <label>Illustration (PNG/JPG/WebP, max 5 Mo)<input id="serviceMissionImage" type="file" accept="image/png,image/jpeg,image/webp"></label><label>Activer la mission<input id="serviceMissionEnabled" type="checkbox" checked></label>
             </div><p id="serviceMissionImageStatus" class="admin-note">Image facultative.</p><button id="serviceMissionSave" class="primary-button" type="submit">Enregistrer la mission</button><button id="serviceMissionCancel" class="secondary-button hidden" type="button">Annuler</button></form><p id="serviceAdminStatus" class="admin-status" role="status" aria-live="polite"></p></div>
         </div>
+        <div id="adminCooperationsSection" class="admin-panel admin-section hidden" style="margin-bottom:16px">
+            <h3>🤝 Paramètres des coopérations</h3>
+            <p class="admin-note">Définis les objectifs et active ou suspends chaque jauge. Les progressions sont collectives. Aucune récompense n’est distribuée à ce stade.</p>
+            <div id="cooperationAdminList" class="cooperation-admin-list"></div>
+            <button id="saveCooperationSettingsButton" class="primary-button admin-submit" type="button">Enregistrer les paramètres</button>
+            <p id="cooperationAdminStatus" class="admin-status" role="status" aria-live="polite"></p>
+        </div>
     </section>
 
     <section id="effectifPage" class="admin-page hidden" aria-labelledby="effectifPageTitle">
@@ -3172,6 +3227,7 @@ import {
     setDoc,
     collection,
     getDocs,
+    onSnapshot,
     addDoc,
     writeBatch,
     updateDoc,
@@ -3293,6 +3349,10 @@ const callGetMyPremiumSpending = httpsCallable(functions, "getMyPremiumSpending"
 const callUpdateMyPlayerIdentity = httpsCallable(functions, "updateMyPlayerIdentity");
 const callRecycleDuplicateCards = httpsCallable(functions, "recycleDuplicateCards");
 const callGetGlobalRecycleCount = httpsCallable(functions, "getGlobalRecycleCount");
+const callGetCooperationProgress = httpsCallable(functions, "getCooperationProgress");
+const callGetAdminCooperationSettings = httpsCallable(functions, "getAdminCooperationSettings");
+const callSaveCooperationSettings = httpsCallable(functions, "saveCooperationSettings");
+const callResetCooperationGauge = httpsCallable(functions, "resetCooperationGauge");
 const callDownloadPlayerBackup = httpsCallable(functions, "downloadPlayerBackup");
 
 const siteUpdatesModal = document.getElementById("siteUpdatesModal");
@@ -3675,6 +3735,17 @@ const messagingPage = document.getElementById("messagingPage");
 const messagingBackButton = document.getElementById("messagingBackButton");
 const ADMIN_EMAIL = "pierre.valentin8@gmail.com";
 let isPlayerPreview = false;
+const cooperationCard = document.getElementById("cooperationCard");
+const cooperationAdminList = document.getElementById("cooperationAdminList");
+const cooperationAdminStatus = document.getElementById("cooperationAdminStatus");
+const cooperationGaugeDefinitions = [
+    { id:"recycling", label:"Recyclage", fieldLabel:"Recyclages collectifs", icon:"./Recyclage.png" },
+    { id:"cardsDrawn", label:"Cartes tirées", fieldLabel:"Cartes tirées collectivement", icon:"./Dos%20cartes.png" },
+    { id:"boostersOpened", label:"Boosters ouverts", fieldLabel:"Boosters ouverts collectivement", icon:"./Booster%20normal.png" }
+];
+let cooperationProgress = { gauges:{}, counters:{} };
+let cooperationUnsubscribers = [];
+let dailyBoosterLastOpenedDate = "";
 let premiumAdminPlayers = [];
 let premiumRewardCards = [];
 const buyNormalBoosterButton = document.getElementById("buyNormalBoosterButton");
@@ -3736,7 +3807,8 @@ const adminSections = {
     rarities: document.getElementById("adminRaritiesSection"),
     cards: document.getElementById("adminCardsSection"),
     gav: document.getElementById("adminGavSection"),
-    serviceMissions: document.getElementById("adminServiceMissionsSection")
+    serviceMissions: document.getElementById("adminServiceMissionsSection"),
+    cooperations: document.getElementById("adminCooperationsSection")
 };
 const minageAdminSelect = document.getElementById("minageAdminSelect");
 const minageCreateButton = document.getElementById("minageCreateButton");
@@ -4086,6 +4158,7 @@ onAuthStateChanged(
            ========================================== */
 
         if (!user) {
+            stopCooperationListeners();
             menuButton.classList.add("hidden");
             dropdownMenu.classList.add("hidden");
             playerLogoutButton.classList.add("hidden");
@@ -4151,6 +4224,7 @@ onAuthStateChanged(
         appPage.classList.remove(
             "hidden"
         );
+        startCooperationListeners();
 
         // Affichage seulement : les règles Firestore protègent les données.
         const isAdminAccount = (user.email || "").toLowerCase() === ADMIN_EMAIL;
@@ -4425,6 +4499,7 @@ async function claimArchivesReward() {
     archivesStatus.textContent = "Le minage est terminé. Récupération de ta récompense…";
     try {
         const response = await callClaimArchivesSortingReward();
+        void refreshCooperationProgress();
         const tokens = Number(response.data.tokens) || 0;
         const tokenReward = Number(response.data.tokenReward) || 0;
         document.getElementById("playerTokens").textContent = tokens.toLocaleString("fr-FR");
@@ -4534,6 +4609,7 @@ document.getElementById("serviceClaimButton").addEventListener("click", async ()
     const button = document.getElementById("serviceClaimButton"); button.disabled = true; serviceStatus.textContent = "Récupération de ta récompense…";
     try {
         const result = (await callClaimServiceMissionReward({ taskId: serviceActiveMission?.taskId })).data || {};
+        void refreshCooperationProgress();
         const details = [`${result.tokenReward || 0} jeton(s)`];
         if (result.cardDropChance > 0 && !result.cardDropSucceeded) details.push("aucune carte n’a été obtenue cette fois");
         (result.cards || []).forEach((card) => details.push(card.name || "une carte"));
@@ -5419,6 +5495,7 @@ premiumSpinButton.addEventListener("click", async () => {
             localStorage.setItem(requestStorageKey, requestId);
         }
         const response = await callSpinPremiumWheel({ requestId });
+        void refreshCooperationProgress();
         localStorage.removeItem(requestStorageKey);
         const data = response.data;
         const prizeIndex = premiumPrizes.findIndex((prize) => prize.id === data.prize.id);
@@ -6542,12 +6619,181 @@ function getParisDateKey() {
 }
 
 function setDailyBoosterButton(lastOpenedDate) {
+    dailyBoosterLastOpenedDate = typeof lastOpenedDate === "string" ? lastOpenedDate : "";
     const alreadyOpened = lastOpenedDate === getParisDateKey();
     dailyBoosterArticle.classList.toggle("hidden", alreadyOpened);
+    cooperationCard.classList.toggle("hidden", !alreadyOpened);
     openDailyBoosterButton.disabled = alreadyOpened;
     openDailyBoosterButton.textContent = alreadyOpened
         ? "Déjà ouvert aujourd’hui"
         : "Ouvrir le booster journalier";
+}
+
+window.setInterval(() => {
+    if (auth.currentUser && getParisDateKey() !== dailyBoosterLastOpenedDate && dailyBoosterArticle.classList.contains("hidden")) {
+        setDailyBoosterButton(dailyBoosterLastOpenedDate);
+    }
+}, 30_000);
+
+function applyCooperationProgress(data) {
+    if (!data || typeof data !== "object") return;
+    cooperationProgress = {
+        gauges: data.gauges && typeof data.gauges === "object" ? data.gauges : cooperationProgress.gauges,
+        counters: data.counters && typeof data.counters === "object" ? data.counters : cooperationProgress.counters
+    };
+    renderCooperationGauges();
+    updateCooperationAdminProgress();
+}
+
+function renderCooperationGauges() {
+    cooperationGaugeDefinitions.forEach((definition) => {
+        const root = document.querySelector(`[data-cooperation-gauge="${definition.id}"]`);
+        if (!root) return;
+        const config = cooperationProgress.gauges?.[definition.id] || {};
+        const current = Math.max(0, Number(cooperationProgress.counters?.[definition.id]) || 0);
+        const goal = Number(config.goal);
+        const hasGoal = Number.isSafeInteger(goal) && goal > 0;
+        const percent = hasGoal ? Math.min(100, Math.max(0, current / goal * 100)) : 0;
+        const track = root.querySelector(".cooperation-gauge-track");
+        const fill = root.querySelector(".cooperation-gauge-fill");
+        const value = root.querySelector(".cooperation-gauge-value");
+        const wasComplete = track.classList.contains("is-complete");
+        fill.style.height = `${percent}%`;
+        track.setAttribute("aria-valuenow", String(Math.round(percent)));
+        track.setAttribute("aria-valuetext", hasGoal ? `${current} sur ${goal}` : "Objectif non défini");
+        value.textContent = hasGoal ? `${current.toLocaleString("fr-FR")} / ${goal.toLocaleString("fr-FR")}` : `${current.toLocaleString("fr-FR")} / —`;
+        root.classList.toggle("cooperation-gauge-disabled", config.enabled === false);
+        root.setAttribute("aria-label", config.enabled === false ? `${definition.label}, coopération en pause` : definition.label);
+        track.classList.toggle("is-complete", hasGoal && percent >= 100);
+        if (!wasComplete && hasGoal && percent >= 100 && config.enabled !== false) {
+            cooperationCard.classList.remove("is-celebrating");
+            void cooperationCard.offsetWidth;
+            cooperationCard.classList.add("is-celebrating");
+            window.setTimeout(() => cooperationCard.classList.remove("is-celebrating"), 1900);
+        }
+    });
+}
+
+function updateCooperationAdminProgress() {
+    cooperationGaugeDefinitions.forEach((definition) => {
+        const row = cooperationAdminList?.querySelector(`[data-admin-cooperation="${definition.id}"]`);
+        if (!row) return;
+        const current = Math.max(0, Number(cooperationProgress.counters?.[definition.id]) || 0);
+        const goal = Number(cooperationProgress.gauges?.[definition.id]?.goal);
+        const text = row.querySelector(".cooperation-admin-progress");
+        text.textContent = Number.isSafeInteger(goal) && goal > 0
+            ? `${current.toLocaleString("fr-FR")} / ${goal.toLocaleString("fr-FR")}`
+            : `${current.toLocaleString("fr-FR")} · objectif à définir`;
+    });
+}
+
+async function refreshCooperationProgress() {
+    if (!auth.currentUser) return;
+    try {
+        const response = await callGetCooperationProgress();
+        applyCooperationProgress(response.data);
+    } catch (error) {
+        console.error("Impossible de charger les coopérations :", error);
+    }
+}
+
+function stopCooperationListeners() {
+    cooperationUnsubscribers.forEach((unsubscribe) => unsubscribe());
+    cooperationUnsubscribers = [];
+}
+
+function startCooperationListeners() {
+    stopCooperationListeners();
+    const statsRef = doc(db, "globalStats", "cooperations");
+    const settingsRef = doc(db, "cooperationSettings", "main");
+    let latestStats = null;
+    let latestSettings = null;
+    const applyLatest = () => {
+        if (latestStats === null || latestSettings === null) return;
+        applyCooperationProgress({ counters: latestStats, gauges: latestSettings.gauges || {} });
+        if (!Object.keys(latestSettings.gauges || {}).length) refreshCooperationProgress();
+    };
+    cooperationUnsubscribers.push(onSnapshot(statsRef, (snapshot) => {
+        latestStats = snapshot.exists() ? snapshot.data() : {};
+        applyLatest();
+    }, (error) => {
+        console.warn("Suivi temps réel des coopérations indisponible; chargement via Firebase Functions.", error);
+        refreshCooperationProgress();
+    }));
+    cooperationUnsubscribers.push(onSnapshot(settingsRef, (snapshot) => {
+        latestSettings = snapshot.exists() ? snapshot.data() : {};
+        applyLatest();
+    }, (error) => {
+        console.warn("Réglages temps réel des coopérations indisponibles; chargement via Firebase Functions.", error);
+        refreshCooperationProgress();
+    }));
+}
+
+async function loadAdminCooperations() {
+    cooperationAdminStatus.textContent = "Chargement des paramètres…";
+    try {
+        const response = await callGetAdminCooperationSettings();
+        applyCooperationProgress(response.data);
+        cooperationAdminList.replaceChildren();
+        cooperationGaugeDefinitions.forEach((definition) => {
+            const config = cooperationProgress.gauges?.[definition.id] || {};
+            const row = document.createElement("div"); row.className = "cooperation-admin-row"; row.dataset.adminCooperation = definition.id;
+            const label = document.createElement("strong"); label.textContent = definition.label;
+            const targetLabel = document.createElement("label"); targetLabel.textContent = "Objectif";
+            const target = document.createElement("input"); target.type = "number"; target.min = "1"; target.max = "1000000000"; target.step = "1";
+            target.className = "admin-field"; target.value = String(Number(config.goal) || ""); target.setAttribute("aria-label", `Objectif de ${definition.label}`); targetLabel.append(target);
+            const progress = document.createElement("span"); progress.className = "cooperation-admin-progress";
+            const enabledLabel = document.createElement("label"); enabledLabel.className = "effectif-eligibility";
+            const enabled = document.createElement("input"); enabled.type = "checkbox"; enabled.checked = config.enabled !== false;
+            enabled.setAttribute("aria-label", `Activer la jauge ${definition.label}`);
+            const enabledText = document.createElement("span"); enabledText.textContent = "Activée";
+            enabled.addEventListener("change", () => { enabledText.textContent = enabled.checked ? "Activée" : "En pause"; });
+            enabledLabel.append(enabled, enabledText);
+            const reset = document.createElement("button"); reset.type = "button"; reset.className = "secondary-button"; reset.textContent = "Réinitialiser";
+            reset.addEventListener("click", async () => {
+                const liveCount = Number(cooperationProgress.counters?.[definition.id]) || 0;
+                if (!window.confirm(`Réinitialiser la jauge « ${definition.label} » (actuellement ${liveCount.toLocaleString("fr-FR")}) ?`)) return;
+                reset.disabled = true; cooperationAdminStatus.textContent = `Réinitialisation de ${definition.label}…`;
+                try {
+                    const result = await callResetCooperationGauge({ gaugeId:definition.id });
+                    applyCooperationProgress(result.data);
+                    cooperationAdminStatus.textContent = `La jauge « ${definition.label} » a été réinitialisée.`;
+                } catch (error) {
+                    console.error("Impossible de réinitialiser la jauge :", error);
+                    cooperationAdminStatus.textContent = error.message || "Réinitialisation refusée. Vérifie le déploiement des fonctions Coopérations.";
+                } finally { reset.disabled = false; }
+            });
+            row.append(label, targetLabel, progress, enabledLabel, reset); cooperationAdminList.append(row);
+        });
+        updateCooperationAdminProgress();
+        cooperationAdminStatus.textContent = "Paramètres chargés. Les valeurs de progression sont communes à tous les joueurs.";
+    } catch (error) {
+        console.error("Impossible de charger les paramètres Coopérations :", error);
+        cooperationAdminStatus.textContent = error.message || "Chargement refusé. Vérifie que getAdminCooperationSettings est déployée.";
+    }
+}
+
+async function saveAdminCooperationSettings() {
+    const gauges = {};
+    let valid = true;
+    cooperationGaugeDefinitions.forEach(({ id }) => {
+        const row = cooperationAdminList.querySelector(`[data-admin-cooperation="${id}"]`);
+        const goal = Number(row?.querySelector('input[type="number"]')?.value);
+        const enabled = row?.querySelector('input[type="checkbox"]')?.checked === true;
+        if (!Number.isSafeInteger(goal) || goal < 1 || goal > 1_000_000_000) valid = false;
+        gauges[id] = { goal, enabled };
+    });
+    if (!valid) { cooperationAdminStatus.textContent = "Chaque objectif doit être un entier entre 1 et 1 000 000 000."; return; }
+    const button = document.getElementById("saveCooperationSettingsButton"); button.disabled = true;
+    cooperationAdminStatus.textContent = "Enregistrement des paramètres…";
+    try {
+        const response = await callSaveCooperationSettings({ gauges });
+        applyCooperationProgress(response.data);
+        cooperationAdminStatus.textContent = "Paramètres des coopérations enregistrés.";
+    } catch (error) {
+        console.error("Impossible d’enregistrer les paramètres Coopérations :", error);
+        cooperationAdminStatus.textContent = error.message || "Enregistrement refusé. Vérifie que saveCooperationSettings est déployée.";
+    } finally { button.disabled = false; }
 }
 
 function getLevelProgress(totalXp) {
@@ -6696,6 +6942,7 @@ eventBoosterOpenButton.addEventListener("click", async () => {
     try {
         const previouslyOwnedIds = await getPreviouslyOwnedCardIds();
         const response = await callOpenEventBooster({ eventId: activeEventBooster.id });
+        void refreshCooperationProgress();
         const result = response.data || {};
         pendingEventBoosterQueue.shift();
         document.getElementById("playerCards").textContent = Number(result.cartesTirees) || 0;
@@ -6852,6 +7099,7 @@ openNormalBoosterButton.addEventListener("click", async () => {
     try {
         const previouslyOwnedIds = await getPreviouslyOwnedCardIds();
         const response = await callOpenClassicBooster();
+        void refreshCooperationProgress();
         const result = response.data;
         const count = Number(result.boostersDisponibles) || 0;
         setOpenBoosterButton(count);
@@ -6892,6 +7140,7 @@ openDailyBoosterButton.addEventListener("click", async () => {
     try {
         const previouslyOwnedIds = await getPreviouslyOwnedCardIds();
         const response = await callOpenDailyBooster();
+        void refreshCooperationProgress();
         const result = response.data;
         document.getElementById("playerCards").textContent = Number(result.cartesTirees) || 0;
         updatePlayerXpDisplay(result.xp);
@@ -6948,6 +7197,7 @@ recycleDuplicatesButton.addEventListener("click", async () => {
     try {
         const copyIds = Array.from(selectedRecycleCopyIds);
         const response = await callRecycleDuplicateCards({ copyIds });
+        void refreshCooperationProgress();
         document.getElementById("playerTokens").textContent = Number(response.data.tokens).toLocaleString("fr-FR");
         selectedRecycleCopyIds.clear();
         await loadGlobalRecyclingCount();
@@ -7617,6 +7867,7 @@ async function showAdminSection(sectionName) {
     }
     if (sectionName === "gav") await loadAdminGavSettings();
     if (sectionName === "serviceMissions") await loadAdminServiceMissions();
+    if (sectionName === "cooperations") await loadAdminCooperations();
 }
 
 let adminEffectifMonths = [];
@@ -8775,6 +9026,7 @@ document.querySelectorAll(".admin-menu-button").forEach((button) => {
     });
 });
 document.getElementById("effectifAddMonthButton").addEventListener("click", addAdminEffectifMonth);
+document.getElementById("saveCooperationSettingsButton").addEventListener("click", saveAdminCooperationSettings);
 
 adminBackButton.addEventListener("click", openAdminHub);
 

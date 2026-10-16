@@ -1,5 +1,5 @@
-const CACHE_NAME = "cartes-popote-app-v106";
-const APP_SHELL = ["./","./index.html","./manifest.webmanifest","./icon-192.png","./icon-512.png","./icon-maskable-512.png","./apple-touch-icon.png","./Logo.png","./Jeton.png","./Jeton%20premium.png","./Admin.png"];
+const CACHE_NAME = "cartes-popote-app-v107";
+const APP_SHELL = ["./","./index.html","./manifest.webmanifest","./icon-192.png","./icon-512.png","./icon-maskable-512.png","./apple-touch-icon.png","./Logo.png","./Jeton.png","./Jeton%20premium.png","./Admin.png","./Recyclage.png","./Dos%20cartes.png","./Booster%20normal.png"];
 self.addEventListener("install", (event) => {
   event.waitUntil(caches.open(CACHE_NAME).then(async (cache) => {
     await Promise.all(APP_SHELL.map(async (path) => {
