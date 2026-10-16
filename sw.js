@@ -1,5 +1,5 @@
-const CACHE_NAME = "cartes-popote-app-v95";
-const APP_SHELL = ["./", "./index.html", "./manifest.webmanifest", "./Logo.png", "./icon-192.png", "./icon-512.png", "./icon-maskable-512.png", "./apple-touch-icon.png", "./Messagerie.png", "./enveloppe.png", "./Jeton.png", "./Dos%20cartes.png", "./Jeton%20premium.png", "./avatar-homme-chauve-barbu.png", "./avatar-homme-vieux.png", "./avatar-licorne.png", "./badge-premium-10.png", "./badge-communes-27.png", "./salle-archives.png", "./Service.png", "./Accueil.png", "./Classement.png", "./Collection.png", "./Recyclage.png", "./Échange.png", "./Règles.png"];
+const CACHE_NAME = "cartes-popote-app-v96";
+const APP_SHELL = ["./","./index.html","./manifest.webmanifest","./icon-192.png","./icon-512.png","./icon-maskable-512.png","./apple-touch-icon.png","./optimized/Logo.png","./optimized/Jeton.png","./optimized/Jeton%20premium.png"];
 self.addEventListener("install", (event) => {
   event.waitUntil(caches.open(CACHE_NAME).then(async (cache) => {
     await Promise.all(APP_SHELL.map(async (path) => {
@@ -29,6 +29,18 @@ self.addEventListener("fetch", (event) => {
   }
   if (APP_SHELL.some((path) => new URL(path, self.registration.scope).href === request.url)) {
     event.respondWith(caches.match(request).then((cached) => cached || fetch(request)));
+    return;
+  }
+  if (url.pathname.includes("/optimized/")) {
+    event.respondWith(caches.match(request).then(async (cached) => {
+      if (cached) return cached;
+      const response = await fetch(request);
+      if (response.ok) {
+        const cache = await caches.open(CACHE_NAME);
+        await cache.put(request, response.clone());
+      }
+      return response;
+    }));
   }
 });
 

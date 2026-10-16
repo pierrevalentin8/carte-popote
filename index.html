@@ -1924,7 +1924,7 @@ body {
 .profile-stat-label { max-width: 230px; color: #59677b; font-size: 12px; line-height: 1.4; }
 .player-profile { max-width: 980px; }
 .profile-pro-card { position: relative; isolation: isolate; overflow: hidden; margin-top: 20px; padding: clamp(18px, 3vw, 30px); border: 3px solid #d7ad46; border-radius: 22px; background: radial-gradient(ellipse at 80% 20%, rgba(53,94,152,.42), transparent 42%), repeating-linear-gradient(135deg, rgba(255,255,255,.018) 0 2px, transparent 2px 7px), linear-gradient(145deg, #06152e, #102d59 58%, #07162f); color: #f7f1df; box-shadow: 0 18px 44px rgba(0,0,0,.38), inset 0 0 0 3px rgba(255,221,132,.16), inset 0 0 28px rgba(0,0,0,.38); }
-.profile-pro-card::before { position: absolute; z-index: -1; top: 8%; right: -3%; width: min(38%, 310px); aspect-ratio: 1; background: url('./Logo.png') center / contain no-repeat; content: ""; opacity: .075; filter: grayscale(1); pointer-events: none; }
+.profile-pro-card::before { position: absolute; z-index: -1; top: 8%; right: -3%; width: min(38%, 310px); aspect-ratio: 1; background: url('./optimized/Logo.png') center / contain no-repeat; content: ""; opacity: .075; filter: grayscale(1); pointer-events: none; }
 .profile-pro-card::after { position: absolute; z-index: -1; inset: 7px; border: 1px solid rgba(255,218,111,.37); border-radius: 15px; content: ""; pointer-events: none; }
 .profile-card-identity { display: grid; grid-template-columns: 142px minmax(0,1fr); align-items: center; gap: clamp(16px,3vw,28px); padding: 2px 48px 18px 2px; }
 .profile-avatar-frame { display: grid; place-items: center; width: 142px; height: 178px; overflow: hidden; border: 4px solid #dcb74f; border-radius: 12px; background: #f8f4e8; box-shadow: 0 6px 17px rgba(0,0,0,.4), inset 0 0 0 2px #fff1bf; }
@@ -2045,9 +2045,9 @@ body {
 
 
     <div class="login-showcase">
-        <img class="login-brand-logo" src="./Logo.png" alt="Logo Cartes & Popote">
+        <img loading="lazy" decoding="async" class="login-brand-logo" src="./optimized/Logo.png" alt="Logo Cartes & Popote">
         <div class="login-promo">
-            <img class="login-card-back-image" src="./Dos%20cartes.png" alt="Dos de carte Cartes & Popote">
+            <img loading="lazy" decoding="async" class="login-card-back-image" src="./optimized/Dos%20cartes.png" alt="Dos de carte Cartes & Popote">
             <div class="login-promo-copy">
                 <span class="login-promo-kicker">Le jeu de cartes gourmand</span>
                 <strong>Ta prochaine carte est peut-être légendaire.</strong>
@@ -2093,14 +2093,14 @@ body {
             <div class="field hidden" id="registerAvatarField">
                 <span class="register-avatar-label">Choisis ton avatar</span>
                 <div class="avatar-picker" role="group" aria-label="Choix de l’avatar">
-                    <button class="avatar-choice is-selected" type="button" data-avatar="femme-blonde" aria-label="Avatar 1" aria-pressed="true"><img src="./avatar-femme-blonde.png" alt="" aria-hidden="true"></button>
-                    <button class="avatar-choice" type="button" data-avatar="femme-brune" aria-label="Avatar 2" aria-pressed="false"><img src="./avatar-femme-brune.png" alt="" aria-hidden="true"></button>
-                    <button class="avatar-choice" type="button" data-avatar="homme-blanc" aria-label="Avatar 3" aria-pressed="false"><img src="./avatar-homme-blanc.png" alt="" aria-hidden="true"></button>
-                    <button class="avatar-choice" type="button" data-avatar="homme-noir" aria-label="Avatar 4" aria-pressed="false"><img src="./avatar-homme-noir.png" alt="" aria-hidden="true"></button>
-                    <button class="avatar-choice" type="button" data-avatar="vieil-homme" aria-label="Avatar 5" aria-pressed="false"><img src="./avatar-vieil-homme.png" alt="" aria-hidden="true"></button>
-                    <button class="avatar-choice" type="button" data-avatar="homme-chauve-barbu" aria-label="Avatar 6" aria-pressed="false"><img src="./avatar-homme-chauve-barbu.png" alt="" aria-hidden="true"></button>
-                    <button class="avatar-choice" type="button" data-avatar="homme-vieux" aria-label="Avatar 7" aria-pressed="false"><img src="./avatar-homme-vieux.png" alt="" aria-hidden="true"></button>
-                    <button class="avatar-choice" type="button" data-avatar="licorne" aria-label="Avatar 8" aria-pressed="false"><img src="./avatar-licorne.png" alt="" aria-hidden="true"></button>
+                    <button class="avatar-choice is-selected" type="button" data-avatar="femme-blonde" aria-label="Avatar 1" aria-pressed="true"><img loading="lazy" decoding="async" src="./optimized/avatar-femme-blonde.png" alt="" aria-hidden="true"></button>
+                    <button class="avatar-choice" type="button" data-avatar="femme-brune" aria-label="Avatar 2" aria-pressed="false"><img loading="lazy" decoding="async" src="./optimized/avatar-femme-brune.png" alt="" aria-hidden="true"></button>
+                    <button class="avatar-choice" type="button" data-avatar="homme-blanc" aria-label="Avatar 3" aria-pressed="false"><img loading="lazy" decoding="async" src="./optimized/avatar-homme-blanc.png" alt="" aria-hidden="true"></button>
+                    <button class="avatar-choice" type="button" data-avatar="homme-noir" aria-label="Avatar 4" aria-pressed="false"><img loading="lazy" decoding="async" src="./optimized/avatar-homme-noir.png" alt="" aria-hidden="true"></button>
+                    <button class="avatar-choice" type="button" data-avatar="vieil-homme" aria-label="Avatar 5" aria-pressed="false"><img loading="lazy" decoding="async" src="./optimized/avatar-vieil-homme.png" alt="" aria-hidden="true"></button>
+                    <button class="avatar-choice" type="button" data-avatar="homme-chauve-barbu" aria-label="Avatar 6" aria-pressed="false"><img loading="lazy" decoding="async" src="./optimized/avatar-homme-chauve-barbu.png" alt="" aria-hidden="true"></button>
+                    <button class="avatar-choice" type="button" data-avatar="homme-vieux" aria-label="Avatar 7" aria-pressed="false"><img loading="lazy" decoding="async" src="./optimized/avatar-homme-vieux.png" alt="" aria-hidden="true"></button>
+                    <button class="avatar-choice" type="button" data-avatar="licorne" aria-label="Avatar 8" aria-pressed="false"><img loading="lazy" decoding="async" src="./optimized/avatar-licorne.png" alt="" aria-hidden="true"></button>
                 </div>
             </div>
 
@@ -2178,7 +2178,7 @@ body {
 
 
         <button id="homeHeaderButton" class="header-logo" type="button" aria-label="Retour à l’accueil" title="Accueil">
-            <img src="./Logo.png" alt="Cartes & Popote">
+            <img loading="lazy" decoding="async" src="./optimized/Logo.png" alt="Cartes & Popote">
         </button>
 
 
@@ -2245,14 +2245,14 @@ body {
 
         <section class="home-player-summary" aria-label="Profil et ressources du joueur">
             <article class="home-resource-tile" aria-label="Jetons classiques disponibles">
-                <img src="./Jeton.png" alt="">
+                <img loading="lazy" decoding="async" src="./optimized/Jeton.png" alt="">
                 <strong id="playerTokens">0</strong>
             </article>
             <button id="playerProfileHomeButton" class="home-profile-button" type="button" aria-label="Ouvrir le profil">
                 <span class="avatar" id="playerAvatar" aria-hidden="true">👤</span>
             </button>
             <button id="premiumHomeButton" class="home-overview-premium" type="button" aria-label="Ouvrir la page Premium">
-                <img src="./Jeton%20premium.png" alt="Jeton Premium">
+                <img loading="lazy" decoding="async" src="./optimized/Jeton%20premium.png" alt="Jeton Premium">
             </button>
             <span id="playerPseudo" class="hidden">Joueur</span>
             <span id="playerBoosters" class="hidden">0</span>
@@ -2263,10 +2263,10 @@ body {
 
         <section class="home-overview-grid" aria-label="Informations Cartes & Popote">
             <button id="leaderboardMenuButton" class="home-overview-leaderboard" type="button" aria-label="Ouvrir le classement" title="Classement">
-                <img src="./Classement.png" alt="">
+                <img loading="lazy" decoding="async" src="./optimized/Classement.png" alt="">
             </button>
             <button id="homeCardCountButton" class="home-card-count" type="button" aria-label="Nombre de cartes créées dans le jeu" disabled>
-                <img class="home-card-count-icon" src="./Dos%20cartes.png" alt="">
+                <img loading="lazy" decoding="async" class="home-card-count-icon" src="./optimized/Dos%20cartes.png" alt="">
                 <span class="home-card-count-copy">
                     <strong id="publicCardCount" class="home-card-count-value">—</strong>
                     <span class="home-card-count-label">cartes créées</span>
@@ -2274,7 +2274,7 @@ body {
             </button>
             <div class="home-overview-archive">
                 <button id="archivesHomeButton" type="button" aria-label="Ouvrir la page Service" title="Service">
-                    <img src="./Service.png" alt="Service">
+                    <img loading="lazy" decoding="async" src="./optimized/Service.png" alt="Service">
                     <span id="archivesHomeCountdown" class="home-archive-countdown hidden" aria-live="polite"></span>
                 </button>
             </div>
@@ -2289,9 +2289,9 @@ body {
 
             <article id="dailyBoosterArticle" class="booster hidden">
 
-                <img
+                <img loading="lazy" decoding="async"
                     class="booster-image"
-                    src="./Booster%20Journalier.png"
+                    src="./optimized/Booster%20Journalier.png"
                     alt="Illustration du booster journalier Cartes & Popote"
                 >
 
@@ -2313,7 +2313,7 @@ body {
             <article class="booster">
 
                 <span class="booster-visual">
-                    <img class="booster-image" src="./Booster%20normal.png" alt="Illustration du booster classique Cartes & Popote">
+                    <img loading="lazy" decoding="async" class="booster-image" src="./optimized/Booster%20normal.png" alt="Illustration du booster classique Cartes & Popote">
                     <strong class="booster-stock-badge"><span id="normalBoosterStockCount">0</span> en stock</strong>
                 </span>
 
@@ -2365,7 +2365,7 @@ body {
 
         <div class="message-compose-card">
             <button id="feedbackToggleButton" class="message-compose-toggle" type="button" aria-expanded="false" aria-controls="feedbackFormPanel" aria-label="Envoyer un message à l’Admin">
-                <img src="./enveloppe.png" alt="">
+                <img loading="lazy" decoding="async" src="./optimized/enveloppe.png" alt="">
                 <span>Envoyer un message</span>
             </button>
         </div>
@@ -2453,7 +2453,7 @@ body {
             <div class="profile-card-identity">
                 <div class="profile-avatar-frame"><span id="profilePageAvatar" class="profile-page-avatar" aria-hidden="true">👤</span></div>
                 <div class="profile-card-details">
-                    <div class="profile-name-line"><h2 id="profilePageTitle">Profil joueur</h2><span id="profilePremiumBadge" class="profile-premium-badge hidden" title="Badge équipé" aria-label="Badge équipé"><img src="./badge-premium-10.png" alt="Badge équipé"></span></div>
+                    <div class="profile-name-line"><h2 id="profilePageTitle">Profil joueur</h2><span id="profilePremiumBadge" class="profile-premium-badge hidden" title="Badge équipé" aria-label="Badge équipé"><img loading="lazy" decoding="async" src="./optimized/badge-premium-10.png" alt="Badge équipé"></span></div>
                     <p id="profileAccountDates" class="profile-account-dates" aria-live="polite"></p>
                 </div>
             </div>
@@ -2469,7 +2469,7 @@ body {
             </section>
             <div class="profile-stats-grid" aria-label="Statistiques personnelles">
                 <article id="profileTokensEarnedCard" class="profile-stat">
-                    <img class="profile-stat-icon profile-stat-icon-image" src="./Jeton.png" alt="">
+                    <img loading="lazy" decoding="async" class="profile-stat-icon profile-stat-icon-image" src="./optimized/Jeton.png" alt="">
                     <span id="profileTokensEarned" class="profile-stat-value">0</span>
                     <span class="profile-stat-label">Jetons obtenus</span>
                 </article>
@@ -2484,7 +2484,7 @@ body {
                     <span class="profile-stat-label">Cartes collectées</span>
                 </article>
                 <article id="profilePremiumSpendingCard" class="profile-stat hidden">
-                    <img class="profile-stat-icon profile-stat-icon-image" src="./Jeton%20premium.png" alt="">
+                    <img loading="lazy" decoding="async" class="profile-stat-icon profile-stat-icon-image" src="./optimized/Jeton%20premium.png" alt="">
                     <span id="profilePremiumSpending" class="profile-stat-value">0 €</span>
                     <span class="profile-stat-label">Dépensés en Premium</span>
                 </article>
@@ -2497,14 +2497,14 @@ body {
                 <span class="register-avatar-label">Modifier mon avatar (une seule fois)</span>
                 <select id="profileAvatarSelect" class="hidden" aria-hidden="true" tabindex="-1"><option value="femme-blonde">Avatar 1</option><option value="femme-brune">Avatar 2</option><option value="homme-blanc">Avatar 3</option><option value="homme-noir">Avatar 4</option><option value="vieil-homme">Avatar 5</option><option value="homme-chauve-barbu">Avatar 6</option><option value="homme-vieux">Avatar 7</option><option value="licorne">Avatar 8</option></select>
                 <div id="profileAvatarChoices" class="avatar-picker profile-avatar-picker" role="group" aria-label="Choisir un avatar">
-                    <button class="avatar-choice" type="button" data-profile-avatar="femme-blonde" aria-label="Choisir l’avatar 1" aria-pressed="false"><img src="./avatar-femme-blonde.png" alt=""></button>
-                    <button class="avatar-choice" type="button" data-profile-avatar="femme-brune" aria-label="Choisir l’avatar 2" aria-pressed="false"><img src="./avatar-femme-brune.png" alt=""></button>
-                    <button class="avatar-choice" type="button" data-profile-avatar="homme-blanc" aria-label="Choisir l’avatar 3" aria-pressed="false"><img src="./avatar-homme-blanc.png" alt=""></button>
-                    <button class="avatar-choice" type="button" data-profile-avatar="homme-noir" aria-label="Choisir l’avatar 4" aria-pressed="false"><img src="./avatar-homme-noir.png" alt=""></button>
-                    <button class="avatar-choice" type="button" data-profile-avatar="vieil-homme" aria-label="Choisir l’avatar 5" aria-pressed="false"><img src="./avatar-vieil-homme.png" alt=""></button>
-                    <button class="avatar-choice" type="button" data-profile-avatar="homme-chauve-barbu" aria-label="Choisir l’avatar 6" aria-pressed="false"><img src="./avatar-homme-chauve-barbu.png" alt=""></button>
-                    <button class="avatar-choice" type="button" data-profile-avatar="homme-vieux" aria-label="Choisir l’avatar 7" aria-pressed="false"><img src="./avatar-homme-vieux.png" alt=""></button>
-                    <button class="avatar-choice" type="button" data-profile-avatar="licorne" aria-label="Choisir l’avatar 8" aria-pressed="false"><img src="./avatar-licorne.png" alt=""></button>
+                    <button class="avatar-choice" type="button" data-profile-avatar="femme-blonde" aria-label="Choisir l’avatar 1" aria-pressed="false"><img loading="lazy" decoding="async" src="./optimized/avatar-femme-blonde.png" alt=""></button>
+                    <button class="avatar-choice" type="button" data-profile-avatar="femme-brune" aria-label="Choisir l’avatar 2" aria-pressed="false"><img loading="lazy" decoding="async" src="./optimized/avatar-femme-brune.png" alt=""></button>
+                    <button class="avatar-choice" type="button" data-profile-avatar="homme-blanc" aria-label="Choisir l’avatar 3" aria-pressed="false"><img loading="lazy" decoding="async" src="./optimized/avatar-homme-blanc.png" alt=""></button>
+                    <button class="avatar-choice" type="button" data-profile-avatar="homme-noir" aria-label="Choisir l’avatar 4" aria-pressed="false"><img loading="lazy" decoding="async" src="./optimized/avatar-homme-noir.png" alt=""></button>
+                    <button class="avatar-choice" type="button" data-profile-avatar="vieil-homme" aria-label="Choisir l’avatar 5" aria-pressed="false"><img loading="lazy" decoding="async" src="./optimized/avatar-vieil-homme.png" alt=""></button>
+                    <button class="avatar-choice" type="button" data-profile-avatar="homme-chauve-barbu" aria-label="Choisir l’avatar 6" aria-pressed="false"><img loading="lazy" decoding="async" src="./optimized/avatar-homme-chauve-barbu.png" alt=""></button>
+                    <button class="avatar-choice" type="button" data-profile-avatar="homme-vieux" aria-label="Choisir l’avatar 7" aria-pressed="false"><img loading="lazy" decoding="async" src="./optimized/avatar-homme-vieux.png" alt=""></button>
+                    <button class="avatar-choice" type="button" data-profile-avatar="licorne" aria-label="Choisir l’avatar 8" aria-pressed="false"><img loading="lazy" decoding="async" src="./optimized/avatar-licorne.png" alt=""></button>
                 </div>
             </div>
             <button id="profileIdentitySaveButton" class="primary-button" type="button">Enregistrer mes modifications</button>
@@ -2642,8 +2642,8 @@ body {
             <div class="service-window-body">
                 <div id="serviceHomeView"><h2>Choisis ta mission</h2><div class="service-choice-grid"><button class="service-button service-choice" type="button" data-service-type="internal"><span>🗂️</span>Service interne</button><button class="service-button service-choice" type="button" data-service-type="external"><span>🌍</span>Service externe</button></div></div>
                 <div id="serviceMissionsView" class="hidden"><button id="serviceMissionsBack" type="button" class="service-button">← Retour</button><h2 id="serviceMissionsTitle"></h2><div id="serviceMissionsList" class="service-mission-grid"></div></div>
-                <div id="serviceActiveView" class="hidden"><h2>Mission en cours</h2><img id="serviceActiveImage" class="service-active-image hidden" alt=""><div class="service-active-details"><strong id="serviceActiveName"></strong><p id="serviceActiveDescription"></p><p>Durée : <span id="serviceActiveDuration"></span></p><p>Récompense : <span id="serviceActiveReward"></span></p></div><p id="serviceActiveCountdown" class="service-active-countdown" aria-live="polite"></p><button id="serviceClaimButton" class="service-button hidden" type="button">Récupérer ma récompense</button></div>
-                <div id="archivesLegacyView" class="hidden"><label for="archivesMiningSelect">Minage existant</label><select id="archivesMiningSelect" class="admin-field" aria-describedby="archivesMiningDescription"></select><img id="archivesMiningImage" class="archives-minage-image hidden" alt="Illustration du minage"><p id="archivesMiningDescription" class="archives-description">Envoie le GAV trier les archives. Il trouvera peut-être des jetons classiques pour toi.</p><div class="archives-action-wrap"><span id="archivesCountdown" class="archives-countdown hidden" aria-live="polite"></span><button id="sortArchivesButton" class="primary-button" type="button" disabled>Lancer le minage</button><p id="archivesStatus" class="archives-status" role="status" aria-live="polite"></p></div></div>
+                <div id="serviceActiveView" class="hidden"><h2>Mission en cours</h2><img loading="lazy" decoding="async" id="serviceActiveImage" class="service-active-image hidden" alt=""><div class="service-active-details"><strong id="serviceActiveName"></strong><p id="serviceActiveDescription"></p><p>Durée : <span id="serviceActiveDuration"></span></p><p>Récompense : <span id="serviceActiveReward"></span></p></div><p id="serviceActiveCountdown" class="service-active-countdown" aria-live="polite"></p><button id="serviceClaimButton" class="service-button hidden" type="button">Récupérer ma récompense</button></div>
+                <div id="archivesLegacyView" class="hidden"><label for="archivesMiningSelect">Minage existant</label><select id="archivesMiningSelect" class="admin-field" aria-describedby="archivesMiningDescription"></select><img loading="lazy" decoding="async" id="archivesMiningImage" class="archives-minage-image hidden" alt="Illustration du minage"><p id="archivesMiningDescription" class="archives-description">Envoie le GAV trier les archives. Il trouvera peut-être des jetons classiques pour toi.</p><div class="archives-action-wrap"><span id="archivesCountdown" class="archives-countdown hidden" aria-live="polite"></span><button id="sortArchivesButton" class="primary-button" type="button" disabled>Lancer le minage</button><p id="archivesStatus" class="archives-status" role="status" aria-live="polite"></p></div></div>
                 <p id="serviceStatus" class="service-win-status" role="status" aria-live="polite"></p>
             </div>
         </div>
@@ -2675,7 +2675,7 @@ body {
         <section class="premium-wheel-card" aria-labelledby="premiumWheelTitle">
             <h3 id="premiumWheelTitle">Roue Premium</h3>
             <p class="admin-note">Utilise 1 jeton Premium pour tenter ta chance.</p>
-            <p class="premium-balance-indicator" aria-label="Solde de jetons Premium"><img src="./Jeton%20premium.png" alt=""><span id="premiumBalanceDisplay">0</span></p>
+            <p class="premium-balance-indicator" aria-label="Solde de jetons Premium"><img loading="lazy" decoding="async" src="./optimized/Jeton%20premium.png" alt=""><span id="premiumBalanceDisplay">0</span></p>
             <div class="premium-wheel-wrap">
                 <div id="premiumMachine" class="premium-machine">
                     <div class="premium-wheel-post" aria-hidden="true">
@@ -2700,7 +2700,7 @@ body {
                     <span class="premium-wheel-pointer" aria-hidden="true"><i></i></span>
                 </div>
                 <div class="premium-wheel-controls">
-                    <button id="premiumSpinButton" class="premium-wheel-center-button" type="button" aria-label="Lancer la roue pour un jeton Premium" disabled><img src="./Jeton%20premium.png" alt=""><span>LANCER LA ROUE</span></button>
+                    <button id="premiumSpinButton" class="premium-wheel-center-button" type="button" aria-label="Lancer la roue pour un jeton Premium" disabled><img loading="lazy" decoding="async" src="./optimized/Jeton%20premium.png" alt=""><span>LANCER LA ROUE</span></button>
                     <button id="premiumSoundToggle" class="premium-sound-toggle" type="button" aria-pressed="false">🔇 Sons désactivés</button>
                 </div>
             </div>
@@ -2779,12 +2779,12 @@ body {
                     <label>Date d’apparition<input id="eventBoosterDate" class="admin-field" type="date" required></label>
                     <label>Nombre de cartes<input id="eventBoosterCardCount" class="admin-field" type="number" min="1" max="20" step="1" value="5" required></label>
                     <div class="full-width"><strong>Rareté de chaque carte</strong><div id="eventBoosterRarityRows" class="event-booster-rarity-rows"></div></div>
-                    <label class="full-width">Image du booster (facultative, PNG/JPG/WebP, 5 Mo max)<input id="eventBoosterImageFile" class="admin-field" type="file" accept="image/png,image/jpeg,image/webp"><img id="eventBoosterImagePreview" class="event-booster-image-preview hidden" alt="Aperçu du booster évènementiel"></label>
+                    <label class="full-width">Image du booster (facultative, PNG/JPG/WebP, 5 Mo max)<input id="eventBoosterImageFile" class="admin-field" type="file" accept="image/png,image/jpeg,image/webp"><img loading="lazy" decoding="async" id="eventBoosterImagePreview" class="event-booster-image-preview hidden" alt="Aperçu du booster évènementiel"></label>
                     <div class="full-width">
                         <label><input id="eventBoosterHasBadge" type="checkbox"> Attribuer un badge au joueur à l’ouverture</label>
                         <div id="eventBoosterBadgeFields" class="event-booster-badge-fields hidden">
                             <label>Nom du badge<input id="eventBoosterBadgeName" class="admin-field" maxlength="60" placeholder="Ex. Édition spéciale"></label>
-                            <label>Image du badge (PNG/JPG/WebP, 5 Mo max)<input id="eventBoosterBadgeFile" class="admin-field" type="file" accept="image/png,image/jpeg,image/webp"><img id="eventBoosterBadgePreview" class="event-booster-badge-preview hidden" alt="Aperçu du badge"></label>
+                            <label>Image du badge (PNG/JPG/WebP, 5 Mo max)<input id="eventBoosterBadgeFile" class="admin-field" type="file" accept="image/png,image/jpeg,image/webp"><img loading="lazy" decoding="async" id="eventBoosterBadgePreview" class="event-booster-badge-preview hidden" alt="Aperçu du badge"></label>
                         </div>
                     </div>
                     <div class="full-width"><label><input id="eventBoosterAllPlayers" type="checkbox" checked> Tous les joueurs</label></div>
@@ -2802,7 +2802,7 @@ body {
     <section id="eventBoosterPromptModal" class="site-updates-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="eventBoosterPromptTitle" aria-hidden="true">
         <div class="site-updates-card event-booster-prompt-card">
             <h2 id="eventBoosterPromptTitle">🎁 Un booster t’attend !</h2>
-            <img id="eventBoosterPromptImage" class="hidden" alt="Illustration du booster évènementiel">
+            <img loading="lazy" decoding="async" id="eventBoosterPromptImage" class="hidden" alt="Illustration du booster évènementiel">
             <p id="eventBoosterPromptDescription"></p>
             <p id="eventBoosterPromptStatus" role="status" aria-live="polite"></p>
             <button id="eventBoosterRetryButton" class="secondary-button hidden" type="button">Réessayer la vérification</button>
@@ -2815,7 +2815,7 @@ body {
             <h2 id="boosterResultTitle">🎉 Booster ouvert !</h2>
             <p id="boosterResultDescription" class="admin-note">Les cartes ont été ajoutées à ta collection.</p>
             <div id="boosterPackReveal" class="booster-pack-reveal hidden" aria-live="polite">
-                <img id="boosterRevealImage" src="./Booster%20normal.png" alt="Booster en cours d’ouverture">
+                <img loading="lazy" decoding="async" id="boosterRevealImage" src="./optimized/Booster%20normal.png" alt="Booster en cours d’ouverture">
                 <p id="boosterRevealLabel">Le booster s’ouvre…</p>
             </div>
             <div id="boosterCardStage" class="booster-card-stage" hidden aria-live="polite">
@@ -2845,7 +2845,7 @@ body {
         <div class="site-updates-card">
             <h2 id="serviceReadyTitle">✅ Mission Service terminée !</h2>
             <p id="serviceReadyMessage">Ta récompense t’attend.</p>
-            <img id="serviceReadyImage" class="service-ready-image hidden" alt="">
+            <img loading="lazy" decoding="async" id="serviceReadyImage" class="service-ready-image hidden" alt="">
             <div class="service-ready-actions">
                 <button id="serviceReadyLaterButton" class="secondary-button" type="button">Plus tard</button>
                 <button id="serviceReadyOpenButton" class="primary-button" type="button">Voir ma récompense</button>
@@ -2927,7 +2927,7 @@ body {
                         </select>
                         <label for="cardImageFile">Visuel (JPG, PNG ou WebP, 5 Mo maximum)</label>
                         <input id="cardImageFile" data-card-field="file" class="admin-field" type="file" accept="image/jpeg,image/png,image/webp">
-                        <img id="cardImagePreview" class="admin-card-preview hidden" alt="Aperçu du visuel">
+                        <img loading="lazy" decoding="async" id="cardImagePreview" class="admin-card-preview hidden" alt="Aperçu du visuel">
                         <input id="cardImage" data-card-field="image" class="admin-field" type="url" maxlength="500" placeholder="Ou URL d’image (facultatif)">
                         <textarea id="cardDescription" data-card-field="description" class="admin-field" maxlength="500" rows="3" placeholder="Description (facultatif)"></textarea>
                     </fieldset>
@@ -2956,7 +2956,7 @@ body {
                 <div class="minage-image-field">
                     <label for="minageImageFile">Image du minage (facultative)</label>
                     <input id="minageImageFile" class="admin-field" type="file" accept="image/png,image/jpeg,image/webp">
-                    <img id="minageImagePreview" class="minage-image-preview hidden" alt="Aperçu de l’image du minage">
+                    <img loading="lazy" decoding="async" id="minageImagePreview" class="minage-image-preview hidden" alt="Aperçu de l’image du minage">
                     <p id="minageImageStatus" class="minage-image-status" role="status" aria-live="polite">PNG, JPG ou WebP, 5 Mo maximum.</p>
                 </div>
                 <label for="gavDurationMinutes">Durée du minage (minutes)</label>
@@ -2992,7 +2992,7 @@ body {
         <button id="effectifBackButton" class="admin-back" type="button">← Retour à l’accueil</button>
         <div class="admin-panel">
             <h2 id="effectifPageTitle">👥 Effectif</h2>
-            <p class="admin-note"><img src="./Jeton.png" alt="Jeton classique" style="width:18px;height:18px;vertical-align:middle;object-fit:contain"> Montant mensuel à attribuer aux joueurs. Coche la case pour autoriser le joueur à récupérer les futures récompenses collectives.</p>
+            <p class="admin-note"><img loading="lazy" decoding="async" src="./optimized/Jeton.png" alt="Jeton classique" style="width:18px;height:18px;vertical-align:middle;object-fit:contain"> Montant mensuel à attribuer aux joueurs. Coche la case pour autoriser le joueur à récupérer les futures récompenses collectives.</p>
             <div class="effectif-toolbar">
                 <label for="effectifMonthInput">Nouveau mois<input id="effectifMonthInput" type="month"></label>
                 <button id="effectifAddMonthButton" class="primary-button effectif-add-month" type="button" aria-label="Ajouter le mois au tableau" title="Ajouter le mois">+</button>
@@ -3024,16 +3024,16 @@ body {
 
 
         <button id="collectionNavButton" class="nav-item nav-image-button" type="button" aria-label="Collection" title="Collection">
-            <img src="./Collection.png" alt="" aria-hidden="true">
+            <img loading="lazy" decoding="async" src="./optimized/Collection.png" alt="" aria-hidden="true">
         </button>
 
         <button id="recyclingNavButton" class="nav-item nav-image-button" type="button" aria-label="Recyclage" title="Recyclage">
-            <img src="./Recyclage.png" alt="" aria-hidden="true">
+            <img loading="lazy" decoding="async" src="./optimized/Recyclage.png" alt="" aria-hidden="true">
         </button>
 
 
         <button id="exchangeNavButton" class="nav-item nav-image-button" type="button" aria-label="Échanges" title="Échanges" aria-describedby="exchangeUnlockNotice">
-            <img src="./Échange.png" alt="" aria-hidden="true">
+            <img loading="lazy" decoding="async" src="./optimized/%C3%89change.png" alt="" aria-hidden="true">
         </button>
 
 
@@ -3361,19 +3361,19 @@ const avatarChoices = Array.from(document.querySelectorAll(".avatar-choice[data-
 const playerAvatar = document.getElementById("playerAvatar");
 const playerProfileHomeButton = document.getElementById("playerProfileHomeButton");
 const PLAYER_AVATARS = {
-    "femme-blonde": "./avatar-femme-blonde.png",
-    "femme-brune": "./avatar-femme-brune.png",
-    "homme-blanc": "./avatar-homme-blanc.png",
-    "homme-noir": "./avatar-homme-noir.png",
-    "vieil-homme": "./avatar-vieil-homme.png",
-    "homme-chauve-barbu": "./avatar-homme-chauve-barbu.png",
-    "homme-vieux": "./avatar-homme-vieux.png",
-    "licorne": "./avatar-licorne.png"
+    "femme-blonde": "./optimized/avatar-femme-blonde.png",
+    "femme-brune": "./optimized/avatar-femme-brune.png",
+    "homme-blanc": "./optimized/avatar-homme-blanc.png",
+    "homme-noir": "./optimized/avatar-homme-noir.png",
+    "vieil-homme": "./optimized/avatar-vieil-homme.png",
+    "homme-chauve-barbu": "./optimized/avatar-homme-chauve-barbu.png",
+    "homme-vieux": "./optimized/avatar-homme-vieux.png",
+    "licorne": "./optimized/avatar-licorne.png"
 };
 const PLAYER_AVATAR_IMAGE_CANDIDATES = {
-    "homme-chauve-barbu": ["./avatar-homme-chauve-barbu.png", "./Images/Avatar/avatar-homme-chauve-barbu.png"],
-    "homme-vieux": ["./avatar-homme-vieux.png", "./homme-vieux.png", "./Images/Avatar/homme-vieux.png", "./Images/Avatar/Vieil%20homme%20blanc.png"],
-    "licorne": ["./avatar-licorne.png", "./Licorne.png", "./licorne.png", "./Images/Avatar/Licorne.png"]
+    "homme-chauve-barbu": ["./optimized/avatar-homme-chauve-barbu.png", "./Images/Avatar/avatar-homme-chauve-barbu.png"],
+    "homme-vieux": ["./optimized/avatar-homme-vieux.png", "./homme-vieux.png", "./Images/Avatar/homme-vieux.png", "./Images/Avatar/Vieil%20homme%20blanc.png"],
+    "licorne": ["./optimized/avatar-licorne.png", "./Licorne.png", "./licorne.png", "./Images/Avatar/Licorne.png"]
 };
 
 function setPlayerAvatarImage(image, avatarId) {
@@ -4569,9 +4569,9 @@ function hidePremiumPrizeReveal() {
 
 function showPremiumPrizeReveal(prize, isTest = false) {
     const iconPaths = {
-        tokens: "./Jeton.png",
-        premium: "./Jeton%20premium.png",
-        booster: "./Booster%20normal.png"
+        tokens: "./optimized/Jeton.png",
+        premium: "./optimized/Jeton%20premium.png",
+        booster: "./optimized/Booster%20normal.png"
     };
     const imagePath = iconPaths[prize.rewardType];
     premiumRevealIcon.replaceChildren();
@@ -5520,8 +5520,8 @@ async function loadPersonalProfile(playerId = auth.currentUser?.uid) {
         document.getElementById("profileAccountDates").textContent = createdAt ? "Compte créé le " + formatProfileDate(createdAt) : "Date de création indisponible";
         profilePageAvatar.replaceChildren();
         const badgeDetails = {
-            "premium-10": { image: "./badge-premium-10.png", label: "Badge Premium 10 €" },
-            "common-season-1": { image: "./badge-communes-27.png", label: "Badge : 27 cartes communes" }
+            "premium-10": { image: "./optimized/badge-premium-10.png", label: "Badge Premium 10 €" },
+            "common-season-1": { image: "./optimized/badge-communes-27.png", label: "Badge : 27 cartes communes" }
         }[player.badgeEquipped] || (() => {
             const badge = (player.eventBadges || []).find((item) => item.id === player.badgeEquipped);
             return badge ? { image: badge.imageUrl, label: badge.name } : null;
@@ -5556,8 +5556,8 @@ function renderProfileBadges(player, isOwnProfile) {
     profileBadgesSection.setAttribute("aria-hidden", "false");
     profileBadgeList.replaceChildren();
     const badgeCatalog = {
-        "premium-10": { id: "premium-10", label: "Premium 10 €", image: "./badge-premium-10.png" },
-        "common-season-1": { id: "common-season-1", label: "27 cartes communes • Saison 1", image: "./badge-communes-27.png" }
+        "premium-10": { id: "premium-10", label: "Premium 10 €", image: "./optimized/badge-premium-10.png" },
+        "common-season-1": { id: "common-season-1", label: "27 cartes communes • Saison 1", image: "./optimized/badge-communes-27.png" }
     };
     (player.eventBadges || []).forEach((badge) => {
         if (badge?.id && badge?.name && badge?.imageUrl) badgeCatalog[badge.id] = { id: badge.id, label: badge.name, image: badge.imageUrl };
@@ -5837,7 +5837,7 @@ async function loadLeaderboard() {
             if (["premium-10", "common-season-1"].includes(player.badgeEquipped) || eventBadge) {
                 const badge = document.createElement("img");
                 badge.className = "leaderboard-badge";
-                const badgeImage = eventBadge?.imageUrl || (player.badgeEquipped === "common-season-1" ? "./badge-communes-27.png" : "./badge-premium-10.png");
+                const badgeImage = eventBadge?.imageUrl || (player.badgeEquipped === "common-season-1" ? "./optimized/badge-communes-27.png" : "./optimized/badge-premium-10.png");
                 badge.src = badgeImage;
                 badge.alt = eventBadge?.name || (player.badgeEquipped === "common-season-1" ? "Badge 27 cartes communes" : "Badge Premium 10 €");
                 badge.title = badge.alt;
@@ -6512,7 +6512,7 @@ async function showBoosterResults(cards, boostersOfferts = 0, boosterType = "cla
     boosterRevealBusy = false;
     boosterResultTitle.textContent = options.name ? `🎁 ${options.name}` : "🎁 Ton booster arrive !";
     boosterResultDescription.textContent = "Les cartes apparaîtront de la moins rare à la plus rare.";
-    boosterRevealImage.src = options.imageUrl || (boosterType === "journalier" ? "./Booster%20Journalier.png" : "./Booster%20normal.png");
+    boosterRevealImage.src = options.imageUrl || (boosterType === "journalier" ? "./optimized/Booster%20Journalier.png" : "./optimized/Booster%20normal.png");
     boosterRevealImage.alt = options.name ? `Illustration de ${options.name}` : boosterType === "journalier" ? "Booster journalier en cours d’ouverture" : "Booster classique en cours d’ouverture";
     viewOwnedCardsButton.textContent = mandatoryEventBoosterOpen ? "Continuer vers le site" : "Voir ma collection";
     boosterRevealLabel.textContent = "Le booster s’ouvre…";
@@ -7570,7 +7570,7 @@ function renderAdminEffectif() {
         const cell = document.createElement("th"); cell.scope = "col";
         const label = document.createElement("span"); label.className = "effectif-month-heading";
         const name = document.createElement("span"); name.textContent = formatEffectifMonth(month);
-        const icon = document.createElement("img"); icon.src = "./Jeton.png"; icon.alt = "Jetons classiques";
+        const icon = document.createElement("img"); icon.src = "./optimized/Jeton.png"; icon.alt = "Jetons classiques";
         label.append(name, icon); cell.append(label); header.append(cell);
     });
     const rewardsHeading = document.createElement("th"); rewardsHeading.scope = "col"; rewardsHeading.textContent = "Récompenses collectives"; header.append(rewardsHeading);
@@ -8565,7 +8565,7 @@ async function loadPlayers() {
             amountInput.setAttribute("aria-label", "Nombre de jetons à attribuer à " + (player.pseudo || player.email || "ce joueur"));
             const tokenIcon = document.createElement("img");
             tokenIcon.className = "player-token-icon";
-            tokenIcon.src = "./Jeton.png";
+            tokenIcon.src = "./optimized/Jeton.png";
             tokenIcon.alt = "";
             tokenIcon.setAttribute("aria-hidden", "true");
 
@@ -8926,7 +8926,7 @@ function addJetonIcons(root = document.body) {
             mention.append(accessibleWord);
             const icon = document.createElement("img");
             icon.className = "jeton-inline-icon";
-            icon.src = /\s+premium\b/i.test(match[0]) ? "./Jeton%20premium.png" : "./Jeton.png";
+            icon.src = /\s+premium\b/i.test(match[0]) ? "./optimized/Jeton%20premium.png" : "./optimized/Jeton.png";
             icon.alt = "";
             icon.setAttribute("aria-hidden", "true");
             mention.append(icon);
