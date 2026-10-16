@@ -1878,7 +1878,7 @@ body {
 .effectif-toolbar input { min-height:40px; padding:7px 9px; border:1px solid #d8c99f; border-radius:8px; background:#fffefa; color:var(--theme-ink); font:inherit; }
 .effectif-add-month { width:42px; min-width:42px; height:42px; padding:0; font-size:24px; line-height:1; }
 .effectif-table-wrap { width:100%; overflow:auto; border:1px solid #d8c99f; border-radius:10px; background:#fffefa; }
-.effectif-table { width:100%; min-width:640px; border-collapse:collapse; color:var(--theme-ink); }
+.effectif-table { width:100%; min-width:920px; border-collapse:collapse; color:var(--theme-ink); }
 .effectif-table th,.effectif-table td { padding:9px 8px; border-bottom:1px solid #e8dfca; text-align:center; }
 .effectif-table th { position:sticky; top:0; z-index:1; background:#10264a; color:#fff; font-size:12px; }
 .effectif-table th:first-child,.effectif-table td:first-child { position:sticky; left:0; z-index:2; min-width:150px; text-align:left; }
@@ -1890,6 +1890,13 @@ body {
 .effectif-eligibility { display:inline-flex; align-items:center; justify-content:center; gap:6px; white-space:nowrap; font-size:12px; font-weight:700; }
 .effectif-eligibility input { width:18px; height:18px; accent-color:#19753c; }
 .effectif-row-save { width:auto; min-width:82px; height:34px; margin:5px 0 0; padding:6px 9px; border-radius:7px; font-size:12px; }
+.effectif-balance { min-width:230px; }
+.effectif-balance-total { display:flex; align-items:center; justify-content:center; gap:5px; margin-bottom:7px; font-size:15px; }
+.effectif-balance-total img { width:21px; height:21px; object-fit:contain; }
+.effectif-token-controls { justify-content:center; gap:5px; }
+.effectif-token-controls .player-token-input { width:72px; padding:6px; }
+.effectif-token-controls button { padding:7px 8px !important; font-size:11px; }
+.effectif-player-email { display:block; margin-top:4px; color:var(--theme-muted); font-size:11px; font-weight:400; }
 .effectif-status { min-height:22px; margin:8px 0; color:var(--theme-muted); font-size:12px; }
 .event-booster-admin { width:min(100%, 980px); margin:0 auto; }
 .event-booster-form-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; }
@@ -3034,22 +3041,15 @@ body {
         <button id="effectifBackButton" class="admin-back" type="button">← Retour à l’accueil</button>
         <div class="admin-panel">
             <h2 id="effectifPageTitle">👥 Effectif</h2>
-            <p class="admin-note"><img loading="lazy" decoding="async" src="./Jeton.png" alt="Jeton classique" style="width:18px;height:18px;vertical-align:middle;object-fit:contain"> Montant mensuel à attribuer aux joueurs. À l’enregistrement, seule la différence encore non versée est créditée. Un montant déjà attribué ne peut pas être diminué ici.</p>
+            <p class="admin-note"><img loading="lazy" decoding="async" src="./Jeton.png" alt="Jeton classique" style="width:18px;height:18px;vertical-align:middle;object-fit:contain"> À l’enregistrement, le montant mensuel est crédité une seule fois. Toute augmentation crédite uniquement la différence. Les retraits sont limités aux jetons encore disponibles.</p>
             <div class="effectif-toolbar">
                 <label for="effectifMonthInput">Nouveau mois<input id="effectifMonthInput" type="month"></label>
                 <button id="effectifAddMonthButton" class="primary-button effectif-add-month" type="button" aria-label="Ajouter le mois au tableau" title="Ajouter le mois">+</button>
+                <button id="downloadPlayersBackupButton" class="secondary-button admin-backup-button" type="button">Télécharger le tableau de sauvegarde (Excel)</button>
             </div>
+            <p id="playersBackupStatus" class="admin-status" role="status" aria-live="polite"></p>
             <p id="effectifStatus" class="effectif-status" role="status" aria-live="polite"></p>
             <div class="effectif-table-wrap"><table class="effectif-table"><thead id="effectifTableHead"></thead><tbody id="effectifTableBody"></tbody></table></div>
-        </div>
-        <div class="admin-panel" style="margin-top:16px">
-            <h3>👥 Gestion des joueurs</h3>
-            <p class="admin-note">Consulte les comptes et attribue ou retire des jetons classiques. Une sauvegarde Excel contient une feuille par joueur.</p>
-            <button id="downloadPlayersBackupButton" class="secondary-button admin-backup-button" type="button">Télécharger le tableau de sauvegarde des joueurs (Excel)</button>
-            <p id="playersBackupStatus" class="admin-status" role="status" aria-live="polite"></p>
-            <p id="playersCount" class="admin-note">Nombre de joueurs inscrits : —</p>
-            <p id="playersStatus" class="admin-status" role="status"></p>
-            <div id="playersList"></div>
         </div>
     </section>
 
@@ -3788,9 +3788,6 @@ let activeMessageCategory = "idee";
 let activeMessageStatus = "nouveau";
 const messageArchivesButton = document.getElementById("messageArchivesButton");
 const adminBackButton = document.getElementById("adminBackButton");
-const playersStatus = document.getElementById("playersStatus");
-const playersList = document.getElementById("playersList");
-const playersCount = document.getElementById("playersCount");
 const rarityForm = document.getElementById("rarityForm");
 const rarityName = document.getElementById("rarityName");
 const rarityPercentage = document.getElementById("rarityPercentage");
@@ -7582,7 +7579,6 @@ async function showAdminSection(sectionName) {
         button.setAttribute("aria-pressed", String(button.dataset.adminSection === sectionName));
     });
 
-    if (sectionName === "players") await loadPlayers();
     if (sectionName === "journal") await loadAdminAnnouncements();
     if (sectionName === "rarities") await loadRarities();
     if (sectionName === "cards") {
@@ -7624,6 +7620,7 @@ function renderAdminEffectif() {
     head.replaceChildren(); body.replaceChildren();
     const header = document.createElement("tr");
     const playerHeading = document.createElement("th"); playerHeading.scope = "col"; playerHeading.textContent = "Joueur"; header.append(playerHeading);
+    const balanceHeading = document.createElement("th"); balanceHeading.scope = "col"; balanceHeading.textContent = "Jetons classiques disponibles"; header.append(balanceHeading);
     adminEffectifMonths.forEach((month) => {
         const cell = document.createElement("th"); cell.scope = "col";
         const label = document.createElement("span"); label.className = "effectif-month-heading";
@@ -7635,11 +7632,45 @@ function renderAdminEffectif() {
     head.append(header);
     if (!adminEffectifPlayers.length) {
         const row = document.createElement("tr"); const cell = document.createElement("td");
-        cell.colSpan = adminEffectifMonths.length + 2; cell.textContent = "Aucun joueur inscrit."; row.append(cell); body.append(row); return;
+        cell.colSpan = adminEffectifMonths.length + 3; cell.textContent = "Aucun joueur inscrit."; row.append(cell); body.append(row); return;
     }
     adminEffectifPlayers.forEach((player) => {
         const row = document.createElement("tr"); row.dataset.playerId = player.id;
-        const name = document.createElement("td"); name.textContent = player.pseudo || "Joueur"; row.append(name);
+        const name = document.createElement("td"); name.textContent = player.pseudo || "Joueur";
+        if (player.email) { const email = document.createElement("small"); email.className = "effectif-player-email"; email.textContent = player.email; name.append(email); }
+        row.append(name);
+        const balanceCell = document.createElement("td"); balanceCell.className = "effectif-balance";
+        const balanceTotal = document.createElement("strong"); balanceTotal.className = "effectif-balance-total";
+        const balanceValue = document.createElement("span"); balanceValue.textContent = String(Number(player.tokens) || 0);
+        const balanceIcon = document.createElement("img"); balanceIcon.src = "./Jeton.png"; balanceIcon.alt = ""; balanceIcon.setAttribute("aria-hidden", "true");
+        balanceTotal.append(balanceValue, balanceIcon);
+        const tokenControls = document.createElement("div"); tokenControls.className = "player-token-controls effectif-token-controls";
+        const tokenAmount = document.createElement("input"); tokenAmount.className = "player-token-input"; tokenAmount.type = "number"; tokenAmount.min = "1"; tokenAmount.max = "1000000"; tokenAmount.step = "1"; tokenAmount.placeholder = "Montant"; tokenAmount.inputMode = "numeric";
+        tokenAmount.setAttribute("aria-label", `Montant de jetons classiques à modifier pour ${player.pseudo || "ce joueur"}`);
+        const grantButton = document.createElement("button"); grantButton.type = "button"; grantButton.className = "primary-button"; grantButton.textContent = "Ajouter";
+        const removeButton = document.createElement("button"); removeButton.type = "button"; removeButton.className = "admin-danger"; removeButton.textContent = "Retirer";
+        const changeTokens = async (direction) => {
+            const amount = Number(tokenAmount.value);
+            const status = document.getElementById("effectifStatus");
+            if (!Number.isSafeInteger(amount) || amount < 1 || amount > 1_000_000) { status.textContent = "Saisis un nombre entier entre 1 et 1 000 000."; tokenAmount.focus(); return; }
+            grantButton.disabled = true; removeButton.disabled = true;
+            status.textContent = direction > 0 ? `Attribution de jetons à ${player.pseudo}…` : `Retrait de jetons disponibles à ${player.pseudo}…`;
+            try {
+                const result = await callAdjustPlayerTokens({ playerId: player.id, amount, direction: direction > 0 ? "add" : "remove" });
+                player.tokens = Number(result.data?.tokens) || 0; balanceValue.textContent = String(player.tokens); tokenAmount.value = "";
+                status.textContent = direction > 0
+                    ? `${amount} jeton${amount === 1 ? "" : "s"} attribué${amount === 1 ? "" : "s"} à ${player.pseudo}.`
+                    : `${amount} jeton${amount === 1 ? "" : "s"} disponible${amount === 1 ? "" : "s"} retiré${amount === 1 ? "" : "s"} à ${player.pseudo}.`;
+            } catch (error) {
+                console.error("Erreur de modification des jetons :", error);
+                status.textContent = error.code === "functions/failed-precondition"
+                    ? (error.message || "Le joueur n’a pas assez de jetons disponibles pour ce retrait.")
+                    : error.code === "functions/permission-denied" ? "Accès refusé. Vérifie que tu es connecté avec le compte Admin."
+                        : "Impossible de modifier les jetons. Vérifie que la fonction adjustPlayerTokens est déployée.";
+            } finally { grantButton.disabled = false; removeButton.disabled = false; }
+        };
+        grantButton.addEventListener("click", () => changeTokens(1)); removeButton.addEventListener("click", () => changeTokens(-1));
+        tokenControls.append(tokenAmount, grantButton, removeButton); balanceCell.append(balanceTotal, tokenControls); row.append(balanceCell);
         const amountInputs = new Map();
         adminEffectifMonths.forEach((month) => {
             const cell = document.createElement("td");
@@ -7656,7 +7687,7 @@ function renderAdminEffectif() {
         const eligibilityText = document.createElement("span"); eligibilityText.textContent = "Autorisé";
         eligibility.addEventListener("change", () => { eligibilityText.textContent = eligibility.checked ? "Autorisé" : "Bloqué"; });
         eligibilityLabel.append(eligibility, eligibilityText);
-        const save = document.createElement("button"); save.type = "button"; save.className = "primary-button effectif-row-save"; save.textContent = "Enregistrer";
+        const save = document.createElement("button"); save.type = "button"; save.className = "primary-button effectif-row-save"; save.textContent = "Valider";
         save.addEventListener("click", async () => {
             save.disabled = true;
             const status = document.getElementById("effectifStatus"); status.textContent = `Enregistrement de ${player.pseudo || "ce joueur"}…`;
@@ -7664,7 +7695,7 @@ function renderAdminEffectif() {
                 const monthlyTokenAmounts = Object.fromEntries([...amountInputs].map(([month, input]) => [month, input.value === "" ? 0 : Number(input.value)]));
                 const result = await callSaveEffectifPlayer({ playerId: player.id, collectiveRewardsEnabled: eligibility.checked, monthlyTokenAmounts });
                 player.monthlyTokenAmounts = monthlyTokenAmounts; player.collectiveRewardsEnabled = eligibility.checked;
-                await loadPlayers();
+                if (Number.isSafeInteger(result.data?.tokens)) { player.tokens = result.data.tokens; balanceValue.textContent = String(player.tokens); }
                 const tokensAdded = Number(result.data?.tokensAdded) || 0;
                 status.textContent = tokensAdded > 0
                     ? `Effectif de ${player.pseudo || "ce joueur"} enregistré : ${tokensAdded} jeton${tokensAdded === 1 ? "" : "s"} classique${tokensAdded === 1 ? "" : "s"} ajouté${tokensAdded === 1 ? "" : "s"}.`
@@ -8581,114 +8612,6 @@ downloadPlayersBackupButton.addEventListener("click", async () => {
     }
 });
 
-async function loadPlayers() {
-    playersList.replaceChildren();
-    playersStatus.textContent = "Chargement des joueurs...";
-    playersCount.textContent = "Nombre de joueurs inscrits : —";
-
-    if (!auth.currentUser || (auth.currentUser.email || "").toLowerCase() !== ADMIN_EMAIL) {
-        playersStatus.textContent = "Accès réservé au compte Admin.";
-        return;
-    }
-
-    try {
-        const response = await callGetAdminPlayers();
-        const players = response.data.players || [];
-        const count = Number(response.data.count) || 0;
-        playersCount.textContent = count + (count > 1 ? " joueurs inscrits" : " joueur inscrit");
-        const sortedPlayers = players
-            .sort((a, b) => (a.pseudo || a.email || "").localeCompare(b.pseudo || b.email || "", "fr"));
-
-        if (sortedPlayers.length === 0) {
-            playersStatus.textContent = "Aucun joueur inscrit pour le moment.";
-            return;
-        }
-
-        playersStatus.textContent = "";
-        sortedPlayers.forEach((player) => {
-            const row = document.createElement("div");
-            row.className = "admin-card-row";
-            const details = document.createElement("div");
-            const name = document.createElement("strong");
-            name.textContent = player.pseudo || "Joueur sans pseudo";
-            const meta = document.createElement("small");
-            meta.textContent = (player.email || "Adresse e-mail inconnue") + " • " + (Number(player.tokens) || 0) + " jetons";
-            details.append(name, meta);
-
-            const controls = document.createElement("div");
-            controls.className = "player-token-controls";
-            const amountInput = document.createElement("input");
-            amountInput.className = "player-token-input";
-            amountInput.type = "number";
-            amountInput.min = "1";
-            amountInput.step = "1";
-            amountInput.max = "1000000";
-            amountInput.placeholder = "Montant";
-            amountInput.setAttribute("aria-label", "Nombre de jetons à attribuer à " + (player.pseudo || player.email || "ce joueur"));
-            const tokenIcon = document.createElement("img");
-            tokenIcon.className = "player-token-icon";
-            tokenIcon.src = "./Jeton.png";
-            tokenIcon.alt = "";
-            tokenIcon.setAttribute("aria-hidden", "true");
-
-            const grantButton = document.createElement("button");
-            grantButton.type = "button";
-            grantButton.className = "primary-button";
-            grantButton.textContent = "Ajouter";
-            const removeButton = document.createElement("button");
-            removeButton.type = "button";
-            removeButton.className = "admin-danger";
-            removeButton.textContent = "Retirer";
-
-            const changeTokens = async (direction) => {
-                const amount = Number(amountInput.value);
-                if (!Number.isSafeInteger(amount) || amount < 1 || amount > 1000000) {
-                    playersStatus.textContent = "Saisis un nombre entier entre 1 et 1 000 000.";
-                    amountInput.focus();
-                    return;
-                }
-
-                grantButton.disabled = true;
-                removeButton.disabled = true;
-                playersStatus.textContent = direction > 0 ? "Attribution des jetons..." : "Retrait des jetons...";
-                try {
-                    await callAdjustPlayerTokens({
-                        playerId: player.id,
-                        amount,
-                        direction: direction > 0 ? "add" : "remove"
-                    });
-                    await loadPlayers();
-                    playersStatus.textContent = direction > 0
-                        ? amount + " jeton(s) attribué(s) à " + (player.pseudo || player.email || "ce joueur") + "."
-                        : amount + " jeton(s) retiré(s) à " + (player.pseudo || player.email || "ce joueur") + ".";
-                } catch (error) {
-                    if (error.code === "functions/failed-precondition") {
-                        playersStatus.textContent = error.message || "Le joueur n’a pas assez de jetons pour ce retrait.";
-                    } else if (error.code === "functions/permission-denied") {
-                        playersStatus.textContent = "Accès refusé. Vérifie que tu es connecté avec le compte Admin.";
-                    } else {
-                        console.error("Erreur de modification des jetons :", error);
-                        playersStatus.textContent = "Impossible de modifier les jetons. Vérifie que les fonctions Firebase sont déployées.";
-                    }
-                    grantButton.disabled = false;
-                    removeButton.disabled = false;
-                }
-            };
-            grantButton.addEventListener("click", () => changeTokens(1));
-            removeButton.addEventListener("click", () => changeTokens(-1));
-
-            controls.append(amountInput, tokenIcon, grantButton, removeButton);
-            row.append(details, controls);
-            playersList.append(row);
-        });
-    } catch (error) {
-        console.error("Erreur de chargement des joueurs :", error);
-        playersStatus.textContent = error.code === "functions/permission-denied"
-            ? "Accès refusé. Vérifie que tu es connecté avec le compte Admin."
-            : "Impossible de charger les joueurs. Déploie les fonctions Firebase mises à jour.";
-    }
-}
-
 function openAdminHub() {
     if (!isCurrentUserAdmin() || isPlayerPreview) return;
     dropdownMenu.classList.add("hidden");
@@ -8747,7 +8670,7 @@ effectifMenuButton.addEventListener("click", async () => {
     document.querySelector(".app-content").classList.add("hidden");
     bottomNav.classList.add("hidden");
     effectifPage.classList.remove("hidden");
-    await Promise.all([loadAdminEffectif(), loadPlayers()]);
+    await loadAdminEffectif();
 });
 effectifBackButton.addEventListener("click", openAdminHub);
 
