@@ -3094,7 +3094,6 @@ body {
                 <div class="poll-prompt-actions"><button id="pollTextSubmitButton" class="primary-button" type="button">Envoyer ma réponse</button></div>
             </div>
             <p id="pollPromptStatus" class="admin-status" role="status" aria-live="polite"></p>
-            <div class="poll-prompt-actions"><button id="pollLaterButton" class="secondary-button" type="button">Répondre plus tard</button></div>
         </div>
     </section>
 
@@ -3483,7 +3482,6 @@ const pollPlayerAnswer = document.getElementById("pollPlayerAnswer");
 const pollYesButton = document.getElementById("pollYesButton");
 const pollNoButton = document.getElementById("pollNoButton");
 const pollTextSubmitButton = document.getElementById("pollTextSubmitButton");
-const pollLaterButton = document.getElementById("pollLaterButton");
 const pollCreateForm = document.getElementById("pollCreateForm");
 const pollTitleInput = document.getElementById("pollTitleInput");
 const pollQuestionInput = document.getElementById("pollQuestionInput");
@@ -3503,11 +3501,10 @@ let announcementsWaitingForServiceModal = [];
 let lastNotifiedServiceTaskId = "";
 let pendingPolls = [];
 let activePoll = null;
-let pollDeferredThisSession = false;
 let pollSubmissionBusy = false;
 
 function tryShowPendingPoll() {
-    if (!auth.currentUser || isPlayerPreview || activePoll || pollDeferredThisSession || !pendingPolls.length) return;
+    if (!auth.currentUser || isPlayerPreview || activePoll || !pendingPolls.length) return;
     const blocked = [eventBoosterPromptModal, boosterResultModal, siteUpdatesModal, serviceReadyModal]
         .some((modal) => modal && !modal.classList.contains("hidden"));
     if (blocked) return;
@@ -3519,7 +3516,6 @@ function tryShowPendingPoll() {
     const isYesNo = activePoll.responseType === "yesno";
     pollYesNoActions.classList.toggle("hidden", !isYesNo);
     pollTextActions.classList.toggle("hidden", isYesNo);
-    pollLaterButton.disabled = false;
     pollPromptModal.classList.remove("hidden");
     pollPromptModal.setAttribute("aria-hidden", "false");
     (isYesNo ? pollYesButton : pollPlayerAnswer).focus();
@@ -3551,7 +3547,7 @@ function continueStartupNoticesAfterPoll() {
 async function submitCurrentPollResponse(answer) {
     if (!activePoll || pollSubmissionBusy) return;
     pollSubmissionBusy = true;
-    [pollYesButton, pollNoButton, pollTextSubmitButton, pollLaterButton].forEach((button) => { button.disabled = true; });
+    [pollYesButton, pollNoButton, pollTextSubmitButton].forEach((button) => { button.disabled = true; });
     pollPromptStatus.textContent = "Enregistrement de ta réponse…";
     try {
         await callSubmitPollResponse({ pollId: activePoll.id, answer });
@@ -3567,17 +3563,8 @@ async function submitCurrentPollResponse(answer) {
             : "Impossible d’enregistrer la réponse. Vérifie ta connexion puis réessaie.";
     } finally {
         pollSubmissionBusy = false;
-        [pollYesButton, pollNoButton, pollTextSubmitButton, pollLaterButton].forEach((button) => { button.disabled = false; });
+        [pollYesButton, pollNoButton, pollTextSubmitButton].forEach((button) => { button.disabled = false; });
     }
-}
-
-function deferCurrentPoll() {
-    if (!activePoll) return;
-    pollDeferredThisSession = true;
-    activePoll = null;
-    pollPromptModal.classList.add("hidden");
-    pollPromptModal.setAttribute("aria-hidden", "true");
-    continueStartupNoticesAfterPoll();
 }
 
 function closeSiteUpdates() {
@@ -3679,7 +3666,6 @@ pollTextSubmitButton.addEventListener("click", () => {
     if (!answer) { pollPromptStatus.textContent = "Écris une réponse avant de l’envoyer."; return; }
     submitCurrentPollResponse(answer);
 });
-pollLaterButton.addEventListener("click", deferCurrentPoll);
 
 
 
@@ -4410,7 +4396,6 @@ onAuthStateChanged(
             pollPromptModal.setAttribute("aria-hidden", "true");
             pendingPolls = [];
             activePoll = null;
-            pollDeferredThisSession = false;
             pollSubmissionBusy = false;
             pendingServiceReadyMission = null;
             announcementsWaitingForServiceModal = [];
