@@ -959,6 +959,24 @@ body {
         );
 }
 
+.booster-classic {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    border: 1px solid rgba(189, 137, 29, .62);
+    background:
+        radial-gradient(ellipse at 50% 0%, rgba(255,255,255,.98) 0%, rgba(255,250,231,.94) 34%, transparent 68%),
+        linear-gradient(155deg, #f8edcf 0%, #e8f0fb 52%, #d4e2f5 100%);
+    box-shadow: 0 12px 28px rgba(7, 26, 57, .18), inset 0 1px 0 rgba(255,255,255,.95), inset 0 -5px 14px rgba(35, 74, 124, .09);
+}
+.booster-classic::before { position: absolute; z-index: -1; inset: 8px; border: 1px solid rgba(195, 148, 48, .27); border-radius: 13px; content: ""; pointer-events: none; }
+.booster-classic .booster-visual { filter: drop-shadow(0 8px 8px rgba(13, 37, 76, .17)); }
+.booster-classic .booster-image { background: radial-gradient(circle, #fffdf7, #dce8fa); border-color: rgba(194, 147, 46, .52); }
+.booster-classic h4 { color: #10264a; text-shadow: 0 1px 0 rgba(255,255,255,.8); }
+.booster-classic button { position: relative; z-index: 1; }
+.booster-classic #openNormalBoosterButton { background: linear-gradient(135deg, #153d70, #0b2146); border-color: #d8ad47; color: #fff6d8; box-shadow: 0 5px 12px rgba(9, 28, 58, .28), inset 0 1px 0 rgba(255,255,255,.22); }
+.booster-classic #openNormalBoosterButton:disabled { background: #d8d5cc; border-color: #c6c1b5; color: #696b70; box-shadow: none; }
+
 
 .booster-icon {
 
@@ -2530,7 +2548,7 @@ body {
             </article>
 
 
-            <article class="booster">
+            <article class="booster booster-classic">
 
                 <span class="booster-visual">
                     <img loading="lazy" decoding="async" class="booster-image" src="./Booster%20normal.png" alt="Illustration du booster classique Cartes & Popote">
@@ -2545,10 +2563,10 @@ body {
                     5 cartes
                 </p>
 
-                <button id="buyNormalBoosterButton" type="button">
-                    Acheter pour 3 jetons
+                <button id="buyNormalBoosterButton" class="hidden" type="button">
+                    3 jeton
                 </button>
-                <button id="openNormalBoosterButton" type="button" disabled>
+                <button id="openNormalBoosterButton" class="hidden" type="button" disabled>
                     Ouvrir un booster (0)
                 </button>
 
@@ -3967,6 +3985,15 @@ let premiumAdminPlayers = [];
 let premiumRewardCards = [];
 const buyNormalBoosterButton = document.getElementById("buyNormalBoosterButton");
 const openNormalBoosterButton = document.getElementById("openNormalBoosterButton");
+const playerTokensDisplay = document.getElementById("playerTokens");
+function updateClassicBoosterPurchaseAvailability() {
+    const tokenDigits = (playerTokensDisplay.textContent || "").match(/^\s*[\d\s\u202f\u00a0.,]+/);
+    const tokenBalance = Number((tokenDigits?.[0] || "0").replace(/[^\d]/g, "")) || 0;
+    const canBuy = Boolean(auth.currentUser) && !isPlayerPreview && tokenBalance > 3;
+    buyNormalBoosterButton.classList.toggle("hidden", !canBuy);
+    buyNormalBoosterButton.disabled = !canBuy;
+}
+new MutationObserver(updateClassicBoosterPurchaseAvailability).observe(playerTokensDisplay, { childList: true, characterData: true, subtree: true });
 const dailyBoosterArticle = document.getElementById("dailyBoosterArticle");
 const openDailyBoosterButton = document.getElementById("openDailyBoosterButton");
 const boosterPurchaseStatus = document.getElementById("boosterPurchaseStatus");
@@ -4374,6 +4401,7 @@ onAuthStateChanged(
     auth,
 
     async function(user) {
+        updateClassicBoosterPurchaseAvailability();
 
 
         /* ==========================================
@@ -4654,7 +4682,7 @@ buyNormalBoosterButton.addEventListener("click", async () => {
             boosterPurchaseStatus.textContent = "Achat refusé. Vérifie que la fonction Firebase buyClassicBooster est déployée.";
         }
     } finally {
-        buyNormalBoosterButton.disabled = false;
+        updateClassicBoosterPurchaseAvailability();
     }
 });
 
@@ -5814,6 +5842,7 @@ premiumAdjustSubmit.addEventListener("click", async () => {
 function setPlayerPreview(enabled) {
     if (!isCurrentUserAdmin()) return;
     isPlayerPreview = enabled;
+    updateClassicBoosterPurchaseAvailability();
     menuButton.classList.toggle("hidden", enabled);
     adminHubOpenButton.classList.toggle("hidden", enabled);
     homeMaintenanceAdminToggle.classList.toggle("hidden", enabled);
@@ -6866,6 +6895,7 @@ function setOpenBoosterButton(count) {
     document.getElementById("normalBoosterStockCount").textContent = available.toLocaleString("fr-FR");
     openNormalBoosterButton.textContent = "Ouvrir un booster";
     openNormalBoosterButton.disabled = available < 1;
+    openNormalBoosterButton.classList.toggle("hidden", available < 1);
     openNextBoosterButton.classList.toggle("hidden", available < 1);
 }
 
