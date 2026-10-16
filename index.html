@@ -904,7 +904,7 @@ body {
 .cooperation-claim-button { max-width:100%; padding:5px 7px; border:1px solid #f0ce72; border-radius:999px; background:linear-gradient(180deg,#ffe895,#d99b22); color:#182b45; font-size:9px; font-weight:900; line-height:1.1; box-shadow:0 2px 0 #80540a,inset 0 1px rgba(255,255,255,.55); cursor:pointer; white-space:normal; }
 .cooperation-claim-button:disabled { opacity:.62; cursor:default; }
 .cooperation-admin-rewards { display:grid; gap:12px; margin:14px 0; }
-.cooperation-admin-reward-row { display:grid; grid-template-columns:minmax(110px,.7fr) repeat(3,minmax(120px,1fr)); gap:10px; align-items:center; padding:12px; border:1px solid #d5bf8a; border-radius:12px; background:linear-gradient(135deg,#fffdf6,#f4eddd); }
+.cooperation-admin-reward-row { display:grid; grid-template-columns:minmax(115px,.8fr) repeat(5,minmax(100px,1fr)); gap:10px; align-items:center; padding:12px; border:1px solid #d5bf8a; border-radius:12px; background:linear-gradient(135deg,#fffdf6,#f4eddd); }
 .cooperation-admin-reward-title { display:flex; align-items:center; gap:9px; color:var(--theme-ink); font-weight:850; }
 .cooperation-admin-reward-title img { width:42px; height:42px; object-fit:contain; filter:drop-shadow(0 2px 3px rgba(0,0,0,.18)); }
 .cooperation-admin-reward-row label { display:grid; gap:5px; color:var(--theme-muted); font-size:11px; font-weight:750; }
@@ -1095,7 +1095,7 @@ body {
 .home-overview-premium { display: flex; min-width: 0; min-height: 62px; align-items: center; justify-content: center; justify-self: stretch; padding: 5px; border: 0; border-radius: 12px; background: transparent; box-shadow: none; font: inherit; cursor: pointer; }
 .home-overview-premium img { width: 48px; height: 48px; object-fit: contain; }
 .home-overview-premium:focus-visible { outline: 3px solid #f7d46b; outline-offset: 2px; }
-.home-overview-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; margin: 12px 0 18px; }
+.home-overview-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin: 12px 0 18px; }
 .home-card-count, .home-overview-grid .home-overview-premium { min-width: 0; min-height: 86px; margin: 0; padding: 10px; border: 1px solid rgba(243,191,56,.75); border-radius: 13px; background: linear-gradient(110deg, #10264a, #183966); color: #fbfaf5; box-shadow: 0 7px 17px rgba(0,0,0,.22); }
 .home-card-count { width: 100%; font: inherit; cursor: default; }
 .home-card-count:not(:disabled) { cursor: pointer; }
@@ -1198,7 +1198,7 @@ body {
 .service-active-countdown { margin:14px 0; padding:10px; border:2px inset #eee; background:#000080; color:#fff; font-size:20px; font-weight:bold; text-align:center; font-variant-numeric:tabular-nums; }
 .service-win-status { min-height:22px; margin:10px 0 0; }
 @media(max-width:760px){.service-admin-grid{grid-template-columns:1fr}.service-admin-header{display:none}.service-admin-row{grid-template-columns:1fr 1fr}.service-admin-row>*:first-child,.service-admin-row>*:last-child{grid-column:1/-1}.service-row-actions{display:flex;flex-wrap:wrap}}
-@media (max-width: 600px) { .home-overview-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; } .home-overview-leaderboard { min-height: 78px; padding: 5px; } .home-overview-leaderboard img { height: 64px; } }
+@media (max-width: 600px) { .home-overview-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; } .home-overview-leaderboard { min-height: 78px; padding: 5px; } .home-overview-leaderboard img { height: 64px; } }
 .home-site-note { display: grid; justify-items: center; gap: 7px; margin: 20px 0 88px; color: #c6d2e5; font-size: 11px; line-height: 1.45; text-align: center; }
 .home-site-note p { margin: 0; }
 .home-site-note a { color: #f7d46b; text-decoration: underline; text-underline-offset: 3px; }
@@ -1412,6 +1412,10 @@ body {
 .player-collection { width: 100%; max-width: 900px; margin: auto; padding: 20px 16px 100px; }
 .player-collection h2 { margin-bottom: 8px; color: #173b52; }
 .collection-display-toggle { display: flex; flex-wrap: wrap; gap: 8px; margin: 14px 0; }
+.collection-season-toggle { display:flex; flex-wrap:wrap; gap:9px; margin:12px 0 16px; }
+.collection-season-toggle button { min-width:120px; padding:10px 16px; border:1px solid #c7b886; border-radius:11px; background:linear-gradient(135deg,#173b52,#10264a); color:#fbfaf5; font:inherit; font-size:14px; font-weight:850; cursor:pointer; box-shadow:0 4px 10px rgba(0,0,0,.16); }
+.collection-season-toggle button[aria-pressed="true"] { border-color:#d7a51e; background:linear-gradient(135deg,#ffe17b,#edb52b); color:#10264a; }
+.collection-season-notice { margin:18px 0; padding:42px 18px; border:2px solid #d7a51e; border-radius:16px; background:repeating-linear-gradient(to bottom,#fbf8ee 0,#fbf8ee 31px,#e9e0cc 32px); color:#173b52; font-size:22px; font-weight:900; text-align:center; box-shadow:0 10px 24px rgba(0,0,0,.2),inset 0 0 0 4px rgba(255,255,255,.5); }
 .collection-display-toggle button { padding: 8px 12px; border: 1px solid #c7b886; border-radius: 10px; background: #f8f5eb; color: #173b52; font: inherit; font-size: 13px; font-weight: 800; cursor: pointer; }
 .collection-display-toggle button[aria-pressed="true"] { border-color: #d7a51e; background: linear-gradient(135deg, #ffe17b, #edb52b); }
 .collection-album-layout { min-width: 0; }
@@ -2370,6 +2374,7 @@ body {
             <button class="admin-menu-button" type="button" data-admin-section="cards" aria-controls="adminCardsSection" aria-pressed="false">🃏 Création de cartes</button>
             <button class="admin-menu-button" type="button" data-admin-section="serviceMissions" aria-controls="adminServiceMissionsSection" aria-pressed="false">📋 Gestion des missions</button>
             <button class="admin-menu-button" type="button" data-admin-section="cooperations" aria-controls="adminCooperationsSection" aria-pressed="false">🤝 Coopérations</button>
+            <button class="admin-hub-card" type="button" data-admin-hub-action="tirages"><span class="admin-hub-card-icon">🃏</span><span><strong>Cartes tirées</strong><small>Total tiré par les joueurs</small></span></button>
             <button class="admin-hub-card" type="button" data-admin-hub-action="effectif"><span class="admin-hub-card-icon">👥</span><span><strong>Effectif</strong><small>Suivi mensuel des joueurs</small></span></button>
             <button class="admin-hub-card" type="button" data-admin-hub-action="boosters"><span class="admin-hub-card-icon">🎁</span><span><strong>Boosters évènementiels</strong><small>Programmation et attribution</small></span></button>
             <button class="admin-hub-card" type="button" data-admin-hub-action="messagerie"><span class="admin-hub-card-icon">💬</span><span><strong>Messagerie</strong><small>Idées, problèmes et archives</small></span></button>
@@ -2409,16 +2414,9 @@ body {
             <span id="playerCards" class="hidden">0</span>
         </section>
 
-        <section class="home-overview-grid" aria-label="Informations Cartes & Popote">
+        <section class="home-overview-grid" aria-label="Classement et Service">
             <button id="leaderboardMenuButton" class="home-overview-leaderboard" type="button" aria-label="Ouvrir le classement" title="Classement">
                 <img loading="lazy" decoding="async" src="./Classement.png" alt="">
-            </button>
-            <button id="homeCardCountButton" class="home-card-count" type="button" aria-label="Nombre de cartes créées dans le jeu" disabled>
-                <img loading="lazy" decoding="async" class="home-card-count-icon" src="./Dos%20cartes.png" alt="">
-                <span class="home-card-count-copy">
-                    <strong id="publicCardCount" class="home-card-count-value">—</strong>
-                    <span class="home-card-count-label">cartes créées</span>
-                </span>
             </button>
             <div class="home-overview-archive">
                 <button id="archivesHomeButton" type="button" aria-label="Ouvrir la page Service" title="Service">
@@ -2758,6 +2756,12 @@ body {
     <section id="collectionPage" class="player-collection hidden" aria-labelledby="collectionTitle">
         <button id="collectionBackButton" class="admin-back" type="button">← Retour à l’accueil</button>
         <h2 id="collectionTitle">🗂️ Mon classeur</h2>
+        <div class="collection-season-toggle" role="group" aria-label="Choisir la saison de la collection">
+            <button id="collectionSeasonOneButton" type="button" aria-pressed="true">Saison 1</button>
+            <button id="collectionSeasonTwoButton" type="button" aria-pressed="false">Saison 2</button>
+        </div>
+        <p id="collectionSeasonComingSoon" class="collection-season-notice hidden" role="status">En cours de création</p>
+        <div id="collectionSeasonContent">
         <p class="admin-note">Tes cartes sont rangées par numéro. Les emplacements vides correspondent aux cartes encore à découvrir.</p>
         <div class="collection-display-toggle" role="group" aria-label="Mode d’affichage du classeur">
             <button id="collectionClassicModeButton" type="button" aria-pressed="true">Affichage classique</button>
@@ -2781,6 +2785,7 @@ body {
                     <button id="collectionNextPageButton" type="button">Suivante →</button>
                 </nav>
             </div>
+        </div>
         </div>
     </section>
 
@@ -3153,7 +3158,7 @@ body {
             <button id="saveCooperationSettingsButton" class="primary-button admin-submit" type="button">Enregistrer les paramètres</button>
             <p id="cooperationAdminStatus" class="admin-status" role="status" aria-live="polite"></p>
             <h4>🎁 Récompenses collectives par jauge</h4>
-            <p class="admin-note">Choisis les jetons classiques, les jetons Premium et/ou une carte. Les joueurs autorisés dans Effectif pourront réclamer la récompense lorsque l’objectif sera atteint.</p>
+            <p class="admin-note">Choisis les jetons classiques, les jetons Premium, une carte précise ou une carte tirée au hasard dans la rareté choisie. Les joueurs autorisés dans Effectif pourront réclamer la récompense lorsque l’objectif sera atteint.</p>
             <div id="cooperationRewardAdminList" class="cooperation-admin-rewards"></div>
             <button id="saveCooperationRewardsButton" class="primary-button admin-submit" type="button">Enregistrer les récompenses</button>
             <p id="cooperationRewardsAdminStatus" class="admin-status" role="status" aria-live="polite"></p>
@@ -3670,7 +3675,6 @@ const statisticsPage = document.getElementById("statisticsPage");
 const statisticsBackButton = document.getElementById("statisticsBackButton");
 const statisticsStatus = document.getElementById("statisticsStatus");
 const statisticsTableBody = document.getElementById("statisticsTableBody");
-const homeCardCountButton = document.getElementById("homeCardCountButton");
 const drawnCardsPage = document.getElementById("drawnCardsPage");
 const drawnCardsBackButton = document.getElementById("drawnCardsBackButton");
 const drawnCardsTotal = document.getElementById("drawnCardsTotal");
@@ -3870,7 +3874,6 @@ let adminMinages = [];
 let selectedAdminMinageId = "";
 const announcementsList = document.getElementById("announcementsList");
 const newPlayersList = document.getElementById("newPlayersList");
-const publicCardCount = document.getElementById("publicCardCount");
 const announcementForm = document.getElementById("announcementForm");
 const announcementTitle = document.getElementById("announcementTitle");
 const announcementMessage = document.getElementById("announcementMessage");
@@ -3895,6 +3898,10 @@ const feedbackSubmitButton = document.getElementById("feedbackSubmitButton");
 const feedbackStatus = document.getElementById("feedbackStatus");
 const collectionPage = document.getElementById("collectionPage");
 const collectionBackButton = document.getElementById("collectionBackButton");
+const collectionSeasonOneButton = document.getElementById("collectionSeasonOneButton");
+const collectionSeasonTwoButton = document.getElementById("collectionSeasonTwoButton");
+const collectionSeasonContent = document.getElementById("collectionSeasonContent");
+const collectionSeasonComingSoon = document.getElementById("collectionSeasonComingSoon");
 const recyclingPage = document.getElementById("recyclingPage");
 const recyclingBackButton = document.getElementById("recyclingBackButton");
 const recyclingStatus = document.getElementById("recyclingStatus");
@@ -3921,9 +3928,12 @@ const homeHeaderButton = document.getElementById("homeHeaderButton");
 const collectionNavButton = document.getElementById("collectionNavButton");
 const recyclingNavButton = document.getElementById("recyclingNavButton");
 let ownedAlbumCards = [];
+let allOwnedAlbumCards = [];
 let recyclableCardCopies = [];
 const selectedRecycleCopyIds = new Set();
 let collectionMaxCardNumber = 0;
+let collectionSeason = "Saison 1";
+let collectionSeasonMetadata = {};
 let collectionAlbumPage = 0;
 let collectionSearchQuery = "";
 let collectionRarityFilterValue = "";
@@ -4285,7 +4295,6 @@ onAuthStateChanged(
         homeMaintenanceAdminToggle.classList.toggle("hidden", !isAdminAccount || isPlayerPreview);
         menuButton.classList.toggle("hidden", !isAdminAccount || isPlayerPreview);
         adminHubOpenButton.classList.toggle("hidden", !isAdminAccount || isPlayerPreview);
-        homeCardCountButton.disabled = !isAdminAccount || isPlayerPreview;
         dropdownMenu.classList.add("hidden");
         playerLogoutButton.classList.toggle("hidden", isAdminAccount);
         adminButton.classList.toggle("hidden", !isAdminAccount || isPlayerPreview);
@@ -4300,7 +4309,6 @@ onAuthStateChanged(
         premiumAdminPanel.classList.toggle("hidden", !isAdminAccount || isPlayerPreview);
         if (!isAdminAccount) messagingPage.classList.add("hidden");
         loadHomeAnnouncements();
-        loadPublicCardCount();
         refreshHomeMaintenanceStatus();
         if (homeMaintenanceRefreshInterval) window.clearInterval(homeMaintenanceRefreshInterval);
         homeMaintenanceRefreshInterval = window.setInterval(refreshHomeMaintenanceStatus, 45_000);
@@ -4522,10 +4530,9 @@ async function showDrawnCardsPage() {
     }
 }
 
-homeCardCountButton.addEventListener("click", showDrawnCardsPage);
 drawnCardsBackButton.addEventListener("click", showHomePage);
 document.addEventListener("click", (event) => {
-    if (event.target.closest("button, a, [role='button']") && !event.target.closest("#homeCardCountButton")) {
+    if (event.target.closest("button, a, [role='button']") && !event.target.closest("#drawnCardsPage") && !event.target.closest('[data-admin-hub-action="tirages"]')) {
         drawnCardsPage.classList.add("hidden");
     }
 }, true);
@@ -5636,7 +5643,6 @@ function setPlayerPreview(enabled) {
     menuButton.classList.toggle("hidden", enabled);
     adminHubOpenButton.classList.toggle("hidden", enabled);
     homeMaintenanceAdminToggle.classList.toggle("hidden", enabled);
-    homeCardCountButton.disabled = enabled;
     dropdownMenu.classList.add("hidden");
     adminButton.classList.toggle("hidden", enabled);
     effectifMenuButton.classList.toggle("hidden", enabled);
@@ -6189,14 +6195,17 @@ async function loadOwnedPlayerCards() {
             callGetOwnedCardNumbers(),
         ]);
         const cardNumbers = numberResponse.data.cardNumbers || {};
-        collectionCategories = Array.isArray(numberResponse.data.categories) ? numberResponse.data.categories : [];
-        collectionCategoryByNumber = numberResponse.data.categoryByNumber && typeof numberResponse.data.categoryByNumber === "object"
-            ? numberResponse.data.categoryByNumber
-            : {};
+        const cardSeasons = numberResponse.data.cardSeasons && typeof numberResponse.data.cardSeasons === "object" ? numberResponse.data.cardSeasons : {};
+        collectionSeasonMetadata = numberResponse.data.seasonData && typeof numberResponse.data.seasonData === "object" ? numberResponse.data.seasonData : {};
+        const currentSeasonData = collectionSeasonMetadata[collectionSeason] || {};
+        collectionCategories = Array.isArray(currentSeasonData.categories) ? currentSeasonData.categories
+            : (Array.isArray(numberResponse.data.categories) ? numberResponse.data.categories : []);
+        collectionCategoryByNumber = currentSeasonData.categoryByNumber && typeof currentSeasonData.categoryByNumber === "object"
+            ? currentSeasonData.categoryByNumber
+            : (numberResponse.data.categoryByNumber && typeof numberResponse.data.categoryByNumber === "object" ? numberResponse.data.categoryByNumber : {});
         if (collectionCategoryFilter && !collectionCategories.includes(collectionCategoryFilter)) collectionCategoryFilter = "";
         if (collectionDisplayMode === "intercalaires" && !collectionCategoryFilter) collectionCategoryFilter = collectionCategories[0] || "";
-        renderCollectionDividers();
-        const reportedMaximum = Number(numberResponse.data.maxCardNumber);
+        const reportedMaximum = Number(currentSeasonData.maxCardNumber ?? numberResponse.data.maxCardNumber);
         if (Number.isSafeInteger(reportedMaximum) && reportedMaximum >= 0) {
             collectionMaxCardNumber = reportedMaximum;
         } else {
@@ -6214,28 +6223,63 @@ async function loadOwnedPlayerCards() {
             .map((item) => {
                 const card = { id: item.id, ...item.data() };
                 card.cardNumber = Number(cardNumbers[card.cardId]) || Number(card.cardNumber) || null;
+                card.season = cardSeasons[card.cardId] || normalizeCollectionSeason(card.season || card.seasonNumber);
                 return card;
             })
             .sort((a, b) => (a.cardNumber || Number.MAX_SAFE_INTEGER) - (b.cardNumber || Number.MAX_SAFE_INTEGER));
-        if (!cards.length) {
-            ownedCardsStatus.textContent = "Ta collection est vide. Ouvre un booster pour obtenir tes premières cartes !";
-            ownedAlbumCards = [];
-            updateRecycleControls();
-            collectionAlbumPage = 0;
-            renderCollectionAlbum();
-            return;
-        }
         const groupedCards = groupCardCopies(cards);
         groupedCards.sort((a, b) => (a.cardNumber || Number.MAX_SAFE_INTEGER) - (b.cardNumber || Number.MAX_SAFE_INTEGER));
-        ownedAlbumCards = groupedCards;
+        allOwnedAlbumCards = groupedCards;
+        applyCollectionSeasonData();
         updateRecycleControls();
         collectionAlbumPage = 0;
-        ownedCardsStatus.textContent = cards.length + (cards.length === 1 ? " exemplaire obtenu" : " exemplaires obtenus")
-            + " • " + groupedCards.length + (groupedCards.length === 1 ? " carte différente" : " cartes différentes");
+        ownedCardsStatus.textContent = cards.length
+            ? cards.length + (cards.length === 1 ? " exemplaire obtenu" : " exemplaires obtenus")
+                + " • " + ownedAlbumCards.length + (ownedAlbumCards.length === 1 ? " carte différente dans cette saison" : " cartes différentes dans cette saison")
+            : "Ta collection est vide. Ouvre un booster pour obtenir tes premières cartes !";
         renderCollectionAlbum();
     } catch (error) {
         console.error("Erreur de chargement de la collection du joueur :", error);
         ownedCardsStatus.textContent = "Impossible de charger ta collection. Vérifie les règles Firestore.";
+    }
+}
+
+function normalizeCollectionSeason(value) {
+    const match = String(value ?? "").match(/\d+/);
+    return `Saison ${match ? Number(match[0]) || 1 : 1}`;
+}
+
+function applyCollectionSeasonData() {
+    const seasonData = collectionSeasonMetadata[collectionSeason] || {};
+    if (Number.isSafeInteger(Number(seasonData.maxCardNumber))) collectionMaxCardNumber = Math.max(0, Number(seasonData.maxCardNumber));
+    if (Array.isArray(seasonData.categories)) collectionCategories = seasonData.categories;
+    if (seasonData.categoryByNumber && typeof seasonData.categoryByNumber === "object") collectionCategoryByNumber = seasonData.categoryByNumber;
+    if (collectionCategoryFilter && !collectionCategories.includes(collectionCategoryFilter)) collectionCategoryFilter = "";
+    if (collectionDisplayMode === "intercalaires" && !collectionCategoryFilter) collectionCategoryFilter = collectionCategories[0] || "";
+    ownedAlbumCards = allOwnedAlbumCards.filter((card) => normalizeCollectionSeason(card.season) === collectionSeason);
+    const seasonCopyCount = ownedAlbumCards.reduce((total, card) => total + (Number(card.quantity) || 1), 0);
+    ownedCardsStatus.textContent = seasonCopyCount
+        ? seasonCopyCount + (seasonCopyCount === 1 ? " exemplaire obtenu" : " exemplaires obtenus")
+            + " • " + ownedAlbumCards.length + (ownedAlbumCards.length === 1 ? " carte différente dans cette saison" : " cartes différentes dans cette saison")
+        : "Aucune carte découverte dans cette saison pour le moment.";
+    renderCollectionDividers();
+    renderCollectionAlbum();
+}
+
+function setCollectionSeason(season) {
+    collectionSeason = season === "Saison 2" ? "Saison 2" : "Saison 1";
+    const isSeasonTwo = collectionSeason === "Saison 2";
+    collectionSeasonOneButton.setAttribute("aria-pressed", String(!isSeasonTwo));
+    collectionSeasonTwoButton.setAttribute("aria-pressed", String(isSeasonTwo));
+    collectionSeasonContent.classList.toggle("hidden", isSeasonTwo);
+    collectionSeasonComingSoon.classList.toggle("hidden", !isSeasonTwo);
+    if (!isSeasonTwo) {
+        collectionSearchInput.value = "";
+        collectionSearchQuery = "";
+        collectionRarityFilter.value = "";
+        collectionRarityFilterValue = "";
+        collectionAlbumPage = 0;
+        applyCollectionSeasonData();
     }
 }
 
@@ -6415,7 +6459,7 @@ function groupCardCopies(cards) {
 }
 
 function updateRecycleControls() {
-    recyclableCardCopies = ownedAlbumCards.flatMap((card) =>
+    recyclableCardCopies = allOwnedAlbumCards.flatMap((card) =>
         typeof card.cardId === "string" && card.cardId
             ? (card.copies || []).slice(1).map((copy, index) => ({ ...copy, recycleCopyNumber: index + 2 }))
             : []
@@ -6814,8 +6858,18 @@ async function loadAdminCooperationRewards() {
             premiumInput.value = String(Number(reward.premiumTokens) || 0);
             premiumInput.setAttribute("aria-label", `Jetons Premium pour ${definition.label}`);
             premiumLabel.append(premiumInput);
+            const modeLabel = document.createElement("label");
+            modeLabel.textContent = "Récompense carte";
+            const modeSelect = document.createElement("select");
+            modeSelect.className = "admin-field"; modeSelect.dataset.rewardField = "cardMode";
+            [["", "Aucune carte"], ["specific", "Carte précise"], ["random", "Carte aléatoire par rareté"]].forEach(([mode, label]) => {
+                const option = document.createElement("option"); option.value = mode; option.textContent = label; modeSelect.append(option);
+            });
+            modeSelect.value = reward.cardMode === "random" ? "random" : (reward.cardMode === "specific" || reward.cardId ? "specific" : "");
+            modeSelect.setAttribute("aria-label", `Mode de récompense carte pour ${definition.label}`);
+            modeLabel.append(modeSelect);
             const cardLabel = document.createElement("label");
-            cardLabel.textContent = "Carte à attribuer";
+            cardLabel.textContent = "Carte précise à attribuer";
             const cardSelect = document.createElement("select");
             cardSelect.className = "admin-field"; cardSelect.dataset.rewardField = "cardId";
             const none = document.createElement("option"); none.value = ""; none.textContent = "Aucune carte";
@@ -6829,7 +6883,32 @@ async function loadAdminCooperationRewards() {
             cardSelect.value = reward.cardId || "";
             cardSelect.setAttribute("aria-label", `Carte de récompense pour ${definition.label}`);
             cardLabel.append(cardSelect);
-            row.append(title, tokensLabel, premiumLabel, cardLabel);
+            const rarityLabel = document.createElement("label");
+            rarityLabel.textContent = "Rareté de la carte aléatoire";
+            const raritySelect = document.createElement("select");
+            raritySelect.className = "admin-field"; raritySelect.dataset.rewardField = "cardRarity";
+            const rarityPlaceholder = document.createElement("option"); rarityPlaceholder.value = ""; rarityPlaceholder.textContent = "Choisir une rareté";
+            raritySelect.append(rarityPlaceholder);
+            [...new Set(cards.map((card) => String(card.rarity || "").trim()).filter(Boolean))]
+                .sort((a, b) => a.localeCompare(b, "fr"))
+                .forEach((rarity) => {
+                    const option = document.createElement("option"); option.value = rarity; option.textContent = rarity; raritySelect.append(option);
+                });
+            raritySelect.value = reward.cardRarity || "";
+            raritySelect.setAttribute("aria-label", `Rareté de la carte aléatoire pour ${definition.label}`);
+            rarityLabel.append(raritySelect);
+            const syncCardInputs = () => {
+                const mode = modeSelect.value;
+                cardLabel.classList.toggle("hidden", mode !== "specific");
+                rarityLabel.classList.toggle("hidden", mode !== "random");
+            };
+            modeSelect.addEventListener("change", () => {
+                if (modeSelect.value !== "specific") cardSelect.value = "";
+                if (modeSelect.value !== "random") raritySelect.value = "";
+                syncCardInputs();
+            });
+            syncCardInputs();
+            row.append(title, tokensLabel, premiumLabel, modeLabel, cardLabel, rarityLabel);
             cooperationRewardAdminList.append(row);
         });
         cooperationRewardsAdminStatus.textContent = "Choisis une ou plusieurs récompenses pour chaque jauge. Une récompense peut être récupérée une fois par joueur et par cycle.";
@@ -6847,11 +6926,14 @@ async function saveAdminCooperationRewards() {
         const row = cooperationRewardAdminList.querySelector(`[data-cooperation-reward="${id}"]`);
         const tokens = Number(row?.querySelector('[data-reward-field="tokens"]')?.value);
         const premiumTokens = Number(row?.querySelector('[data-reward-field="premiumTokens"]')?.value);
+        const cardMode = row?.querySelector('[data-reward-field="cardMode"]')?.value || "";
         const cardId = row?.querySelector('[data-reward-field="cardId"]')?.value || "";
+        const cardRarity = row?.querySelector('[data-reward-field="cardRarity"]')?.value || "";
         if (!Number.isSafeInteger(tokens) || tokens < 0 || tokens > 1_000_000 || !Number.isSafeInteger(premiumTokens) || premiumTokens < 0 || premiumTokens > 1_000_000) valid = false;
-        rewards[id] = { tokens, premiumTokens, cardId };
+        if ((cardMode === "specific" && !cardId) || (cardMode === "random" && !cardRarity)) valid = false;
+        rewards[id] = { tokens, premiumTokens, cardMode, cardId, cardRarity };
     });
-    if (!valid) { cooperationRewardsAdminStatus.textContent = "Les quantités doivent être des nombres entiers entre 0 et 1 000 000."; return; }
+    if (!valid) { cooperationRewardsAdminStatus.textContent = "Vérifie les quantités et complète la carte précise ou la rareté aléatoire choisie."; return; }
     const button = document.getElementById("saveCooperationRewardsButton");
     button.disabled = true;
     cooperationRewardsAdminStatus.textContent = "Enregistrement des récompenses…";
@@ -7385,6 +7467,8 @@ openDailyBoosterButton.addEventListener("click", async () => {
 
 homeHeaderButton.addEventListener("click", showHomePage);
 collectionBackButton.addEventListener("click", showHomePage);
+collectionSeasonOneButton.addEventListener("click", () => setCollectionSeason("Saison 1"));
+collectionSeasonTwoButton.addEventListener("click", () => setCollectionSeason("Saison 2"));
 rulesBackButton.addEventListener("click", showHomePage);
 collectionSearchInput.addEventListener("input", () => {
     collectionSearchQuery = collectionSearchInput.value;
@@ -7776,7 +7860,6 @@ function createAdminCardRow(cardDoc) {
             await deleteDoc(doc(db, "cards", cardDoc.id));
             adminStatus.textContent = "Carte supprimée.";
             await loadCards();
-            await loadPublicCardCount();
         } catch (error) {
             console.error(error);
             adminStatus.textContent = "Suppression refusée. Vérifie les règles Firestore.";
@@ -8760,21 +8843,6 @@ async function loadHomeAnnouncements() {
     }
 }
 
-async function loadPublicCardCount() {
-    publicCardCount.textContent = "…";
-    if (!auth.currentUser) return;
-    try {
-        const response = await callGetPublicCardCount();
-        const count = Number(response.data.count);
-        publicCardCount.textContent = Number.isSafeInteger(count) && count >= 0
-            ? count.toLocaleString("fr-FR")
-            : "—";
-    } catch (error) {
-        console.error("Erreur de chargement du nombre de cartes :", error);
-        publicCardCount.textContent = "—";
-    }
-}
-
 async function loadAdminAnnouncements() {
     adminAnnouncementsList.replaceChildren();
     adminAnnouncementsStatus.textContent = "Chargement des annonces…";
@@ -9164,6 +9232,7 @@ document.querySelectorAll("[data-admin-hub-action]").forEach((button) => {
         const action = button.dataset.adminHubAction;
         if (action === "preview") { playerPreviewToggle.click(); return; }
         if (action === "logout") { logoutButton.click(); return; }
+        if (action === "tirages") { adminHubPage.classList.add("hidden"); void showDrawnCardsPage(); return; }
         const destination = {
             effectif: effectifMenuButton,
             boosters: eventBoostersMenuButton,
@@ -9398,7 +9467,6 @@ cardForm.addEventListener("submit", async (event) => {
         cardSubmit.textContent = "Ajouter les cartes saisies";
         cardCancelEdit.classList.add("hidden");
         await loadCards();
-        await loadPublicCardCount();
     } catch (error) {
         console.error("Erreur d’enregistrement :", error);
         if (cardSaveStage === "Storage" || String(error.code || "").startsWith("storage/")) {
