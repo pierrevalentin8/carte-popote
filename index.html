@@ -879,27 +879,34 @@ body {
     gap: 10px;
 }
 
-#cooperationCard { grid-column:auto; display:flex; flex-direction:column; min-width:0; min-height:320px; padding:13px 9px 10px; overflow:hidden; border:2px solid #e2ad3c; background:radial-gradient(ellipse at 50% 0%,#173d72 0%,#0b1e3c 72%); color:#f8f2df; box-shadow:inset 0 0 0 2px rgba(255,218,126,.13),0 5px 13px rgba(5,15,33,.22); }
+#cooperationCard { grid-column:auto; display:flex; flex-direction:column; min-width:0; min-height:350px; padding:13px 9px 11px; overflow:hidden; border:2px solid #e2ad3c; background:radial-gradient(ellipse at 50% 0%,rgba(39,91,150,.92) 0%,#112b50 42%,#091a34 100%); color:#f8f2df; box-shadow:inset 0 0 0 2px rgba(255,218,126,.15),inset 0 12px 24px rgba(82,171,255,.08),0 7px 18px rgba(5,15,33,.3); }
 #cooperationCard h4 { margin:0 0 12px; color:#ffd66b; font-size:16px; letter-spacing:.04em; text-align:center; text-shadow:0 0 9px rgba(255,193,54,.48); }
 .cooperation-gauges { display:grid; flex:1; min-height:0; grid-template-columns:repeat(3,minmax(0,1fr)); gap:6px; align-items:stretch; }
 .cooperation-gauge { display:grid; min-width:0; grid-template-rows:56px auto minmax(0,1fr) auto; justify-items:center; align-content:stretch; gap:6px; text-align:center; }
 .cooperation-gauge img { width:54px; height:54px; object-fit:contain; filter:drop-shadow(0 0 7px var(--gauge-color)); }
 .cooperation-gauge-label { min-height:27px; color:#fff5da; font-size:10px; font-weight:800; line-height:1.2; }
-.cooperation-gauge-track { position:relative; display:flex; width:34px; height:100%; min-height:0; align-items:flex-end; overflow:hidden; border:2px solid #cda64f; border-radius:999px; background:linear-gradient(90deg,#08162b,#183458 48%,#08162b); box-shadow:inset 0 0 7px #020914,0 0 5px rgba(255,210,95,.24); }
-.cooperation-gauge-fill { width:100%; height:0%; border-radius:999px; background:linear-gradient(90deg,rgba(255,255,255,.42),var(--gauge-color) 55%,rgba(0,0,0,.28)); box-shadow:0 0 10px var(--gauge-color),inset 0 0 6px rgba(255,255,255,.55); transition:height .85s cubic-bezier(.2,.8,.2,1); }
-.cooperation-gauge-track.is-complete { box-shadow:inset 0 0 7px #020914,0 0 11px var(--gauge-color); }
+.cooperation-gauge-track { position:relative; display:block; width:38px; height:100%; min-height:0; overflow:hidden; border:2px solid #f0cc74; border-radius:999px; background:linear-gradient(90deg,#050f20 0%,#102a4a 35%,#173658 52%,#09172b 100%); box-shadow:inset 2px 0 5px rgba(0,0,0,.8),inset -2px 0 5px rgba(0,0,0,.7),inset 0 0 12px #020914,0 0 0 2px rgba(5,16,34,.72),0 0 9px rgba(255,211,111,.25); }
+.cooperation-gauge-track::before { position:absolute; z-index:2; inset:3px 5px; border-left:1px solid rgba(255,255,255,.22); border-right:1px solid rgba(255,255,255,.08); border-radius:inherit; background:linear-gradient(90deg,rgba(255,255,255,.12),transparent 35%,transparent 70%,rgba(255,255,255,.08)); content:""; pointer-events:none; }
+.cooperation-gauge-fill { position:absolute; right:0; bottom:0; left:0; width:100%; height:0%; overflow:hidden; border-radius:0 0 999px 999px; background:linear-gradient(90deg,color-mix(in srgb,var(--gauge-color) 62%,#07162b),var(--gauge-color) 34%,color-mix(in srgb,var(--gauge-color) 72%,white) 50%,var(--gauge-color) 72%,color-mix(in srgb,var(--gauge-color) 55%,#07162b)); box-shadow:0 0 13px var(--gauge-color),inset 0 0 10px rgba(255,255,255,.36); transition:height 1s cubic-bezier(.2,.8,.2,1); }
+.cooperation-gauge-fill::before { position:absolute; top:0; right:0; left:0; height:5px; border-radius:50%; background:rgba(255,255,255,.8); box-shadow:0 0 8px 2px var(--gauge-color); content:""; animation:gaugeLiquidSurface 2.2s ease-in-out infinite alternate; }
+.cooperation-gauge-fill::after { position:absolute; inset:0; background:radial-gradient(circle at 35% 78%,rgba(255,255,255,.6) 0 1px,transparent 2px),radial-gradient(circle at 70% 55%,rgba(255,255,255,.48) 0 1px,transparent 2px),radial-gradient(circle at 48% 30%,rgba(255,255,255,.38) 0 1px,transparent 2px); background-size:100% 54px; content:""; animation:gaugeBubbles 4s linear infinite; }
+.cooperation-gauge-track.is-complete { box-shadow:inset 0 0 12px #020914,0 0 7px var(--gauge-color),0 0 18px color-mix(in srgb,var(--gauge-color) 65%,transparent); }
+.cooperation-gauge-track.is-complete .cooperation-gauge-fill { filter:saturate(1.3) brightness(1.12); }
 .cooperation-gauge-disabled { opacity:.48; }
 .cooperation-gauge-value { max-width:100%; color:#fff; font-size:10px; font-weight:800; line-height:1.15; white-space:normal; overflow-wrap:anywhere; font-variant-numeric:tabular-nums; }
+.cooperation-reward-note { flex:none; margin:9px 0 0; padding-top:8px; border-top:1px solid rgba(238,196,103,.34); color:#f6e7c1; font-size:10px; font-weight:700; line-height:1.3; text-align:center; text-shadow:0 1px 3px rgba(0,0,0,.7); }
 #cooperationCard.is-celebrating { animation:cooperationComplete .9s ease-in-out 2; }
 @keyframes cooperationComplete { 50% { box-shadow:inset 0 0 0 2px rgba(255,255,255,.55),0 0 24px #ffe17a; } }
+@keyframes gaugeLiquidSurface { to { opacity:.55; transform:scaleX(.72); } }
+@keyframes gaugeBubbles { to { background-position:0 -108px; } }
 .cooperation-admin-list { display:grid; gap:10px; margin:12px 0; }
 .cooperation-admin-row { display:grid; grid-template-columns:minmax(100px,1.3fr) minmax(86px,.7fr) minmax(120px,1fr) auto auto; gap:9px; align-items:center; padding:10px; border:1px solid #d8c99f; border-radius:9px; background:#fffefa; }
 .cooperation-admin-row strong { color:var(--theme-ink); }
 .cooperation-admin-progress { color:var(--theme-muted); font-size:12px; text-align:center; }
 .cooperation-admin-row input[type="number"] { width:100%; min-width:72px; }
 .cooperation-admin-row input[type="checkbox"] { width:19px; height:19px; accent-color:#19753c; }
-@media (max-width:520px) { #cooperationCard { min-height:290px; padding:12px 6px 9px; } .cooperation-gauges { gap:3px; } .cooperation-gauge { grid-template-rows:48px auto minmax(0,1fr) auto; gap:5px; } .cooperation-gauge img { width:46px; height:46px; } .cooperation-gauge-track { width:30px; } .cooperation-gauge-label,.cooperation-gauge-value { font-size:9px; } .cooperation-admin-row { grid-template-columns:1fr 72px; } .cooperation-admin-progress { text-align:left; } }
-@media (prefers-reduced-motion:reduce) { .cooperation-gauge-fill { transition:none; } #cooperationCard.is-celebrating { animation:none; } }
+@media (max-width:520px) { #cooperationCard { min-height:320px; padding:12px 6px 9px; } .cooperation-gauges { gap:3px; } .cooperation-gauge { grid-template-rows:48px auto minmax(0,1fr) auto; gap:5px; } .cooperation-gauge img { width:46px; height:46px; } .cooperation-gauge-track { width:32px; } .cooperation-gauge-label,.cooperation-gauge-value { font-size:9px; } .cooperation-reward-note { font-size:9px; } .cooperation-admin-row { grid-template-columns:1fr 72px; } .cooperation-admin-progress { text-align:left; } }
+@media (prefers-reduced-motion:reduce) { .cooperation-gauge-fill,.cooperation-gauge-fill::before,.cooperation-gauge-fill::after { transition:none; animation:none; } #cooperationCard.is-celebrating { animation:none; } }
 
 
 .booster {
@@ -2451,6 +2458,7 @@ body {
                         <span class="cooperation-gauge-value">0 / 0</span>
                     </div>
                 </div>
+                <p class="cooperation-reward-note">Une récompense collective lorsqu’une jauge est complétée</p>
             </article>
 
 
