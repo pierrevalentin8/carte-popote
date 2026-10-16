@@ -1878,18 +1878,24 @@ body {
 .effectif-toolbar input { min-height:40px; padding:7px 9px; border:1px solid #d8c99f; border-radius:8px; background:#fffefa; color:var(--theme-ink); font:inherit; }
 .effectif-add-month { width:42px; min-width:42px; height:42px; padding:0; font-size:24px; line-height:1; }
 .effectif-table-wrap { width:100%; overflow:auto; border:1px solid #d8c99f; border-radius:10px; background:#fffefa; }
-.effectif-table { width:100%; min-width:920px; border-collapse:collapse; color:var(--theme-ink); }
-.effectif-table th,.effectif-table td { padding:9px 8px; border-bottom:1px solid #e8dfca; text-align:center; }
-.effectif-table th { position:sticky; top:0; z-index:1; background:#10264a; color:#fff; font-size:12px; }
-.effectif-table th:first-child,.effectif-table td:first-child { position:sticky; left:0; z-index:2; min-width:150px; text-align:left; }
+.effectif-table { width:100%; min-width:1050px; border-collapse:separate; border-spacing:0; color:var(--theme-ink); }
+.effectif-table th,.effectif-table td { padding:11px 10px; border-bottom:1px solid #e8dfca; text-align:center; vertical-align:middle; }
+.effectif-table th { position:sticky; top:0; z-index:1; background:#10264a; color:#fff; font-size:12px; line-height:1.3; }
+.effectif-table th:first-child,.effectif-table td:first-child { position:sticky; left:0; z-index:2; min-width:155px; text-align:left; }
 .effectif-table td:first-child { background:#fffefa; font-weight:800; }
-.effectif-table td:last-child { min-width:160px; }
-.effectif-month-heading { display:grid; justify-items:center; gap:3px; }
+.effectif-table th:first-child { z-index:3; border-radius:9px 0 0 0; }
+.effectif-table td:last-child,.effectif-table th:last-child { min-width:180px; }
+.effectif-month-heading { display:grid; min-width:108px; justify-items:center; gap:4px; }
 .effectif-month-heading img { width:20px; height:20px; object-fit:contain; }
-.effectif-token-input { width:90px; max-width:100%; padding:7px; border:1px solid #d8c99f; border-radius:7px; text-align:center; font:inherit; }
+.effectif-month-cell { min-width:120px; }
+.effectif-token-input { width:82px; max-width:100%; padding:8px 6px; border:1px solid #c9b77e; border-radius:7px; background:#fffefa; color:var(--theme-ink); text-align:center; font:inherit; font-weight:700; }
+.effectif-token-input:focus { outline:2px solid #d9a52b; outline-offset:1px; }
+.effectif-token-input.effectif-token-locked,.effectif-token-input:disabled { border-color:#d4d0c6; background:#e8e6e1; color:#77756f; cursor:not-allowed; opacity:1; }
+.effectif-cell-locked { display:block; margin-top:4px; color:#77756f; font-size:10px; font-weight:700; }
 .effectif-eligibility { display:inline-flex; align-items:center; justify-content:center; gap:6px; white-space:nowrap; font-size:12px; font-weight:700; }
 .effectif-eligibility input { width:18px; height:18px; accent-color:#19753c; }
 .effectif-row-save { width:auto; min-width:82px; height:34px; margin:5px 0 0; padding:6px 9px; border-radius:7px; font-size:12px; }
+.effectif-row-actions { display:flex; flex-direction:column; align-items:center; gap:5px; }
 .effectif-balance { min-width:230px; }
 .effectif-balance-total { display:flex; align-items:center; justify-content:center; gap:5px; margin-bottom:7px; font-size:15px; }
 .effectif-balance-total img { width:21px; height:21px; object-fit:contain; }
@@ -3041,7 +3047,7 @@ body {
         <button id="effectifBackButton" class="admin-back" type="button">← Retour à l’accueil</button>
         <div class="admin-panel">
             <h2 id="effectifPageTitle">👥 Effectif</h2>
-            <p class="admin-note"><img loading="lazy" decoding="async" src="./Jeton.png" alt="Jeton classique" style="width:18px;height:18px;vertical-align:middle;object-fit:contain"> À l’enregistrement, le montant mensuel est crédité une seule fois. Toute augmentation crédite uniquement la différence. Les retraits sont limités aux jetons encore disponibles.</p>
+            <p class="admin-note"><img loading="lazy" decoding="async" src="./Jeton.png" alt="Jeton classique" style="width:18px;height:18px;vertical-align:middle;object-fit:contain"> Saisis les montants dans les colonnes des mois, puis valide la ligne. Un montant validé est crédité une seule fois, grisé et verrouillé. Les retraits sont limités aux jetons encore disponibles.</p>
             <div class="effectif-toolbar">
                 <label for="effectifMonthInput">Nouveau mois<input id="effectifMonthInput" type="month"></label>
                 <button id="effectifAddMonthButton" class="primary-button effectif-add-month" type="button" aria-label="Ajouter le mois au tableau" title="Ajouter le mois">+</button>
@@ -7628,7 +7634,7 @@ function renderAdminEffectif() {
         const icon = document.createElement("img"); icon.src = "./Jeton.png"; icon.alt = "Jetons classiques";
         label.append(name, icon); cell.append(label); header.append(cell);
     });
-    const rewardsHeading = document.createElement("th"); rewardsHeading.scope = "col"; rewardsHeading.textContent = "Récompenses collectives"; header.append(rewardsHeading);
+    const rewardsHeading = document.createElement("th"); rewardsHeading.scope = "col"; rewardsHeading.textContent = "Récompenses collectives · validation"; header.append(rewardsHeading);
     head.append(header);
     if (!adminEffectifPlayers.length) {
         const row = document.createElement("tr"); const cell = document.createElement("td");
@@ -7673,12 +7679,22 @@ function renderAdminEffectif() {
         tokenControls.append(tokenAmount, grantButton, removeButton); balanceCell.append(balanceTotal, tokenControls); row.append(balanceCell);
         const amountInputs = new Map();
         adminEffectifMonths.forEach((month) => {
-            const cell = document.createElement("td");
+            const cell = document.createElement("td"); cell.className = "effectif-month-cell";
             const input = document.createElement("input"); input.className = "effectif-token-input"; input.type = "number";
             input.min = "0"; input.max = "1000000"; input.step = "1"; input.inputMode = "numeric";
             input.setAttribute("aria-label", `${player.pseudo || "Joueur"}, jetons classiques pour ${formatEffectifMonth(month)}`);
             input.placeholder = "0"; input.value = player.monthlyTokenAmounts?.[month] ?? "";
-            amountInputs.set(month, input); cell.append(input); row.append(cell);
+            const monthLocked = player.monthlyTokenValidated?.[month] === true;
+            input.disabled = monthLocked;
+            if (monthLocked) {
+                input.classList.add("effectif-token-locked"); input.title = "Montant validé et verrouillé";
+                const lockLabel = document.createElement("small"); lockLabel.className = "effectif-cell-locked"; lockLabel.textContent = "Validé";
+                cell.append(input, lockLabel);
+            } else {
+                input.title = "Saisis le montant puis valide la ligne";
+                amountInputs.set(month, input); cell.append(input);
+            }
+            row.append(cell);
         });
         const eligibilityCell = document.createElement("td");
         const eligibilityLabel = document.createElement("label"); eligibilityLabel.className = "effectif-eligibility";
@@ -7694,7 +7710,16 @@ function renderAdminEffectif() {
             try {
                 const monthlyTokenAmounts = Object.fromEntries([...amountInputs].map(([month, input]) => [month, input.value === "" ? 0 : Number(input.value)]));
                 const result = await callSaveEffectifPlayer({ playerId: player.id, collectiveRewardsEnabled: eligibility.checked, monthlyTokenAmounts });
-                player.monthlyTokenAmounts = monthlyTokenAmounts; player.collectiveRewardsEnabled = eligibility.checked;
+                player.monthlyTokenAmounts = { ...(player.monthlyTokenAmounts || {}), ...monthlyTokenAmounts }; player.collectiveRewardsEnabled = eligibility.checked;
+                player.monthlyTokenValidated = { ...(player.monthlyTokenValidated || {}) };
+                for (const month of [...amountInputs.keys()]) {
+                    player.monthlyTokenValidated[month] = true;
+                    const input = amountInputs.get(month);
+                    input.disabled = true; input.classList.add("effectif-token-locked"); input.title = "Montant validé et verrouillé";
+                    const lockLabel = document.createElement("small"); lockLabel.className = "effectif-cell-locked"; lockLabel.textContent = "Validé";
+                    input.parentElement.append(lockLabel);
+                    amountInputs.delete(month);
+                }
                 if (Number.isSafeInteger(result.data?.tokens)) { player.tokens = result.data.tokens; balanceValue.textContent = String(player.tokens); }
                 const tokensAdded = Number(result.data?.tokensAdded) || 0;
                 status.textContent = tokensAdded > 0
@@ -7705,7 +7730,8 @@ function renderAdminEffectif() {
                 status.textContent = error.message || "Enregistrement refusé. Vérifie que les fonctions Effectif sont déployées.";
             } finally { save.disabled = false; }
         });
-        eligibilityCell.append(eligibilityLabel, document.createElement("br"), save); row.append(eligibilityCell); body.append(row);
+        const rowActions = document.createElement("div"); rowActions.className = "effectif-row-actions";
+        rowActions.append(eligibilityLabel, save); eligibilityCell.append(rowActions); row.append(eligibilityCell); body.append(row);
     });
 }
 
