@@ -2134,11 +2134,7 @@ body {
 .exchange-page { width: 100%; max-width: 980px; min-height: calc(100dvh - 70px); margin: auto; padding: 24px 16px 100px; color: var(--theme-cream); }
 .exchange-page h2 { margin: 20px 0 8px; color: var(--theme-gold-light); font-size: 25px; }
 .exchange-intro { margin: 0 0 18px; color: #c6d2e5; font-size: 13px; line-height: 1.55; }
-.exchange-player-header { display: grid; grid-template-columns: minmax(130px, .8fr) minmax(0, 2fr); align-items: stretch; gap: 12px; margin: 18px 0 24px; }
-.exchange-player-name, .exchange-missing-panel { padding: 16px; border: 1px solid rgba(243,191,56,.72); border-radius: 14px; background: linear-gradient(145deg, #183766, #10264a); box-shadow: 0 8px 20px rgba(0,0,0,.22), inset 0 1px rgba(255,255,255,.09); }
-.exchange-player-name { display: flex; flex-direction: column; justify-content: center; gap: 6px; }
-.exchange-player-name span, .exchange-section-label { color: #c6d2e5; font-size: 11px; font-weight: 800; letter-spacing: .07em; text-transform: uppercase; }
-.exchange-player-name strong { color: var(--theme-gold-light); font-size: 19px; overflow-wrap: anywhere; }
+.exchange-missing-panel { padding: 16px; margin: 18px 0 24px; border: 1px solid rgba(243,191,56,.72); border-radius: 14px; background: linear-gradient(145deg, #183766, #10264a); box-shadow: 0 8px 20px rgba(0,0,0,.22), inset 0 1px rgba(255,255,255,.09); }
 .exchange-missing-panel h3, .exchange-ads-heading { margin: 0 0 11px; color: var(--theme-gold-light); font-size: 15px; }
 .exchange-missing-list { display: flex; flex-wrap: wrap; gap: 7px; margin: 0; padding: 0; list-style: none; }
 .exchange-missing-list li { min-width: 37px; padding: 6px 8px; border: 1px solid currentColor; border-radius: 8px; background: rgba(255,255,255,.94); text-align: center; font-size: 13px; font-weight: 900; }
@@ -2151,10 +2147,16 @@ body {
 .exchange-ad-title { display: block; padding-bottom: 8px; margin-bottom: 11px; border-bottom: 1px dashed #a5987e; color: #163a70; font-family: Georgia, serif; font-size: 15px; font-weight: 900; }
 .exchange-ad p { margin: 6px 0 0; font-family: Georgia, serif; font-size: 15px; line-height: 1.55; }
 .exchange-ad-label { font-weight: 700; }
+.exchange-trade-button { display: block; min-width: 130px; margin: 14px 0 0 auto; padding: 9px 15px; border: 1px solid #d7a51e; border-radius: 9px; background: linear-gradient(135deg, #ffe17b, #edb52b); color: #10264a; font: inherit; font-size: 13px; font-weight: 900; cursor: pointer; box-shadow: 0 3px 0 #a8780b, 0 5px 9px rgba(0,0,0,.18); }
+.exchange-trade-button:hover { filter: brightness(1.04); transform: translateY(-1px); }
+.exchange-modal-field { display: grid; gap: 6px; margin: 12px 0; color: #293447; font-size: 13px; font-weight: 800; text-align: left; }
+.exchange-modal-field select { width: 100%; min-height: 42px; padding: 9px 11px; border: 1px solid #aeb9c9; border-radius: 8px; background: #fff; color: #17243a; font: inherit; }
+.exchange-modal-actions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 9px; margin-top: 16px; }
+.exchange-offer-numbers { margin: 10px 0; padding: 12px; border: 1px solid #d7c79e; border-radius: 9px; background: #fffdf7; color: #26324a; font-weight: 700; line-height: 1.7; }
 .exchange-ad-numbers { display: inline-flex; flex-wrap: wrap; gap: 5px; margin: 7px 4px; vertical-align: middle; }
 .exchange-ad-numbers span { padding: 2px 6px; border: 1px solid currentColor; border-radius: 4px; background: rgba(255,255,255,.7); font-family: system-ui, sans-serif; font-size: 12px; font-weight: 900; }
 .exchange-status { margin: 12px 0; color: #c6d2e5; font-size: 13px; line-height: 1.5; }
-@media (max-width: 620px) { .exchange-page { padding: 18px 11px 92px; } .exchange-player-header { grid-template-columns: 1fr; } .exchange-player-name { min-height: 76px; } .exchange-ad p { font-size: 15px; } }
+@media (max-width: 620px) { .exchange-page { padding: 18px 11px 92px; } .exchange-ad p { font-size: 15px; } .exchange-modal-actions > button { flex: 1 1 100%; } }
 .statistics-page { width: 100%; max-width: 1200px; min-height: calc(100dvh - 70px); margin: auto; padding: 24px 16px 100px; color: var(--theme-cream); }
 .statistics-page h2 { margin-top: 20px; color: var(--theme-gold-light); font-size: 24px; }
 .statistics-intro, .statistics-status { margin-top: 8px; color: #c6d2e5; font-size: 13px; line-height: 1.5; }
@@ -2841,7 +2843,7 @@ body {
                 <tbody id="statisticsTableBody"></tbody>
             </table>
         </div>
-        <p class="statistics-tracking-note">Sur mobile, fais glisser le tableau horizontalement. Les anciens achats, dépenses et jetons attribués avant leur suivi ne peuvent pas être reconstitués. Les échanges ne sont pas encore disponibles ; leur compteur reste à zéro.</p>
+        <p class="statistics-tracking-note">Sur mobile, fais glisser le tableau horizontalement. Les anciens achats, dépenses et jetons attribués avant leur suivi ne peuvent pas être reconstitués. Les échanges acceptés sont désormais comptabilisés.</p>
     </section>
 
     <section id="drawnCardsPage" class="statistics-page hidden" aria-labelledby="drawnCardsTitle">
@@ -2891,13 +2893,10 @@ body {
         <button id="exchangeBackButton" class="admin-back" type="button">← Retour à l’accueil</button>
         <h2 id="exchangeTitle">🤝 Échanges entre joueurs</h2>
         <p class="exchange-intro">Retrouve les cartes qui te manquent et consulte les petites annonces des joueurs. Les cartes mystiques ne sont pas échangeables pour le moment.</p>
-        <div class="exchange-player-header">
-            <div class="exchange-player-name"><strong id="exchangePlayerPseudo">Chargement…</strong></div>
-            <div class="exchange-missing-panel">
-                <h3>Numéros qu’il te manque</h3>
-                <ul id="exchangeMissingNumbers" class="exchange-missing-list" aria-label="Numéros de cartes manquantes"></ul>
-                <p id="exchangeMissingStatus" class="exchange-status" role="status" aria-live="polite">Chargement de ta collection…</p>
-            </div>
+        <div class="exchange-missing-panel">
+            <h3>Numéros qu’il te manque</h3>
+            <ul id="exchangeMissingNumbers" class="exchange-missing-list" aria-label="Numéros de cartes manquantes"></ul>
+            <p id="exchangeMissingStatus" class="exchange-status" role="status" aria-live="polite">Chargement de ta collection…</p>
         </div>
         <h3 class="exchange-ads-heading">Petites annonces</h3>
         <p id="exchangeAdsStatus" class="exchange-status" role="status" aria-live="polite">Chargement des annonces…</p>
@@ -3164,6 +3163,27 @@ body {
                 <div class="poll-prompt-actions"><button id="pollTextSubmitButton" class="primary-button" type="button">Envoyer ma réponse</button></div>
             </div>
             <p id="pollPromptStatus" class="admin-status" role="status" aria-live="polite"></p>
+        </div>
+    </section>
+
+    <section id="exchangeComposeModal" class="site-updates-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="exchangeComposeTitle" aria-hidden="true">
+        <div class="site-updates-card">
+            <h2 id="exchangeComposeTitle">Proposer un échange</h2>
+            <p id="exchangeComposeIntro"></p>
+            <label class="exchange-modal-field" for="exchangeSendNumber">Carte que tu proposes<select id="exchangeSendNumber"></select></label>
+            <label class="exchange-modal-field" for="exchangeReceiveNumber">Carte que tu demandes<select id="exchangeReceiveNumber"></select></label>
+            <p id="exchangeComposeStatus" class="admin-status" role="status" aria-live="polite"></p>
+            <div class="exchange-modal-actions"><button id="exchangeComposeCancel" class="secondary-button" type="button">Annuler</button><button id="exchangeComposeSubmit" class="primary-button" type="button">Envoyer la demande</button></div>
+        </div>
+    </section>
+
+    <section id="exchangeOfferModal" class="site-updates-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="exchangeOfferTitle" aria-hidden="true">
+        <div class="site-updates-card">
+            <h2 id="exchangeOfferTitle">Demande d’échange</h2>
+            <p id="exchangeOfferMessage"></p>
+            <div id="exchangeOfferDetails" class="exchange-offer-numbers"></div>
+            <p id="exchangeOfferStatus" class="admin-status" role="status" aria-live="polite"></p>
+            <div class="exchange-modal-actions"><button id="exchangeOfferRefuse" class="secondary-button" type="button">Refuser</button><button id="exchangeOfferAccept" class="primary-button" type="button">Accepter</button></div>
         </div>
     </section>
 
@@ -3539,6 +3559,10 @@ const callGetAdminPolls = httpsCallable(functions, "getAdminPolls");
 const callGetPollResults = httpsCallable(functions, "getPollResults");
 const callGetPendingPolls = httpsCallable(functions, "getPendingPolls");
 const callSubmitPollResponse = httpsCallable(functions, "submitPollResponse");
+const callGetPendingExchangeOffers = httpsCallable(functions, "getPendingExchangeOffers");
+const callCreateExchangeOffer = httpsCallable(functions, "createExchangeOffer");
+const callAcceptExchangeOffer = httpsCallable(functions, "acceptExchangeOffer");
+const callRefuseExchangeOffer = httpsCallable(functions, "refuseExchangeOffer");
 
 const siteUpdatesModal = document.getElementById("siteUpdatesModal");
 const siteUpdatesList = document.getElementById("siteUpdatesList");
@@ -3561,6 +3585,19 @@ const pollCreateButton = document.getElementById("pollCreateButton");
 const pollAdminStatus = document.getElementById("pollAdminStatus");
 const pollAdminList = document.getElementById("pollAdminList");
 const pollResultsPanel = document.getElementById("pollResultsPanel");
+const exchangeComposeModal = document.getElementById("exchangeComposeModal");
+const exchangeComposeIntro = document.getElementById("exchangeComposeIntro");
+const exchangeSendNumber = document.getElementById("exchangeSendNumber");
+const exchangeReceiveNumber = document.getElementById("exchangeReceiveNumber");
+const exchangeComposeStatus = document.getElementById("exchangeComposeStatus");
+const exchangeComposeCancel = document.getElementById("exchangeComposeCancel");
+const exchangeComposeSubmit = document.getElementById("exchangeComposeSubmit");
+const exchangeOfferModal = document.getElementById("exchangeOfferModal");
+const exchangeOfferMessage = document.getElementById("exchangeOfferMessage");
+const exchangeOfferDetails = document.getElementById("exchangeOfferDetails");
+const exchangeOfferStatus = document.getElementById("exchangeOfferStatus");
+const exchangeOfferAccept = document.getElementById("exchangeOfferAccept");
+const exchangeOfferRefuse = document.getElementById("exchangeOfferRefuse");
 const serviceReadyModal = document.getElementById("serviceReadyModal");
 const serviceReadyMessage = document.getElementById("serviceReadyMessage");
 const serviceReadyImage = document.getElementById("serviceReadyImage");
@@ -3573,10 +3610,16 @@ let lastNotifiedServiceTaskId = "";
 let pendingPolls = [];
 let activePoll = null;
 let pollSubmissionBusy = false;
+let pendingExchangeOffers = [];
+let activeExchangeOffer = null;
+let exchangeOfferPollTimer = null;
+let exchangeOfferPollInFlight = false;
+let exchangeOfferActionBusy = false;
+let exchangeOfferTarget = null;
 
 function tryShowPendingPoll() {
     if (!auth.currentUser || isPlayerPreview || activePoll || !pendingPolls.length) return;
-    const blocked = [eventBoosterPromptModal, boosterResultModal, siteUpdatesModal, serviceReadyModal]
+    const blocked = [eventBoosterPromptModal, boosterResultModal, siteUpdatesModal, serviceReadyModal, exchangeOfferModal]
         .some((modal) => modal && !modal.classList.contains("hidden"));
     if (blocked) return;
     activePoll = pendingPolls[0];
@@ -3613,6 +3656,75 @@ function continueStartupNoticesAfterPoll() {
     }
     if (pendingServiceReadyMission && serviceReadyModal.classList.contains("hidden")) showPendingServiceReadyNotification();
     tryShowPendingPoll();
+    tryShowPendingExchangeOffer();
+}
+
+function tryShowPendingExchangeOffer() {
+    if (!auth.currentUser || isPlayerPreview || activeExchangeOffer || !pendingExchangeOffers.length) return;
+    const blocked = [eventBoosterPromptModal, boosterResultModal, siteUpdatesModal, serviceReadyModal, pollPromptModal, exchangeComposeModal]
+        .some((modal) => modal && !modal.classList.contains("hidden"));
+    if (blocked) return;
+    activeExchangeOffer = pendingExchangeOffers[0];
+    exchangeOfferMessage.textContent = `${activeExchangeOffer.senderPseudo || "Un joueur"} te propose un échange.`;
+    exchangeOfferDetails.textContent = `${activeExchangeOffer.senderPseudo || "Un joueur"} te propose sa carte n° ${activeExchangeOffer.offeredNumber} contre ta carte n° ${activeExchangeOffer.requestedNumber}.`;
+    exchangeOfferStatus.textContent = "";
+    exchangeOfferAccept.disabled = false;
+    exchangeOfferRefuse.disabled = false;
+    exchangeOfferModal.classList.remove("hidden");
+    exchangeOfferModal.setAttribute("aria-hidden", "false");
+    exchangeOfferAccept.focus();
+}
+
+async function loadPendingExchangeOffers() {
+    if (!auth.currentUser || isPlayerPreview || exchangeOfferPollInFlight) return;
+    exchangeOfferPollInFlight = true;
+    try {
+        const response = await callGetPendingExchangeOffers();
+        pendingExchangeOffers = Array.isArray(response.data?.offers) ? response.data.offers : [];
+        if (activeExchangeOffer && pendingExchangeOffers.some((offer) => offer.id === activeExchangeOffer.id)) return;
+        if (activeExchangeOffer) {
+            exchangeOfferModal.classList.add("hidden");
+            exchangeOfferModal.setAttribute("aria-hidden", "true");
+            exchangeOfferActionBusy = false;
+        }
+        activeExchangeOffer = null;
+        tryShowPendingExchangeOffer();
+    } catch (error) {
+        console.warn("Impossible de charger les demandes d’échange en attente :", error);
+    } finally {
+        exchangeOfferPollInFlight = false;
+    }
+}
+
+async function answerExchangeOffer(accept) {
+    if (!activeExchangeOffer || exchangeOfferActionBusy) return;
+    exchangeOfferActionBusy = true;
+    exchangeOfferAccept.disabled = true;
+    exchangeOfferRefuse.disabled = true;
+    exchangeOfferStatus.textContent = accept ? "Validation de l’échange…" : "Enregistrement du refus…";
+    try {
+        if (accept) await callAcceptExchangeOffer({ offerId: activeExchangeOffer.id });
+        else await callRefuseExchangeOffer({ offerId: activeExchangeOffer.id });
+        const completedOffer = activeExchangeOffer;
+        pendingExchangeOffers = pendingExchangeOffers.filter((offer) => offer.id !== completedOffer.id);
+        exchangeOfferStatus.textContent = accept ? "Échange effectué ! Les deux cartes ont été transférées." : "Demande refusée.";
+        if (accept && !exchangePage.classList.contains("hidden")) void showExchangePage();
+        window.setTimeout(() => {
+            exchangeOfferModal.classList.add("hidden");
+            exchangeOfferModal.setAttribute("aria-hidden", "true");
+            activeExchangeOffer = null;
+            exchangeOfferActionBusy = false;
+            void loadPendingExchangeOffers();
+        }, 900);
+    } catch (error) {
+        console.error("Traitement de la demande d’échange impossible :", error);
+        exchangeOfferStatus.textContent = error.code === "functions/failed-precondition"
+            ? (error.message || "Les cartes ne sont plus disponibles pour cet échange. Recharge la page.")
+            : "Impossible de traiter la demande. Vérifie ta connexion puis réessaie.";
+        exchangeOfferAccept.disabled = false;
+        exchangeOfferRefuse.disabled = false;
+        exchangeOfferActionBusy = false;
+    }
 }
 
 async function submitCurrentPollResponse(answer) {
@@ -3646,6 +3758,7 @@ function closeSiteUpdates() {
     pendingSiteUpdateIds = [];
     showPendingServiceReadyNotification();
     if (serviceReadyModal.classList.contains("hidden")) tryShowPendingPoll();
+    tryShowPendingExchangeOffer();
 }
 
 function closeServiceReadyNotification() {
@@ -3660,6 +3773,7 @@ function closeServiceReadyNotification() {
         archivesHomeButton.focus({ preventScroll: true });
         tryShowPendingPoll();
     }
+    tryShowPendingExchangeOffer();
 }
 
 function showPendingServiceReadyNotification() {
@@ -4144,7 +4258,6 @@ const feedbackStatus = document.getElementById("feedbackStatus");
 const collectionPage = document.getElementById("collectionPage");
 const exchangePage = document.getElementById("exchangePage");
 const exchangeBackButton = document.getElementById("exchangeBackButton");
-const exchangePlayerPseudo = document.getElementById("exchangePlayerPseudo");
 const exchangeMissingNumbers = document.getElementById("exchangeMissingNumbers");
 const exchangeMissingStatus = document.getElementById("exchangeMissingStatus");
 const exchangeAdsStatus = document.getElementById("exchangeAdsStatus");
@@ -4249,6 +4362,65 @@ exchangeNavButton.addEventListener("click", async () => {
     await showExchangePage();
 });
 exchangeBackButton.addEventListener("click", showHomePage);
+exchangeComposeCancel.addEventListener("click", () => {
+    exchangeComposeModal.classList.add("hidden");
+    exchangeComposeModal.setAttribute("aria-hidden", "true");
+    exchangeOfferTarget = null;
+});
+exchangeOfferAccept.addEventListener("click", () => { void answerExchangeOffer(true); });
+exchangeOfferRefuse.addEventListener("click", () => { void answerExchangeOffer(false); });
+
+function openExchangeComposer(ad) {
+    if (!ad?.id || !Array.isArray(ad.numbers) || !ad.numbers.length || !Array.isArray(ad.offerNumbers) || !ad.offerNumbers.length) return;
+    exchangeOfferTarget = ad;
+    exchangeComposeIntro.textContent = `Choisis une carte en double à proposer à ${ad.pseudo}, puis une carte en double que tu souhaites recevoir.`;
+    const fillOptions = (select, cards) => {
+        select.replaceChildren();
+        cards.forEach((card) => {
+            const option = document.createElement("option");
+            option.value = String(card.number);
+            const rarity = card.rarity === "rare" ? "Rare" : card.rarity === "legendaire" ? "Légendaire" : "Commune";
+            option.textContent = `N° ${card.number} — ${rarity}`;
+            select.append(option);
+        });
+    };
+    fillOptions(exchangeSendNumber, ad.numbers);
+    fillOptions(exchangeReceiveNumber, ad.offerNumbers);
+    exchangeComposeStatus.textContent = "";
+    exchangeComposeSubmit.disabled = false;
+    exchangeComposeModal.classList.remove("hidden");
+    exchangeComposeModal.setAttribute("aria-hidden", "false");
+}
+
+exchangeComposeSubmit.addEventListener("click", async () => {
+    if (!exchangeOfferTarget || !auth.currentUser) return;
+    const offeredNumber = Number(exchangeSendNumber.value);
+    const requestedNumber = Number(exchangeReceiveNumber.value);
+    if (!Number.isSafeInteger(offeredNumber) || !Number.isSafeInteger(requestedNumber)) {
+        exchangeComposeStatus.textContent = "Sélectionne les deux cartes avant d’envoyer la demande.";
+        return;
+    }
+    exchangeComposeSubmit.disabled = true;
+    exchangeComposeStatus.textContent = "Envoi de la demande…";
+    try {
+        await callCreateExchangeOffer({ recipientId: exchangeOfferTarget.id, offeredNumber, requestedNumber });
+        const targetPseudo = exchangeOfferTarget.pseudo || "ce joueur";
+        exchangeComposeStatus.textContent = `Demande envoyée à ${targetPseudo}. Il la recevra sur le site.`;
+        exchangeAdsStatus.textContent = `Ta demande d’échange a été envoyée à ${targetPseudo}.`;
+        window.setTimeout(() => {
+            exchangeComposeModal.classList.add("hidden");
+            exchangeComposeModal.setAttribute("aria-hidden", "true");
+            exchangeOfferTarget = null;
+            exchangeComposeSubmit.disabled = false;
+        }, 1100);
+    } catch (error) {
+        console.error("Envoi de la demande d’échange impossible :", error);
+        exchangeComposeStatus.textContent = error.code === "functions/failed-precondition"
+            ? (error.message || "Ces cartes ne sont plus disponibles pour cet échange. Recharge les annonces.")
+            : "Impossible d’envoyer la demande. Vérifie que les fonctions d’échange sont déployées.";
+        exchangeComposeSubmit.disabled = false;
+    }
+});
 let editingCardId = null;
 
 for (let index = 2; index <= 5; index += 1) {
@@ -4487,6 +4659,15 @@ onAuthStateChanged(
 
         if (!user) {
             stopCooperationListeners();
+            if (exchangeOfferPollTimer) window.clearInterval(exchangeOfferPollTimer);
+            exchangeOfferPollTimer = null;
+            pendingExchangeOffers = [];
+            activeExchangeOffer = null;
+            exchangeOfferActionBusy = false;
+            exchangeOfferModal.classList.add("hidden");
+            exchangeOfferModal.setAttribute("aria-hidden", "true");
+            exchangeComposeModal.classList.add("hidden");
+            exchangeComposeModal.setAttribute("aria-hidden", "true");
             if (homeMaintenanceRefreshInterval) window.clearInterval(homeMaintenanceRefreshInterval);
             homeMaintenanceRefreshInterval = null;
             homeMaintenanceAdminToggle.classList.add("hidden");
@@ -4729,6 +4910,10 @@ onAuthStateChanged(
 
         await checkPendingEventBoosters(user.uid);
         await loadPendingPolls();
+        await loadPendingExchangeOffers();
+        if (!exchangeOfferPollTimer) {
+            exchangeOfferPollTimer = window.setInterval(() => { void loadPendingExchangeOffers(); }, 15000);
+        }
 
     }
 
@@ -4802,14 +4987,12 @@ async function showExchangePage() {
     [termsPage, financePage, profilePage, leaderboardPage, statisticsPage, drawnCardsPage, collectionPage, exchangePage, recyclingPage, adminPage, eventBoostersAdminPage, effectifPage, messagingPage, rulesPage, premiumPage, archivesPage, adminHubPage, pollsAdminPage].forEach((page) => page.classList.add("hidden"));
     exchangePage.classList.remove("hidden");
     bottomNav.classList.add("hidden");
-    exchangePlayerPseudo.textContent = "Chargement…";
     exchangeMissingNumbers.replaceChildren();
     exchangeMissingStatus.textContent = "Chargement des cartes manquantes…";
     exchangeAdsList.replaceChildren();
     exchangeAdsStatus.textContent = "Chargement des annonces…";
     try {
         const response = (await callGetExchangeBoard()).data || {};
-        exchangePlayerPseudo.textContent = response.pseudo || "Joueur";
         const missingCards = Array.isArray(response.missingCards) ? response.missingCards : [];
         missingCards.forEach((card) => {
             const item = document.createElement("li");
@@ -4855,7 +5038,15 @@ async function showExchangePage() {
                 article.append(paragraph);
             };
             appendNumberLine("Cherche :", Array.isArray(ad.numbers) ? ad.numbers : [], "aucun numéro indiqué.");
-            appendNumberLine("A aussi en double parmi tes cartes manquantes :", Array.isArray(ad.offerNumbers) ? ad.offerNumbers : [], "aucun pour le moment.");
+            appendNumberLine("Donne :", Array.isArray(ad.offerNumbers) ? ad.offerNumbers : [], "aucune carte indiquée.");
+            if (Array.isArray(ad.numbers) && ad.numbers.length && Array.isArray(ad.offerNumbers) && ad.offerNumbers.length) {
+                const tradeButton = document.createElement("button");
+                tradeButton.type = "button";
+                tradeButton.className = "exchange-trade-button";
+                tradeButton.textContent = "Echanger";
+                tradeButton.addEventListener("click", () => openExchangeComposer(ad));
+                article.append(tradeButton);
+            }
             exchangeAdsList.append(article);
         });
         exchangeAdsStatus.textContent = ads.length
@@ -4863,7 +5054,6 @@ async function showExchangePage() {
             : "Aucune annonce ne correspond pour le moment aux cartes que tu as en double.";
     } catch (error) {
         console.error("Impossible de charger la page Échanges :", error);
-        exchangePlayerPseudo.textContent = "Joueur";
         exchangeMissingStatus.textContent = "Impossible de charger les cartes manquantes. Vérifie que la fonction getExchangeBoard est déployée.";
         exchangeAdsStatus.textContent = "Impossible de charger les petites annonces.";
     }
