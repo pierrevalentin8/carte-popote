@@ -2581,7 +2581,7 @@ body {
                 <button id="buyNormalBoosterButton" class="hidden" type="button">
                     3 jeton
                 </button>
-                <button id="openNormalBoosterButton" class="hidden" type="button" disabled>
+                <button id="openNormalBoosterButton" type="button" disabled>
                     Ouvrir un booster (0)
                 </button>
 
@@ -4000,7 +4000,7 @@ const playerTokensDisplay = document.getElementById("playerTokens");
 function updateClassicBoosterPurchaseAvailability() {
     const tokenDigits = (playerTokensDisplay.textContent || "").match(/^\s*[\d\s\u202f\u00a0.,]+/);
     const tokenBalance = Number((tokenDigits?.[0] || "0").replace(/[^\d]/g, "")) || 0;
-    const canBuy = Boolean(auth.currentUser) && !isPlayerPreview && tokenBalance > 3;
+    const canBuy = Boolean(auth.currentUser) && !isPlayerPreview && tokenBalance >= 3;
     buyNormalBoosterButton.classList.toggle("hidden", !canBuy);
     buyNormalBoosterButton.disabled = !canBuy;
 }
@@ -6906,7 +6906,6 @@ function setOpenBoosterButton(count) {
     document.getElementById("normalBoosterStockCount").textContent = available.toLocaleString("fr-FR");
     openNormalBoosterButton.textContent = "Ouvrir un booster";
     openNormalBoosterButton.disabled = available < 1;
-    openNormalBoosterButton.classList.toggle("hidden", available < 1);
     openNextBoosterButton.classList.toggle("hidden", available < 1);
 }
 
