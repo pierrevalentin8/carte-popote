@@ -2148,9 +2148,9 @@ body {
 .exchange-ads-heading { margin-top: 27px; font-size: 19px; }
 .exchange-ads-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr)); gap: 13px; }
 .exchange-ad { position: relative; padding: 17px 18px 16px; border: 1px solid #b9aa87; border-radius: 5px; background: repeating-linear-gradient(0deg, rgba(116,93,54,.045) 0 1px, transparent 1px 4px), linear-gradient(135deg, #fffdf5, #eee6d2); color: #292b31; box-shadow: 0 8px 18px rgba(0,0,0,.24), inset 0 0 0 4px rgba(255,255,255,.48); }
-.exchange-ad::before { content: "PETITES ANNONCES"; display: block; padding-bottom: 8px; margin-bottom: 11px; border-bottom: 1px dashed #a5987e; color: #74684f; font-family: Georgia, serif; font-size: 10px; font-weight: 900; letter-spacing: .14em; }
-.exchange-ad p { margin: 0; font-family: Georgia, serif; font-size: 16px; line-height: 1.55; }
-.exchange-ad strong { color: #163a70; }
+.exchange-ad-title { display: block; padding-bottom: 8px; margin-bottom: 11px; border-bottom: 1px dashed #a5987e; color: #163a70; font-family: Georgia, serif; font-size: 15px; font-weight: 900; }
+.exchange-ad p { margin: 6px 0 0; font-family: Georgia, serif; font-size: 15px; line-height: 1.55; }
+.exchange-ad-label { font-weight: 700; }
 .exchange-ad-numbers { display: inline-flex; flex-wrap: wrap; gap: 5px; margin: 7px 4px; vertical-align: middle; }
 .exchange-ad-numbers span { padding: 2px 6px; border: 1px solid currentColor; border-radius: 4px; background: rgba(255,255,255,.7); font-family: system-ui, sans-serif; font-size: 12px; font-weight: 900; }
 .exchange-status { margin: 12px 0; color: #c6d2e5; font-size: 13px; line-height: 1.5; }
@@ -2892,7 +2892,7 @@ body {
         <h2 id="exchangeTitle">🤝 Échanges entre joueurs</h2>
         <p class="exchange-intro">Retrouve les cartes qui te manquent et consulte les petites annonces des joueurs. Les cartes mystiques ne sont pas échangeables pour le moment.</p>
         <div class="exchange-player-header">
-            <div class="exchange-player-name"><span>Ton pseudo</span><strong id="exchangePlayerPseudo">Chargement…</strong></div>
+            <div class="exchange-player-name"><strong id="exchangePlayerPseudo">Chargement…</strong></div>
             <div class="exchange-missing-panel">
                 <h3>Numéros qu’il te manque</h3>
                 <ul id="exchangeMissingNumbers" class="exchange-missing-list" aria-label="Numéros de cartes manquantes"></ul>
@@ -4827,21 +4827,35 @@ async function showExchangePage() {
         ads.forEach((ad) => {
             const article = document.createElement("article");
             article.className = "exchange-ad";
-            const paragraph = document.createElement("p");
-            const pseudo = document.createElement("strong");
-            pseudo.textContent = ad.pseudo || "Joueur";
-            paragraph.append(pseudo, document.createTextNode(" cherche les numéros : "));
-            const numbers = document.createElement("span");
-            numbers.className = "exchange-ad-numbers";
-            (Array.isArray(ad.numbers) ? ad.numbers : []).forEach((card) => {
-                const number = document.createElement("span");
-                number.className = card.rarity === "rare" ? "exchange-rarity-rare"
-                    : card.rarity === "legendaire" ? "exchange-rarity-legendary" : "exchange-rarity-common";
-                number.textContent = String(card.number);
-                numbers.append(number);
-            });
-            paragraph.append(numbers, document.createTextNode(" que tu as en double."));
-            article.append(paragraph);
+            const title = document.createElement("strong");
+            title.className = "exchange-ad-title";
+            title.textContent = ad.pseudo || "Joueur";
+            article.append(title);
+            const appendNumberLine = (label, cards, emptyMessage) => {
+                const paragraph = document.createElement("p");
+                const lineLabel = document.createElement("span");
+                lineLabel.className = "exchange-ad-label";
+                lineLabel.textContent = label;
+                paragraph.append(lineLabel);
+                if (cards.length) {
+                    const numbers = document.createElement("span");
+                    numbers.className = "exchange-ad-numbers";
+                    cards.forEach((card) => {
+                        const number = document.createElement("span");
+                        number.className = card.rarity === "rare" ? "exchange-rarity-rare"
+                            : card.rarity === "legendaire" ? "exchange-rarity-legendary" : "exchange-rarity-common";
+                        number.textContent = String(card.number);
+                        number.title = card.rarity === "rare" ? "Carte rare" : card.rarity === "legendaire" ? "Carte légendaire" : "Carte commune";
+                        numbers.append(number);
+                    });
+                    paragraph.append(numbers);
+                } else {
+                    paragraph.append(document.createTextNode(" " + emptyMessage));
+                }
+                article.append(paragraph);
+            };
+            appendNumberLine("Cherche :", Array.isArray(ad.numbers) ? ad.numbers : [], "aucun numéro indiqué.");
+            appendNumberLine("A aussi en double parmi tes cartes manquantes :", Array.isArray(ad.offerNumbers) ? ad.offerNumbers : [], "aucun pour le moment.");
             exchangeAdsList.append(article);
         });
         exchangeAdsStatus.textContent = ads.length
