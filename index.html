@@ -1606,6 +1606,44 @@ body {
 .premium-prize-field-caption { display: block; align-self: end; padding: 0 2px 2px; color: #4c335d; font-size: 10px; font-weight: 800; }
 .premium-prize-edit-row .premium-card-select { grid-column: 1 / -2; }
 .premium-wheel-preview-note { margin: 8px 0; color: #685279; font-size: 12px; }
+/* Premium: identité améthyste et or, cohérente avec la roue */
+.premium-page { position: relative; isolation: isolate; overflow: hidden; max-width: 960px; border: 1px solid rgba(198,137,235,.23); border-top: 0; border-radius: 0 0 28px 28px; background: radial-gradient(ellipse at 50% 0, rgba(129,51,169,.2), transparent 43%), radial-gradient(ellipse at 4% 42%, rgba(89,38,126,.12), transparent 35%), linear-gradient(180deg, rgba(16,10,32,.52), rgba(7,15,34,.24)); box-shadow: 0 24px 70px rgba(0,0,0,.2); }
+.premium-page h2 { width: fit-content; margin: 14px auto 18px; padding: 8px 26px 11px; border-bottom: 2px solid rgba(255,213,103,.82); color: #ffe6a1; font-family: Georgia, "Times New Roman", serif; font-size: clamp(27px,5vw,36px); letter-spacing: .045em; text-align: center; text-shadow: 0 3px 12px rgba(207,112,255,.52); }
+.premium-rule-card, .premium-balance-card { position: relative; overflow: hidden; border: 1px solid rgba(255,224,154,.88); border-radius: 18px; background: linear-gradient(145deg,#fffef8 0%,#f7efff 57%,#e8d6f4 100%); box-shadow: 0 9px 24px rgba(0,0,0,.25), inset 0 1px 0 #fff, inset 0 -2px 0 rgba(174,125,207,.16); }
+.premium-rule-card::before, .premium-balance-card::before { position: absolute; inset: 5px; border: 1px solid rgba(177,131,206,.25); border-radius: 13px; content: ""; pointer-events: none; }
+.premium-rule-card { border-left: 5px solid #b65bdd; }
+.premium-balance-card { min-height: 76px; background: linear-gradient(135deg,#fff8d9,#f5e8ff 60%,#e5c8fa); }
+.premium-balance-value { color: #6d168f; text-shadow: 0 1px 0 #fff; }
+.premium-wheel-card { position: relative; isolation: isolate; overflow: hidden; padding: clamp(16px,3vw,28px); border: 2px solid #d8ad53; border-radius: 24px; background: radial-gradient(ellipse at 50% 4%, rgba(162,84,190,.55), transparent 43%), radial-gradient(ellipse at 50% 100%, rgba(237,174,57,.12), transparent 50%), linear-gradient(145deg,#100c25,#25113d 50%,#100b24); color: #fff8e8; box-shadow: 0 18px 40px rgba(0,0,0,.42), inset 0 0 0 4px rgba(255,229,159,.08), inset 0 0 44px rgba(187,96,226,.13); }
+.premium-wheel-card::before { position: absolute; z-index: -1; inset: 7px; border: 1px solid rgba(255,218,134,.32); border-radius: 16px; content: ""; pointer-events: none; }
+.premium-wheel-card > h3 { margin: 2px 0 6px; color: #ffe39a; font-family: Georgia, "Times New Roman", serif; font-size: clamp(21px,4vw,27px); text-shadow: 0 2px 12px rgba(238,173,255,.45); }
+.premium-wheel-card > .admin-note { color: #e5d5f1; }
+.premium-wheel-card .premium-status { color: #f7e8ff; }
+.premium-wheel-card .premium-balance-indicator { border-color: #e6c56e; background: linear-gradient(135deg,#fff9df,#f3e4ff); box-shadow: 0 4px 15px rgba(0,0,0,.28), inset 0 1px 0 #fff; }
+.premium-wheel-card .premium-prize-list { gap: 10px; }
+.premium-prize-item { position: relative; overflow: hidden; padding: 11px 13px; border: 1px solid rgba(229,195,250,.8); border-radius: 12px; background: linear-gradient(145deg,rgba(255,255,255,.97),rgba(238,220,251,.95)); color: #38204e; box-shadow: 0 5px 12px rgba(0,0,0,.2), inset 0 1px 0 #fff; }
+.premium-journal-card, .premium-grant-card, .premium-player-table-card, .premium-monthly-sales-card { border-color: rgba(217,177,241,.78); border-radius: 16px; background: linear-gradient(145deg,#fffdfd,#f1e5fa 72%,#e8d8f4); box-shadow: 0 8px 20px rgba(0,0,0,.2), inset 0 1px 0 #fff; }
+.premium-admin-card { padding: 0; border: 0; background: transparent; box-shadow: none; }
+.premium-admin-disclosure { border-color: rgba(227,192,246,.8); border-radius: 17px; background: linear-gradient(145deg,#fffcff,#eee0f7); box-shadow: 0 8px 22px rgba(0,0,0,.22), inset 0 1px 0 #fff; }
+.premium-admin-disclosure > summary { position: relative; padding: 15px 18px; color: #4a2167; font-size: 14px; transition: background .18s ease, color .18s ease; }
+.premium-admin-disclosure > summary:hover { background: rgba(151,73,187,.08); color: #762a9d; }
+.premium-admin-disclosure[open] > summary { border-color: #e4cbed; }
+.premium-admin-disclosure-content { padding: 2px 14px 14px; }
+.premium-rules-editor { border-color: #d8b7e9; border-radius: 14px; background: linear-gradient(145deg,#fff,#f6effa); box-shadow: inset 0 1px 0 #fff; }
+.premium-page .admin-field { border: 1px solid #cfb5df; border-radius: 10px; background: #fff; color: #2d1b3c; box-shadow: inset 0 1px 2px rgba(63,29,83,.06); }
+.premium-page .admin-field:focus { border-color: #a34bc5; outline: 3px solid rgba(163,75,197,.16); }
+.premium-page .primary-button, .premium-page .secondary-button, .premium-page .admin-back, .premium-page .premium-sound-toggle, .premium-page .premium-claim-button { min-height: 42px; border: 1px solid #f0d186; border-radius: 11px; font-weight: 900; transition: transform .16s ease, filter .16s ease, box-shadow .16s ease; }
+.premium-page .primary-button { background: linear-gradient(135deg,#a943c9,#73289b 58%,#4b1a70); color: #fff; box-shadow: inset 0 1px 0 rgba(255,255,255,.34), 0 4px 0 #391453, 0 7px 13px rgba(43,13,61,.28); }
+.premium-page .secondary-button, .premium-page .admin-back { border-color: #d9b965; background: linear-gradient(135deg,#fff1bf,#f0ca65 58%,#dca638); color: #39264b; box-shadow: inset 0 1px 0 #fff8dc, 0 4px 0 #a77a25, 0 7px 13px rgba(43,13,61,.2); }
+.premium-page .premium-sound-toggle { border-color: #bc85d2; background: linear-gradient(135deg,#51216f,#321047); color: #fff6dc; box-shadow: inset 0 1px 0 rgba(255,255,255,.2), 0 4px 12px rgba(0,0,0,.28); }
+.premium-page .premium-claim-button { border-color: #f3d277; background: linear-gradient(135deg,#fff0b4,#edbd4f); color: #39264b; box-shadow: inset 0 1px 0 #fff8dc, 0 4px 0 #a77a25, 0 6px 12px rgba(43,13,61,.22); }
+.premium-page .primary-button:hover:not(:disabled), .premium-page .secondary-button:hover:not(:disabled), .premium-page .admin-back:hover:not(:disabled), .premium-page .premium-sound-toggle:hover:not(:disabled), .premium-page .premium-claim-button:hover:not(:disabled) { filter: brightness(1.06); transform: translateY(-2px); }
+.premium-page .primary-button:active:not(:disabled), .premium-page .secondary-button:active:not(:disabled), .premium-page .admin-back:active:not(:disabled), .premium-page .premium-claim-button:active:not(:disabled) { transform: translateY(1px); box-shadow: inset 0 1px 0 rgba(255,255,255,.28), 0 2px 0 #754f1d; }
+.premium-page .premium-player-table-wrap { border-color: #d1b3e1; border-radius: 12px; box-shadow: 0 4px 12px rgba(56,24,78,.1); }
+.premium-page .premium-player-table th { background: linear-gradient(135deg,#592579,#3b1658); color: #ffedb4; }
+.premium-page .premium-player-table tbody tr:nth-child(even) { background: #f6eefb; }
+.premium-page .premium-player-table tbody tr:last-child td { border-bottom: 0; }
+@media (max-width: 600px) { .premium-page { padding: 15px 11px 92px; border-radius: 0 0 20px 20px; } .premium-page h2 { margin-bottom: 14px; } .premium-wheel-card { padding: 14px 10px; border-radius: 18px; } .premium-rule-card { line-height: 1.7; } .premium-journal-entry { gap: 5px; } }
 @media (max-width: 600px) { .premium-prize-edit-row { grid-template-columns: 1fr 1fr; } .premium-prize-edit-row > :first-child { grid-column: 1 / -1; } .premium-admin-player { grid-template-columns: minmax(90px, 1fr) auto; } .premium-admin-player-controls { grid-column: 1 / -1; justify-content: flex-end; } .premium-grant-fields { grid-template-columns: 1fr 1fr; } .premium-grant-fields #premiumAdjustSubmit { grid-column: 1 / -1; } }
 @media (max-width: 600px) { .premium-prize-edit-row .premium-card-select { grid-column: 1 / -1; } .premium-journal-entry { flex-direction: column; gap: 4px; } .premium-journal-entry span:last-child { text-align: left; } .player-preview-banner { align-items: flex-start; flex-direction: column; } }
 @keyframes premium-wheel-aura { from { opacity: .72; transform: scale(1); filter: brightness(1); } to { opacity: 1; transform: scale(1.025); filter: brightness(1.2); } }
