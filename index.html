@@ -2227,6 +2227,31 @@ body {
 .profile-stat-value { color: #ffdc69; font-size: clamp(17px,2.4vw,23px); }
 .profile-stat-label { max-width: 110px; color: #d1d9e7; font-size: 11px; }
 .profile-tracking-note { margin: 9px 2px 0; color: #adbdd4; font-size: 10px; text-align: left; }
+.profile-history { margin-top: 20px; padding: 16px; border: 1px solid rgba(231,193,91,.55); border-radius: 15px; background: linear-gradient(145deg,rgba(7,22,45,.94),rgba(16,43,79,.94)); color: #f8f3e6; box-shadow: 0 9px 22px rgba(0,0,0,.22),inset 0 1px rgba(255,255,255,.07); }
+.profile-history h3 { margin: 0; color: #ffdc69; font-size: 17px; }
+.profile-history-intro { margin: 5px 0 13px; color: #c4d0e2; font-size: 11px; line-height: 1.45; }
+.profile-calendar-header { display:flex; align-items:center; justify-content:space-between; gap:8px; margin-bottom:10px; }
+.profile-calendar-header strong { color:#fff2c1; font-size:14px; text-transform:capitalize; }
+.profile-calendar-nav { display:flex; gap:6px; }
+.profile-calendar-nav button { width:32px; height:30px; border:1px solid rgba(243,191,56,.6); border-radius:8px; background:#17345c; color:#ffe28a; font-size:17px; cursor:pointer; }
+.profile-calendar-weekdays,.profile-calendar-grid { display:grid; grid-template-columns:repeat(7,minmax(0,1fr)); gap:4px; }
+.profile-calendar-weekdays { margin-bottom:4px; color:#9eacc0; font-size:9px; font-weight:800; text-align:center; }
+.profile-calendar-day { position:relative; min-height:38px; padding:4px 2px; border:1px solid rgba(255,255,255,.1); border-radius:8px; background:rgba(255,255,255,.055); color:#e9edf5; font:inherit; font-size:11px; cursor:pointer; }
+.profile-calendar-day.is-outside { opacity:.32; }
+.profile-calendar-day.has-events { border-color:rgba(255,211,101,.65); background:rgba(196,142,28,.18); color:#ffe28a; font-weight:900; }
+.profile-calendar-day.is-selected { outline:2px solid #ffdc69; outline-offset:1px; }
+.profile-calendar-day.has-events::after { position:absolute; bottom:3px; left:50%; width:4px; height:4px; border-radius:50%; background:#ffdc69; content:""; transform:translateX(-50%); }
+.profile-history-selected { min-height:50px; margin-top:12px; padding:11px 12px; border-radius:10px; background:rgba(1,10,24,.45); }
+.profile-history-selected h4 { margin:0 0 8px; color:#ffdc69; font-size:12px; }
+.profile-history-list { display:grid; gap:7px; margin:0; padding:0; list-style:none; }
+.profile-history-item { display:grid; grid-template-columns:48px minmax(0,1fr); gap:8px; padding-bottom:7px; border-bottom:1px solid rgba(255,255,255,.09); font-size:11px; line-height:1.4; }
+.profile-history-item:last-child { padding-bottom:0; border-bottom:0; }
+.profile-history-time { color:#aebbd0; font-variant-numeric:tabular-nums; }
+.profile-history-item strong { display:block; color:#fff4d0; }
+.profile-history-item span:last-child { color:#d3dceb; }
+.profile-history-empty { margin:0; color:#aebbd0; font-size:11px; }
+.profile-history-undated { margin-top:9px; color:#c4d0e2; font-size:10px; }
+.profile-history-undated strong { color:#ffdc69; }
 .profile-identity-editor { margin-top: 14px; }
 .profile-badges { margin-top: 15px; }
 .profile-roadmap-visual-hidden { display: none !important; }
@@ -2890,6 +2915,20 @@ body {
                 </article>
             </div>
             <p class="profile-tracking-note">Totaux cumulés, distincts des soldes disponibles. Les jetons reçus avant la mise en place du suivi peuvent manquer.</p>
+            <section id="profileHistory" class="profile-history hidden" aria-labelledby="profileHistoryTitle">
+                <h3 id="profileHistoryTitle">Mon historique</h3>
+                <p class="profile-history-intro">Choisis un jour pour retrouver les cartes et récompenses obtenues. Les gains antérieurs sont affichés lorsqu’une date a été conservée.</p>
+                <div class="profile-calendar-header">
+                    <div class="profile-calendar-nav"><button id="profileCalendarPrevious" type="button" aria-label="Mois précédent">‹</button></div>
+                    <strong id="profileCalendarMonth" aria-live="polite"></strong>
+                    <div class="profile-calendar-nav"><button id="profileCalendarNext" type="button" aria-label="Mois suivant">›</button></div>
+                </div>
+                <div class="profile-calendar-weekdays" aria-hidden="true"><span>Lun</span><span>Mar</span><span>Mer</span><span>Jeu</span><span>Ven</span><span>Sam</span><span>Dim</span></div>
+                <div id="profileCalendarGrid" class="profile-calendar-grid" role="grid" aria-label="Calendrier des récompenses"></div>
+                <div id="profileHistorySelected" class="profile-history-selected" aria-live="polite"></div>
+                <div id="profileHistoryUndated" class="profile-history-undated hidden"></div>
+                <p id="profileHistoryStatus" class="profile-history-empty" role="status" aria-live="polite"></p>
+            </section>
         </article>
         <section id="profileIdentityEditor" class="profile-identity-editor hidden" aria-label="Modifier mon pseudo et mon avatar">
             <label for="profilePseudoInput">Modifier mon pseudo (une seule fois)<input id="profilePseudoInput" class="admin-field" type="text" minlength="3" maxlength="24" autocomplete="nickname"></label>
@@ -3692,6 +3731,7 @@ const callGetPremiumWheelJournal = httpsCallable(functions, "getPremiumWheelJour
 const callGetPremiumRewardCards = httpsCallable(functions, "getPremiumRewardCards");
 const callGetPublicPlayerProfile = httpsCallable(functions, "getPublicPlayerProfile");
 const callGetMyPremiumSpending = httpsCallable(functions, "getMyPremiumSpending");
+const callGetMyRewardHistory = httpsCallable(functions, "getMyRewardHistory");
 const callUpdateMyPlayerIdentity = httpsCallable(functions, "updateMyPlayerIdentity");
 const callRecycleDuplicateCards = httpsCallable(functions, "recycleDuplicateCards");
 const callGetGlobalRecycleCount = httpsCallable(functions, "getGlobalRecycleCount");
@@ -4157,6 +4197,15 @@ let viewedOtherPlayerId = null;
 const profileTokensEarned = document.getElementById("profileTokensEarned");
 const profileClassicBoostersOpened = document.getElementById("profileClassicBoostersOpened");
 const profileCardsCollected = document.getElementById("profileCardsCollected");
+const profileHistorySection = document.getElementById("profileHistory");
+const profileCalendarGrid = document.getElementById("profileCalendarGrid");
+const profileCalendarMonth = document.getElementById("profileCalendarMonth");
+const profileHistorySelected = document.getElementById("profileHistorySelected");
+const profileHistoryUndated = document.getElementById("profileHistoryUndated");
+const profileHistoryStatus = document.getElementById("profileHistoryStatus");
+let profileHistoryEvents = [];
+let profileHistoryMonth = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
+let profileHistorySelectedDate = new Intl.DateTimeFormat("en-CA", { timeZone: "Europe/Paris", year: "numeric", month: "2-digit", day: "2-digit" }).format(new Date());
 const profileCurrentLevel = document.getElementById("profileCurrentLevel");
 const profileTotalXp = document.getElementById("profileTotalXp");
 const profileXpTrack = document.getElementById("profileXpTrack");
@@ -6590,6 +6639,111 @@ function renderDailyStreakBadge(container, streak, countElementId) {
     if (count) count.textContent = "×" + safeStreak;
 }
 
+function profileHistoryDateKey(date) {
+    return new Intl.DateTimeFormat("en-CA", { timeZone: "Europe/Paris", year: "numeric", month: "2-digit", day: "2-digit" }).format(date);
+}
+
+function renderProfileHistory() {
+    if (!profileCalendarGrid) return;
+    profileCalendarMonth.textContent = profileHistoryMonth.toLocaleDateString("fr-FR", { month: "long", year: "numeric" });
+    profileCalendarGrid.replaceChildren();
+    const year = profileHistoryMonth.getFullYear();
+    const month = profileHistoryMonth.getMonth();
+    const firstDay = new Date(year, month, 1);
+    const mondayOffset = (firstDay.getDay() + 6) % 7;
+    const start = new Date(year, month, 1 - mondayOffset);
+    const eventsByDate = new Map();
+    profileHistoryEvents.forEach((event) => {
+        if (!event.createdAt) return;
+        const key = profileHistoryDateKey(new Date(event.createdAt));
+        if (!eventsByDate.has(key)) eventsByDate.set(key, []);
+        eventsByDate.get(key).push(event);
+    });
+    for (let index = 0; index < 42; index += 1) {
+        const date = new Date(start.getFullYear(), start.getMonth(), start.getDate() + index);
+        const key = profileHistoryDateKey(date);
+        const dayEvents = eventsByDate.get(key) || [];
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "profile-calendar-day" + (date.getMonth() !== month ? " is-outside" : "")
+            + (dayEvents.length ? " has-events" : "") + (key === profileHistorySelectedDate ? " is-selected" : "");
+        button.textContent = String(date.getDate());
+        button.setAttribute("role", "gridcell");
+        button.setAttribute("aria-label", date.toLocaleDateString("fr-FR", { dateStyle: "full" }) + (dayEvents.length ? `, ${dayEvents.length} événement${dayEvents.length > 1 ? "s" : ""}` : ""));
+        button.setAttribute("aria-pressed", String(key === profileHistorySelectedDate));
+        button.addEventListener("click", () => {
+            profileHistorySelectedDate = key;
+            profileHistoryMonth = new Date(date.getFullYear(), date.getMonth(), 1);
+            renderProfileHistory();
+        });
+        profileCalendarGrid.append(button);
+    }
+    const selectedDate = new Date(profileHistorySelectedDate + "T12:00:00+01:00");
+    const dayLabel = selectedDate.toLocaleDateString("fr-FR", { weekday: "long", day: "numeric", month: "long", year: "numeric", timeZone: "Europe/Paris" });
+    const selectedEvents = (eventsByDate.get(profileHistorySelectedDate) || []).slice().sort((a, b) => a.createdAt.localeCompare(b.createdAt));
+    const heading = document.createElement("h4");
+    heading.textContent = dayLabel.charAt(0).toLocaleUpperCase("fr-FR") + dayLabel.slice(1);
+    const list = document.createElement("ul");
+    list.className = "profile-history-list";
+    selectedEvents.forEach((event) => {
+        const item = document.createElement("li");
+        item.className = "profile-history-item";
+        const time = document.createElement("span");
+        time.className = "profile-history-time";
+        time.textContent = new Date(event.createdAt).toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit", timeZone: "Europe/Paris" });
+        const body = document.createElement("span");
+        const title = document.createElement("strong");
+        title.textContent = event.title || "Récompense";
+        body.append(title, document.createTextNode(event.detail || ""));
+        item.append(time, body);
+        list.append(item);
+    });
+    profileHistorySelected.replaceChildren(heading);
+    if (selectedEvents.length) profileHistorySelected.append(list);
+    else {
+        const empty = document.createElement("p");
+        empty.className = "profile-history-empty";
+        empty.textContent = "Aucune récompense enregistrée ce jour-là.";
+        profileHistorySelected.append(empty);
+    }
+    const monthKey = `${year}-${String(month + 1).padStart(2, "0")}`;
+    const undated = profileHistoryEvents.filter((event) => event.month === monthKey);
+    profileHistoryUndated.classList.toggle("hidden", undated.length === 0);
+    profileHistoryUndated.replaceChildren();
+    if (undated.length) {
+        const title = document.createElement("strong");
+        title.textContent = "Éléments du mois sans jour précis : ";
+        profileHistoryUndated.append(title, document.createTextNode(undated.map((event) => event.detail).join(" · ")));
+    }
+}
+
+async function loadProfileRewardHistory() {
+    profileHistorySection.classList.remove("hidden");
+    profileHistoryStatus.textContent = "Chargement de l’historique…";
+    try {
+        const response = await callGetMyRewardHistory();
+        profileHistoryEvents = Array.isArray(response.data.events) ? response.data.events : [];
+        profileHistoryStatus.textContent = profileHistoryEvents.length
+            ? "Les éléments datés sont signalés dans le calendrier."
+            : "Aucun événement avec une date n’a encore été enregistré.";
+        renderProfileHistory();
+    } catch (error) {
+        console.error("Impossible de charger l’historique du profil :", error);
+        profileHistoryStatus.textContent = "Historique temporairement indisponible.";
+    }
+}
+
+document.getElementById("profileCalendarPrevious")?.addEventListener("click", () => {
+    profileHistoryMonth = new Date(profileHistoryMonth.getFullYear(), profileHistoryMonth.getMonth() - 1, 1);
+    profileHistorySelectedDate = profileHistoryDateKey(profileHistoryMonth);
+    renderProfileHistory();
+});
+document.getElementById("profileCalendarNext")?.addEventListener("click", () => {
+    profileHistoryMonth = new Date(profileHistoryMonth.getFullYear(), profileHistoryMonth.getMonth() + 1, 1);
+    profileHistorySelectedDate = profileHistoryDateKey(profileHistoryMonth);
+    renderProfileHistory();
+});
+
 async function loadPersonalProfile(playerId = auth.currentUser?.uid) {
     if (!auth.currentUser || !playerId) return;
     const isOwnProfile = playerId === auth.currentUser.uid;
@@ -6601,6 +6755,7 @@ async function loadPersonalProfile(playerId = auth.currentUser?.uid) {
         profileEditToggleButton.title = "Modifier le profil";
         profilePremiumSpendingCard.classList.toggle("hidden", !isOwnProfile);
         document.getElementById("profileTokensEarnedCard").classList.toggle("hidden", !isOwnProfile);
+        profileHistorySection.classList.toggle("hidden", !isOwnProfile);
         let player;
         let openedClassics = 0;
         if (isOwnProfile) {
@@ -6611,6 +6766,7 @@ async function loadPersonalProfile(playerId = auth.currentUser?.uid) {
             ]);
             if (!snapshot.exists()) throw new Error("PLAYER_PROFILE_MISSING");
             player = snapshot.data();
+            await loadProfileRewardHistory();
             loadedProfileIdentity = {
                 pseudo: player.pseudo || "",
                 avatar: player.avatar || ""
