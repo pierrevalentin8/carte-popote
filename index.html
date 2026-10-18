@@ -2228,7 +2228,11 @@ body {
 .profile-stat-label { max-width: 110px; color: #d1d9e7; font-size: 11px; }
 .profile-tracking-note { margin: 9px 2px 0; color: #adbdd4; font-size: 10px; text-align: left; }
 .profile-history { margin-top: 20px; padding: 16px; border: 1px solid rgba(231,193,91,.55); border-radius: 15px; background: linear-gradient(145deg,rgba(7,22,45,.94),rgba(16,43,79,.94)); color: #f8f3e6; box-shadow: 0 9px 22px rgba(0,0,0,.22),inset 0 1px rgba(255,255,255,.07); }
-.profile-history h3 { margin: 0; color: #ffdc69; font-size: 17px; }
+.profile-history > summary { display:flex; align-items:center; justify-content:space-between; gap:10px; color:#ffdc69; font-size:15px; font-weight:900; list-style:none; cursor:pointer; }
+.profile-history > summary::-webkit-details-marker { display:none; }
+.profile-history > summary::after { display:grid; place-items:center; width:25px; height:25px; flex:0 0 25px; border:1px solid rgba(255,220,105,.48); border-radius:50%; background:rgba(255,220,105,.1); color:#ffdc69; content:"⌄"; font-size:17px; line-height:1; transition:transform .2s ease; }
+.profile-history[open] > summary::after { transform:rotate(180deg); }
+.profile-history-content { padding-top:12px; }
 .profile-history-intro { margin: 5px 0 13px; color: #c4d0e2; font-size: 11px; line-height: 1.45; }
 .profile-calendar-header { display:flex; align-items:center; justify-content:space-between; gap:8px; margin-bottom:10px; }
 .profile-calendar-header strong { color:#fff2c1; font-size:14px; text-transform:capitalize; }
@@ -2915,8 +2919,9 @@ body {
                 </article>
             </div>
             <p class="profile-tracking-note">Totaux cumulés, distincts des soldes disponibles. Les jetons reçus avant la mise en place du suivi peuvent manquer.</p>
-            <section id="profileHistory" class="profile-history hidden" aria-labelledby="profileHistoryTitle">
-                <h3 id="profileHistoryTitle">Mon historique</h3>
+            <details id="profileHistory" class="profile-history hidden">
+                <summary id="profileHistoryTitle">Mon historique</summary>
+                <div class="profile-history-content">
                 <p class="profile-history-intro">Choisis un jour pour retrouver les cartes et récompenses obtenues. Les gains antérieurs sont affichés lorsqu’une date a été conservée.</p>
                 <div class="profile-calendar-header">
                     <div class="profile-calendar-nav"><button id="profileCalendarPrevious" type="button" aria-label="Mois précédent">‹</button></div>
@@ -2928,7 +2933,8 @@ body {
                 <div id="profileHistorySelected" class="profile-history-selected" aria-live="polite"></div>
                 <div id="profileHistoryUndated" class="profile-history-undated hidden"></div>
                 <p id="profileHistoryStatus" class="profile-history-empty" role="status" aria-live="polite"></p>
-            </section>
+                </div>
+            </details>
         </article>
         <section id="profileIdentityEditor" class="profile-identity-editor hidden" aria-label="Modifier mon pseudo et mon avatar">
             <label for="profilePseudoInput">Modifier mon pseudo (une seule fois)<input id="profilePseudoInput" class="admin-field" type="text" minlength="3" maxlength="24" autocomplete="nickname"></label>
