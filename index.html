@@ -2341,11 +2341,13 @@ body {
 .premium-booster-settings { margin-top: 12px; padding: 14px; border: 1px solid rgba(220,178,244,.45); border-radius: 14px; background: radial-gradient(ellipse at 50% 4%, rgba(162,84,190,.55), transparent 43%), radial-gradient(ellipse at 50% 100%, rgba(237,174,57,.12), transparent 50%), linear-gradient(145deg,#100c25,#25113d 50%,#100b24); color: #fff8e8; }
 .premium-booster-settings h3 { margin: 0 0 6px; color: #ffe39a; font-size: 16px; }
 .premium-booster-settings .admin-note { margin: 0 0 10px; color: #e7d7f2; }
-.premium-booster-rarities { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 9px; margin: 10px 0; }
+.premium-booster-price-field { display: grid; max-width: 260px; gap: 5px; margin: 10px 0; color: #f0e3f7; font-size: 12px; font-weight: 800; }
+.premium-booster-rarities { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); gap: 9px; margin: 10px 0; }
 .premium-booster-rarities label { display: grid; gap: 5px; color: #f0e3f7; font-size: 12px; font-weight: 800; }
 .premium-booster-rarities .admin-field { min-width: 0; }
+.premium-booster-chance-invalid { color: #ffb7bc !important; }
 @media (max-width: 760px) { .premium-game-layout { grid-template-columns: minmax(0,1fr); } .premium-booster-card { width: 100%; } .premium-booster-pack { width: min(72vw,300px); height: clamp(260px,92vw,390px); } }
-@media (max-width: 480px) { .premium-booster-rarities { grid-template-columns: 1fr; } }
+@media (max-width: 560px) { .premium-booster-rarities { grid-template-columns: repeat(2,minmax(0,1fr)); } }
 </style>
 
 </head>
@@ -3083,13 +3085,16 @@ body {
                 </div>
                 <section class="premium-booster-settings" aria-labelledby="premiumBoosterSettingsTitle">
                     <h3 id="premiumBoosterSettingsTitle">Booster Premium</h3>
-                    <p class="admin-note">Choisis la rareté de chacune des trois cartes. Les cartes sont tirées au hasard parmi celles disponibles dans cette rareté.</p>
+                    <p class="admin-note">Choisis le prix et la probabilité de chaque rareté. Le total doit faire 100 % ; les trois cartes sont tirées séparément selon ces probabilités.</p>
+                    <label class="premium-booster-price-field">Prix du booster (jetons Premium)<input id="premiumBoosterPriceInput" class="admin-field" type="number" min="1" max="1000" step="1" value="2"></label>
                     <div class="premium-booster-rarities">
-                        <label>Carte 1<select id="premiumBoosterRarity1" class="admin-field premium-booster-rarity"></select></label>
-                        <label>Carte 2<select id="premiumBoosterRarity2" class="admin-field premium-booster-rarity"></select></label>
-                        <label>Carte 3<select id="premiumBoosterRarity3" class="admin-field premium-booster-rarity"></select></label>
+                        <label>Communes (%)<input class="admin-field premium-booster-rarity-chance" data-rarity="commune" type="number" min="0" max="100" step="0.01" value="60"></label>
+                        <label>Rares (%)<input class="admin-field premium-booster-rarity-chance" data-rarity="rare" type="number" min="0" max="100" step="0.01" value="30"></label>
+                        <label>Légendaires (%)<input class="admin-field premium-booster-rarity-chance" data-rarity="legendaire" type="number" min="0" max="100" step="0.01" value="9"></label>
+                        <label>Mystiques (%)<input class="admin-field premium-booster-rarity-chance" data-rarity="mystique" type="number" min="0" max="100" step="0.01" value="1"></label>
                     </div>
-                    <button id="premiumBoosterSettingsSave" class="primary-button" type="button">Enregistrer les raretés</button>
+                    <p id="premiumBoosterChanceTotal" class="premium-status" aria-live="polite">Total des probabilités : 100 %.</p>
+                    <button id="premiumBoosterSettingsSave" class="primary-button" type="button">Enregistrer les réglages</button>
                     <p id="premiumBoosterSettingsStatus" class="premium-status" role="status" aria-live="polite"></p>
                 </section>
                 <p class="admin-note">Configure les cadeaux et leurs taux. Le total des taux doit faire 100 %.</p>
@@ -3150,10 +3155,10 @@ body {
         </section>
         <section class="premium-booster-card" aria-labelledby="premiumBoosterTitle">
             <h3 id="premiumBoosterTitle">Booster Premium</h3>
-            <p class="premium-booster-copy">Trois cartes choisies selon les raretés configurées.</p>
+            <p class="premium-booster-copy">Trois cartes tirées selon les probabilités de rareté définies par l’admin.</p>
             <img class="premium-booster-pack" src="./Booster%20premium.png" alt="Booster Premium contenant trois cartes" loading="lazy" decoding="async">
             <button id="openPremiumBoosterButton" class="premium-booster-buy" type="button" disabled>
-                <span>Ouvrir</span><span class="premium-booster-price"><img src="./Jeton%20premium.png" alt="">2</span>
+                <span>Ouvrir</span><span class="premium-booster-price"><img src="./Jeton%20premium.png" alt=""><span id="premiumBoosterPriceDisplay">2</span></span>
             </button>
             <p id="premiumBoosterStatus" class="premium-booster-status" role="status" aria-live="polite">Coût : 2 jetons Premium.</p>
         </section>
@@ -4247,7 +4252,10 @@ const premiumRevealHeading = document.getElementById("premiumRevealHeading");
 const premiumRevealName = document.getElementById("premiumRevealName");
 const premiumRevealDescription = document.getElementById("premiumRevealDescription");
 const premiumPrizeList = document.getElementById("premiumPrizeList");
-const premiumBoosterRaritySelects = Array.from(document.querySelectorAll(".premium-booster-rarity"));
+const premiumBoosterRarityChanceInputs = Array.from(document.querySelectorAll(".premium-booster-rarity-chance"));
+const premiumBoosterPriceInput = document.getElementById("premiumBoosterPriceInput");
+const premiumBoosterPriceDisplay = document.getElementById("premiumBoosterPriceDisplay");
+const premiumBoosterChanceTotal = document.getElementById("premiumBoosterChanceTotal");
 const premiumBoosterSettingsSave = document.getElementById("premiumBoosterSettingsSave");
 const premiumBoosterSettingsStatus = document.getElementById("premiumBoosterSettingsStatus");
 const openPremiumBoosterButton = document.getElementById("openPremiumBoosterButton");
@@ -5692,33 +5700,48 @@ function isCurrentUserAdmin() {
     return Boolean(auth.currentUser && (auth.currentUser.email || "").toLowerCase() === ADMIN_EMAIL);
 }
 
-const PREMIUM_BOOSTER_RARITY_OPTIONS = [
-    { value: "commune", label: "Commune" },
-    { value: "rare", label: "Rare" },
-    { value: "legendaire", label: "Légendaire" },
-    { value: "mystique", label: "Mystique" }
-];
-const PREMIUM_BOOSTER_DEFAULT_RARITIES = ["commune", "rare", "legendaire"];
+const PREMIUM_BOOSTER_DEFAULT_CHANCES = { commune: 60, rare: 30, legendaire: 9, mystique: 1 };
+let premiumBoosterPrice = 2;
 
-function setPremiumBoosterRarityInputs(rarities = PREMIUM_BOOSTER_DEFAULT_RARITIES) {
-    premiumBoosterRaritySelects.forEach((select, index) => {
-        select.replaceChildren();
-        PREMIUM_BOOSTER_RARITY_OPTIONS.forEach((rarity) => {
-            const option = document.createElement("option");
-            option.value = rarity.value;
-            option.textContent = rarity.label;
-            select.append(option);
-        });
-        select.value = rarities[index] || PREMIUM_BOOSTER_DEFAULT_RARITIES[index];
+function readPremiumBoosterChanceInputs() {
+    return Object.fromEntries(premiumBoosterRarityChanceInputs.map((input) => [input.dataset.rarity, Number(input.value)]));
+}
+
+function updatePremiumBoosterChanceTotal() {
+    const values = Object.values(readPremiumBoosterChanceInputs());
+    const sum = values.reduce((total, value) => total + (Number.isFinite(value) ? value : 0), 0);
+    const normalized = Math.round(sum * 100) / 100;
+    const valid = values.every((value) => Number.isFinite(value) && value >= 0 && value <= 100
+        && Math.abs(value * 100 - Math.round(value * 100)) < 0.0001)
+        && Math.abs(normalized - 100) < 0.001;
+    premiumBoosterChanceTotal.textContent = `Total des probabilités : ${normalized.toLocaleString("fr-FR")} %${valid ? " ✓" : " (le total doit faire 100 %)"}`;
+    premiumBoosterChanceTotal.classList.toggle("premium-booster-chance-invalid", !valid);
+    premiumBoosterSettingsSave.disabled = !valid || !Number.isSafeInteger(Number(premiumBoosterPriceInput.value))
+        || Number(premiumBoosterPriceInput.value) < 1 || Number(premiumBoosterPriceInput.value) > 1000;
+    return valid;
+}
+
+function setPremiumBoosterSettings(settings = {}) {
+    const price = Number(settings.price);
+    premiumBoosterPrice = Number.isSafeInteger(price) && price >= 1 && price <= 1000 ? price : 2;
+    premiumBoosterPriceDisplay.textContent = premiumBoosterPrice.toLocaleString("fr-FR");
+    premiumBoosterPriceInput.value = String(premiumBoosterPrice);
+    const chances = settings.rarityChances && typeof settings.rarityChances === "object"
+        ? settings.rarityChances : PREMIUM_BOOSTER_DEFAULT_CHANCES;
+    premiumBoosterRarityChanceInputs.forEach((input) => {
+        const value = Number(chances[input.dataset.rarity] ?? PREMIUM_BOOSTER_DEFAULT_CHANCES[input.dataset.rarity]);
+        input.value = String(Number.isFinite(value) ? value : PREMIUM_BOOSTER_DEFAULT_CHANCES[input.dataset.rarity]);
     });
+    updatePremiumBoosterChanceTotal();
+    updatePremiumBoosterButton();
 }
 
 function updatePremiumBoosterButton() {
     const previewDisabled = isPlayerPreview || !auth.currentUser;
-    openPremiumBoosterButton.disabled = previewDisabled || premiumSpinInProgress || premiumBalanceCount < 2;
+    openPremiumBoosterButton.disabled = previewDisabled || premiumSpinInProgress || premiumBalanceCount < premiumBoosterPrice;
     if (previewDisabled) premiumBoosterStatus.textContent = "Aperçu joueur : les achats sont désactivés.";
-    else if (premiumBalanceCount < 2) premiumBoosterStatus.textContent = "Coût : 2 jetons Premium. Il t’en faut au moins 2 pour l’ouvrir.";
-    else premiumBoosterStatus.textContent = "Coût : 2 jetons Premium • 3 cartes.";
+    else if (premiumBalanceCount < premiumBoosterPrice) premiumBoosterStatus.textContent = `Coût : ${premiumBoosterPrice} jetons Premium. Il t’en faut davantage pour l’ouvrir.`;
+    else premiumBoosterStatus.textContent = `Coût : ${premiumBoosterPrice} jetons Premium • 3 cartes.`;
 }
 
 async function loadPremiumWheel() {
@@ -5744,6 +5767,15 @@ async function loadPremiumWheel() {
         updatePremiumBoosterButton();
         const prizes = Array.isArray(configResponse.data.prizes) ? configResponse.data.prizes : [];
         renderPremiumPrizeList(prizes);
+        try {
+            const boosterSettings = await callGetPremiumBoosterSettings();
+            setPremiumBoosterSettings(boosterSettings.data);
+            if (isAdminView) premiumBoosterSettingsStatus.textContent = "Prix et probabilités actuels chargés.";
+        } catch (boosterSettingsError) {
+            console.error("Impossible de charger la configuration du booster Premium :", boosterSettingsError);
+            setPremiumBoosterSettings();
+            if (isAdminView) premiumBoosterSettingsStatus.textContent = "Déploie les fonctions du booster Premium pour charger ses réglages.";
+        }
         premiumStatus.textContent = isPlayerPreview
             ? "Aperçu joueur normal : les actions de jeu sont désactivées."
             : prizes.length ? "Chaque tour utilise 1 jeton Premium." : "La roue n’a pas encore de cadeau configuré.";
@@ -5764,15 +5796,6 @@ async function loadPremiumWheel() {
             renderPremiumAdminPlayers();
             premiumPrizeEditor.replaceChildren();
             prizes.forEach((prize) => createPremiumPrizeEditorRow(prize));
-            try {
-                const boosterSettings = await callGetPremiumBoosterSettings();
-                setPremiumBoosterRarityInputs(boosterSettings.data.cardRarities);
-                premiumBoosterSettingsStatus.textContent = "Raretés actuelles chargées.";
-            } catch (boosterSettingsError) {
-                console.error("Impossible de charger la configuration du booster Premium :", boosterSettingsError);
-                setPremiumBoosterRarityInputs();
-                premiumBoosterSettingsStatus.textContent = "Déploie getPremiumBoosterSettings et savePremiumBoosterSettings pour configurer les cartes.";
-            }
         } else {
             premiumPrizeEditor.replaceChildren();
         }
@@ -6247,25 +6270,35 @@ premiumRulesSaveButton.addEventListener("click", async () => {
 
 premiumBoosterSettingsSave.addEventListener("click", async () => {
     if (!isCurrentUserAdmin() || isPlayerPreview) return;
-    const cardRarities = premiumBoosterRaritySelects.map((select) => select.value);
+    const price = Number(premiumBoosterPriceInput.value);
+    const rarityChances = readPremiumBoosterChanceInputs();
+    const totalChance = Object.values(rarityChances).reduce((sum, value) => sum + (Number.isFinite(value) ? value : 0), 0);
+    if (!updatePremiumBoosterChanceTotal() || !Number.isSafeInteger(price) || price < 1 || price > 1000
+        || Math.round(totalChance * 100) !== 10000) {
+        premiumBoosterSettingsStatus.textContent = "Le prix doit être un entier de 1 à 1 000 ; les probabilités doivent totaliser 100 % (deux décimales maximum).";
+        return;
+    }
     premiumBoosterSettingsSave.disabled = true;
-    premiumBoosterSettingsStatus.textContent = "Enregistrement des raretés…";
+    premiumBoosterSettingsStatus.textContent = "Enregistrement du prix et des probabilités…";
     try {
-        const response = await callSavePremiumBoosterSettings({ cardRarities });
-        setPremiumBoosterRarityInputs(response.data.cardRarities);
-        premiumBoosterSettingsStatus.textContent = "Les trois raretés du booster Premium sont enregistrées.";
+        const response = await callSavePremiumBoosterSettings({ price, rarityChances });
+        setPremiumBoosterSettings(response.data);
+        premiumBoosterSettingsStatus.textContent = "Le prix et les probabilités du booster Premium sont enregistrés.";
     } catch (error) {
-        console.error("Enregistrement des raretés du booster Premium impossible :", error);
+        console.error("Enregistrement des réglages du booster Premium impossible :", error);
         premiumBoosterSettingsStatus.textContent = error.code === "functions/failed-precondition" || error.code === "functions/invalid-argument"
-            ? (error.message || "Vérifie que chaque rareté contient des cartes disponibles.")
+            ? (error.message || "Vérifie le prix, les probabilités et la disponibilité des cartes de chaque rareté utilisée.")
             : "Impossible d’enregistrer les raretés. Vérifie que les fonctions du booster Premium sont déployées.";
     } finally {
         premiumBoosterSettingsSave.disabled = false;
     }
 });
 
+premiumBoosterRarityChanceInputs.forEach((input) => input.addEventListener("input", updatePremiumBoosterChanceTotal));
+premiumBoosterPriceInput.addEventListener("input", updatePremiumBoosterChanceTotal);
+
 openPremiumBoosterButton.addEventListener("click", async () => {
-    if (!auth.currentUser || isPlayerPreview || premiumSpinInProgress || premiumBalanceCount < 2) return;
+    if (!auth.currentUser || isPlayerPreview || premiumSpinInProgress || premiumBalanceCount < premiumBoosterPrice) return;
     premiumSpinInProgress = true;
     openPremiumBoosterButton.disabled = true;
     premiumSpinButton.disabled = true;
@@ -6297,7 +6330,7 @@ openPremiumBoosterButton.addEventListener("click", async () => {
     } catch (error) {
         console.error("Erreur pendant l’ouverture du booster Premium :", error);
         premiumBoosterStatus.textContent = error.code === "functions/failed-precondition"
-            ? (error.message || "Il faut 2 jetons Premium et une configuration valide pour ouvrir ce booster.")
+            ? (error.message || `Il faut ${premiumBoosterPrice} jeton${premiumBoosterPrice === 1 ? "" : "s"} Premium et une configuration valide pour ouvrir ce booster.`)
             : "Impossible d’ouvrir le booster Premium. Vérifie que openPremiumBooster est déployée.";
     } finally {
         premiumSpinInProgress = false;
