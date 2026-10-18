@@ -6753,6 +6753,9 @@ document.getElementById("profileCalendarNext")?.addEventListener("click", () => 
     profileHistorySelectedDate = profileHistoryDateKey(profileHistoryMonth);
     renderProfileHistory();
 });
+profileHistorySection?.addEventListener("toggle", () => {
+    if (profileHistorySection.open && auth.currentUser && viewedOtherPlayerId === null) loadProfileRewardHistory();
+});
 
 async function loadPersonalProfile(playerId = auth.currentUser?.uid) {
     if (!auth.currentUser || !playerId) return;
@@ -6776,7 +6779,6 @@ async function loadPersonalProfile(playerId = auth.currentUser?.uid) {
             ]);
             if (!snapshot.exists()) throw new Error("PLAYER_PROFILE_MISSING");
             player = snapshot.data();
-            await loadProfileRewardHistory();
             loadedProfileIdentity = {
                 pseudo: player.pseudo || "",
                 avatar: player.avatar || ""
