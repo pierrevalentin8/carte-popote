@@ -1502,6 +1502,11 @@ body {
 .premium-rule-card { display: block; padding: clamp(18px, 3vw, 26px); border-color: rgba(224, 186, 255, .95); background: linear-gradient(145deg, #fffdfd, #f6edff 58%, #ead8fb); color: #302044; font-family: Georgia, "Times New Roman", serif; font-size: clamp(15px, 1.8vw, 17px); font-weight: 500; line-height: 1.8; letter-spacing: .01em; }
 .premium-rule-card img { width: 1.1em; height: 1.1em; object-fit: contain; }
 #premiumRulesText { display: block; white-space: pre-line; overflow-wrap: anywhere; }
+.premium-rule-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
+.premium-rules-edit-button { flex: 0 0 auto; display: inline-grid; width: 34px; height: 34px; place-items: center; padding: 0; border: 1px solid rgba(255,220,137,.8); border-radius: 10px; background: linear-gradient(145deg,#533076,#24113e); color: #ffe39a; box-shadow: 0 3px 0 #120a20, 0 5px 10px rgba(0,0,0,.28), inset 0 1px 0 rgba(255,255,255,.32); cursor: pointer; font-size: 17px; }
+.premium-rules-edit-button:hover { transform: translateY(-1px); filter: brightness(1.12); }
+.premium-rules-edit-button:active { transform: translateY(2px); box-shadow: 0 1px 0 #120a20, inset 0 1px 0 rgba(255,255,255,.22); }
+.premium-rule-card .premium-rules-editor { flex-basis: 100%; }
 .premium-rules-editor { margin-top: 10px; padding: 13px; border: 1px solid #d7b4ec; border-radius: 14px; background: rgba(255,255,255,.82); }
 .premium-rules-editor label { display: block; margin-bottom: 7px; font-weight: 800; }
 .premium-rules-editor textarea { min-height: 90px; resize: vertical; }
@@ -3067,7 +3072,15 @@ body {
         <button id="premiumBackButton" class="admin-back" type="button">← Retour à l’accueil</button>
         <h2 id="premiumPageTitle">Premium</h2>
         <div class="premium-intro-grid">
-            <div class="premium-rule-card"><span id="premiumRulesText">Règle Premium : 1 € = 2 jetons Premium.</span></div>
+            <div class="premium-rule-card">
+                <div class="premium-rule-header"><span id="premiumRulesText">Règle Premium : 1 € = 2 jetons Premium.</span><button id="premiumRulesEditButton" class="premium-rules-edit-button hidden" type="button" aria-label="Modifier les règles Premium" title="Modifier les règles Premium" aria-expanded="false" aria-controls="premiumRulesEditor">🖌️</button></div>
+                <div id="premiumRulesEditor" class="premium-rules-editor hidden">
+                    <label for="premiumRulesInput">Règles Premium</label>
+                    <textarea id="premiumRulesInput" class="admin-field" maxlength="3000" placeholder="Écris les règles Premium…"></textarea>
+                    <button id="premiumRulesSaveButton" class="primary-button" type="button">Valider</button>
+                    <p id="premiumRulesStatus" class="premium-status" role="status" aria-live="polite"></p>
+                </div>
+            </div>
             <section class="premium-journal-card" aria-labelledby="premiumJournalTitle">
                 <h3 id="premiumJournalTitle">5 derniers tirages</h3>
                 <p id="premiumJournalStatus" class="premium-status" role="status" aria-live="polite">Chargement du journal…</p>
@@ -3077,12 +3090,6 @@ body {
         <details id="premiumSettingsDisclosure" class="premium-admin-disclosure hidden">
             <summary>⚙️ Paramètres</summary>
             <div class="premium-admin-disclosure-content">
-                <div id="premiumRulesEditor" class="premium-rules-editor">
-                    <label for="premiumRulesInput">Règles de la page Premium (visibles par les joueurs)</label>
-                    <textarea id="premiumRulesInput" class="admin-field" maxlength="3000" placeholder="Écris les règles Premium…"></textarea>
-                    <button id="premiumRulesSaveButton" class="primary-button" type="button">Valider</button>
-                    <p id="premiumRulesStatus" class="premium-status" role="status" aria-live="polite"></p>
-                </div>
                 <section class="premium-booster-settings" aria-labelledby="premiumBoosterSettingsTitle">
                     <h3 id="premiumBoosterSettingsTitle">Booster Premium</h3>
                     <p class="admin-note">Choisis le prix et la probabilité de chaque rareté. Le total doit faire 100 % ; les trois cartes sont tirées séparément selon ces probabilités.</p>
@@ -4233,6 +4240,7 @@ const premiumSettingsDisclosure = document.getElementById("premiumSettingsDisclo
 const premiumAdministrationDisclosure = document.getElementById("premiumAdministrationDisclosure");
 const premiumBackButton = document.getElementById("premiumBackButton");
 const premiumRulesText = document.getElementById("premiumRulesText");
+const premiumRulesEditButton = document.getElementById("premiumRulesEditButton");
 const premiumRulesEditor = document.getElementById("premiumRulesEditor");
 const premiumRulesInput = document.getElementById("premiumRulesInput");
 const premiumRulesSaveButton = document.getElementById("premiumRulesSaveButton");
@@ -5748,6 +5756,7 @@ async function loadPremiumWheel() {
     if (!auth.currentUser) return;
     const isAdminView = isCurrentUserAdmin() && !isPlayerPreview;
     premiumAdminPanel.classList.toggle("hidden", !isAdminView);
+    premiumRulesEditButton.classList.toggle("hidden", !isAdminView);
     premiumSettingsDisclosure.classList.toggle("hidden", !isAdminView);
     premiumAdministrationDisclosure.classList.toggle("hidden", !isAdminView);
     premiumTestWheelButton.classList.toggle("hidden", !isAdminView);
@@ -6266,6 +6275,14 @@ premiumRulesSaveButton.addEventListener("click", async () => {
     } finally {
         premiumRulesSaveButton.disabled = false;
     }
+});
+
+premiumRulesEditButton.addEventListener("click", () => {
+    if (!isCurrentUserAdmin() || isPlayerPreview) return;
+    const isOpening = premiumRulesEditor.classList.contains("hidden");
+    premiumRulesEditor.classList.toggle("hidden", !isOpening);
+    premiumRulesEditButton.setAttribute("aria-expanded", String(isOpening));
+    if (isOpening) premiumRulesInput.focus();
 });
 
 premiumBoosterSettingsSave.addEventListener("click", async () => {
