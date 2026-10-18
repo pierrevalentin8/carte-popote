@@ -2099,6 +2099,10 @@ body {
 .effectif-table td:last-child,.effectif-table th:last-child { min-width:110px; }
 .effectif-month-heading { display:grid; min-width:108px; justify-items:center; gap:4px; }
 .effectif-month-heading img { width:20px; height:20px; object-fit:contain; }
+.effectif-month-heading-row { display:flex; align-items:center; justify-content:center; gap:8px; }
+.effectif-month-reset { border:1px solid #b84a4a; border-radius:50%; width:24px; height:24px; padding:0; color:#8a2020; background:#fff1ef; font-weight:800; line-height:1; cursor:pointer; box-shadow:0 2px 3px #0002; }
+.effectif-month-reset:hover { color:#fff; background:#a82f2f; transform:translateY(-1px); }
+.effectif-month-reset:disabled { opacity:.55; cursor:wait; transform:none; }
 .effectif-month-cell { min-width:104px; }
 .effectif-token-input { width:82px; max-width:100%; padding:8px 6px; border:1px solid #c9b77e; border-radius:7px; background:#fffefa; color:var(--theme-ink); text-align:center; font:inherit; font-weight:700; }
 .effectif-token-input:focus { outline:2px solid #d9a52b; outline-offset:1px; }
@@ -3712,6 +3716,7 @@ const callGetAdminServiceMissions = httpsCallable(functions, "getAdminServiceMis
 const callSaveServiceMission = httpsCallable(functions, "saveServiceMission");
 const callGetAdminEffectif = httpsCallable(functions, "getAdminEffectif");
 const callAddEffectifMonth = httpsCallable(functions, "addEffectifMonth");
+const callResetEffectifMonth = httpsCallable(functions, "resetEffectifMonth");
 const callSaveEffectifPlayer = httpsCallable(functions, "saveEffectifPlayer");
 const callGetAdminEventBoosters = httpsCallable(functions, "getAdminEventBoosters");
 const callSaveEventBooster = httpsCallable(functions, "saveEventBooster");
@@ -9491,9 +9496,14 @@ function renderAdminEffectif() {
     adminEffectifMonths.forEach((month) => {
         const cell = document.createElement("th"); cell.scope = "col";
         const label = document.createElement("span"); label.className = "effectif-month-heading";
+        const headingRow = document.createElement("span"); headingRow.className = "effectif-month-heading-row";
         const name = document.createElement("span"); name.textContent = formatEffectifMonth(month);
         const icon = document.createElement("img"); icon.src = "./Jeton.png"; icon.alt = "Jetons classiques";
-        label.append(name, icon); cell.append(label); header.append(cell);
+        const reset = document.createElement("button"); reset.type = "button"; reset.className = "effectif-month-reset"; reset.textContent = "×";
+        reset.title = `Supprimer et réinitialiser ${formatEffectifMonth(month)}`;
+        reset.setAttribute("aria-label", `Supprimer et réinitialiser ${formatEffectifMonth(month)}`);
+        reset.addEventListener("click", () => resetAdminEffectifMonth(month, reset));
+        headingRow.append(name, reset); label.append(headingRow, icon); cell.append(label); header.append(cell);
     });
     const rewardsHeading = document.createElement("th"); rewardsHeading.scope = "col"; rewardsHeading.textContent = "Récompenses collectives"; header.append(rewardsHeading);
     const saveHeading = document.createElement("th"); saveHeading.scope = "col"; saveHeading.textContent = "Validation"; header.append(saveHeading);
@@ -9581,6 +9591,31 @@ async function addAdminEffectifMonth() {
         console.error("Impossible d’ajouter un mois à l’effectif :", error);
         status.textContent = error.message || "Impossible d’ajouter le mois. Vérifie que les fonctions Effectif sont déployées.";
     } finally { button.disabled = false; }
+}
+
+async function resetAdminEffectifMonth(month, button) {
+    const label = formatEffectifMonth(month);
+    if (!confirm(`Supprimer et réinitialiser ${label} ? Les montants et validations de ce mois seront effacés. Les jetons attribués seront retirés des soldes s’ils n’ont pas été dépensés.`)) return;
+    const status = document.getElementById("effectifStatus");
+    button.disabled = true; status.textContent = `Réinitialisation de ${label}…`;
+    try {
+        const response = await callResetEffectifMonth({ month });
+        adminEffectifMonths = Array.isArray(response.data?.months) ? response.data.months : adminEffectifMonths.filter((value) => value !== month);
+        adminEffectifPlayers = adminEffectifPlayers.map((player) => {
+            const amounts = { ...(player.monthlyTokenAmounts || {}) };
+            const credited = { ...(player.monthlyTokenCredited || {}) };
+            const validated = { ...(player.monthlyTokenValidated || {}) };
+            delete amounts[month]; delete credited[month]; delete validated[month];
+            return { ...player, monthlyTokenAmounts: amounts, monthlyTokenCredited: credited, monthlyTokenValidated: validated };
+        });
+        renderAdminEffectif();
+        const removed = Number(response.data?.tokensRemoved) || 0;
+        status.textContent = `${label} supprimé et réinitialisé.${removed ? ` ${removed} jeton${removed === 1 ? "" : "s"} retiré${removed === 1 ? "" : "s"} des soldes.` : " Aucun jeton n’avait été attribué."}`;
+    } catch (error) {
+        console.error(`Impossible de réinitialiser ${label} :`, error);
+        status.textContent = error.message || `Impossible de réinitialiser ${label}.`;
+        button.disabled = false;
+    }
 }
 
 function serviceRewardSummary(mission) {
