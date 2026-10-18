@@ -1542,7 +1542,6 @@ body {
 .premium-wheel-panel-illustration-icon img {width:88%;height:88%;object-fit:contain;filter:drop-shadow(0 2px 2px rgba(0,0,0,.48));}
 .premium-wheel-panel-copy {min-width:0;text-align:left;text-shadow:0 2px 2px #15081e;}
 .premium-wheel-panel-name {display:block;overflow:hidden;color:#fff9e9;font-size:clamp(14px,3.6vw,24px);font-weight:1000;line-height:1.08;text-overflow:ellipsis;text-transform:uppercase;white-space:nowrap;}
-.premium-wheel-panel-detail {display:block;margin-top:4px;color:#ffe08a;font-size:clamp(10px,2.7vw,17px);font-weight:900;line-height:1.1;text-transform:uppercase;}
 .premium-wheel-post {position:relative;z-index:3;display:flex;align-self:stretch;flex-direction:column;align-items:center;justify-content:space-between;margin:7px 0 13px;padding:10px 3px;border:3px solid #ffd878;border-radius:18px;background:linear-gradient(90deg,#311044,#8e36a6 40%,#53175f 72%,#270d39);box-shadow:inset 0 0 0 3px #38144d,inset 0 0 14px #f3a8ff,0 7px 12px rgba(0,0,0,.48);}
 .premium-wheel-chef {display:grid;width:clamp(30px,7vw,48px);aspect-ratio:1;place-items:center;border:2px solid #ffdd81;border-radius:12px;background:linear-gradient(145deg,#a342bc,#32124c);font-size:clamp(18px,4vw,28px);}
 .premium-wheel-stars {color:#ffd34e;font-size:clamp(15px,3.4vw,23px);line-height:1;text-shadow:0 0 8px #ffdb55;}
@@ -5467,7 +5466,8 @@ function renderPremiumPrizeList(prizes) {
     const slotCount = count ? Math.max(12, count * Math.ceil(12 / count)) : 0;
     const stepDegrees = slotCount ? 360 / slotCount : 0;
     const colors = ["#7422a5", "#1667bc", "#bc8118", "#b72b91", "#a32634", "#4c38aa", "#167f9c", "#8244b3"];
-    const icons = { tokens: "🪙", premium: "💎", booster: "🎴", card: "🃏" };
+    const icons = { premium: "💎", card: "🃏" };
+    const iconImages = { tokens: "./Jeton.png", booster: "./Booster%20normal.png" };
     const stageHeight = premiumWheel.parentElement.clientHeight || 320;
     const reelRadius = Math.max(110, stageHeight * 0.455);
     const panelHeight = Math.max(52, 2 * reelRadius * Math.tan(Math.PI / Math.max(slotCount, 1)));
@@ -5496,17 +5496,23 @@ function renderPremiumPrizeList(prizes) {
         illustration.setAttribute("aria-hidden", "true");
         const illustrationIcon = document.createElement("span");
         illustrationIcon.className = "premium-wheel-panel-illustration-icon";
-        illustrationIcon.textContent = isAdminView ? (icons[prize.rewardType] || "🎁") : "✨";
+        const iconImagePath = iconImages[prize.rewardType];
+        if (iconImagePath) {
+            const iconImage = document.createElement("img");
+            iconImage.src = iconImagePath;
+            iconImage.alt = "";
+            iconImage.setAttribute("aria-hidden", "true");
+            illustrationIcon.append(iconImage);
+        } else {
+            illustrationIcon.textContent = icons[prize.rewardType] || "🎁";
+        }
         illustration.append(illustrationIcon);
         const copy = document.createElement("span");
         copy.className = "premium-wheel-panel-copy";
         const name = document.createElement("strong");
         name.className = "premium-wheel-panel-name";
-        name.textContent = isAdminView ? (prize.name || "Cadeau") : "Lot mystère";
-        const detail = document.createElement("small");
-        detail.className = "premium-wheel-panel-detail";
-        detail.textContent = isAdminView ? premiumRewardDescription(prize) : "Surprise Premium";
-        copy.append(name, detail);
+        name.textContent = prize.name || "Cadeau";
+        copy.append(name);
         panel.append(illustration, copy);
         premiumWheel.append(panel);
     };
