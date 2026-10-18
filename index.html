@@ -2325,6 +2325,27 @@ body {
     .admin-menu { grid-template-columns: 1fr; gap: 8px; }
     .admin-menu-button { min-height: 48px; text-align: left; }
 }
+.premium-game-layout { display: grid; grid-template-columns: minmax(0,1fr) minmax(230px, .38fr); align-items: start; gap: 14px; margin-top: 14px; }
+.premium-game-layout > .premium-wheel-card { min-width: 0; margin-top: 0; }
+.premium-booster-card { display: flex; min-width: 0; flex-direction: column; align-items: center; margin-top: 0; padding: 20px 16px; border: 1px solid #d8ad53; border-radius: 24px; background: radial-gradient(ellipse at 50% 4%, rgba(162,84,190,.55), transparent 43%), radial-gradient(ellipse at 50% 100%, rgba(237,174,57,.12), transparent 50%), linear-gradient(145deg,#100c25,#25113d 50%,#100b24); color: #fff8e8; text-align: center; box-shadow: 0 18px 40px rgba(0,0,0,.42), inset 0 0 0 4px rgba(255,229,159,.08), inset 0 0 44px rgba(187,96,226,.13); }
+.premium-booster-card h3 { margin: 2px 0 5px; color: #ffe39a; font: 700 clamp(19px,2vw,25px) Georgia,"Times New Roman",serif; text-shadow: 0 2px 12px rgba(238,173,255,.45); }
+.premium-booster-copy { min-height: 38px; margin: 0; color: #e5d5f1; font-size: 12px; line-height: 1.45; }
+.premium-booster-pack { display: block; width: min(100%,220px); height: clamp(250px,29vw,340px); margin: 10px auto 14px; object-fit: contain; filter: drop-shadow(0 11px 13px rgba(0,0,0,.5)); }
+.premium-booster-buy { display: flex; width: 100%; min-height: 48px; align-items: center; justify-content: center; gap: 12px; padding: 9px 14px; border: 2px solid #ffe398; border-radius: 13px; background: linear-gradient(135deg,#9b37c0,#5b187c 68%,#34104d); color: #fff8e8; font: inherit; font-size: 15px; font-weight: 1000; cursor: pointer; box-shadow: inset 0 1px 0 rgba(255,255,255,.4),0 5px 0 #2b0e40,0 9px 15px rgba(0,0,0,.3); transition: transform .15s ease,filter .15s ease; }
+.premium-booster-buy:hover:not(:disabled) { filter: brightness(1.12); transform: translateY(-2px); }
+.premium-booster-buy:active:not(:disabled) { transform: translateY(2px); box-shadow: inset 0 1px 0 rgba(255,255,255,.3),0 2px 0 #2b0e40; }
+.premium-booster-buy:disabled { opacity: .56; cursor: not-allowed; filter: grayscale(.25); }
+.premium-booster-price { display: inline-flex; align-items: center; gap: 5px; padding: 3px 8px; border: 1px solid rgba(255,232,164,.72); border-radius: 999px; background: rgba(21,8,39,.42); color: #ffe39a; }
+.premium-booster-price img { width: 23px; height: 23px; object-fit: contain; }
+.premium-booster-status { min-height: 34px; margin: 9px 0 0; color: #e7d7f2; font-size: 11px; line-height: 1.45; }
+.premium-booster-settings { margin-top: 12px; padding: 14px; border: 1px solid rgba(220,178,244,.45); border-radius: 14px; background: radial-gradient(ellipse at 50% 4%, rgba(162,84,190,.55), transparent 43%), radial-gradient(ellipse at 50% 100%, rgba(237,174,57,.12), transparent 50%), linear-gradient(145deg,#100c25,#25113d 50%,#100b24); color: #fff8e8; }
+.premium-booster-settings h3 { margin: 0 0 6px; color: #ffe39a; font-size: 16px; }
+.premium-booster-settings .admin-note { margin: 0 0 10px; color: #e7d7f2; }
+.premium-booster-rarities { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 9px; margin: 10px 0; }
+.premium-booster-rarities label { display: grid; gap: 5px; color: #f0e3f7; font-size: 12px; font-weight: 800; }
+.premium-booster-rarities .admin-field { min-width: 0; }
+@media (max-width: 760px) { .premium-game-layout { grid-template-columns: minmax(0,1fr); } .premium-booster-card { width: 100%; } .premium-booster-pack { width: min(72vw,300px); height: clamp(260px,92vw,390px); } }
+@media (max-width: 480px) { .premium-booster-rarities { grid-template-columns: 1fr; } }
 </style>
 
 </head>
@@ -3060,6 +3081,17 @@ body {
                     <button id="premiumRulesSaveButton" class="primary-button" type="button">Valider</button>
                     <p id="premiumRulesStatus" class="premium-status" role="status" aria-live="polite"></p>
                 </div>
+                <section class="premium-booster-settings" aria-labelledby="premiumBoosterSettingsTitle">
+                    <h3 id="premiumBoosterSettingsTitle">Booster Premium</h3>
+                    <p class="admin-note">Choisis la rareté de chacune des trois cartes. Les cartes sont tirées au hasard parmi celles disponibles dans cette rareté.</p>
+                    <div class="premium-booster-rarities">
+                        <label>Carte 1<select id="premiumBoosterRarity1" class="admin-field premium-booster-rarity"></select></label>
+                        <label>Carte 2<select id="premiumBoosterRarity2" class="admin-field premium-booster-rarity"></select></label>
+                        <label>Carte 3<select id="premiumBoosterRarity3" class="admin-field premium-booster-rarity"></select></label>
+                    </div>
+                    <button id="premiumBoosterSettingsSave" class="primary-button" type="button">Enregistrer les raretés</button>
+                    <p id="premiumBoosterSettingsStatus" class="premium-status" role="status" aria-live="polite"></p>
+                </section>
                 <p class="admin-note">Configure les cadeaux et leurs taux. Le total des taux doit faire 100 %.</p>
                 <div id="premiumPrizeEditor"></div>
                 <button id="premiumAddPrizeButton" class="secondary-button" type="button">Créer un cadeau</button>
@@ -3067,6 +3099,7 @@ body {
                 <p id="premiumAdminStatus" class="premium-status" role="status" aria-live="polite"></p>
             </div>
         </details>
+        <div class="premium-game-layout">
         <section class="premium-wheel-card" aria-labelledby="premiumWheelTitle">
             <h3 id="premiumWheelTitle">Roue Premium</h3>
             <p class="admin-note">Utilise 1 jeton Premium pour tenter ta chance.</p>
@@ -3115,6 +3148,16 @@ body {
             </div>
             <div id="premiumPrizeList" class="premium-prize-list"></div>
         </section>
+        <section class="premium-booster-card" aria-labelledby="premiumBoosterTitle">
+            <h3 id="premiumBoosterTitle">Booster Premium</h3>
+            <p class="premium-booster-copy">Trois cartes choisies selon les raretés configurées.</p>
+            <img class="premium-booster-pack" src="./Booster%20premium.png" alt="Booster Premium contenant trois cartes" loading="lazy" decoding="async">
+            <button id="openPremiumBoosterButton" class="premium-booster-buy" type="button" disabled>
+                <span>Ouvrir</span><span class="premium-booster-price"><img src="./Jeton%20premium.png" alt="">2</span>
+            </button>
+            <p id="premiumBoosterStatus" class="premium-booster-status" role="status" aria-live="polite">Coût : 2 jetons Premium.</p>
+        </section>
+        </div>
         <section id="premiumAdminPanel" class="premium-admin-card hidden">
           <details id="premiumAdministrationDisclosure" class="premium-admin-disclosure">
             <summary>🛡️ Administration Premium</summary>
@@ -3624,6 +3667,9 @@ const callGetPremiumRules = httpsCallable(functions, "getPremiumRules");
 const callSavePremiumRules = httpsCallable(functions, "savePremiumRules");
 const callSavePremiumWheel = httpsCallable(functions, "savePremiumWheel");
 const callSpinPremiumWheel = httpsCallable(functions, "spinPremiumWheel");
+const callGetPremiumBoosterSettings = httpsCallable(functions, "getPremiumBoosterSettings");
+const callSavePremiumBoosterSettings = httpsCallable(functions, "savePremiumBoosterSettings");
+const callOpenPremiumBooster = httpsCallable(functions, "openPremiumBooster");
 const callTestPremiumWheel = httpsCallable(functions, "testPremiumWheel");
 const callAdjustPlayerPremiumTokens = httpsCallable(functions, "adjustPlayerPremiumTokens");
 const callInitializePremiumAssignedTokens = httpsCallable(functions, "initializePremiumAssignedTokens");
@@ -4201,6 +4247,11 @@ const premiumRevealHeading = document.getElementById("premiumRevealHeading");
 const premiumRevealName = document.getElementById("premiumRevealName");
 const premiumRevealDescription = document.getElementById("premiumRevealDescription");
 const premiumPrizeList = document.getElementById("premiumPrizeList");
+const premiumBoosterRaritySelects = Array.from(document.querySelectorAll(".premium-booster-rarity"));
+const premiumBoosterSettingsSave = document.getElementById("premiumBoosterSettingsSave");
+const premiumBoosterSettingsStatus = document.getElementById("premiumBoosterSettingsStatus");
+const openPremiumBoosterButton = document.getElementById("openPremiumBoosterButton");
+const premiumBoosterStatus = document.getElementById("premiumBoosterStatus");
 const premiumAdminPanel = document.getElementById("premiumAdminPanel");
 const premiumPrizeEditor = document.getElementById("premiumPrizeEditor");
 const premiumAddPrizeButton = document.getElementById("premiumAddPrizeButton");
@@ -5641,6 +5692,35 @@ function isCurrentUserAdmin() {
     return Boolean(auth.currentUser && (auth.currentUser.email || "").toLowerCase() === ADMIN_EMAIL);
 }
 
+const PREMIUM_BOOSTER_RARITY_OPTIONS = [
+    { value: "commune", label: "Commune" },
+    { value: "rare", label: "Rare" },
+    { value: "legendaire", label: "Légendaire" },
+    { value: "mystique", label: "Mystique" }
+];
+const PREMIUM_BOOSTER_DEFAULT_RARITIES = ["commune", "rare", "legendaire"];
+
+function setPremiumBoosterRarityInputs(rarities = PREMIUM_BOOSTER_DEFAULT_RARITIES) {
+    premiumBoosterRaritySelects.forEach((select, index) => {
+        select.replaceChildren();
+        PREMIUM_BOOSTER_RARITY_OPTIONS.forEach((rarity) => {
+            const option = document.createElement("option");
+            option.value = rarity.value;
+            option.textContent = rarity.label;
+            select.append(option);
+        });
+        select.value = rarities[index] || PREMIUM_BOOSTER_DEFAULT_RARITIES[index];
+    });
+}
+
+function updatePremiumBoosterButton() {
+    const previewDisabled = isPlayerPreview || !auth.currentUser;
+    openPremiumBoosterButton.disabled = previewDisabled || premiumSpinInProgress || premiumBalanceCount < 2;
+    if (previewDisabled) premiumBoosterStatus.textContent = "Aperçu joueur : les achats sont désactivés.";
+    else if (premiumBalanceCount < 2) premiumBoosterStatus.textContent = "Coût : 2 jetons Premium. Il t’en faut au moins 2 pour l’ouvrir.";
+    else premiumBoosterStatus.textContent = "Coût : 2 jetons Premium • 3 cartes.";
+}
+
 async function loadPremiumWheel() {
     if (!auth.currentUser) return;
     const isAdminView = isCurrentUserAdmin() && !isPlayerPreview;
@@ -5661,6 +5741,7 @@ async function loadPremiumWheel() {
         const balance = Number(player.jetonsPremium || 0);
         premiumBalanceCount = Number.isSafeInteger(balance) && balance >= 0 ? balance : 0;
         premiumBalanceDisplay.textContent = premiumBalanceCount.toLocaleString("fr-FR");
+        updatePremiumBoosterButton();
         const prizes = Array.isArray(configResponse.data.prizes) ? configResponse.data.prizes : [];
         renderPremiumPrizeList(prizes);
         premiumStatus.textContent = isPlayerPreview
@@ -5683,6 +5764,15 @@ async function loadPremiumWheel() {
             renderPremiumAdminPlayers();
             premiumPrizeEditor.replaceChildren();
             prizes.forEach((prize) => createPremiumPrizeEditorRow(prize));
+            try {
+                const boosterSettings = await callGetPremiumBoosterSettings();
+                setPremiumBoosterRarityInputs(boosterSettings.data.cardRarities);
+                premiumBoosterSettingsStatus.textContent = "Raretés actuelles chargées.";
+            } catch (boosterSettingsError) {
+                console.error("Impossible de charger la configuration du booster Premium :", boosterSettingsError);
+                setPremiumBoosterRarityInputs();
+                premiumBoosterSettingsStatus.textContent = "Déploie getPremiumBoosterSettings et savePremiumBoosterSettings pour configurer les cartes.";
+            }
         } else {
             premiumPrizeEditor.replaceChildren();
         }
@@ -6155,6 +6245,69 @@ premiumRulesSaveButton.addEventListener("click", async () => {
     }
 });
 
+premiumBoosterSettingsSave.addEventListener("click", async () => {
+    if (!isCurrentUserAdmin() || isPlayerPreview) return;
+    const cardRarities = premiumBoosterRaritySelects.map((select) => select.value);
+    premiumBoosterSettingsSave.disabled = true;
+    premiumBoosterSettingsStatus.textContent = "Enregistrement des raretés…";
+    try {
+        const response = await callSavePremiumBoosterSettings({ cardRarities });
+        setPremiumBoosterRarityInputs(response.data.cardRarities);
+        premiumBoosterSettingsStatus.textContent = "Les trois raretés du booster Premium sont enregistrées.";
+    } catch (error) {
+        console.error("Enregistrement des raretés du booster Premium impossible :", error);
+        premiumBoosterSettingsStatus.textContent = error.code === "functions/failed-precondition" || error.code === "functions/invalid-argument"
+            ? (error.message || "Vérifie que chaque rareté contient des cartes disponibles.")
+            : "Impossible d’enregistrer les raretés. Vérifie que les fonctions du booster Premium sont déployées.";
+    } finally {
+        premiumBoosterSettingsSave.disabled = false;
+    }
+});
+
+openPremiumBoosterButton.addEventListener("click", async () => {
+    if (!auth.currentUser || isPlayerPreview || premiumSpinInProgress || premiumBalanceCount < 2) return;
+    premiumSpinInProgress = true;
+    openPremiumBoosterButton.disabled = true;
+    premiumSpinButton.disabled = true;
+    premiumTestWheelButton.disabled = true;
+    openPremiumBoosterButton.querySelector("span:first-child").textContent = "Ouverture…";
+    premiumBoosterStatus.textContent = "Le booster Premium s’ouvre…";
+    let requestId = crypto.randomUUID();
+    const requestStorageKey = "premiumBoosterPendingOpen:" + auth.currentUser.uid;
+    const storedRequestId = localStorage.getItem(requestStorageKey);
+    if (/^[a-f0-9-]{32,36}$/i.test(storedRequestId || "")) requestId = storedRequestId;
+    else localStorage.setItem(requestStorageKey, requestId);
+    try {
+        const previouslyOwnedIds = await getPreviouslyOwnedCardIds();
+        const response = await callOpenPremiumBooster({ requestId });
+        void refreshCooperationProgress();
+        localStorage.removeItem(requestStorageKey);
+        const data = response.data;
+        premiumBalanceCount = Number(data.jetonsPremium) || 0;
+        premiumBalanceDisplay.textContent = premiumBalanceCount.toLocaleString("fr-FR");
+        document.getElementById("playerTokens").textContent = Number(data.tokens).toLocaleString("fr-FR");
+        document.getElementById("playerBoosters").textContent = Number(data.boostersDisponibles).toLocaleString("fr-FR");
+        setOpenBoosterButton(data.boostersDisponibles);
+        updatePlayerXpDisplay(data.xp);
+        premiumBoosterStatus.textContent = "Booster ouvert : 3 cartes ajoutées à ta collection.";
+        await showBoosterResults(markNewlyDiscoveredCards(data.cards || [], previouslyOwnedIds), data.boostersOfferts, "premium", {
+            name: "Booster Premium",
+            imageUrl: "./Booster%20premium.png"
+        });
+    } catch (error) {
+        console.error("Erreur pendant l’ouverture du booster Premium :", error);
+        premiumBoosterStatus.textContent = error.code === "functions/failed-precondition"
+            ? (error.message || "Il faut 2 jetons Premium et une configuration valide pour ouvrir ce booster.")
+            : "Impossible d’ouvrir le booster Premium. Vérifie que openPremiumBooster est déployée.";
+    } finally {
+        premiumSpinInProgress = false;
+        openPremiumBoosterButton.querySelector("span:first-child").textContent = "Ouvrir";
+        updatePremiumBoosterButton();
+        premiumSpinButton.disabled = isPlayerPreview || premiumBalanceCount < 1 || premiumPrizes.length === 0;
+        premiumTestWheelButton.disabled = !isCurrentUserAdmin() || isPlayerPreview || premiumPrizes.length === 0;
+    }
+});
+
 premiumAddPrizeButton.addEventListener("click", () => {
     if (!isCurrentUserAdmin() || isPlayerPreview) return;
     createPremiumPrizeEditorRow({ percentage: premiumPrizeEditor.children.length ? 1 : 100, rewardType: "tokens", rewardAmount: 1 });
@@ -6201,6 +6354,7 @@ premiumSpinButton.addEventListener("click", async () => {
     if (!auth.currentUser || isPlayerPreview || premiumSpinInProgress) return;
     premiumSpinInProgress = true;
     premiumSpinButton.disabled = true;
+    updatePremiumBoosterButton();
     premiumStatus.textContent = "La roue tourne…";
     try {
         const requestStorageKey = "premiumWheelPendingSpin:" + auth.currentUser.uid;
@@ -6218,6 +6372,7 @@ premiumSpinButton.addEventListener("click", async () => {
         await animatePremiumWheelToPrize(prizeIndex);
         premiumBalanceCount = Number(data.jetonsPremium);
         premiumBalanceDisplay.textContent = premiumBalanceCount.toLocaleString("fr-FR");
+        updatePremiumBoosterButton();
         document.getElementById("playerTokens").textContent = Number(data.tokens).toLocaleString("fr-FR");
         document.getElementById("playerBoosters").textContent = Number(data.boostersDisponibles).toLocaleString("fr-FR");
         setOpenBoosterButton(data.boostersDisponibles);
@@ -6233,12 +6388,14 @@ premiumSpinButton.addEventListener("click", async () => {
     } finally {
         premiumSpinInProgress = false;
         premiumSpinButton.disabled = isPlayerPreview || premiumBalanceCount < 1 || premiumPrizes.length === 0;
+        updatePremiumBoosterButton();
     }
 });
 
 premiumTestWheelButton.addEventListener("click", async () => {
     if (!isCurrentUserAdmin() || isPlayerPreview || premiumSpinInProgress) return;
     premiumSpinInProgress = true;
+    updatePremiumBoosterButton();
     renderPremiumPrizeList(premiumPrizes);
     premiumStatus.textContent = "Test de la roue en cours… Aucun cadeau ne sera attribué.";
     try {
@@ -6254,6 +6411,7 @@ premiumTestWheelButton.addEventListener("click", async () => {
     } finally {
         premiumSpinInProgress = false;
         renderPremiumPrizeList(premiumPrizes);
+        updatePremiumBoosterButton();
     }
 });
 
@@ -7841,8 +7999,8 @@ async function showBoosterResults(cards, boostersOfferts = 0, boosterType = "cla
     boosterRevealBusy = false;
     boosterResultTitle.textContent = options.name ? `🎁 ${options.name}` : "🎁 Ton booster arrive !";
     boosterResultDescription.textContent = "Les cartes apparaîtront de la moins rare à la plus rare.";
-    boosterRevealImage.src = options.imageUrl || (boosterType === "journalier" ? "./Booster%20Journalier.png" : "./Booster%20normal.png");
-    boosterRevealImage.alt = options.name ? `Illustration de ${options.name}` : boosterType === "journalier" ? "Booster journalier en cours d’ouverture" : "Booster classique en cours d’ouverture";
+    boosterRevealImage.src = options.imageUrl || (boosterType === "premium" ? "./Booster%20premium.png" : boosterType === "journalier" ? "./Booster%20Journalier.png" : "./Booster%20normal.png");
+    boosterRevealImage.alt = options.name ? `Illustration de ${options.name}` : boosterType === "premium" ? "Booster Premium en cours d’ouverture" : boosterType === "journalier" ? "Booster journalier en cours d’ouverture" : "Booster classique en cours d’ouverture";
     viewOwnedCardsButton.textContent = mandatoryEventBoosterOpen ? "Continuer vers le site" : "Voir ma collection";
     boosterRevealLabel.textContent = "Le booster s’ouvre…";
     boosterPackReveal.classList.remove("hidden", "is-opening");
