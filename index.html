@@ -1632,6 +1632,8 @@ body {
 .profile-badge-option img { width: 40px; height: 40px; object-fit: contain; }
 .profile-badge-option button { padding: 7px 10px; border: 1px solid rgba(243,191,56,.65); border-radius: 8px; background: var(--theme-cream); color: var(--theme-ink); font: inherit; font-size: 11px; font-weight: 800; cursor: pointer; }
 .leaderboard-badge { width: 25px; height: 25px; object-fit: contain; align-self: center; }
+.leaderboard-daily-streak { display: inline-flex; align-items: center; gap: 1px; color: #674515; font-size: 10px; font-weight: 900; white-space: nowrap; }
+.leaderboard-daily-streak img { width: 25px; height: 25px; object-fit: contain; }
 .site-updates-overlay { position: fixed; inset: 0; z-index: 700; display: grid; place-items: center; padding: 16px; background: rgba(3,11,25,.78); }
 .site-updates-card { width: min(100%, 520px); max-height: min(82dvh, 680px); overflow: auto; padding: 24px; border: 2px solid var(--theme-gold, #e5b530); border-radius: 22px; background: var(--theme-cream, #fffdf7); color: var(--theme-ink, #10264a); box-shadow: 0 22px 65px rgba(0,0,0,.45); }
 .site-updates-card h2 { margin: 0 0 8px; color: var(--theme-ink, #10264a); }
@@ -2112,6 +2114,8 @@ body {
 .profile-name-line { display: flex; align-items: center; flex-wrap: wrap; gap: 10px; }
 .profile-name-line h2 { max-width: 100%; margin: 0; padding: 7px 14px; border: 1px solid #ead9ad; border-radius: 8px; background: linear-gradient(#fffdf5,#e9dfc9); color: #10264a; font-size: clamp(23px,4vw,34px); font-weight: 900; line-height: 1.15; overflow-wrap: anywhere; box-shadow: 0 3px 9px rgba(0,0,0,.25); }
 .profile-premium-badge { width: 44px; height: 44px; flex-basis: 44px; filter: drop-shadow(0 3px 6px rgba(0,0,0,.4)); }
+.profile-daily-streak { display: inline-flex; align-items: center; gap: 3px; color: #fff1bd; font-size: 12px; font-weight: 900; white-space: nowrap; filter: drop-shadow(0 2px 4px rgba(0,0,0,.4)); }
+.profile-daily-streak img { width: 36px; height: 36px; object-fit: contain; }
 .profile-account-dates { margin: 10px 0 0; color: #d5deec; font-size: 12px; line-height: 1.65; white-space: pre-line; }
 .profile-edit-icon { position: absolute; z-index: 2; top: 17px; right: 17px; display: grid; place-items: center; width: 46px; height: 46px; padding: 0; border: 2px solid #dfbb59; border-radius: 50%; background: #0a2145; color: #fff4d0; font-size: 21px; cursor: pointer; box-shadow: 0 4px 11px rgba(0,0,0,.35); transition: transform .16s ease, background .16s ease; }
 .profile-edit-icon:hover { transform: translateY(-2px); background: #183d70; }
@@ -2732,7 +2736,7 @@ body {
             <div class="profile-card-identity">
                 <div class="profile-avatar-frame"><span id="profilePageAvatar" class="profile-page-avatar" aria-hidden="true">👤</span></div>
                 <div class="profile-card-details">
-                    <div class="profile-name-line"><h2 id="profilePageTitle">Profil joueur</h2><span id="profilePremiumBadge" class="profile-premium-badge hidden" title="Badge équipé" aria-label="Badge équipé"><img loading="lazy" decoding="async" src="./badge-premium-10.png" alt="Badge équipé"></span></div>
+                    <div class="profile-name-line"><h2 id="profilePageTitle">Profil joueur</h2><span id="profileDailyStreak" class="profile-daily-streak hidden" aria-live="polite"><img loading="lazy" decoding="async" src="./flamme-bleue.png" alt=""><span id="profileDailyStreakCount">×0</span></span><span id="profilePremiumBadge" class="profile-premium-badge hidden" title="Badge équipé" aria-label="Badge équipé"><img loading="lazy" decoding="async" src="./badge-premium-10.png" alt="Badge équipé"></span></div>
                     <p id="profileAccountDates" class="profile-account-dates" aria-live="polite"></p>
                 </div>
             </div>
@@ -6228,6 +6232,29 @@ function formatProfileDate(value) {
     return new Intl.DateTimeFormat("fr-FR", dateOnly ? { dateStyle: "long" } : { dateStyle: "medium", timeStyle: "short" }).format(date);
 }
 
+function getDailyStreakTier(streak) {
+    if (streak >= 100) return { label: "violette", image: "./flamme-violette.png" };
+    if (streak >= 30) return { label: "or", image: "./flamme-or.png" };
+    if (streak >= 10) return { label: "rouge", image: "./flamme-rouge.png" };
+    return { label: "bleue", image: "./flamme-bleue.png" };
+}
+
+function renderDailyStreakBadge(container, streak, countElementId) {
+    if (!container) return;
+    const safeStreak = Number.isSafeInteger(streak) && streak >= 2 ? streak : 0;
+    container.classList.toggle("hidden", safeStreak < 2);
+    if (safeStreak < 2) return;
+    const tier = getDailyStreakTier(safeStreak);
+    const image = container.querySelector("img");
+    if (image) {
+        image.src = tier.image;
+        image.alt = `Flamme ${tier.label}`;
+    }
+    container.title = `${safeStreak} jours consécutifs de booster journalier ouvert`;
+    const count = document.getElementById(countElementId);
+    if (count) count.textContent = "×" + safeStreak;
+}
+
 async function loadPersonalProfile(playerId = auth.currentUser?.uid) {
     if (!auth.currentUser || !playerId) return;
     const isOwnProfile = playerId === auth.currentUser.uid;
@@ -6279,6 +6306,7 @@ async function loadPersonalProfile(playerId = auth.currentUser?.uid) {
                 player.eventBadges = badgeResponse.data.eventBadges || [];
                 player.badgeEquipped = badgeResponse.data.badgeEquipped || "";
                 player.commonSeasonOneProgress = Number(badgeResponse.data.commonSeasonOneProgress) || 0;
+                player.boosterJournalierStreak = Number(badgeResponse.data.boosterJournalierStreak) || 0;
                 const formattedSpending = (totalAmountCents / 100).toLocaleString("fr-FR", { style: "currency", currency: "EUR" });
                 profilePremiumSpending.textContent = formattedSpending;
             } catch (spendingError) {
@@ -6296,6 +6324,7 @@ async function loadPersonalProfile(playerId = auth.currentUser?.uid) {
         }
         const createdAt = player.createdAt || player.accountCreatedAt || player.dateCreation;
         document.getElementById("profileAccountDates").textContent = createdAt ? "Compte créé le " + formatProfileDate(createdAt) : "Date de création indisponible";
+        renderDailyStreakBadge(document.getElementById("profileDailyStreak"), Number(player.boosterJournalierStreak) || 0, "profileDailyStreakCount");
         profilePageAvatar.replaceChildren();
         const badgeDetails = {
             "premium-10": { image: "./badge-premium-10.png", label: "Badge Premium 10 €" },
@@ -6621,6 +6650,23 @@ async function loadLeaderboard() {
                 badge.alt = eventBadge?.name || (player.badgeEquipped === "common-season-1" ? "Badge 27 cartes communes" : "Badge Premium 10 €");
                 badge.title = badge.alt;
                 nameLine.append(badge);
+            }
+            const dailyStreak = Number(player.boosterJournalierStreak) || 0;
+            if (dailyStreak >= 2) {
+                const streakBadge = document.createElement("span");
+                streakBadge.className = "leaderboard-daily-streak";
+                const flame = document.createElement("img");
+                const streakTier = getDailyStreakTier(dailyStreak);
+                flame.src = streakTier.image;
+                flame.alt = "Flamme " + streakTier.label;
+                flame.title = `${dailyStreak} jours consécutifs de booster journalier ouvert`;
+                flame.loading = "lazy";
+                flame.decoding = "async";
+                const count = document.createElement("span");
+                count.textContent = "×" + dailyStreak;
+                streakBadge.setAttribute("aria-label", `${streakTier.label}, série de ${dailyStreak} jours`);
+                streakBadge.append(flame, count);
+                nameLine.append(streakBadge);
             }
             nameLine.append(level);
             const total = document.createElement("span");
