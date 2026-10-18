@@ -3345,6 +3345,15 @@ body {
         </div>
     </section>
 
+    <section id="mysticRewardModal" class="site-updates-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="mysticRewardTitle" aria-hidden="true">
+        <div class="site-updates-card">
+            <h2 id="mysticRewardTitle">✨ Une carte mystique a été tirée !</h2>
+            <p id="mysticRewardIntro">Les joueurs reçoivent 3 jetons classiques.</p>
+            <ul id="mysticRewardList" class="site-updates-list"></ul>
+            <div class="site-updates-actions"><button id="mysticRewardCloseButton" class="primary-button" type="button">Continuer</button></div>
+        </div>
+    </section>
+
     <section id="pollPromptModal" class="site-updates-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="pollPromptTitle" aria-hidden="true">
         <div class="site-updates-card">
             <h2 id="pollPromptTitle">🗳️ Sondage</h2>
@@ -3724,6 +3733,7 @@ const callGetAdminPlayers = httpsCallable(functions, "getAdminPlayers");
 const callRecordHistoricalPremiumPayment = httpsCallable(functions, "recordHistoricalPremiumPayment");
 const callAdjustPlayerTokens = httpsCallable(functions, "adjustPlayerTokens");
 const callGetLeaderboard = httpsCallable(functions, "getLeaderboard");
+const callClaimMysticPullRewards = httpsCallable(functions, "claimMysticPullRewards");
 const callBuyClassicBooster = httpsCallable(functions, "buyClassicBooster");
 const callGetPublicCardCount = httpsCallable(functions, "getPublicCardCount");
 const callGetPremiumWheel = httpsCallable(functions, "getPremiumWheel");
@@ -3803,6 +3813,10 @@ const serviceReadyMessage = document.getElementById("serviceReadyMessage");
 const serviceReadyImage = document.getElementById("serviceReadyImage");
 const serviceReadyLaterButton = document.getElementById("serviceReadyLaterButton");
 const serviceReadyOpenButton = document.getElementById("serviceReadyOpenButton");
+const mysticRewardModal = document.getElementById("mysticRewardModal");
+const mysticRewardIntro = document.getElementById("mysticRewardIntro");
+const mysticRewardList = document.getElementById("mysticRewardList");
+const mysticRewardCloseButton = document.getElementById("mysticRewardCloseButton");
 let pendingSiteUpdateIds = [];
 let pendingServiceReadyMission = null;
 let announcementsWaitingForServiceModal = [];
@@ -3816,6 +3830,52 @@ let exchangeOfferPollTimer = null;
 let exchangeOfferPollInFlight = false;
 let exchangeOfferActionBusy = false;
 let exchangeOfferTarget = null;
+let pendingMysticPullNotices = [];
+let mysticRewardShowTimer = null;
+
+async function loadAndClaimMysticPullRewards() {
+    if (!auth.currentUser || isPlayerPreview) return;
+    try {
+        const response = await callClaimMysticPullRewards();
+        const data = response.data || {};
+        pendingMysticPullNotices = Array.isArray(data.rewards) ? data.rewards : [];
+        const tokenCount = document.getElementById("playerTokens");
+        if (tokenCount && Number.isFinite(Number(data.tokens))) tokenCount.textContent = String(data.tokens);
+        if (pendingMysticPullNotices.length && !mysticRewardShowTimer) {
+            mysticRewardShowTimer = window.setInterval(tryShowMysticPullReward, 1000);
+            tryShowMysticPullReward();
+        }
+    } catch (error) {
+        console.warn("Impossible de récupérer les récompenses de tirage mystique :", error);
+    }
+}
+
+function tryShowMysticPullReward() {
+    if (!auth.currentUser || isPlayerPreview || !pendingMysticPullNotices.length || !mysticRewardModal.classList.contains("hidden")) return;
+    const blocked = [eventBoosterPromptModal, boosterResultModal, siteUpdatesModal, serviceReadyModal, pollPromptModal, exchangeOfferModal, exchangeComposeModal]
+        .some((modal) => modal && !modal.classList.contains("hidden"));
+    if (blocked) return;
+    if (mysticRewardShowTimer) window.clearInterval(mysticRewardShowTimer);
+    mysticRewardShowTimer = null;
+    const notices = pendingMysticPullNotices;
+    const total = notices.reduce((sum, notice) => sum + (Number(notice.tokenReward) || 3), 0);
+    mysticRewardIntro.textContent = `Un joueur a tiré une carte mystique ! Tu reçois ${total} jeton${total > 1 ? "s" : ""} classique${total > 1 ? "s" : ""}.`;
+    mysticRewardList.replaceChildren();
+    notices.forEach((notice) => {
+        const item = document.createElement("li");
+        const heading = document.createElement("strong");
+        heading.textContent = `${notice.playerPseudo || "Un joueur"} a obtenu « ${notice.cardName || "Carte mystique"} »`;
+        const detail = document.createElement("p");
+        detail.textContent = `Booster ${notice.boosterType || "Premium"} · +${Number(notice.tokenReward) || 3} jetons classiques`;
+        detail.style.cssText = "margin:5px 0 0";
+        item.append(heading, detail);
+        mysticRewardList.append(item);
+    });
+    pendingMysticPullNotices = [];
+    mysticRewardModal.classList.remove("hidden");
+    mysticRewardModal.setAttribute("aria-hidden", "false");
+    mysticRewardCloseButton.focus();
+}
 
 function tryShowPendingPoll() {
     if (!auth.currentUser || isPlayerPreview || activePoll || !pendingPolls.length) return;
@@ -3976,6 +4036,13 @@ function closeServiceReadyNotification() {
     tryShowPendingExchangeOffer();
 }
 
+function closeMysticPullReward() {
+    mysticRewardModal.classList.add("hidden");
+    mysticRewardModal.setAttribute("aria-hidden", "true");
+    tryShowPendingPoll();
+    tryShowPendingExchangeOffer();
+}
+
 function showPendingServiceReadyNotification() {
     const mission = pendingServiceReadyMission;
     if (!mission || !siteUpdatesModal.classList.contains("hidden") || !pollPromptModal.classList.contains("hidden")) return;
@@ -4038,6 +4105,7 @@ function showSiteUpdatesIfNeeded(updates) {
 }
 
 siteUpdatesCloseButton.addEventListener("click", closeSiteUpdates);
+mysticRewardCloseButton.addEventListener("click", closeMysticPullReward);
 serviceReadyLaterButton.addEventListener("click", closeServiceReadyNotification);
 serviceReadyOpenButton.addEventListener("click", async () => {
     closeServiceReadyNotification();
@@ -4874,6 +4942,11 @@ onAuthStateChanged(
            ========================================== */
 
         if (!user) {
+            if (mysticRewardShowTimer) window.clearInterval(mysticRewardShowTimer);
+            mysticRewardShowTimer = null;
+            pendingMysticPullNotices = [];
+            mysticRewardModal.classList.add("hidden");
+            mysticRewardModal.setAttribute("aria-hidden", "true");
             stopCooperationListeners();
             if (exchangeOfferPollTimer) window.clearInterval(exchangeOfferPollTimer);
             exchangeOfferPollTimer = null;
@@ -5127,6 +5200,7 @@ onAuthStateChanged(
         await checkPendingEventBoosters(user.uid);
         await loadPendingPolls();
         await loadPendingExchangeOffers();
+        await loadAndClaimMysticPullRewards();
         if (!exchangeOfferPollTimer) {
             exchangeOfferPollTimer = window.setInterval(() => { void loadPendingExchangeOffers(); }, 15000);
         }
@@ -6805,6 +6879,10 @@ async function loadPersonalProfile(playerId = auth.currentUser?.uid) {
                 player.hasPremiumBadge = spendingResponse.data.hasPremiumBadge === true;
             player.badgeEquipped = player.badgeEquipped || "";
                 const badgeResponse = await callGetPublicPlayerProfile({ playerId });
+                const serverTokenTotal = Number(badgeResponse.data.classicTokensEarned);
+                if (Number.isSafeInteger(serverTokenTotal) && serverTokenTotal >= 0) {
+                    profileTokensEarned.textContent = serverTokenTotal.toLocaleString("fr-FR");
+                }
                 player.unlockedBadgeIds = badgeResponse.data.unlockedBadgeIds || [];
                 player.eventBadges = badgeResponse.data.eventBadges || [];
                 player.badgeEquipped = badgeResponse.data.badgeEquipped || "";
