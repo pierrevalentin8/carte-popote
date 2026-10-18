@@ -6949,7 +6949,8 @@ async function loadPersonalProfile(playerId = auth.currentUser?.uid) {
             "common-season-1": { image: "./badge-communes-27.png", label: "Badge : 27 cartes communes" },
             "classic-tokens-100": { image: "./badge-jetons-classiques-100.png", label: "100 jetons gagnés" },
             "classic-tokens-300": { image: "./badge-jetons-classiques-300.png", label: "300 jetons classiques gagnés" },
-            "classic-tokens-500": { image: "./badge-jetons-classiques-500.png", label: "500 jetons classiques gagnés" }
+            "classic-tokens-500": { image: "./badge-jetons-classiques-500.png", label: "500 jetons classiques gagnés" },
+            "service-50h": { image: "./badge-50h.png", label: "50 heures de Service" }
         }[player.badgeEquipped] || (() => {
             const badge = (player.eventBadges || []).find((item) => item.id === player.badgeEquipped);
             return badge ? { image: badge.imageUrl, label: badge.name } : null;
@@ -6988,7 +6989,8 @@ function renderProfileBadges(player, isOwnProfile) {
         "common-season-1": { id: "common-season-1", label: "27 cartes communes • Saison 1", image: "./badge-communes-27.png" },
         "classic-tokens-100": { id: "classic-tokens-100", label: "100 jetons gagnés", image: "./badge-jetons-classiques-100.png" },
         "classic-tokens-300": { id: "classic-tokens-300", label: "300 jetons classiques gagnés", image: "./badge-jetons-classiques-300.png" },
-        "classic-tokens-500": { id: "classic-tokens-500", label: "500 jetons classiques gagnés", image: "./badge-jetons-classiques-500.png" }
+        "classic-tokens-500": { id: "classic-tokens-500", label: "500 jetons classiques gagnés", image: "./badge-jetons-classiques-500.png" },
+        "service-50h": { id: "service-50h", label: "50 heures de Service", image: "./badge-50h.png" }
     };
     (player.eventBadges || []).forEach((badge) => {
         if (badge?.id && badge?.name && badge?.imageUrl) badgeCatalog[badge.id] = { id: badge.id, label: badge.name, image: badge.imageUrl };
@@ -7266,20 +7268,22 @@ async function loadLeaderboard() {
             level.textContent = "Niveau " + (Number(player.niveau) || 1);
             nameLine.append(name);
             const eventBadge = (player.eventBadges || []).find((badge) => badge.id === player.badgeEquipped);
-            if (["premium-10", "common-season-1", "classic-tokens-100", "classic-tokens-300", "classic-tokens-500"].includes(player.badgeEquipped) || eventBadge) {
+            if (["premium-10", "common-season-1", "classic-tokens-100", "classic-tokens-300", "classic-tokens-500", "service-50h"].includes(player.badgeEquipped) || eventBadge) {
                 const badge = document.createElement("img");
                 badge.className = "leaderboard-badge";
                 const badgeImage = eventBadge?.imageUrl || (player.badgeEquipped === "common-season-1"
                     ? "./badge-communes-27.png"
                     : player.badgeEquipped === "classic-tokens-100" ? "./badge-jetons-classiques-100.png"
                         : player.badgeEquipped === "classic-tokens-300" ? "./badge-jetons-classiques-300.png"
-                            : player.badgeEquipped === "classic-tokens-500" ? "./badge-jetons-classiques-500.png" : "./badge-premium-10.png");
+                            : player.badgeEquipped === "classic-tokens-500" ? "./badge-jetons-classiques-500.png"
+                                : player.badgeEquipped === "service-50h" ? "./badge-50h.png" : "./badge-premium-10.png");
                 badge.src = badgeImage;
                 badge.alt = eventBadge?.name || (player.badgeEquipped === "common-season-1"
                     ? "Badge 27 cartes communes"
                     : player.badgeEquipped === "classic-tokens-100" ? "100 jetons gagnés"
                         : player.badgeEquipped === "classic-tokens-300" ? "Badge 300 jetons classiques"
-                            : player.badgeEquipped === "classic-tokens-500" ? "Badge 500 jetons classiques" : "Badge Premium 10 €");
+                        : player.badgeEquipped === "classic-tokens-500" ? "Badge 500 jetons classiques"
+                            : player.badgeEquipped === "service-50h" ? "Badge 50 heures de Service" : "Badge Premium 10 €");
                 badge.title = badge.alt;
                 nameLine.append(badge);
             }
