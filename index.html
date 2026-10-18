@@ -2090,20 +2090,16 @@ body {
 .effectif-toolbar input { min-height:40px; padding:7px 9px; border:1px solid #d8c99f; border-radius:8px; background:#fffefa; color:var(--theme-ink); font:inherit; }
 .effectif-add-month { width:42px; min-width:42px; height:42px; padding:0; font-size:24px; line-height:1; }
 .effectif-table-wrap { width:100%; overflow:auto; border:1px solid #d8c99f; border-radius:10px; background:#fffefa; }
-.effectif-table { width:100%; min-width:1050px; border-collapse:separate; border-spacing:0; color:var(--theme-ink); }
+.effectif-table { width:max-content; min-width:100%; border-collapse:separate; border-spacing:0; color:var(--theme-ink); }
 .effectif-table th,.effectif-table td { padding:11px 10px; border-bottom:1px solid #e8dfca; text-align:center; vertical-align:middle; }
 .effectif-table th { position:sticky; top:0; z-index:1; background:#10264a; color:#fff; font-size:12px; line-height:1.3; }
-.effectif-table th:first-child,.effectif-table td:first-child { position:sticky; left:0; z-index:2; min-width:155px; text-align:left; }
+.effectif-table th:first-child,.effectif-table td:first-child { position:sticky; left:0; z-index:2; min-width:210px; text-align:left; }
 .effectif-table td:first-child { background:#fffefa; font-weight:800; }
 .effectif-table th:first-child { z-index:3; border-radius:9px 0 0 0; }
-.effectif-table td:last-child,.effectif-table th:last-child { min-width:180px; }
+.effectif-table td:last-child,.effectif-table th:last-child { min-width:110px; }
 .effectif-month-heading { display:grid; min-width:108px; justify-items:center; gap:4px; }
 .effectif-month-heading img { width:20px; height:20px; object-fit:contain; }
-.effectif-month-cell { min-width:120px; }
-.effectif-month-controls { display:flex; align-items:center; justify-content:center; gap:4px; white-space:nowrap; }
-.effectif-month-controls .effectif-token-input { width:54px; min-width:42px; padding:6px 3px; }
-.effectif-month-step { display:grid; width:34px; min-width:34px; height:32px; place-items:center; padding:0 !important; font-size:17px; line-height:1; }
-.effectif-month-step:disabled { opacity:.45; cursor:not-allowed; }
+.effectif-month-cell { min-width:104px; }
 .effectif-token-input { width:82px; max-width:100%; padding:8px 6px; border:1px solid #c9b77e; border-radius:7px; background:#fffefa; color:var(--theme-ink); text-align:center; font:inherit; font-weight:700; }
 .effectif-token-input:focus { outline:2px solid #d9a52b; outline-offset:1px; }
 .effectif-token-input.effectif-token-locked,.effectif-token-input:disabled { border-color:#d4d0c6; background:#e8e6e1; color:#77756f; cursor:not-allowed; opacity:1; }
@@ -2112,32 +2108,19 @@ body {
 .effectif-eligibility input { width:18px; height:18px; accent-color:#19753c; }
 .effectif-row-save { width:auto; min-width:82px; height:34px; margin:5px 0 0; padding:6px 9px; border-radius:7px; font-size:12px; }
 .effectif-row-actions { display:flex; flex-direction:column; align-items:center; gap:5px; }
-.effectif-balance { min-width:250px; }
-.effectif-balance-total { display:flex; flex:0 0 auto; align-items:center; justify-content:center; gap:4px; margin:0; font-size:14px; white-space:nowrap; }
-.effectif-balance-total img { width:21px; height:21px; object-fit:contain; }
-.effectif-token-controls { flex-wrap:nowrap; justify-content:center; gap:5px; }
-.effectif-token-controls .player-token-input { width:58px; min-width:48px; padding:6px 3px; }
-.player-token-controls .effectif-token-compact-button { display:grid; width:34px; min-width:34px; height:32px; place-items:center; padding:0 !important; font-size:17px; line-height:1; }
 .effectif-player-email { display:block; margin-top:4px; color:var(--theme-muted); font-size:11px; font-weight:400; }
+.effectif-player-created { display:block; margin-top:4px; color:var(--theme-muted); font-size:11px; font-weight:500; }
 .effectif-status { min-height:22px; margin:8px 0; color:var(--theme-muted); font-size:12px; }
 @media (min-width:1000px) and (orientation:landscape) {
     .admin-page#effectifPage { width:100%; max-width:1900px; padding:18px 24px 40px; }
     #effectifPage > .admin-panel { width:100%; padding:20px 22px; }
-    .effectif-table-wrap { overflow-x:hidden; }
-    .effectif-table { width:100%; min-width:0; table-layout:fixed; }
-    .effectif-table th,.effectif-table td { padding:9px 6px; }
-    .effectif-table th:first-child,.effectif-table td:first-child { width:150px; min-width:0; }
-    .effectif-table th:nth-child(2),.effectif-table td:nth-child(2) { width:clamp(250px,21vw,320px); }
-    .effectif-table th:last-child,.effectif-table td:last-child { width:clamp(160px,14vw,195px); min-width:0; }
-    .effectif-month-heading { min-width:0; font-size:11px; }
-    .effectif-month-cell { width:auto; min-width:0; }
-    .effectif-month-controls { gap:2px; }
-    .effectif-month-controls .effectif-token-input { width:min(100%,54px); min-width:34px; }
-    .effectif-month-step { width:34px; min-width:34px; height:32px; }
-    .effectif-token-input { width:min(100%,72px); padding:7px 3px; }
-    .effectif-balance { min-width:0; }
-    .effectif-token-controls { flex-wrap:nowrap; }
-    .effectif-token-controls .player-token-input { width:58px; min-width:48px; }
+    .effectif-table-wrap { overflow-x:auto; }
+    .effectif-table { width:max-content; min-width:100%; table-layout:auto; }
+    .effectif-table th,.effectif-table td { padding:9px 8px; }
+    .effectif-table th:first-child,.effectif-table td:first-child { min-width:175px; }
+    .effectif-month-heading { min-width:104px; font-size:11px; }
+    .effectif-month-cell { min-width:104px; }
+    .effectif-token-input { width:74px; padding:7px 4px; }
     .effectif-row-actions { gap:4px; }
 }
 .event-booster-admin { width:min(100%, 980px); margin:0 auto; }
@@ -3539,11 +3522,11 @@ body {
         <button id="effectifBackButton" class="admin-back" type="button">← Retour à l’accueil</button>
         <div class="admin-panel">
             <h2 id="effectifPageTitle">👥 Effectif</h2>
-            <p class="admin-note"><img loading="lazy" decoding="async" src="./Jeton.png" alt="Jeton classique" style="width:18px;height:18px;vertical-align:middle;object-fit:contain"> Saisis les montants dans les colonnes des mois, puis valide la ligne. Un montant validé est crédité une seule fois, grisé et verrouillé. Les retraits sont limités aux jetons encore disponibles.</p>
+            <p class="admin-note"><img loading="lazy" decoding="async" src="./Jeton.png" alt="Jeton classique" style="width:18px;height:18px;vertical-align:middle;object-fit:contain"> Les joueurs sont classés du plus ancien au plus récent. Saisis les jetons du mois puis valide la ligne pour les attribuer. Les montants validés restent visibles et verrouillés.</p>
             <div class="effectif-toolbar">
                 <label for="effectifMonthInput">Nouveau mois<input id="effectifMonthInput" type="month"></label>
                 <button id="effectifAddMonthButton" class="primary-button effectif-add-month" type="button" aria-label="Ajouter le mois au tableau" title="Ajouter le mois">+</button>
-                <button id="downloadPlayersBackupButton" class="secondary-button admin-backup-button" type="button">Télécharger le tableau de sauvegarde (Excel)</button>
+                <button id="downloadPlayersBackupButton" class="secondary-button admin-backup-button" type="button">Exporter toutes les données (Excel)</button>
             </div>
             <p id="playersBackupStatus" class="admin-status" role="status" aria-live="polite"></p>
             <p id="effectifStatus" class="effectif-status" role="status" aria-live="polite"></p>
@@ -9490,7 +9473,9 @@ async function loadAdminEffectif() {
         adminEffectifMonths = Array.isArray(response.data?.months) ? response.data.months : [];
         adminEffectifPlayers = Array.isArray(response.data?.players) ? response.data.players : [];
         renderAdminEffectif();
-        status.textContent = `${adminEffectifPlayers.length} joueur${adminEffectifPlayers.length === 1 ? "" : "s"} dans le tableau.`;
+        status.textContent = response.data?.monthsReset === true
+            ? `Ancien tableau remis à zéro : mois et montants retirés du tableau. Les soldes déjà crédités restent inchangés. ${adminEffectifPlayers.length} joueur${adminEffectifPlayers.length === 1 ? "" : "s"} chargé${adminEffectifPlayers.length === 1 ? "" : "s"}.`
+            : `${adminEffectifPlayers.length} joueur${adminEffectifPlayers.length === 1 ? "" : "s"} dans le tableau.`;
     } catch (error) {
         console.error("Impossible de charger l’effectif :", error);
         status.textContent = error.message || "Impossible de charger l’effectif. Vérifie que les fonctions Effectif sont déployées.";
@@ -9503,7 +9488,6 @@ function renderAdminEffectif() {
     head.replaceChildren(); body.replaceChildren();
     const header = document.createElement("tr");
     const playerHeading = document.createElement("th"); playerHeading.scope = "col"; playerHeading.textContent = "Joueur"; header.append(playerHeading);
-    const balanceHeading = document.createElement("th"); balanceHeading.scope = "col"; balanceHeading.textContent = "Septembre 2026"; header.append(balanceHeading);
     adminEffectifMonths.forEach((month) => {
         const cell = document.createElement("th"); cell.scope = "col";
         const label = document.createElement("span"); label.className = "effectif-month-heading";
@@ -9511,7 +9495,8 @@ function renderAdminEffectif() {
         const icon = document.createElement("img"); icon.src = "./Jeton.png"; icon.alt = "Jetons classiques";
         label.append(name, icon); cell.append(label); header.append(cell);
     });
-    const rewardsHeading = document.createElement("th"); rewardsHeading.scope = "col"; rewardsHeading.textContent = "Récompenses collectives · validation"; header.append(rewardsHeading);
+    const rewardsHeading = document.createElement("th"); rewardsHeading.scope = "col"; rewardsHeading.textContent = "Récompenses collectives"; header.append(rewardsHeading);
+    const saveHeading = document.createElement("th"); saveHeading.scope = "col"; saveHeading.textContent = "Validation"; header.append(saveHeading);
     head.append(header);
     if (!adminEffectifPlayers.length) {
         const row = document.createElement("tr"); const cell = document.createElement("td");
@@ -9521,39 +9506,8 @@ function renderAdminEffectif() {
         const row = document.createElement("tr"); row.dataset.playerId = player.id;
         const name = document.createElement("td"); name.textContent = player.pseudo || "Joueur";
         if (player.email) { const email = document.createElement("small"); email.className = "effectif-player-email"; email.textContent = player.email; name.append(email); }
+        if (player.createdAt) { const created = document.createElement("small"); created.className = "effectif-player-created"; created.textContent = "Inscrit le " + formatProfileDate(player.createdAt); name.append(created); }
         row.append(name);
-        const balanceCell = document.createElement("td"); balanceCell.className = "effectif-balance";
-        const balanceTotal = document.createElement("strong"); balanceTotal.className = "effectif-balance-total";
-        const balanceValue = document.createElement("span"); balanceValue.textContent = String(Number(player.tokens) || 0);
-        const balanceIcon = document.createElement("img"); balanceIcon.src = "./Jeton.png"; balanceIcon.alt = ""; balanceIcon.setAttribute("aria-hidden", "true");
-        balanceTotal.append(balanceValue, balanceIcon);
-        const tokenControls = document.createElement("div"); tokenControls.className = "player-token-controls effectif-token-controls";
-        const tokenAmount = document.createElement("input"); tokenAmount.className = "player-token-input"; tokenAmount.type = "number"; tokenAmount.min = "1"; tokenAmount.max = "1000000"; tokenAmount.step = "1"; tokenAmount.placeholder = "Montant"; tokenAmount.inputMode = "numeric";
-        tokenAmount.setAttribute("aria-label", `Montant de jetons classiques à modifier pour ${player.pseudo || "ce joueur"}`);
-        const grantButton = document.createElement("button"); grantButton.type = "button"; grantButton.className = "primary-button effectif-token-compact-button"; grantButton.textContent = "+"; grantButton.title = `Ajouter des jetons à ${player.pseudo || "ce joueur"}`; grantButton.setAttribute("aria-label", grantButton.title);
-        const removeButton = document.createElement("button"); removeButton.type = "button"; removeButton.className = "admin-danger effectif-token-compact-button"; removeButton.textContent = "−"; removeButton.title = `Retirer des jetons disponibles à ${player.pseudo || "ce joueur"}`; removeButton.setAttribute("aria-label", removeButton.title);
-        const changeTokens = async (direction) => {
-            const amount = Number(tokenAmount.value);
-            const status = document.getElementById("effectifStatus");
-            if (!Number.isSafeInteger(amount) || amount < 1 || amount > 1_000_000) { status.textContent = "Saisis un nombre entier entre 1 et 1 000 000."; tokenAmount.focus(); return; }
-            grantButton.disabled = true; removeButton.disabled = true;
-            status.textContent = direction > 0 ? `Attribution de jetons à ${player.pseudo}…` : `Retrait de jetons disponibles à ${player.pseudo}…`;
-            try {
-                const result = await callAdjustPlayerTokens({ playerId: player.id, amount, direction: direction > 0 ? "add" : "remove" });
-                player.tokens = Number(result.data?.tokens) || 0; balanceValue.textContent = String(player.tokens); tokenAmount.value = "";
-                status.textContent = direction > 0
-                    ? `${amount} jeton${amount === 1 ? "" : "s"} attribué${amount === 1 ? "" : "s"} à ${player.pseudo}.`
-                    : `${amount} jeton${amount === 1 ? "" : "s"} disponible${amount === 1 ? "" : "s"} retiré${amount === 1 ? "" : "s"} à ${player.pseudo}.`;
-            } catch (error) {
-                console.error("Erreur de modification des jetons :", error);
-                status.textContent = error.code === "functions/failed-precondition"
-                    ? (error.message || "Le joueur n’a pas assez de jetons disponibles pour ce retrait.")
-                    : error.code === "functions/permission-denied" ? "Accès refusé. Vérifie que tu es connecté avec le compte Admin."
-                        : "Impossible de modifier les jetons. Vérifie que la fonction adjustPlayerTokens est déployée.";
-            } finally { grantButton.disabled = false; removeButton.disabled = false; }
-        };
-        grantButton.addEventListener("click", () => changeTokens(1)); removeButton.addEventListener("click", () => changeTokens(-1));
-        tokenControls.append(balanceTotal, tokenAmount, grantButton, removeButton); balanceCell.append(tokenControls); row.append(balanceCell);
         const amountInputs = new Map();
         adminEffectifMonths.forEach((month) => {
             const cell = document.createElement("td"); cell.className = "effectif-month-cell";
@@ -9563,28 +9517,13 @@ function renderAdminEffectif() {
             input.placeholder = "0"; input.value = player.monthlyTokenAmounts?.[month] ?? "";
             const monthLocked = player.monthlyTokenValidated?.[month] === true;
             input.disabled = monthLocked;
-            const monthControls = document.createElement("div"); monthControls.className = "effectif-month-controls";
-            const decrement = document.createElement("button"); decrement.type = "button"; decrement.className = "admin-danger effectif-token-compact-button effectif-month-step"; decrement.textContent = "−";
-            decrement.title = `Diminuer le montant de ${formatEffectifMonth(month)}`; decrement.setAttribute("aria-label", decrement.title);
-            const increment = document.createElement("button"); increment.type = "button"; increment.className = "primary-button effectif-token-compact-button effectif-month-step"; increment.textContent = "+";
-            increment.title = `Augmenter le montant de ${formatEffectifMonth(month)}`; increment.setAttribute("aria-label", increment.title);
-            const adjustMonthAmount = (delta) => {
-                if (input.disabled) return;
-                const current = input.value === "" ? 0 : Number(input.value);
-                const next = Math.max(0, Math.min(1_000_000, (Number.isSafeInteger(current) ? current : 0) + delta));
-                input.value = String(next); input.dispatchEvent(new Event("input", { bubbles:true }));
-            };
-            decrement.addEventListener("click", () => adjustMonthAmount(-1));
-            increment.addEventListener("click", () => adjustMonthAmount(1));
-            monthControls.append(decrement, input, increment);
             if (monthLocked) {
                 input.classList.add("effectif-token-locked"); input.title = "Montant validé et verrouillé";
-                decrement.disabled = true; increment.disabled = true;
                 const lockLabel = document.createElement("small"); lockLabel.className = "effectif-cell-locked"; lockLabel.textContent = "Validé";
-                cell.append(monthControls, lockLabel);
+                cell.append(input, lockLabel);
             } else {
                 input.title = "Saisis le montant puis valide la ligne";
-                amountInputs.set(month, input); cell.append(monthControls);
+                amountInputs.set(month, input); cell.append(input);
             }
             row.append(cell);
         });
@@ -9612,7 +9551,6 @@ function renderAdminEffectif() {
                     input.parentElement.append(lockLabel);
                     amountInputs.delete(month);
                 }
-                if (Number.isSafeInteger(result.data?.tokens)) { player.tokens = result.data.tokens; balanceValue.textContent = String(player.tokens); }
                 const tokensAdded = Number(result.data?.tokensAdded) || 0;
                 status.textContent = tokensAdded > 0
                     ? `Effectif de ${player.pseudo || "ce joueur"} enregistré : ${tokensAdded} jeton${tokensAdded === 1 ? "" : "s"} classique${tokensAdded === 1 ? "" : "s"} ajouté${tokensAdded === 1 ? "" : "s"}.`
@@ -9622,8 +9560,8 @@ function renderAdminEffectif() {
                 status.textContent = error.message || "Enregistrement refusé. Vérifie que les fonctions Effectif sont déployées.";
             } finally { save.disabled = false; }
         });
-        const rowActions = document.createElement("div"); rowActions.className = "effectif-row-actions";
-        rowActions.append(eligibilityLabel, save); eligibilityCell.append(rowActions); row.append(eligibilityCell); body.append(row);
+        eligibilityCell.append(eligibilityLabel); row.append(eligibilityCell);
+        const saveCell = document.createElement("td"); saveCell.append(save); row.append(saveCell); body.append(row);
     });
 }
 
@@ -10489,7 +10427,7 @@ messageArchivesButton.addEventListener("click", () => {
     loadAdminMessages(activeMessageCategory, activeMessageStatus === "archives" ? "nouveau" : "archives");
 });
 
-function buildUniqueCardsWorkbookXml(players) {
+function buildUniqueCardsWorkbookXml(players, effectifMonths = [], effectifPlayers = []) {
     const escapeXml = (value) => String(value ?? "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&apos;");
     const usedNames = new Set();
     const worksheetName = (rawName, index) => {
@@ -10504,7 +10442,15 @@ function buildUniqueCardsWorkbookXml(players) {
         return candidate;
     };
     const cell = (value, numeric = false) => "<Cell><Data ss:Type=\"" + (numeric && value !== "" && value !== null && value !== undefined && Number.isFinite(Number(value)) ? "Number" : "String") + "\">" + escapeXml(value) + "</Data></Cell>";
-    const sheets = (Array.isArray(players) ? players : []).map((player, index) => {
+    const effectifHeaders = ["Pseudo", "Date d’inscription", "Courriel", "Solde de jetons classiques", "Récompenses collectives autorisées", ...effectifMonths.map(formatEffectifMonth)];
+    const effectifRows = ["<Row>" + effectifHeaders.map((value) => cell(value)).join("") + "</Row>"]
+        .concat((Array.isArray(effectifPlayers) ? effectifPlayers : []).map((player) => "<Row>" + [
+            cell(player.pseudo), cell(player.createdAt ? formatProfileDate(player.createdAt) : ""), cell(player.email),
+            cell(Number(player.tokens) || 0, true), cell(player.collectiveRewardsEnabled !== false ? "Oui" : "Non"),
+            ...effectifMonths.map((month) => cell(player.monthlyTokenAmounts?.[month] ?? 0, true))
+        ].join("") + "</Row>"));
+    const effectifSheet = "<Worksheet ss:Name=\"Effectif\"><Table>" + effectifRows.join("") + "</Table></Worksheet>";
+    const cardSheets = (Array.isArray(players) ? players : []).map((player, index) => {
         const headers = ["Numéro", "Nom de la carte", "Catégorie", "Rareté", "Identifiant carte"];
         const profileRows = [
             "<Row>" + cell("Joueur") + cell(player.pseudo) + "</Row>",
@@ -10518,7 +10464,7 @@ function buildUniqueCardsWorkbookXml(players) {
         ].join("") + "</Row>").join("");
         return "<Worksheet ss:Name=\"" + escapeXml(worksheetName(player.pseudo, index)) + "\"><Table>" + profileRows + cardRows + "</Table></Worksheet>";
     }).join("");
-    return '<?xml version="1.0" encoding="UTF-8"?><?mso-application progid="Excel.Sheet"?><Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet" xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet" xmlns:html="http://www.w3.org/TR/REC-html40">' + sheets + "</Workbook>";
+    return '<?xml version="1.0" encoding="UTF-8"?><?mso-application progid="Excel.Sheet"?><Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet" xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet" xmlns:html="http://www.w3.org/TR/REC-html40">' + effectifSheet + cardSheets + "</Workbook>";
 }
 
 downloadPlayersBackupButton.addEventListener("click", async () => {
@@ -10529,7 +10475,7 @@ downloadPlayersBackupButton.addEventListener("click", async () => {
         const response = await callDownloadPlayerBackup();
         const backup = response.data;
         const stamp = new Date().toISOString().slice(0, 10);
-        const workbook = buildUniqueCardsWorkbookXml(backup.uniqueCardsByPlayer);
+        const workbook = buildUniqueCardsWorkbookXml(backup.uniqueCardsByPlayer, adminEffectifMonths, adminEffectifPlayers);
         const blob = new Blob(["\uFEFF", workbook], { type: "application/vnd.ms-excel;charset=utf-8" });
         const url = URL.createObjectURL(blob);
         const link = document.createElement("a");
