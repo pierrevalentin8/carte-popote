@@ -1497,6 +1497,8 @@ body {
 .premium-page { width: 100%; max-width: 850px; min-height: calc(100dvh - 70px); margin: auto; padding: 22px 16px 100px; color: var(--theme-cream); }
 .premium-page h2 { margin: 19px 0 8px; color: #f1a8ff; font-size: 24px; }
 .premium-rule-card, .premium-balance-card, .premium-wheel-card, .premium-admin-card { margin-top: 14px; padding: 16px; border: 1px solid rgba(231, 158, 255, .8); border-radius: 17px; background: linear-gradient(145deg, #fbf7ff, #f0e1ff); color: #25143c; box-shadow: 0 10px 26px rgba(0,0,0,.24); }
+.premium-intro-grid { display: grid; grid-template-columns: minmax(0,1.25fr) minmax(270px,.85fr); align-items: stretch; gap: 14px; margin-top: 14px; }
+.premium-intro-grid > .premium-rule-card, .premium-intro-grid > .premium-journal-card { width: auto; min-width: 0; height: 100%; margin: 0; }
 .premium-rule-card { display: block; padding: clamp(18px, 3vw, 26px); border-color: rgba(224, 186, 255, .95); background: linear-gradient(145deg, #fffdfd, #f6edff 58%, #ead8fb); color: #302044; font-family: Georgia, "Times New Roman", serif; font-size: clamp(15px, 1.8vw, 17px); font-weight: 500; line-height: 1.8; letter-spacing: .01em; }
 .premium-rule-card img { width: 1.1em; height: 1.1em; object-fit: contain; }
 #premiumRulesText { display: block; white-space: pre-line; overflow-wrap: anywhere; }
@@ -1644,6 +1646,7 @@ body {
 .premium-page .premium-player-table tbody tr:nth-child(even) { background: #f6eefb; }
 .premium-page .premium-player-table tbody tr:last-child td { border-bottom: 0; }
 @media (max-width: 600px) { .premium-page { padding: 15px 11px 92px; border-radius: 0 0 20px 20px; } .premium-page h2 { margin-bottom: 14px; } .premium-wheel-card { padding: 14px 10px; border-radius: 18px; } .premium-rule-card { line-height: 1.7; } .premium-journal-entry { gap: 5px; } }
+@media (max-width: 700px) { .premium-intro-grid { grid-template-columns: 1fr; } .premium-intro-grid > .premium-rule-card, .premium-intro-grid > .premium-journal-card { height: auto; } }
 /* Roue élargie et fonds unifiés pour tous les encarts Premium */
 .premium-wheel-wrap { width: min(100%, 760px); }
 .premium-machine { grid-template-columns: minmax(0,1fr); padding: 0; }
@@ -3035,8 +3038,13 @@ body {
     <section id="premiumPage" class="premium-page hidden" aria-labelledby="premiumPageTitle">
         <button id="premiumBackButton" class="admin-back" type="button">← Retour à l’accueil</button>
         <h2 id="premiumPageTitle">Premium</h2>
-        <div class="premium-rule-card">
-            <span id="premiumRulesText">Règle Premium : 1 € = 2 jetons Premium.</span>
+        <div class="premium-intro-grid">
+            <div class="premium-rule-card"><span id="premiumRulesText">Règle Premium : 1 € = 2 jetons Premium.</span></div>
+            <section class="premium-journal-card" aria-labelledby="premiumJournalTitle">
+                <h3 id="premiumJournalTitle">5 derniers tirages</h3>
+                <p id="premiumJournalStatus" class="premium-status" role="status" aria-live="polite">Chargement du journal…</p>
+                <div id="premiumJournalList" class="premium-journal-list" aria-live="polite"></div>
+            </section>
         </div>
         <details id="premiumSettingsDisclosure" class="premium-admin-disclosure hidden">
             <summary>⚙️ Paramètres</summary>
@@ -3102,11 +3110,6 @@ body {
             </div>
             <div id="premiumPrizeList" class="premium-prize-list"></div>
         </section>
-        <section class="premium-journal-card" aria-labelledby="premiumJournalTitle">
-            <h3 id="premiumJournalTitle">5 derniers tirages</h3>
-            <p id="premiumJournalStatus" class="premium-status" role="status" aria-live="polite">Chargement du journal…</p>
-            <div id="premiumJournalList" class="premium-journal-list" aria-live="polite"></div>
-        </section>
         <section id="premiumAdminPanel" class="premium-admin-card hidden">
           <details id="premiumAdministrationDisclosure" class="premium-admin-disclosure">
             <summary>🛡️ Administration Premium</summary>
@@ -3130,11 +3133,6 @@ body {
                         <tbody id="premiumPlayersTableBody"></tbody>
                     </table>
                 </div>
-            </section>
-            <section class="premium-monthly-sales-card" aria-labelledby="premiumMonthlyTitle">
-                <h3 id="premiumMonthlyTitle">Jetons Premium attribués par mois et par joueur</h3>
-                <p id="premiumMonthlyStatus" class="admin-status" role="status" aria-live="polite"></p>
-                <div class="premium-player-table-wrap"><table class="premium-player-table premium-monthly-sales-table"><thead><tr><th>Mois</th><th>Joueur</th><th>Jetons attribués</th><th>Montant (€)</th></tr></thead><tbody id="premiumMonthlyTableBody"></tbody></table></div>
             </section>
             </div>
           </details>
@@ -4209,8 +4207,6 @@ const premiumAdjustDirection = document.getElementById("premiumAdjustDirection")
 const premiumAdjustAmount = document.getElementById("premiumAdjustAmount");
 const premiumAdjustSubmit = document.getElementById("premiumAdjustSubmit");
 const premiumPlayersTableBody = document.getElementById("premiumPlayersTableBody");
-const premiumMonthlyStatus = document.getElementById("premiumMonthlyStatus");
-const premiumMonthlyTableBody = document.getElementById("premiumMonthlyTableBody");
 const premiumJournalStatus = document.getElementById("premiumJournalStatus");
 const premiumJournalList = document.getElementById("premiumJournalList");
 const messagingPage = document.getElementById("messagingPage");
@@ -5697,13 +5693,18 @@ function renderPremiumAdminPlayers() {
     placeholder.textContent = premiumAdminPlayers.length ? "Choisir un joueur" : "Aucun joueur inscrit";
     premiumPlayerSelect.append(placeholder);
     premiumPlayersTableBody.replaceChildren();
-    premiumAdminPlayers
+    [...premiumAdminPlayers]
         .sort((left, right) => (left.pseudo || "").localeCompare(right.pseudo || "", "fr", { sensitivity: "base" }))
         .forEach((player) => {
             const option = document.createElement("option");
             option.value = player.id;
             option.textContent = (player.pseudo || "Joueur") + " • solde " + (Number(player.jetonsPremium) || 0).toLocaleString("fr-FR");
             premiumPlayerSelect.append(option);
+        });
+    [...premiumAdminPlayers]
+        .sort((left, right) => (Number(right.jetonsPremiumAttribues) || 0) - (Number(left.jetonsPremiumAttribues) || 0)
+            || (left.pseudo || "").localeCompare(right.pseudo || "", "fr", { sensitivity: "base" }))
+        .forEach((player) => {
             const row = document.createElement("tr");
             [player.pseudo || "Joueur", Number(player.jetonsPremiumAttribues) || 0, Number(player.jetonsPremiumUtilises) || 0].forEach((value, columnIndex) => {
                 const cell = document.createElement("td");
@@ -5732,7 +5733,6 @@ async function loadPremiumAdminPlayers() {
         premiumPlayersStatus.textContent = premiumAdminPlayers.length
             ? premiumAdminPlayers.length + (premiumAdminPlayers.length > 1 ? " joueurs" : " joueur")
             : "Aucun joueur inscrit.";
-        await renderMonthlyPremiumReport(premiumMonthlyTableBody, premiumMonthlyStatus);
     } catch (error) {
         console.error("Erreur de chargement des statistiques Premium :", error);
         premiumPlayersStatus.textContent = "Impossible de charger les joueurs. Vérifie que getAdminPlayers est déployée.";
