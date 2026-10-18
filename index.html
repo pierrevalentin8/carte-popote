@@ -5464,6 +5464,7 @@ const PREMIUM_REWARD_TYPES = [
     { value: "tokens", label: "Jetons classiques" },
     { value: "premium", label: "Jetons Premium" },
     { value: "booster", label: "Booster classique" },
+    { value: "premiumBooster", label: "Booster Premium (3 cartes)" },
     { value: "card", label: "Carte de la collection" }
 ];
 let premiumPrizes = [];
@@ -5475,6 +5476,8 @@ let premiumBalanceCount = 0;
 let premiumSoundEnabled = false;
 let premiumAudioContext = null;
 let premiumLastTickAt = 0;
+let premiumPendingBoosterCards = [];
+let premiumPendingBoosterBonus = 0;
 
 function premiumRewardDescription(prize) {
     const amount = Number(prize.rewardAmount) || 1;
@@ -5482,6 +5485,7 @@ function premiumRewardDescription(prize) {
         tokens: amount + (amount > 1 ? " jetons" : " jeton"),
         premium: amount + (amount > 1 ? " jetons Premium" : " jeton Premium"),
         booster: amount + (amount > 1 ? " boosters classiques" : " booster classique"),
+        premiumBooster: "Booster Premium • 3 cartes selon les probabilités configurées",
         card: prize.rewardCardName ? (amount > 1 ? amount + " exemplaires de « " + prize.rewardCardName + " »" : "Carte « " + prize.rewardCardName + " »") : "Carte surprise"
     };
     return labels[prize.rewardType] || prize.name || "Cadeau";
@@ -5497,7 +5501,8 @@ function showPremiumPrizeReveal(prize, isTest = false) {
     const iconPaths = {
         tokens: "./Jeton.png",
         premium: "./Jeton%20premium.png",
-        booster: "./Booster%20normal.png"
+        booster: "./Booster%20normal.png",
+        premiumBooster: "./Booster%20premium.png"
     };
     const imagePath = iconPaths[prize.rewardType];
     premiumRevealIcon.replaceChildren();
@@ -5512,8 +5517,8 @@ function showPremiumPrizeReveal(prize, isTest = false) {
     premiumRevealHeading.textContent = isTest ? "Résultat du test" : "Lot remporté !";
     premiumRevealName.textContent = prize.name || "Cadeau";
     premiumRevealDescription.textContent = premiumRewardDescription(prize);
-    premiumClaimPrizeButton.textContent = isTest ? "Fermer le résultat" : "Récupérer ma récompense";
-    const exceptional = prize.rewardType === "card" || prize.rewardType === "premium";
+    premiumClaimPrizeButton.textContent = isTest ? "Fermer le résultat" : prize.rewardType === "premiumBooster" ? "Ouvrir le booster" : "Récupérer ma récompense";
+    const exceptional = prize.rewardType === "card" || prize.rewardType === "premium" || prize.rewardType === "premiumBooster";
     premiumPrizeReveal.classList.toggle("is-exceptional", exceptional);
     premiumMachine.classList.toggle("is-exceptional", exceptional);
     playPremiumWinSound(exceptional);
@@ -5536,7 +5541,7 @@ function renderPremiumPrizeList(prizes) {
     const stepDegrees = slotCount ? 360 / slotCount : 0;
     const colors = ["#7422a5", "#1667bc", "#bc8118", "#b72b91", "#a32634", "#4c38aa", "#167f9c", "#8244b3"];
     const icons = { premium: "💎", card: "🃏" };
-    const iconImages = { tokens: "./Jeton.png", booster: "./Booster%20normal.png" };
+    const iconImages = { tokens: "./Jeton.png", booster: "./Booster%20normal.png", premiumBooster: "./Booster%20premium.png" };
     const stageHeight = premiumWheel.parentElement.clientHeight || 320;
     const reelRadius = Math.max(110, stageHeight * 0.455);
     const panelHeight = Math.max(52, 2 * reelRadius * Math.tan(Math.PI / Math.max(slotCount, 1)));
@@ -5679,6 +5684,9 @@ function createPremiumPrizeEditorRow(prize = {}) {
     cardSelect.value = prize.rewardCardId || "";
     cardSelect.classList.toggle("hidden", type.value !== "card");
     cardSelect.required = type.value === "card";
+    amountGroup.classList.toggle("hidden", type.value === "premiumBooster");
+    amount.disabled = type.value === "premiumBooster";
+    if (type.value === "premiumBooster") amount.value = "1";
     if (type.value === "card") {
         amountLabel.textContent = "Exemplaires de cette carte";
         amount.max = "100";
@@ -5686,9 +5694,12 @@ function createPremiumPrizeEditorRow(prize = {}) {
     type.addEventListener("change", () => {
         cardSelect.classList.toggle("hidden", type.value !== "card");
         cardSelect.required = type.value === "card";
+        amountGroup.classList.toggle("hidden", type.value === "premiumBooster");
+        amount.disabled = type.value === "premiumBooster";
         amountLabel.textContent = type.value === "card" ? "Exemplaires de cette carte" : "Quantité attribuée";
         amount.max = type.value === "card" ? "100" : "1000000";
         if (type.value === "card") amount.value = "1";
+        if (type.value === "premiumBooster") amount.value = "1";
     });
     const remove = document.createElement("button");
     remove.type = "button";
@@ -6247,8 +6258,15 @@ premiumSoundToggle.addEventListener("click", () => {
 });
 
 premiumClaimPrizeButton.addEventListener("click", () => {
+    const cards = premiumPendingBoosterCards;
+    const boostersOfferts = premiumPendingBoosterBonus;
+    premiumPendingBoosterCards = [];
+    premiumPendingBoosterBonus = 0;
     hidePremiumPrizeReveal();
     premiumMachine.classList.remove("is-winning", "is-exceptional");
+    if (cards.length) {
+        void showBoosterResults(cards, boostersOfferts, "premium", { name: "Booster Premium", imageUrl: "./Booster%20premium.png" });
+    }
 });
 
 let premiumResizeTimer = null;
@@ -6373,7 +6391,7 @@ premiumSavePrizesButton.addEventListener("click", async () => {
             name: row.querySelector(".premium-prize-name").value.trim(),
             rewardType: row.querySelector(".premium-prize-type").value,
             percentage: Number(row.querySelector(".premium-prize-chance").value),
-            rewardAmount: Number(row.querySelector(".premium-prize-amount").value)
+            rewardAmount: row.querySelector(".premium-prize-type").value === "premiumBooster" ? 1 : Number(row.querySelector(".premium-prize-amount").value)
         };
         if (prize.rewardType === "card") prize.rewardCardId = row.querySelector(".premium-prize-card").value;
         return prize;
@@ -6415,6 +6433,9 @@ premiumSpinButton.addEventListener("click", async () => {
             requestId = crypto.randomUUID();
             localStorage.setItem(requestStorageKey, requestId);
         }
+        let previouslyOwnedIds = new Set();
+        try { previouslyOwnedIds = await getPreviouslyOwnedCardIds(); }
+        catch (collectionError) { console.warn("Impossible de charger les cartes déjà obtenues avant le tirage :", collectionError); }
         const response = await callSpinPremiumWheel({ requestId });
         void refreshCooperationProgress();
         localStorage.removeItem(requestStorageKey);
@@ -6428,6 +6449,13 @@ premiumSpinButton.addEventListener("click", async () => {
         document.getElementById("playerTokens").textContent = Number(data.tokens).toLocaleString("fr-FR");
         document.getElementById("playerBoosters").textContent = Number(data.boostersDisponibles).toLocaleString("fr-FR");
         setOpenBoosterButton(data.boostersDisponibles);
+        if (Number.isFinite(Number(data.cartesTirees))) document.getElementById("playerCards").textContent = Number(data.cartesTirees).toLocaleString("fr-FR");
+        if (Number.isFinite(Number(data.xp))) updatePlayerXpDisplay(data.xp);
+        const boosterResult = data.prize.boosterResult;
+        premiumPendingBoosterCards = boosterResult?.cards
+            ? markNewlyDiscoveredCards(boosterResult.cards, previouslyOwnedIds)
+            : [];
+        premiumPendingBoosterBonus = Number(boosterResult?.boostersOfferts) || 0;
         showPremiumPrizeReveal(data.prize);
         premiumStatus.textContent = "Cadeau obtenu : " + data.prize.name + " — " + premiumRewardDescription(data.prize) + ".";
         await loadPremiumJournal();
