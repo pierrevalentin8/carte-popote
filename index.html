@@ -1222,7 +1222,15 @@ body {
 .service-window-body { padding:clamp(12px,3vw,28px); }
 .service-choice-grid,.service-mission-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%,230px),1fr)); gap:14px; margin:18px 0; }
 .service-choice { min-height:130px; display:grid; place-content:center; justify-items:center; gap:8px; font-size:16px; }
-.service-choice span { font-size:36px; }
+.service-choice span { font-size:36px; }.service-collective-hours { max-width:760px; margin:18px auto 4px; padding:12px 14px 10px; border:3px outset #f4f4f4; background:#d4d0c8; color:#111; box-shadow:3px 3px 0 #333; font:13px Tahoma,Arial,sans-serif; }
+.service-collective-heading { display:flex; align-items:center; gap:10px; margin-bottom:9px; }
+.service-collective-heading > span { display:grid; width:38px; height:38px; flex:0 0 38px; place-items:center; border:2px outset #eee; background:#c0c0c0; font-size:22px; }
+.service-collective-heading div { display:grid; gap:3px; }
+.service-collective-heading strong { color:#000080; font-size:14px; }
+.service-collective-heading div span { font-weight:800; font-size:15px; font-variant-numeric:tabular-nums; }
+.service-collective-track { height:23px; overflow:hidden; padding:3px; border:2px inset #eee; background:#fff; box-shadow:inset 1px 1px 2px #777; }
+.service-collective-fill { width:0%; height:100%; border:1px solid #041c52; background:repeating-linear-gradient(90deg,#1757b6 0 12px,#307ce0 12px 17px,#1757b6 17px 22px); box-shadow:inset 0 1px rgba(255,255,255,.55); transition:width .8s ease; }
+.service-collective-caption { margin:6px 0 0; color:#333; font-size:11px; font-weight:700; text-align:right; font-variant-numeric:tabular-nums; }
 .service-mission-card,.service-admin-card { border:2px outset #eee; background:#d4d0c8; padding:12px; }
 .service-mission-card img,.service-admin-card img { display:block; width:min(100%,180px); max-height:130px; object-fit:contain; margin:0 auto 8px; }
 .service-admin-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; }
@@ -2218,7 +2226,7 @@ body {
 .profile-level-heading span, .profile-xp-caption { color: #d7e0ef; }
 .profile-xp-track { height: 12px; border: 2px solid #ad8740; background: #07152e; }
 .profile-xp-fill { background: linear-gradient(90deg,#d89b12,#ffe47b,#f4bd30); box-shadow: 0 0 9px rgba(255,218,100,.45); }
-.profile-stats-grid { grid-template-columns: repeat(4,minmax(0,1fr)); gap: 0; margin-top: 17px; border: 1px solid rgba(231,193,91,.52); border-radius: 12px; background: rgba(2,12,29,.55); }
+.profile-stats-grid { grid-template-columns: repeat(auto-fit,minmax(140px,1fr)); gap: 0; margin-top: 17px; border: 1px solid rgba(231,193,91,.52); border-radius: 12px; background: rgba(2,12,29,.55); }
 .profile-stat { position: relative; min-height: 82px; flex-direction: row; justify-content: center; gap: 8px; padding: 12px 8px; border: 0; border-radius: 0; background: transparent; color: #f8f3e6; box-shadow: none; }
 .profile-stat + .profile-stat { border-left: 1px solid rgba(231,193,91,.42); }
 .profile-stats-grid > .profile-stat:last-child:nth-child(odd) { grid-column: auto; }
@@ -2263,7 +2271,7 @@ body {
 .profile-identity-editor { margin-top: 14px; }
 .profile-badges { margin-top: 15px; }
 .profile-roadmap-visual-hidden { display: none !important; }
-@media (max-width: 620px) { .profile-card-identity { grid-template-columns: 108px minmax(0,1fr); gap: 13px; padding-right: 38px; } .profile-avatar-frame { width: 108px; height: 142px; } .profile-name-line { gap: 5px; } .profile-name-line h2 { padding: 6px 9px; font-size: clamp(19px,5.4vw,27px); } .profile-premium-badge { width: 36px; height: 36px; flex-basis: 36px; } .profile-edit-icon { top: 12px; right: 12px; width: 42px; height: 42px; } .profile-stats-grid { grid-template-columns: repeat(2,minmax(0,1fr)); } .profile-stat { min-height: 66px; justify-content: flex-start; padding: 8px 10px; } .profile-stat:nth-child(3) { border-left: 0; border-top: 1px solid rgba(231,193,91,.42); } .profile-stat:nth-child(4) { border-top: 1px solid rgba(231,193,91,.42); } }
+@media (max-width: 620px) { .profile-card-identity { grid-template-columns: 108px minmax(0,1fr); gap: 13px; padding-right: 38px; } .profile-avatar-frame { width: 108px; height: 142px; } .profile-name-line { gap: 5px; } .profile-name-line h2 { padding: 6px 9px; font-size: clamp(19px,5.4vw,27px); } .profile-premium-badge { width: 36px; height: 36px; flex-basis: 36px; } .profile-edit-icon { top: 12px; right: 12px; width: 42px; height: 42px; } .profile-stats-grid { grid-template-columns: repeat(2,minmax(0,1fr)); } .profile-stat { min-height: 66px; justify-content: flex-start; padding: 8px 10px; } .profile-stat:nth-child(odd) { border-left: 0; } .profile-stat:nth-child(n+3) { border-top: 1px solid rgba(231,193,91,.42); } }
 @media (max-width: 390px) { .profile-card-identity { grid-template-columns: 88px minmax(0,1fr); gap: 9px; padding-right: 34px; } .profile-avatar-frame { width: 88px; height: 120px; } .profile-account-dates { font-size: 10px; } .profile-stat-icon { font-size: 17px; } .profile-stat-label { font-size: 10px; } }
 .leaderboard-page { width: 100%; max-width: 900px; min-height: calc(100dvh - 70px); margin: auto; padding: 24px 16px 100px; color: var(--theme-cream); }
 .exchange-page { width: 100%; max-width: 980px; min-height: calc(100dvh - 70px); margin: auto; padding: 24px 16px 100px; color: var(--theme-cream); }
@@ -2916,6 +2924,11 @@ body {
                     <span id="profileCardsCollected" class="profile-stat-value">0</span>
                     <span class="profile-stat-label">Cartes collectées</span>
                 </article>
+                <article class="profile-stat">
+                    <span class="profile-stat-icon" aria-hidden="true">🕒</span>
+                    <span id="profileServiceTime" class="profile-stat-value">0 h 00</span>
+                    <span class="profile-stat-label">Temps de Service</span>
+                </article>
                 <article id="profilePremiumSpendingCard" class="profile-stat hidden">
                     <img loading="lazy" decoding="async" class="profile-stat-icon profile-stat-icon-image" src="./Jeton%20premium.png" alt="">
                     <span id="profilePremiumSpending" class="profile-stat-value">0 €</span>
@@ -3110,7 +3123,7 @@ body {
         <div class="service-window">
             <div class="service-titlebar"><span aria-hidden="true">📁</span><strong id="archivesPageTitle">Service</strong><div class="service-window-controls"><button type="button" aria-label="Réduire">_</button><button type="button" aria-label="Agrandir">□</button><button id="archivesBackButton" type="button" aria-label="Fermer">×</button></div></div>
             <div class="service-window-body">
-                <div id="serviceHomeView"><h2>Choisis ta mission</h2><div class="service-choice-grid"><button class="service-button service-choice" type="button" data-service-type="internal"><span>🗂️</span>Service interne</button><button class="service-button service-choice" type="button" data-service-type="external"><span>🌍</span>Service externe</button></div></div>
+                <div id="serviceHomeView"><h2>Choisis ta mission</h2><div class="service-choice-grid"><button class="service-button service-choice" type="button" data-service-type="internal"><span>🗂️</span>Service interne</button><button class="service-button service-choice" type="button" data-service-type="external"><span>🌍</span>Service externe</button></div><section class="service-collective-hours" aria-labelledby="serviceCollectiveTitle"><div class="service-collective-heading"><span aria-hidden="true">⏱️</span><div><strong id="serviceCollectiveTitle">Temps de Service collectif</strong><span id="serviceCollectiveValue">0 h 00 cumulées</span></div></div><div id="serviceCollectiveTrack" class="service-collective-track" role="progressbar" aria-label="Progression du temps collectif vers le prochain repère de 100 heures" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><div id="serviceCollectiveFill" class="service-collective-fill"></div></div><p id="serviceCollectiveCaption" class="service-collective-caption">0 h / 100 h vers le prochain repère</p></section></div>
                 <div id="serviceMissionsView" class="hidden"><button id="serviceMissionsBack" type="button" class="service-button">← Retour</button><h2 id="serviceMissionsTitle"></h2><div id="serviceMissionsList" class="service-mission-grid"></div></div>
                 <div id="serviceActiveView" class="hidden"><h2>Mission en cours</h2><img loading="lazy" decoding="async" id="serviceActiveImage" class="service-active-image hidden" alt=""><div class="service-active-details"><strong id="serviceActiveName"></strong><p id="serviceActiveDescription"></p><p>Durée : <span id="serviceActiveDuration"></span></p><p>Récompense : <span id="serviceActiveReward"></span></p></div><p id="serviceActiveCountdown" class="service-active-countdown" aria-live="polite"></p><button id="serviceClaimButton" class="service-button hidden" type="button">Récupérer ma récompense</button></div>
                 <div id="archivesLegacyView" class="hidden"><label for="archivesMiningSelect">Minage existant</label><select id="archivesMiningSelect" class="admin-field" aria-describedby="archivesMiningDescription"></select><img loading="lazy" decoding="async" id="archivesMiningImage" class="archives-minage-image hidden" alt="Illustration du minage"><p id="archivesMiningDescription" class="archives-description">Envoie le GAV trier les archives. Il trouvera peut-être des jetons classiques pour toi.</p><div class="archives-action-wrap"><span id="archivesCountdown" class="archives-countdown hidden" aria-live="polite"></span><button id="sortArchivesButton" class="primary-button" type="button" disabled>Lancer le minage</button><p id="archivesStatus" class="archives-status" role="status" aria-live="polite"></p></div></div>
@@ -4275,6 +4288,7 @@ let viewedOtherPlayerId = null;
 const profileTokensEarned = document.getElementById("profileTokensEarned");
 const profileClassicBoostersOpened = document.getElementById("profileClassicBoostersOpened");
 const profileCardsCollected = document.getElementById("profileCardsCollected");
+const profileServiceTime = document.getElementById("profileServiceTime");
 const profileHistorySection = document.getElementById("profileHistory");
 const profileCalendarGrid = document.getElementById("profileCalendarGrid");
 const profileCalendarMonth = document.getElementById("profileCalendarMonth");
@@ -4335,7 +4349,14 @@ const serviceActiveView = document.getElementById("serviceActiveView");
 const serviceLegacyView = document.getElementById("archivesLegacyView");
 const serviceMissionsList = document.getElementById("serviceMissionsList");
 const serviceStatus = document.getElementById("serviceStatus");
+const serviceCollectiveValue = document.getElementById("serviceCollectiveValue");
+const serviceCollectiveTrack = document.getElementById("serviceCollectiveTrack");
+const serviceCollectiveFill = document.getElementById("serviceCollectiveFill");
+const serviceCollectiveCaption = document.getElementById("serviceCollectiveCaption");
 let serviceMissions = [];
+let serviceCollectiveWorkBaseMs = 0;
+let serviceCollectiveActiveTasks = [];
+let serviceCollectiveRefreshTimer = null;
 let selectedServiceMissionId = "";
 let serviceActiveMission = null;
 let serviceCountdownInterval = null;
@@ -4942,6 +4963,10 @@ onAuthStateChanged(
            ========================================== */
 
         if (!user) {
+            if (serviceCollectiveRefreshTimer) window.clearInterval(serviceCollectiveRefreshTimer);
+            serviceCollectiveRefreshTimer = null;
+            serviceCollectiveActiveTasks = [];
+            serviceCollectiveWorkBaseMs = 0;
             if (mysticRewardShowTimer) window.clearInterval(mysticRewardShowTimer);
             mysticRewardShowTimer = null;
             pendingMysticPullNotices = [];
@@ -5240,6 +5265,8 @@ buyNormalBoosterButton.addEventListener("click", async () => {
 });
 
 function showHomePage() {
+    if (serviceCollectiveRefreshTimer) window.clearInterval(serviceCollectiveRefreshTimer);
+    serviceCollectiveRefreshTimer = null;
     adminHubReturnPending = false;
     document.querySelector(".app-content").classList.remove("hidden");
     adminHubPage.classList.add("hidden");
@@ -6700,6 +6727,14 @@ function formatProfileDate(value) {
     return new Intl.DateTimeFormat("fr-FR", dateOnly ? { dateStyle: "long" } : { dateStyle: "medium", timeStyle: "short" }).format(date);
 }
 
+function formatServiceWorkDuration(milliseconds) {
+    const safeMs = Number.isFinite(Number(milliseconds)) ? Math.max(0, Number(milliseconds)) : 0;
+    const totalMinutes = Math.floor(safeMs / 60000);
+    const hours = Math.floor(totalMinutes / 60);
+    const minutes = totalMinutes % 60;
+    return `${hours.toLocaleString("fr-FR")} h ${String(minutes).padStart(2, "0")}`;
+}
+
 function getDailyStreakTier(streak) {
     if (streak >= 100) return { label: "violette", image: "./flamme-violette.png" };
     if (streak >= 30) return { label: "or", image: "./flamme-or.png" };
@@ -6879,6 +6914,7 @@ async function loadPersonalProfile(playerId = auth.currentUser?.uid) {
                 player.hasPremiumBadge = spendingResponse.data.hasPremiumBadge === true;
             player.badgeEquipped = player.badgeEquipped || "";
                 const badgeResponse = await callGetPublicPlayerProfile({ playerId });
+                player.serviceTimeMs = Number(badgeResponse.data.serviceTimeMs) || 0;
                 const serverTokenTotal = Number(badgeResponse.data.classicTokensEarned);
                 if (Number.isSafeInteger(serverTokenTotal) && serverTokenTotal >= 0) {
                     profileTokensEarned.textContent = serverTokenTotal.toLocaleString("fr-FR");
@@ -6905,6 +6941,7 @@ async function loadPersonalProfile(playerId = auth.currentUser?.uid) {
         }
         const createdAt = player.createdAt || player.accountCreatedAt || player.dateCreation;
         document.getElementById("profileAccountDates").textContent = createdAt ? "Compte créé le " + formatProfileDate(createdAt) : "Date de création indisponible";
+        profileServiceTime.textContent = formatServiceWorkDuration(player.serviceTimeMs ?? player.archivesTotalWorkMs ?? 0);
         renderDailyStreakBadge(document.getElementById("profileDailyStreak"), Number(player.boosterJournalierStreak) || 0, "profileDailyStreakCount");
         profilePageAvatar.replaceChildren();
         const badgeDetails = {
@@ -9586,6 +9623,28 @@ function setServiceView(view) {
     serviceLegacyView.classList.toggle("hidden", view !== "legacy");
 }
 
+function updateServiceCollectiveGauge() {
+    if (!serviceCollectiveTrack || !serviceCollectiveFill || !serviceCollectiveValue || !serviceCollectiveCaption) return;
+    if (archivesPage.classList.contains("hidden")) return;
+    const now = Date.now();
+    const activeMs = serviceCollectiveActiveTasks.reduce((sum, task) => {
+        const startedAt = Number(task.startedAt);
+        const durationMs = Number(task.durationMs);
+        if (!Number.isFinite(startedAt) || !Number.isFinite(durationMs) || durationMs <= 0) return sum;
+        return sum + Math.min(durationMs, Math.max(0, now - startedAt));
+    }, 0);
+    const totalMs = Math.max(0, serviceCollectiveWorkBaseMs + activeMs);
+    const intervalMs = 100 * 60 * 60 * 1000;
+    const currentSegmentMs = totalMs % intervalMs;
+    const progress = Math.min(100, currentSegmentMs / intervalMs * 100);
+    const totalHours = Math.floor(totalMs / 3600000);
+    const nextMarker = (Math.floor(totalHours / 100) + 1) * 100;
+    serviceCollectiveValue.textContent = `${formatServiceWorkDuration(totalMs)} cumulées`;
+    serviceCollectiveCaption.textContent = `${formatServiceWorkDuration(currentSegmentMs)} / 100 h · prochain repère : ${nextMarker.toLocaleString("fr-FR")} h`;
+    serviceCollectiveFill.style.width = `${progress}%`;
+    serviceCollectiveTrack.setAttribute("aria-valuenow", String(Math.round(progress)));
+}
+
 function renderServiceMissions(type) {
     serviceMissionsList.replaceChildren();
     const items = serviceMissions.filter((mission) => mission.serviceType === type);
@@ -9667,6 +9726,17 @@ async function loadServicePage() {
     try {
         const [response, oldResponse] = await Promise.all([callGetServiceMissions(), callGetArchivesTaskStatus()]);
         serviceMissions = Array.isArray(response.data?.missions) ? response.data.missions : [];
+        serviceCollectiveActiveTasks = Array.isArray(response.data?.collectiveServiceActiveTasks) ? response.data.collectiveServiceActiveTasks : [];
+        const responseNow = Date.now();
+        const activeMsAtResponse = serviceCollectiveActiveTasks.reduce((sum, task) => {
+            const startedAt = Number(task.startedAt);
+            const durationMs = Number(task.durationMs);
+            return sum + (Number.isFinite(startedAt) && Number.isFinite(durationMs) && durationMs > 0
+                ? Math.min(durationMs, Math.max(0, responseNow - startedAt)) : 0);
+        }, 0);
+        serviceCollectiveWorkBaseMs = Math.max(0, (Number(response.data?.collectiveServiceWorkMs) || 0) - activeMsAtResponse);
+        updateServiceCollectiveGauge();
+        if (!serviceCollectiveRefreshTimer) serviceCollectiveRefreshTimer = window.setInterval(updateServiceCollectiveGauge, 1000);
         if (response.data?.active) { renderServiceActiveMission(response.data.active); serviceStatus.textContent = ""; return; }
         const legacy = oldResponse.data || {};
         if (legacy.readyAt) {
