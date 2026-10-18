@@ -1532,8 +1532,14 @@ body {
 .premium-wheel { position:absolute;top:50%;left:0;width:100%;height:1px;transform-style:preserve-3d;transform:translateY(-50%) rotateX(0deg);will-change:transform; }
 .premium-wheel-panel { position:absolute;top:0;left:0;display:flex;width:100%;height:var(--panel-height,90px);align-items:center;gap:clamp(6px,2vw,18px);overflow:hidden;padding:8px clamp(10px,3vw,25px);border:3px solid #fff0b4;border-radius:8px;background:linear-gradient(110deg,var(--panel-color,#6f28a0),#29113f 62%,var(--panel-color,#6f28a0));color:#fff9e9;box-shadow:inset 0 0 0 2px rgba(255,255,255,.18),inset 0 0 18px rgba(255,220,123,.25),0 5px 12px rgba(0,0,0,.62);backface-visibility:hidden;transform:rotateX(var(--panel-angle)) translateZ(var(--reel-radius)); }
 .premium-wheel-panel::after {position:absolute;inset:3px;border:1px solid rgba(255,225,139,.7);border-radius:5px;content:"";pointer-events:none;}
-.premium-wheel-panel-illustration {display:grid;flex:0 0 clamp(42px,10vw,76px);width:clamp(42px,10vw,76px);height:70%;place-items:center;border:2px solid #f7d267;border-radius:10px;background:linear-gradient(145deg,rgba(255,255,255,.22),rgba(38,10,54,.5));font-size:clamp(24px,6vw,42px);filter:drop-shadow(0 3px 3px rgba(0,0,0,.5));}
-.premium-wheel-panel-illustration img {width:85%;height:85%;object-fit:contain;}
+.premium-wheel-panel-illustration {position:relative;display:grid;flex:0 0 clamp(46px,10vw,76px);width:clamp(46px,10vw,76px);height:clamp(46px,10vw,76px);place-items:center;overflow:hidden;border:2px solid #fff0a8;border-radius:50%;background:radial-gradient(circle at 34% 25%,#fff9d8 0 5%,#ffe78c 9%,#d18a25 34%,#76338e 68%,#281044 100%);box-shadow:inset 0 2px 4px rgba(255,255,255,.82),inset 0 -5px 9px rgba(30,6,47,.75),0 0 0 3px rgba(44,13,62,.8),0 0 13px rgba(255,218,103,.72),0 4px 8px rgba(0,0,0,.55);font-size:clamp(24px,6vw,42px);filter:drop-shadow(0 2px 2px rgba(0,0,0,.38));}
+.premium-wheel-panel-illustration::before {position:absolute;inset:5px;border:1px solid rgba(255,255,226,.72);border-radius:50%;content:"";box-shadow:inset 0 0 7px rgba(255,247,192,.4);pointer-events:none;}
+.premium-wheel-panel-illustration::after {position:absolute;top:-25%;left:-45%;width:38%;height:155%;transform:rotate(35deg);background:linear-gradient(90deg,transparent,rgba(255,255,255,.34),transparent);content:"";pointer-events:none;}
+.premium-wheel-panel-illustration-icon {position:relative;z-index:1;display:grid;width:78%;height:78%;place-items:center;border-radius:50%;background:radial-gradient(circle at 35% 25%,rgba(255,255,255,.42),rgba(255,255,255,.08) 52%,rgba(29,7,48,.22));text-shadow:0 2px 2px rgba(27,7,41,.75),0 0 9px rgba(255,240,174,.65);}
+.premium-wheel-panel-illustration[data-reward-type="premium"] {background:radial-gradient(circle at 34% 25%,#f8eaff 0 5%,#e6aaff 10%,#9839d0 38%,#3c176d 72%,#170d37 100%);box-shadow:inset 0 2px 4px rgba(255,255,255,.85),inset 0 -5px 9px rgba(30,6,47,.75),0 0 0 3px rgba(44,13,62,.8),0 0 15px rgba(222,123,255,.78),0 4px 8px rgba(0,0,0,.55);}
+.premium-wheel-panel-illustration[data-reward-type="booster"] {background:radial-gradient(circle at 34% 25%,#eaffff 0 5%,#8de9ff 10%,#258ed1 38%,#17407f 72%,#101d45 100%);}
+.premium-wheel-panel-illustration[data-reward-type="card"] {background:radial-gradient(circle at 34% 25%,#fff8df 0 5%,#ffdc8b 10%,#d48735 38%,#733384 72%,#251044 100%);}
+.premium-wheel-panel-illustration-icon img {width:88%;height:88%;object-fit:contain;filter:drop-shadow(0 2px 2px rgba(0,0,0,.48));}
 .premium-wheel-panel-copy {min-width:0;text-align:left;text-shadow:0 2px 2px #15081e;}
 .premium-wheel-panel-name {display:block;overflow:hidden;color:#fff9e9;font-size:clamp(14px,3.6vw,24px);font-weight:1000;line-height:1.08;text-overflow:ellipsis;text-transform:uppercase;white-space:nowrap;}
 .premium-wheel-panel-detail {display:block;margin-top:4px;color:#ffe08a;font-size:clamp(10px,2.7vw,17px);font-weight:900;line-height:1.1;text-transform:uppercase;}
@@ -5486,8 +5492,12 @@ function renderPremiumPrizeList(prizes) {
 
         const illustration = document.createElement("span");
         illustration.className = "premium-wheel-panel-illustration";
+        illustration.dataset.rewardType = prize.rewardType || "mystery";
         illustration.setAttribute("aria-hidden", "true");
-        illustration.textContent = isAdminView ? (icons[prize.rewardType] || "🎁") : "✨";
+        const illustrationIcon = document.createElement("span");
+        illustrationIcon.className = "premium-wheel-panel-illustration-icon";
+        illustrationIcon.textContent = isAdminView ? (icons[prize.rewardType] || "🎁") : "✨";
+        illustration.append(illustrationIcon);
         const copy = document.createElement("span");
         copy.className = "premium-wheel-panel-copy";
         const name = document.createElement("strong");
