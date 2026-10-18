@@ -6946,7 +6946,10 @@ async function loadPersonalProfile(playerId = auth.currentUser?.uid) {
         profilePageAvatar.replaceChildren();
         const badgeDetails = {
             "premium-10": { image: "./badge-premium-10.png", label: "Badge Premium 10 €" },
+            "premium-50": { image: "./premium%2050.png", label: "Badge Premium 50 €" },
+            "premium-100": { image: "./premium%20100.png", label: "Badge Premium 100 €" },
             "common-season-1": { image: "./badge-communes-27.png", label: "Badge : 27 cartes communes" },
+            "season-1-complete": { image: "./Saison%201.png", label: "Collection complète • Saison 1" },
             "classic-tokens-100": { image: "./badge-jetons-classiques-100.png", label: "100 jetons gagnés" },
             "classic-tokens-300": { image: "./badge-jetons-classiques-300.png", label: "300 jetons classiques gagnés" },
             "classic-tokens-500": { image: "./badge-jetons-classiques-500.png", label: "500 jetons classiques gagnés" },
@@ -6991,7 +6994,10 @@ function renderProfileBadges(player, isOwnProfile) {
     profileBadgeList.replaceChildren();
     const badgeCatalog = {
         "premium-10": { id: "premium-10", label: "Premium 10 €", image: "./badge-premium-10.png" },
+        "premium-50": { id: "premium-50", label: "Premium 50 €", image: "./premium%2050.png" },
+        "premium-100": { id: "premium-100", label: "Premium 100 €", image: "./premium%20100.png" },
         "common-season-1": { id: "common-season-1", label: "27 cartes communes • Saison 1", image: "./badge-communes-27.png" },
+        "season-1-complete": { id: "season-1-complete", label: "Collection complète • Saison 1", image: "./Saison%201.png" },
         "classic-tokens-100": { id: "classic-tokens-100", label: "100 jetons gagnés", image: "./badge-jetons-classiques-100.png" },
         "classic-tokens-300": { id: "classic-tokens-300", label: "300 jetons classiques gagnés", image: "./badge-jetons-classiques-300.png" },
         "classic-tokens-500": { id: "classic-tokens-500", label: "500 jetons classiques gagnés", image: "./badge-jetons-classiques-500.png" },
@@ -7278,10 +7284,13 @@ async function loadLeaderboard() {
             level.textContent = "Niveau " + (Number(player.niveau) || 1);
             nameLine.append(name);
             const eventBadge = (player.eventBadges || []).find((badge) => badge.id === player.badgeEquipped);
-            if (["premium-10", "common-season-1", "classic-tokens-100", "classic-tokens-300", "classic-tokens-500", "service-50h", "service-200h", "service-500h", "level-5", "level-10", "level-15"].includes(player.badgeEquipped) || eventBadge) {
+            if (["premium-10", "premium-50", "premium-100", "common-season-1", "season-1-complete", "classic-tokens-100", "classic-tokens-300", "classic-tokens-500", "service-50h", "service-200h", "service-500h", "level-5", "level-10", "level-15"].includes(player.badgeEquipped) || eventBadge) {
                 const badge = document.createElement("img");
                 badge.className = "leaderboard-badge";
-                const badgeImage = eventBadge?.imageUrl || (player.badgeEquipped === "common-season-1"
+                const badgeImage = eventBadge?.imageUrl || (player.badgeEquipped === "premium-50" ? "./premium%2050.png"
+                    : player.badgeEquipped === "premium-100" ? "./premium%20100.png"
+                    : player.badgeEquipped === "season-1-complete" ? "./Saison%201.png"
+                    : player.badgeEquipped === "common-season-1"
                     ? "./badge-communes-27.png"
                     : player.badgeEquipped === "classic-tokens-100" ? "./badge-jetons-classiques-100.png"
                         : player.badgeEquipped === "classic-tokens-300" ? "./badge-jetons-classiques-300.png"
@@ -7293,7 +7302,10 @@ async function loadLeaderboard() {
                                                 : player.badgeEquipped === "level-10" ? "./badge%20niv%2010.png"
                                                     : player.badgeEquipped === "level-15" ? "./badge%20niv%2015.png" : "./badge-premium-10.png");
                 badge.src = badgeImage;
-                badge.alt = eventBadge?.name || (player.badgeEquipped === "common-season-1"
+                badge.alt = eventBadge?.name || (player.badgeEquipped === "premium-50" ? "Badge Premium 50 €"
+                    : player.badgeEquipped === "premium-100" ? "Badge Premium 100 €"
+                    : player.badgeEquipped === "season-1-complete" ? "Badge collection complète de la saison 1"
+                    : player.badgeEquipped === "common-season-1"
                     ? "Badge 27 cartes communes"
                     : player.badgeEquipped === "classic-tokens-100" ? "100 jetons gagnés"
                         : player.badgeEquipped === "classic-tokens-300" ? "Badge 300 jetons classiques"
