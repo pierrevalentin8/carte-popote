@@ -1140,7 +1140,7 @@ body {
 .home-overview-premium { display: flex; min-width: 0; min-height: 62px; align-items: center; justify-content: center; justify-self: stretch; padding: 5px; border: 0; border-radius: 12px; background: transparent; box-shadow: none; font: inherit; cursor: pointer; }
 .home-overview-premium img { width: 48px; height: 48px; object-fit: contain; }
 .home-overview-premium:focus-visible { outline: 3px solid #f7d46b; outline-offset: 2px; }
-.home-overview-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin: 12px 0 18px; }
+.home-overview-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; margin: 12px 0 18px; }
 .home-card-count, .home-overview-grid .home-overview-premium { min-width: 0; min-height: 86px; margin: 0; padding: 10px; border: 1px solid rgba(243,191,56,.75); border-radius: 13px; background: linear-gradient(110deg, #10264a, #183966); color: #fbfaf5; box-shadow: 0 7px 17px rgba(0,0,0,.22); }
 .home-card-count { width: 100%; font: inherit; cursor: default; }
 .home-card-count:not(:disabled) { cursor: pointer; }
@@ -1148,6 +1148,9 @@ body {
 .home-card-count:disabled { opacity: 1; }
 .home-overview-leaderboard { display: flex; width: 100%; min-width: 0; min-height: 86px; align-items: center; justify-content: center; margin: 0; padding: 8px; border: 1px solid rgba(243,191,56,.75); border-radius: 13px; background: linear-gradient(110deg, #10264a, #183966); box-shadow: 0 7px 17px rgba(0,0,0,.22); cursor: pointer; }
 .home-overview-leaderboard img { width: min(100%, 78px); height: 72px; object-fit: contain; }
+.home-overview-activity { display:flex; width:100%; min-width:0; min-height:86px; align-items:center; justify-content:center; padding:8px; border:1px solid rgba(243,191,56,.75); border-radius:13px; background:linear-gradient(110deg,#10264a,#183966); box-shadow:0 7px 17px rgba(0,0,0,.22); cursor:pointer; }
+.home-overview-activity img { width:min(100%,78px); height:72px; object-fit:contain; }
+.home-overview-activity:focus-visible { outline:3px solid #f7d46b; outline-offset:3px; }
 .home-overview-leaderboard:focus-visible { outline: 3px solid #f7d46b; outline-offset: 3px; }
 .home-card-count-icon { width: 28px; height: 38px; }
 .home-card-count-value { font-size: 21px; }
@@ -1251,7 +1254,7 @@ body {
 .service-active-countdown { margin:14px 0; padding:10px; border:2px inset #eee; background:#000080; color:#fff; font-size:20px; font-weight:bold; text-align:center; font-variant-numeric:tabular-nums; }
 .service-win-status { min-height:22px; margin:10px 0 0; }
 @media(max-width:760px){.service-admin-grid{grid-template-columns:1fr}.service-admin-header{display:none}.service-admin-row{grid-template-columns:1fr 1fr}.service-admin-row>*:first-child,.service-admin-row>*:last-child{grid-column:1/-1}.service-row-actions{display:flex;flex-wrap:wrap}}
-@media (max-width: 600px) { .home-overview-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; } .home-overview-leaderboard { min-height: 78px; padding: 5px; } .home-overview-leaderboard img { height: 64px; } }
+@media (max-width: 600px) { .home-overview-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; } .home-overview-leaderboard, .home-overview-activity { min-height: 78px; padding: 5px; } .home-overview-leaderboard img, .home-overview-activity img { height: 64px; } }
 .home-site-note { display: grid; justify-items: center; gap: 7px; margin: 20px 0 88px; color: #c6d2e5; font-size: 11px; line-height: 1.45; text-align: center; }
 .home-site-note p { margin: 0; }
 .home-site-note a { color: #f7d46b; text-decoration: underline; text-underline-offset: 3px; }
@@ -2261,6 +2264,20 @@ body {
 @media (max-width: 620px) { .profile-card-identity { grid-template-columns: 108px minmax(0,1fr); gap: 13px; padding-right: 38px; } .profile-avatar-frame { width: 108px; height: 142px; } .profile-name-line { gap: 5px; } .profile-name-line h2 { padding: 6px 9px; font-size: clamp(19px,5.4vw,27px); } .profile-premium-badge { width: 36px; height: 36px; flex-basis: 36px; } .profile-edit-icon { top: 12px; right: 12px; width: 42px; height: 42px; } .profile-stats-grid { grid-template-columns: repeat(2,minmax(0,1fr)); } .profile-stat { min-height: 66px; justify-content: flex-start; padding: 8px 10px; } .profile-stat:nth-child(odd) { border-left: 0; } .profile-stat:nth-child(n+3) { border-top: 1px solid rgba(231,193,91,.42); } }
 @media (max-width: 390px) { .profile-card-identity { grid-template-columns: 88px minmax(0,1fr); gap: 9px; padding-right: 34px; } .profile-avatar-frame { width: 88px; height: 120px; } .profile-account-dates { font-size: 10px; } .profile-stat-icon { font-size: 17px; } .profile-stat-label { font-size: 10px; } }
 .leaderboard-page { width: 100%; max-width: 900px; min-height: calc(100dvh - 70px); margin: auto; padding: 24px 16px 100px; color: var(--theme-cream); }
+.activity-page { width:100%; max-width:1000px; min-height:calc(100dvh - 70px); margin:auto; padding:24px 16px 100px; color:var(--theme-cream); }
+.activity-page h2 { margin:20px 0 8px; color:var(--theme-gold-light); font-size:24px; }
+.activity-toolbar { display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; margin:14px 0; }
+.activity-toolbar p { margin:0; color:#c6d2e5; font-size:13px; }
+.activity-toolbar select { min-height:42px; padding:8px 12px; border:1px solid rgba(243,191,56,.8); border-radius:10px; background:#fffdf5; color:#17243a; font:inherit; font-weight:800; }
+.activity-status { margin:8px 0; color:#c6d2e5; font-size:13px; }
+.activity-list { display:grid; gap:9px; margin-top:14px; }
+.activity-row { display:grid; grid-template-columns:minmax(120px,190px) 16px minmax(80px,1fr) 56px; align-items:center; gap:8px; padding:12px 14px; border:1px solid rgba(243,191,56,.55); border-radius:12px; background:var(--theme-cream); color:var(--theme-ink); box-shadow:0 6px 16px rgba(0,0,0,.2); }
+.activity-player { overflow:hidden; font-size:14px; font-weight:800; text-overflow:ellipsis; white-space:nowrap; }
+.activity-zero { color:#758096; font-size:10px; font-weight:800; text-align:center; }
+.activity-track { height:16px; overflow:hidden; border:1px solid #b7c6db; border-radius:999px; background:linear-gradient(180deg,#e6edf5,#cbd6e3); box-shadow:inset 0 2px 4px #10264a22; }
+.activity-fill { height:100%; min-width:0; border-radius:inherit; background:linear-gradient(90deg,#28a6ee,#2460d5); box-shadow:inset 0 1px 2px #ffffff99,0 0 8px #2589e766; transition:width .35s ease; }
+.activity-value { color:#173e72; font-size:14px; font-weight:900; text-align:right; font-variant-numeric:tabular-nums; }
+@media (max-width:600px) { .activity-page { padding:18px 11px 92px; } .activity-row { grid-template-columns:minmax(80px,125px) 14px minmax(48px,1fr) 34px; gap:6px; padding:10px 8px; } .activity-player { font-size:12px; } .activity-value { font-size:11px; } .activity-track { height:14px; } }
 .exchange-page { width: 100%; max-width: 980px; min-height: calc(100dvh - 70px); margin: auto; padding: 24px 16px 100px; color: var(--theme-cream); }
 .exchange-page h2 { margin: 20px 0 8px; color: var(--theme-gold-light); font-size: 25px; }
 .exchange-intro { margin: 0 0 18px; color: #c6d2e5; font-size: 13px; line-height: 1.55; }
@@ -2675,6 +2692,9 @@ body {
             <button id="leaderboardMenuButton" class="home-overview-leaderboard" type="button" aria-label="Ouvrir le classement" title="Classement">
                 <img loading="lazy" decoding="async" src="./Classement.png" alt="">
             </button>
+            <button id="activityHomeButton" class="home-overview-activity" type="button" aria-label="Ouvrir la page Activité" title="Activité">
+                <img loading="lazy" decoding="async" src="./Activité.png" alt="">
+            </button>
             <div class="home-overview-archive">
                 <button id="archivesHomeButton" type="button" aria-label="Ouvrir la page Service" title="Service">
                     <img loading="lazy" decoding="async" src="./Service.png" alt="Service">
@@ -2993,6 +3013,23 @@ body {
         <p class="leaderboard-intro">Les points sont calculés sur les cartes uniques : commune 1 point, rare 2 points, légendaire 3 points et mystique 5 points. Clique sur un pseudo pour ouvrir son profil.</p>
         <p id="leaderboardStatus" class="leaderboard-status" role="status" aria-live="polite">Chargement du classement...</p>
         <div id="leaderboardList" class="leaderboard-list"></div>
+    </section>
+
+    <section id="activityPage" class="activity-page hidden" aria-labelledby="activityTitle">
+        <button id="activityBackButton" class="admin-back" type="button">← Retour à l’accueil</button>
+        <h2 id="activityTitle">📈 Activité hebdomadaire</h2>
+        <div class="activity-toolbar">
+            <p id="activityWeekLabel">Semaine en cours</p>
+            <label for="activityMetricSelect">Comparer :
+                <select id="activityMetricSelect">
+                    <option value="cardsDrawn">Cartes tirées</option>
+                    <option value="recycling">Recyclage</option>
+                    <option value="boostersOpened">Boosters ouverts</option>
+                </select>
+            </label>
+        </div>
+        <p id="activityStatus" class="activity-status" role="status" aria-live="polite">Chargement de l’activité…</p>
+        <div id="activityList" class="activity-list" aria-label="Comparaison des joueurs"></div>
     </section>
 
     <section id="statisticsPage" class="statistics-page hidden" aria-labelledby="statisticsTitle">
@@ -3734,6 +3771,7 @@ const callGetAdminPlayers = httpsCallable(functions, "getAdminPlayers");
 const callRecordHistoricalPremiumPayment = httpsCallable(functions, "recordHistoricalPremiumPayment");
 const callAdjustPlayerTokens = httpsCallable(functions, "adjustPlayerTokens");
 const callGetLeaderboard = httpsCallable(functions, "getLeaderboard");
+const callGetWeeklyActivity = httpsCallable(functions, "getWeeklyActivity");
 const callClaimMysticPullRewards = httpsCallable(functions, "claimMysticPullRewards");
 const callBuyClassicBooster = httpsCallable(functions, "buyClassicBooster");
 const callGetPublicCardCount = httpsCallable(functions, "getPublicCardCount");
@@ -4297,6 +4335,13 @@ const leaderboardPage = document.getElementById("leaderboardPage");
 const leaderboardBackButton = document.getElementById("leaderboardBackButton");
 const leaderboardStatus = document.getElementById("leaderboardStatus");
 const leaderboardList = document.getElementById("leaderboardList");
+const activityHomeButton = document.getElementById("activityHomeButton");
+const activityPage = document.getElementById("activityPage");
+const activityBackButton = document.getElementById("activityBackButton");
+const activityMetricSelect = document.getElementById("activityMetricSelect");
+const activityWeekLabel = document.getElementById("activityWeekLabel");
+const activityStatus = document.getElementById("activityStatus");
+const activityList = document.getElementById("activityList");
 const statisticsMenuButton = document.getElementById("statisticsMenuButton");
 const statisticsPage = document.getElementById("statisticsPage");
 const statisticsBackButton = document.getElementById("statisticsBackButton");
@@ -5005,7 +5050,7 @@ onAuthStateChanged(
             rulesPage.classList.add("hidden");
             profilePage.classList.add("hidden");
     exchangePage.classList.add("hidden");
-            leaderboardPage.classList.add("hidden");
+            leaderboardPage.classList.add("hidden"); activityPage.classList.add("hidden");
             statisticsPage.classList.add("hidden");
             drawnCardsPage.classList.add("hidden");
             collectionPage.classList.add("hidden");
@@ -5263,7 +5308,7 @@ function showHomePage() {
     financePage.classList.add("hidden");
     profilePage.classList.add("hidden");
     exchangePage.classList.add("hidden");
-    leaderboardPage.classList.add("hidden");
+    leaderboardPage.classList.add("hidden"); activityPage.classList.add("hidden");
     statisticsPage.classList.add("hidden");
     drawnCardsPage.classList.add("hidden");
     collectionPage.classList.add("hidden");
@@ -5289,7 +5334,7 @@ async function showExchangePage() {
     if (!auth.currentUser) return;
     dropdownMenu.classList.add("hidden");
     document.querySelector(".app-content").classList.add("hidden");
-    [termsPage, financePage, profilePage, leaderboardPage, statisticsPage, drawnCardsPage, collectionPage, exchangePage, recyclingPage, adminPage, eventBoostersAdminPage, effectifPage, messagingPage, rulesPage, premiumPage, archivesPage, adminHubPage, pollsAdminPage].forEach((page) => page.classList.add("hidden"));
+    [termsPage, financePage, profilePage, leaderboardPage, activityPage, statisticsPage, drawnCardsPage, collectionPage, exchangePage, recyclingPage, adminPage, eventBoostersAdminPage, effectifPage, messagingPage, rulesPage, premiumPage, archivesPage, adminHubPage, pollsAdminPage].forEach((page) => page.classList.add("hidden"));
     exchangePage.classList.remove("hidden");
     bottomNav.classList.add("hidden");
     exchangeMissingNumbers.replaceChildren();
@@ -5368,7 +5413,7 @@ async function showDrawnCardsPage() {
     if (!auth.currentUser || (auth.currentUser.email || "").toLowerCase() !== ADMIN_EMAIL || isPlayerPreview) return;
     dropdownMenu.classList.add("hidden");
     document.querySelector(".app-content").classList.add("hidden");
-    [termsPage, financePage, profilePage, leaderboardPage, statisticsPage, collectionPage, exchangePage, recyclingPage, adminPage, eventBoostersAdminPage, effectifPage, messagingPage, rulesPage, premiumPage, archivesPage].forEach((page) => page.classList.add("hidden"));
+    [termsPage, financePage, profilePage, leaderboardPage, activityPage, statisticsPage, collectionPage, exchangePage, recyclingPage, adminPage, eventBoostersAdminPage, effectifPage, messagingPage, rulesPage, premiumPage, archivesPage].forEach((page) => page.classList.add("hidden"));
     drawnCardsPage.classList.remove("hidden");
     bottomNav.classList.add("hidden");
     drawnCardsTotal.textContent = "Chargement du total…";
@@ -5509,7 +5554,7 @@ async function openArchivesPage() {
     if (!auth.currentUser) return;
     dropdownMenu.classList.add("hidden");
     document.querySelector(".app-content").classList.add("hidden");
-    [termsPage, financePage, profilePage, leaderboardPage, statisticsPage, collectionPage, exchangePage, recyclingPage, adminPage, eventBoostersAdminPage, effectifPage, messagingPage, rulesPage, premiumPage].forEach((page) => page.classList.add("hidden"));
+    [termsPage, financePage, profilePage, leaderboardPage, activityPage, statisticsPage, collectionPage, exchangePage, recyclingPage, adminPage, eventBoostersAdminPage, effectifPage, messagingPage, rulesPage, premiumPage].forEach((page) => page.classList.add("hidden"));
     bottomNav.classList.add("hidden");
     archivesPage.classList.remove("hidden");
     await loadServicePage();
@@ -6200,7 +6245,7 @@ financeMenuButton.addEventListener("click", async () => {
     if (!isCurrentUserAdmin() || isPlayerPreview) return;
     dropdownMenu.classList.add("hidden");
     document.querySelector(".app-content").classList.add("hidden");
-    [premiumPage, profilePage, leaderboardPage, statisticsPage, collectionPage, exchangePage, recyclingPage, adminPage, eventBoostersAdminPage, effectifPage, messagingPage, rulesPage].forEach((page) => page.classList.add("hidden"));
+    [premiumPage, profilePage, leaderboardPage, activityPage, statisticsPage, collectionPage, exchangePage, recyclingPage, adminPage, eventBoostersAdminPage, effectifPage, messagingPage, rulesPage].forEach((page) => page.classList.add("hidden"));
     bottomNav.classList.add("hidden");
     archivesPage.classList.add("hidden");
     financePage.classList.remove("hidden");
@@ -6268,7 +6313,7 @@ async function openPremiumPage() {
     document.querySelector(".app-content").classList.add("hidden");
     profilePage.classList.add("hidden");
     exchangePage.classList.add("hidden");
-    leaderboardPage.classList.add("hidden");
+    leaderboardPage.classList.add("hidden"); activityPage.classList.add("hidden");
     statisticsPage.classList.add("hidden");
     financePage.classList.add("hidden");
     collectionPage.classList.add("hidden");
@@ -7116,7 +7161,7 @@ playerProfileHomeButton.addEventListener("click", async () => {
     dropdownMenu.classList.add("hidden");
     premiumPage.classList.add("hidden");
     document.querySelector(".app-content").classList.add("hidden");
-    leaderboardPage.classList.add("hidden");
+    leaderboardPage.classList.add("hidden"); activityPage.classList.add("hidden");
     statisticsPage.classList.add("hidden");
     collectionPage.classList.add("hidden");
     recyclingPage.classList.add("hidden");
@@ -7260,7 +7305,7 @@ async function loadLeaderboard() {
                 viewedOtherPlayerId = player.id;
                 archivesPage.classList.add("hidden");
     profilePage.classList.remove("hidden");
-                leaderboardPage.classList.add("hidden");
+                leaderboardPage.classList.add("hidden"); activityPage.classList.add("hidden");
                 document.querySelector(".app-content").classList.add("hidden");
                 bottomNav.classList.add("hidden");
                 await loadPersonalProfile(player.id);
@@ -7396,7 +7441,7 @@ statisticsMenuButton.addEventListener("click", async () => {
     document.querySelector(".app-content").classList.add("hidden");
     profilePage.classList.add("hidden");
     exchangePage.classList.add("hidden");
-    leaderboardPage.classList.add("hidden");
+    leaderboardPage.classList.add("hidden"); activityPage.classList.add("hidden");
     collectionPage.classList.add("hidden");
     recyclingPage.classList.add("hidden");
     adminPage.classList.add("hidden");
@@ -7437,6 +7482,55 @@ leaderboardMenuButton.addEventListener("click", async () => {
 });
 
 leaderboardBackButton.addEventListener("click", showHomePage);
+
+const activityMetricLabels = { recycling: "Recyclages", cardsDrawn: "Cartes tirées", boostersOpened: "Boosters ouverts" };
+function formatActivityDate(value) {
+    const date = new Date(`${value}T00:00:00Z`);
+    return Number.isFinite(date.getTime()) ? new Intl.DateTimeFormat("fr-FR", { day: "numeric", month: "long", timeZone: "UTC" }).format(date) : value;
+}
+
+async function loadWeeklyActivity() {
+    if (!auth.currentUser) { activityStatus.textContent = "Connecte-toi pour consulter l’activité."; return; }
+    activityStatus.textContent = "Chargement de l’activité…";
+    activityList.replaceChildren();
+    try {
+        const metric = activityMetricSelect.value;
+        const response = (await callGetWeeklyActivity({ metric })).data || {};
+        const players = Array.isArray(response.players) ? response.players : [];
+        if (response.weekStart && response.weekEnd) activityWeekLabel.textContent = `Semaine du ${formatActivityDate(response.weekStart)} au ${formatActivityDate(response.weekEnd)} · ${activityMetricLabels[metric] || "Activité"}`;
+        const maxValue = Math.max(0, ...players.map((player) => Number(player.value) || 0));
+        players.forEach((player) => {
+            const value = Math.max(0, Number(player.value) || 0);
+            const row = document.createElement("article"); row.className = "activity-row";
+            const name = document.createElement("span"); name.className = "activity-player"; name.textContent = player.pseudo || "Joueur";
+            const zero = document.createElement("span"); zero.className = "activity-zero"; zero.textContent = "0"; zero.setAttribute("aria-hidden", "true");
+            const track = document.createElement("div"); track.className = "activity-track"; track.setAttribute("role", "progressbar");
+            track.setAttribute("aria-label", `${player.pseudo || "Joueur"} : ${value} ${activityMetricLabels[metric]?.toLocaleLowerCase("fr") || "activités"}`);
+            track.setAttribute("aria-valuemin", "0"); track.setAttribute("aria-valuemax", String(maxValue)); track.setAttribute("aria-valuenow", String(value));
+            const fill = document.createElement("div"); fill.className = "activity-fill"; fill.style.width = maxValue ? `${Math.max(0, Math.min(100, value / maxValue * 100))}%` : "0%"; track.append(fill);
+            const count = document.createElement("span"); count.className = "activity-value"; count.textContent = value.toLocaleString("fr-FR");
+            row.append(name, zero, track, count); activityList.append(row);
+        });
+        activityStatus.textContent = players.length ? `${players.length} joueur${players.length === 1 ? "" : "s"} · classés du plus actif au moins actif.` : "Aucun joueur inscrit.";
+    } catch (error) {
+        console.error("Impossible de charger l’activité hebdomadaire :", error);
+        activityStatus.textContent = error.message || "Impossible de charger l’activité hebdomadaire. Vérifie que la fonction Firebase est déployée.";
+    }
+}
+
+async function openActivityPage() {
+    if (!auth.currentUser) return;
+    dropdownMenu.classList.add("hidden");
+    document.querySelector(".app-content").classList.add("hidden");
+    [termsPage, financePage, profilePage, leaderboardPage, activityPage, statisticsPage, drawnCardsPage, collectionPage, exchangePage, recyclingPage, adminPage, eventBoostersAdminPage, effectifPage, messagingPage, rulesPage, premiumPage, archivesPage, adminHubPage, pollsAdminPage].forEach((page) => page.classList.add("hidden"));
+    activityPage.classList.remove("hidden");
+    bottomNav.classList.add("hidden");
+    await loadWeeklyActivity();
+}
+
+activityHomeButton.addEventListener("click", openActivityPage);
+activityBackButton.addEventListener("click", showHomePage);
+activityMetricSelect.addEventListener("change", loadWeeklyActivity);
 
 async function loadOwnedPlayerCards() {
     ownedPlayerCardGrid.replaceChildren();
@@ -8853,7 +8947,7 @@ collectionNavButton.addEventListener("click", async () => {
     document.querySelector(".app-content").classList.add("hidden");
     profilePage.classList.add("hidden");
     exchangePage.classList.add("hidden");
-    leaderboardPage.classList.add("hidden");
+    leaderboardPage.classList.add("hidden"); activityPage.classList.add("hidden");
     statisticsPage.classList.add("hidden");
     adminPage.classList.add("hidden");
     effectifPage.classList.add("hidden");
@@ -8873,7 +8967,7 @@ recyclingNavButton.addEventListener("click", async () => {
     document.querySelector(".app-content").classList.add("hidden");
     profilePage.classList.add("hidden");
     exchangePage.classList.add("hidden");
-    leaderboardPage.classList.add("hidden");
+    leaderboardPage.classList.add("hidden"); activityPage.classList.add("hidden");
     statisticsPage.classList.add("hidden");
     collectionPage.classList.add("hidden");
     adminPage.classList.add("hidden");
@@ -9427,7 +9521,7 @@ document.getElementById("eventBoosterCancelEditButton").addEventListener("click"
 eventBoostersMenuButton.addEventListener("click", async () => {
     if (!isCurrentUserAdmin() || isPlayerPreview) return;
     dropdownMenu.classList.add("hidden");
-    [termsPage, financePage, profilePage, leaderboardPage, statisticsPage, drawnCardsPage, collectionPage, exchangePage, recyclingPage,
+    [termsPage, financePage, profilePage, leaderboardPage, activityPage, statisticsPage, drawnCardsPage, collectionPage, exchangePage, recyclingPage,
         adminPage, effectifPage, messagingPage, rulesPage, premiumPage, archivesPage].forEach((page) => page.classList.add("hidden"));
     document.querySelector(".app-content").classList.add("hidden");
     bottomNav.classList.add("hidden");
@@ -10639,7 +10733,7 @@ async function openPollAdminPage() {
     adminHubReturnPending = true;
     adminHubPage.classList.add("hidden");
     document.querySelector(".app-content").classList.add("hidden");
-    [termsPage, financePage, profilePage, leaderboardPage, statisticsPage, drawnCardsPage, collectionPage, exchangePage, recyclingPage,
+    [termsPage, financePage, profilePage, leaderboardPage, activityPage, statisticsPage, drawnCardsPage, collectionPage, exchangePage, recyclingPage,
         adminPage, effectifPage, eventBoostersAdminPage, messagingPage, rulesPage, premiumPage, archivesPage].forEach((page) => page.classList.add("hidden"));
     pollsAdminPage.classList.remove("hidden");
     bottomNav.classList.add("hidden");
@@ -10652,7 +10746,7 @@ function openAdminHub() {
     dropdownMenu.classList.add("hidden");
     document.querySelector(".app-content").classList.add("hidden");
     pollsAdminPage.classList.add("hidden");
-    [termsPage, financePage, profilePage, leaderboardPage, statisticsPage, drawnCardsPage, collectionPage, exchangePage, recyclingPage,
+    [termsPage, financePage, profilePage, leaderboardPage, activityPage, statisticsPage, drawnCardsPage, collectionPage, exchangePage, recyclingPage,
         adminPage, effectifPage, eventBoostersAdminPage, messagingPage, rulesPage, premiumPage, archivesPage].forEach((page) => page.classList.add("hidden"));
     adminHubPage.classList.remove("hidden");
     bottomNav.classList.add("hidden");
@@ -10700,7 +10794,7 @@ adminButton.addEventListener("click", async () => {
     document.querySelector(".app-content").classList.add("hidden");
     profilePage.classList.add("hidden");
     exchangePage.classList.add("hidden");
-    leaderboardPage.classList.add("hidden");
+    leaderboardPage.classList.add("hidden"); activityPage.classList.add("hidden");
     statisticsPage.classList.add("hidden");
     collectionPage.classList.add("hidden");
     recyclingPage.classList.add("hidden");
@@ -10717,7 +10811,7 @@ adminButton.addEventListener("click", async () => {
 effectifMenuButton.addEventListener("click", async () => {
     if (!auth.currentUser || (auth.currentUser.email || "").toLowerCase() !== ADMIN_EMAIL || isPlayerPreview) return;
     dropdownMenu.classList.add("hidden");
-    [termsPage, financePage, premiumPage, profilePage, leaderboardPage, statisticsPage, drawnCardsPage, collectionPage,
+    [termsPage, financePage, premiumPage, profilePage, leaderboardPage, activityPage, statisticsPage, drawnCardsPage, collectionPage,
         recyclingPage, adminPage, eventBoostersAdminPage, effectifPage, messagingPage, rulesPage, archivesPage].forEach((page) => page.classList.add("hidden"));
     document.querySelector(".app-content").classList.add("hidden");
     bottomNav.classList.add("hidden");
@@ -10733,7 +10827,7 @@ adminMessagesMenuButton.addEventListener("click", async () => {
     document.querySelector(".app-content").classList.add("hidden");
     profilePage.classList.add("hidden");
     exchangePage.classList.add("hidden");
-    leaderboardPage.classList.add("hidden");
+    leaderboardPage.classList.add("hidden"); activityPage.classList.add("hidden");
     statisticsPage.classList.add("hidden");
     collectionPage.classList.add("hidden");
     recyclingPage.classList.add("hidden");
@@ -10754,7 +10848,7 @@ document.querySelectorAll(".admin-menu-button").forEach((button) => {
         if (button.closest("#adminHubPage")) {
             adminHubPage.classList.add("hidden");
             document.querySelector(".app-content").classList.add("hidden");
-            [termsPage, financePage, profilePage, leaderboardPage, statisticsPage, drawnCardsPage, collectionPage, exchangePage, recyclingPage,
+            [termsPage, financePage, profilePage, leaderboardPage, activityPage, statisticsPage, drawnCardsPage, collectionPage, exchangePage, recyclingPage,
                 effectifPage, eventBoostersAdminPage, messagingPage, rulesPage, premiumPage, archivesPage].forEach((page) => page.classList.add("hidden"));
             adminPage.classList.remove("hidden");
             bottomNav.classList.add("hidden");

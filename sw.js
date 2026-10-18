@@ -1,5 +1,5 @@
-const CACHE_NAME = "cartes-popote-app-v155";
-const APP_SHELL = ["./","./index.html","./manifest.webmanifest","./icon-192.png","./icon-512.png","./icon-maskable-512.png","./apple-touch-icon.png","./Logo.png","./Jeton.png","./Jeton%20premium.png","./Admin.png","./Recyclage.png","./Dos%20cartes.png","./Booster%20normal.png","./Booster%20premium.png","./flamme-bleue.png","./flamme-rouge.png","./flamme-or.png","./flamme-violette.png","./badge-jetons-classiques-100.png"];
+const CACHE_NAME = "cartes-popote-app-v156";
+const APP_SHELL = ["./","./index.html","./manifest.webmanifest","./icon-192.png","./icon-512.png","./icon-maskable-512.png","./apple-touch-icon.png","./Logo.png","./Activit%C3%A9.png","./Jeton.png","./Jeton%20premium.png","./Admin.png","./Recyclage.png","./Dos%20cartes.png","./Booster%20normal.png","./Booster%20premium.png","./flamme-bleue.png","./flamme-rouge.png","./flamme-or.png","./flamme-violette.png","./badge-jetons-classiques-100.png"];
 self.addEventListener("install", (event) => {
   event.waitUntil(caches.open(CACHE_NAME).then(async (cache) => {
     await Promise.all(APP_SHELL.map(async (path) => {
