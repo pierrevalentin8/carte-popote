@@ -903,7 +903,7 @@ body {
 #cooperationCard { grid-column:auto; display:flex; flex-direction:column; min-width:0; min-height:350px; padding:13px 9px 11px; overflow:hidden; border:2px solid #e2ad3c; background:radial-gradient(ellipse at 50% 0%,rgba(39,91,150,.92) 0%,#112b50 42%,#091a34 100%); color:#f8f2df; box-shadow:inset 0 0 0 2px rgba(255,218,126,.15),inset 0 12px 24px rgba(82,171,255,.08),0 7px 18px rgba(5,15,33,.3); }
 #cooperationCard h4 { margin:0 0 12px; color:#ffd66b; font-size:16px; letter-spacing:.04em; text-align:center; text-shadow:0 0 9px rgba(255,193,54,.48); }
 .cooperation-gauges { display:grid; flex:1; min-height:0; grid-template-columns:repeat(3,minmax(0,1fr)); gap:6px; align-items:stretch; }
-.cooperation-gauge { display:grid; min-width:0; grid-template-rows:56px auto minmax(0,1fr) auto auto; justify-items:center; align-content:stretch; gap:6px; text-align:center; }
+.cooperation-gauge { display:grid; min-width:0; grid-template-rows:56px auto minmax(0,1fr) auto; justify-items:center; align-content:stretch; gap:6px; text-align:center; }
 .cooperation-gauge img { width:54px; height:54px; object-fit:contain; filter:drop-shadow(0 0 7px var(--gauge-color)); }
 .cooperation-gauge-label { min-height:27px; color:#fff5da; font-size:10px; font-weight:800; line-height:1.2; }
 .cooperation-gauge-track { position:relative; display:block; width:38px; height:100%; min-height:0; overflow:hidden; border:2px solid #f0cc74; border-radius:999px; background:linear-gradient(90deg,#050f20 0%,#102a4a 35%,#173658 52%,#09172b 100%); box-shadow:inset 2px 0 5px rgba(0,0,0,.8),inset -2px 0 5px rgba(0,0,0,.7),inset 0 0 12px #020914,0 0 0 2px rgba(5,16,34,.72),0 0 9px rgba(255,211,111,.25); }
@@ -915,8 +915,6 @@ body {
 .cooperation-gauge-track.is-complete .cooperation-gauge-fill { filter:saturate(1.3) brightness(1.12); }
 .cooperation-gauge-disabled { opacity:.48; }
 .cooperation-gauge-value { max-width:100%; color:#fff; font-size:10px; font-weight:800; line-height:1.15; white-space:normal; overflow-wrap:anywhere; font-variant-numeric:tabular-nums; }
-.cooperation-claim-button { max-width:100%; padding:5px 7px; border:1px solid #f0ce72; border-radius:999px; background:linear-gradient(180deg,#ffe895,#d99b22); color:#182b45; font-size:9px; font-weight:900; line-height:1.1; box-shadow:0 2px 0 #80540a,inset 0 1px rgba(255,255,255,.55); cursor:pointer; white-space:normal; }
-.cooperation-claim-button:disabled { opacity:.62; cursor:default; }
 .cooperation-admin-rewards { display:grid; gap:12px; margin:14px 0; }
 .cooperation-admin-reward-row { display:grid; grid-template-columns:minmax(115px,.8fr) repeat(5,minmax(100px,1fr)); gap:10px; align-items:center; padding:12px; border:1px solid #d5bf8a; border-radius:12px; background:linear-gradient(135deg,#fffdf6,#f4eddd); }
 .cooperation-admin-reward-title { display:flex; align-items:center; gap:9px; color:var(--theme-ink); font-weight:850; }
@@ -934,7 +932,7 @@ body {
 .cooperation-admin-progress { color:var(--theme-muted); font-size:12px; text-align:center; }
 .cooperation-admin-row input[type="number"] { width:100%; min-width:72px; }
 .cooperation-admin-row input[type="checkbox"] { width:19px; height:19px; accent-color:#19753c; }
-@media (max-width:520px) { #cooperationCard { min-height:320px; padding:12px 6px 9px; } .cooperation-gauges { gap:3px; } .cooperation-gauge { grid-template-rows:48px auto minmax(0,1fr) auto auto; gap:5px; } .cooperation-gauge img { width:46px; height:46px; } .cooperation-gauge-track { width:32px; } .cooperation-gauge-label,.cooperation-gauge-value { font-size:9px; } .cooperation-claim-button { padding:4px 3px; font-size:8px; } .cooperation-reward-note { font-size:9px; } .cooperation-admin-row { grid-template-columns:1fr 72px; } .cooperation-admin-progress { text-align:left; } }
+@media (max-width:520px) { #cooperationCard { min-height:320px; padding:12px 6px 9px; } .cooperation-gauges { gap:3px; } .cooperation-gauge { grid-template-rows:48px auto minmax(0,1fr) auto; gap:5px; } .cooperation-gauge img { width:46px; height:46px; } .cooperation-gauge-track { width:32px; } .cooperation-gauge-label,.cooperation-gauge-value { font-size:9px; } .cooperation-reward-note { font-size:9px; } .cooperation-admin-row { grid-template-columns:1fr 72px; } .cooperation-admin-progress { text-align:left; } }
 @media (max-width:600px) { .home-maintenance-admin-toggle { left:8px; right:auto; gap:4px; padding:6px; font-size:0; } .home-maintenance-admin-toggle::before { content:"🛠"; font-size:15px; } .home-maintenance-admin-toggle input { width:27px; height:15px; flex-basis:27px; } .home-maintenance-admin-toggle input::after { width:9px; height:9px; } .home-maintenance-admin-toggle input:checked::after { transform:translateX(12px); } .cooperation-admin-reward-row { grid-template-columns:1fr 1fr; } .cooperation-admin-reward-title { grid-column:1 / -1; } }
 @media (prefers-reduced-motion:reduce) { .cooperation-gauge-fill,.cooperation-gauge-fill::before,.cooperation-gauge-fill::after { transition:none; animation:none; } #cooperationCard.is-celebrating { animation:none; } }
 
@@ -1739,6 +1737,23 @@ body {
 .leaderboard-badge { width: 25px; height: 25px; object-fit: contain; align-self: center; }
 .leaderboard-daily-streak { display: inline-flex; align-items: center; gap: 1px; color: #674515; font-size: 10px; font-weight: 900; white-space: nowrap; }
 .leaderboard-daily-streak img { width: 25px; height: 25px; object-fit: contain; }
+.site-updates-overlay.cooperation-reward-overlay { z-index:1450; background:radial-gradient(ellipse at center,rgba(19,52,93,.78),rgba(2,8,22,.92)); backdrop-filter:blur(7px); }
+.cooperation-reward-card { position:relative; width:min(100%,540px); max-height:90vh; overflow:auto; padding:clamp(22px,5vw,38px); border:2px solid #e7b944; border-radius:22px; color:#fff6df; text-align:center; background:radial-gradient(ellipse at 50% 0%,#214f86 0%,#112b50 48%,#07172f 100%); box-shadow:inset 0 0 0 2px rgba(255,224,148,.14),0 0 0 5px rgba(217,164,53,.18),0 22px 70px rgba(0,0,0,.58),0 0 35px rgba(75,157,255,.25); animation:cooperationRewardEnter .38s cubic-bezier(.2,.8,.2,1) both; }
+.cooperation-reward-card::before { position:absolute; inset:9px; border:1px solid rgba(247,205,107,.36); border-radius:15px; content:""; pointer-events:none; }
+.cooperation-reward-card h2 { margin:0 0 14px; color:#ffe17a; font-size:clamp(20px,5vw,29px); line-height:1.15; text-shadow:0 0 13px rgba(255,192,54,.52); }
+.cooperation-reward-card p { color:#f7efdc; line-height:1.5; }
+.cooperation-reward-caption { margin:20px 0 10px; color:#ffd66b!important; font-weight:900; text-transform:uppercase; letter-spacing:.08em; }
+.cooperation-reward-items { display:grid; gap:8px; margin:0 auto 16px; max-width:390px; }
+.cooperation-reward-item { display:flex; align-items:center; justify-content:center; gap:12px; min-height:68px; padding:9px 14px; border:1px solid rgba(246,205,111,.56); border-radius:14px; background:linear-gradient(110deg,rgba(255,255,255,.08),rgba(245,187,59,.12),rgba(255,255,255,.05)); box-shadow:inset 0 1px rgba(255,255,255,.1),0 5px 15px rgba(0,0,0,.18); font-weight:850; }
+.cooperation-reward-item img { width:52px; height:52px; flex:none; object-fit:contain; filter:drop-shadow(0 0 7px rgba(255,211,111,.45)); }
+.cooperation-reward-item span { text-align:left; }
+.cooperation-reward-foot { margin:12px 0 20px; color:#fff3cd!important; font-weight:750; }
+.cooperation-reward-status { min-height:1.4em; color:#ffd4a3!important; font-size:13px; }
+.cooperation-reward-actions { display:flex; justify-content:center; }
+.cooperation-reward-actions button { min-width:170px; padding:12px 24px; border:1px solid #fff0b0; border-radius:999px; color:#18304e; background:linear-gradient(180deg,#fff0a5,#e8ad2f); box-shadow:0 4px 0 #885b0b,0 8px 20px rgba(0,0,0,.3),inset 0 1px rgba(255,255,255,.8); font-size:16px; font-weight:950; cursor:pointer; }
+.cooperation-reward-actions button:disabled { opacity:.68; cursor:wait; }
+@keyframes cooperationRewardEnter { from { opacity:0; transform:translateY(16px) scale(.96); } to { opacity:1; transform:translateY(0) scale(1); } }
+@media(max-width:520px) { .site-updates-overlay.cooperation-reward-overlay { padding:12px; } .cooperation-reward-card { padding:24px 18px; border-radius:18px; } .cooperation-reward-item { min-height:60px; gap:9px; padding:8px 10px; } .cooperation-reward-item img { width:44px; height:44px; } }
 .site-updates-overlay { position: fixed; inset: 0; z-index: 700; display: grid; place-items: center; padding: 16px; background: rgba(3,11,25,.78); }
 .site-updates-card { width: min(100%, 520px); max-height: min(82dvh, 680px); overflow: auto; padding: 24px; border: 2px solid var(--theme-gold, #e5b530); border-radius: 22px; background: var(--theme-cream, #fffdf7); color: var(--theme-ink, #10264a); box-shadow: 0 22px 65px rgba(0,0,0,.45); }
 .site-updates-card h2 { margin: 0 0 8px; color: var(--theme-ink, #10264a); }
@@ -2741,21 +2756,18 @@ body {
                         <span class="cooperation-gauge-label">Recyclage</span>
                         <div class="cooperation-gauge-track" role="progressbar" aria-label="Progression collective du recyclage" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><div class="cooperation-gauge-fill"></div></div>
                         <span class="cooperation-gauge-value">0 / 0</span>
-                        <button class="cooperation-claim-button hidden" type="button" data-claim-cooperation="recycling">Réclamer</button>
                     </div>
                     <div class="cooperation-gauge" data-cooperation-gauge="cardsDrawn" style="--gauge-color:#45d9ff">
                         <img src="./Dos%20cartes.png" alt="" loading="lazy" decoding="async">
                         <span class="cooperation-gauge-label">Cartes tirées</span>
                         <div class="cooperation-gauge-track" role="progressbar" aria-label="Progression collective des cartes tirées" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><div class="cooperation-gauge-fill"></div></div>
                         <span class="cooperation-gauge-value">0 / 0</span>
-                        <button class="cooperation-claim-button hidden" type="button" data-claim-cooperation="cardsDrawn">Réclamer</button>
                     </div>
                     <div class="cooperation-gauge" data-cooperation-gauge="boostersOpened" style="--gauge-color:#c17bff">
                         <img src="./Booster%20normal.png" alt="" loading="lazy" decoding="async">
                         <span class="cooperation-gauge-label">Boosters ouverts</span>
                         <div class="cooperation-gauge-track" role="progressbar" aria-label="Progression collective des boosters ouverts" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><div class="cooperation-gauge-fill"></div></div>
                         <span class="cooperation-gauge-value">0 / 0</span>
-                        <button class="cooperation-claim-button hidden" type="button" data-claim-cooperation="boostersOpened">Réclamer</button>
                     </div>
                 </div>
                 <p class="cooperation-reward-note">Une récompense collective lorsqu’une jauge est complétée</p>
@@ -3370,6 +3382,18 @@ body {
         </div>
     </section>
 
+    <section id="cooperationRewardModal" class="site-updates-overlay cooperation-reward-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="cooperationRewardTitle" aria-hidden="true">
+        <div class="cooperation-reward-card">
+            <h2 id="cooperationRewardTitle">🎉 OBJECTIF COLLECTIF ATTEINT ! 🎉</h2>
+            <p>Grâce aux efforts de toute la brigade, un nouvel objectif de coopération a été atteint !</p>
+            <p class="cooperation-reward-caption">Récompense obtenue :</p>
+            <div id="cooperationRewardItems" class="cooperation-reward-items"></div>
+            <p class="cooperation-reward-foot">Votre récompense a été automatiquement ajoutée à votre compte !</p>
+            <p id="cooperationRewardStatus" class="cooperation-reward-status" role="status" aria-live="polite"></p>
+            <div class="cooperation-reward-actions"><button id="cooperationRewardAcknowledgeButton" type="button">SUPER !</button></div>
+        </div>
+    </section>
+
     <section id="serviceReadyModal" class="site-updates-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="serviceReadyTitle" aria-hidden="true">
         <div class="site-updates-card">
             <h2 id="serviceReadyTitle">✅ Mission Service terminée !</h2>
@@ -3798,7 +3822,7 @@ const callGetCooperationProgress = httpsCallable(functions, "getCooperationProgr
 const callGetAdminCooperationSettings = httpsCallable(functions, "getAdminCooperationSettings");
 const callSaveCooperationSettings = httpsCallable(functions, "saveCooperationSettings");
 const callSaveCooperationRewards = httpsCallable(functions, "saveCooperationRewards");
-const callClaimCooperationReward = httpsCallable(functions, "claimCooperationReward");
+const callAcknowledgeCooperationReward = httpsCallable(functions, "ackCooperationRewardAnnouncement");
 const callResetCooperationGauge = httpsCallable(functions, "resetCooperationGauge");
 const callGetHomeMaintenanceStatus = httpsCallable(functions, "getHomeMaintenanceStatus");
 const callSetHomeMaintenanceStatus = httpsCallable(functions, "setHomeMaintenanceStatus");
@@ -4470,6 +4494,13 @@ const messagingBackButton = document.getElementById("messagingBackButton");
 const ADMIN_EMAIL = "pierre.valentin8@gmail.com";
 let isPlayerPreview = false;
 const cooperationCard = document.getElementById("cooperationCard");
+const cooperationRewardModal = document.getElementById("cooperationRewardModal");
+const cooperationRewardItems = document.getElementById("cooperationRewardItems");
+const cooperationRewardStatus = document.getElementById("cooperationRewardStatus");
+const cooperationRewardAcknowledgeButton = document.getElementById("cooperationRewardAcknowledgeButton");
+let cooperationAnnouncementQueue = [];
+let cooperationAnnouncementActive = null;
+let cooperationProgressRefreshTimer = null;
 const cooperationAdminList = document.getElementById("cooperationAdminList");
 const cooperationAdminStatus = document.getElementById("cooperationAdminStatus");
 const cooperationRewardAdminList = document.getElementById("cooperationRewardAdminList");
@@ -4482,7 +4513,7 @@ const cooperationGaugeDefinitions = [
     { id:"cardsDrawn", label:"Cartes tirées", fieldLabel:"Cartes tirées collectivement", icon:"./Dos%20cartes.png" },
     { id:"boostersOpened", label:"Boosters ouverts", fieldLabel:"Boosters ouverts collectivement", icon:"./Booster%20normal.png" }
 ];
-let cooperationProgress = { gauges:{}, counters:{}, claims:{}, eligible:true };
+let cooperationProgress = { gauges:{}, counters:{}, claims:{}, eligible:true, pendingAnnouncements:[] };
 let cooperationUnsubscribers = [];
 let homeMaintenanceRefreshInterval = null;
 let dailyBoosterLastOpenedDate = "";
@@ -5005,6 +5036,11 @@ onAuthStateChanged(
             pendingMysticPullNotices = [];
             mysticRewardModal.classList.add("hidden");
             mysticRewardModal.setAttribute("aria-hidden", "true");
+            cooperationAnnouncementQueue = []; cooperationAnnouncementActive = null;
+            cooperationProgress = { gauges:{}, counters:{}, claims:{}, eligible:true, pendingAnnouncements:[] };
+            if (cooperationProgressRefreshTimer) window.clearTimeout(cooperationProgressRefreshTimer);
+            cooperationProgressRefreshTimer = null;
+            cooperationRewardModal.classList.add("hidden"); cooperationRewardModal.setAttribute("aria-hidden", "true");
             stopCooperationListeners();
             if (exchangeOfferPollTimer) window.clearInterval(exchangeOfferPollTimer);
             exchangeOfferPollTimer = null;
@@ -8088,18 +8124,73 @@ window.setInterval(() => {
     }
 }, 30_000);
 
+function enqueueCooperationAnnouncements(announcements) {
+    if (!Array.isArray(announcements)) return;
+    const known = new Set(cooperationAnnouncementQueue.map((item) => item.claimId));
+    if (cooperationAnnouncementActive?.claimId) known.add(cooperationAnnouncementActive.claimId);
+    announcements.forEach((item) => { if (item?.claimId && !known.has(item.claimId)) { cooperationAnnouncementQueue.push(item); known.add(item.claimId); } });
+    presentNextCooperationAnnouncement();
+}
+
+function addCooperationRewardLine(imageSrc, label, amount) {
+    const row = document.createElement("div"); row.className = "cooperation-reward-item";
+    const image = document.createElement("img"); image.src = imageSrc; image.alt = ""; image.loading = "lazy"; image.decoding = "async";
+    const text = document.createElement("span"); text.textContent = label + " · " + Number(amount).toLocaleString("fr-FR");
+    row.append(image, text); cooperationRewardItems.append(row);
+}
+
+function renderCooperationRewardAnnouncement(item) {
+    cooperationRewardItems.replaceChildren();
+    const reward = item?.reward || {};
+    if (Number(reward.tokens) > 0) addCooperationRewardLine("./Jeton.png", Number(reward.tokens) === 1 ? "Jeton classique" : "Jetons classiques", Number(reward.tokens));
+    if (Number(reward.premiumTokens) > 0) addCooperationRewardLine("./Jeton%20premium.png", Number(reward.premiumTokens) === 1 ? "Jeton Premium" : "Jetons Premium", Number(reward.premiumTokens));
+    if (reward.cardId) { const rarity = reward.cardRarity ? " · " + reward.cardRarity : ""; addCooperationRewardLine(reward.cardImageUrl || "./Dos%20cartes.png", "Carte : " + (reward.cardName || "Carte") + rarity, "1"); }
+    cooperationRewardStatus.textContent = "";
+}
+
+function presentNextCooperationAnnouncement() {
+    if (cooperationAnnouncementActive || !cooperationAnnouncementQueue.length || !auth.currentUser || isPlayerPreview) return;
+    const blockingDialog = Array.from(document.querySelectorAll("[role=dialog]:not(.hidden)")).some((dialog) => dialog !== cooperationRewardModal);
+    if (blockingDialog) return;
+    cooperationAnnouncementActive = cooperationAnnouncementQueue[0];
+    renderCooperationRewardAnnouncement(cooperationAnnouncementActive);
+    cooperationRewardModal.classList.remove("hidden"); cooperationRewardModal.setAttribute("aria-hidden", "false");
+    cooperationRewardAcknowledgeButton.focus();
+}
+
+cooperationRewardAcknowledgeButton.addEventListener("click", async () => {
+    const item = cooperationAnnouncementActive;
+    if (!item || !auth.currentUser || cooperationRewardAcknowledgeButton.disabled) return;
+    cooperationRewardAcknowledgeButton.disabled = true; cooperationRewardStatus.textContent = "Enregistrement…";
+    try {
+        await callAcknowledgeCooperationReward({ claimId: item.claimId });
+        cooperationAnnouncementQueue = cooperationAnnouncementQueue.filter((entry) => entry.claimId !== item.claimId);
+        cooperationAnnouncementActive = null;
+        cooperationRewardModal.classList.add("hidden"); cooperationRewardModal.setAttribute("aria-hidden", "true");
+        cooperationRewardAcknowledgeButton.disabled = false; cooperationRewardStatus.textContent = "";
+        presentNextCooperationAnnouncement();
+    } catch (error) {
+        console.error("Impossible d’enregistrer l’affichage de la récompense collective :", error);
+        cooperationRewardStatus.textContent = "L’annonce n’a pas pu être enregistrée. Réessaie pour fermer cette fenêtre.";
+        cooperationRewardAcknowledgeButton.disabled = false;
+    }
+});
+window.setInterval(presentNextCooperationAnnouncement, 700);
 function applyCooperationProgress(data) {
     if (!data || typeof data !== "object") return;
     cooperationProgress = {
         gauges: data.gauges && typeof data.gauges === "object" ? data.gauges : cooperationProgress.gauges,
         counters: data.counters && typeof data.counters === "object" ? data.counters : cooperationProgress.counters,
         claims: data.claims && typeof data.claims === "object" ? data.claims : cooperationProgress.claims,
-        eligible: typeof data.eligible === "boolean" ? data.eligible : cooperationProgress.eligible
+        eligible: typeof data.eligible === "boolean" ? data.eligible : cooperationProgress.eligible,
+        pendingAnnouncements: Array.isArray(data.pendingAnnouncements) ? data.pendingAnnouncements : cooperationProgress.pendingAnnouncements
     };
+    enqueueCooperationAnnouncements(cooperationProgress.pendingAnnouncements);
+    if (data.tokens != null && document.getElementById("playerTokens")) document.getElementById("playerTokens").textContent = Number(data.tokens).toLocaleString("fr-FR");
+    if (data.jetonsPremium != null) { premiumBalanceCount = Number(data.jetonsPremium) || 0; premiumBalanceDisplay.textContent = premiumBalanceCount.toLocaleString("fr-FR"); }
     renderCooperationGauges();
     updateCooperationAdminProgress();
 }
-
 function renderCooperationGauges() {
     cooperationGaugeDefinitions.forEach((definition) => {
         const root = document.querySelector(`[data-cooperation-gauge="${definition.id}"]`);
@@ -8112,62 +8203,22 @@ function renderCooperationGauges() {
         const track = root.querySelector(".cooperation-gauge-track");
         const fill = root.querySelector(".cooperation-gauge-fill");
         const value = root.querySelector(".cooperation-gauge-value");
-        const claimButton = root.querySelector("[data-claim-cooperation]");
         const wasComplete = track.classList.contains("is-complete");
-        fill.style.width = "100%";
-        fill.style.height = `${percent}%`;
+        fill.style.width = "100%"; fill.style.height = `${percent}%`;
         track.setAttribute("aria-valuenow", String(Math.round(percent)));
         track.setAttribute("aria-valuetext", hasGoal ? `${current} sur ${goal}` : "Objectif non défini");
         value.textContent = hasGoal ? `${current.toLocaleString("fr-FR")} / ${goal.toLocaleString("fr-FR")}` : `${current.toLocaleString("fr-FR")} / —`;
         root.classList.toggle("cooperation-gauge-disabled", config.enabled === false);
         root.setAttribute("aria-label", config.enabled === false ? `${definition.label}, coopération en pause` : definition.label);
         track.classList.toggle("is-complete", hasGoal && percent >= 100);
-        const reward = config.reward || {};
-        const hasReward = Number(reward.tokens) > 0 || Number(reward.premiumTokens) > 0 || Boolean(reward.cardId);
         const complete = hasGoal && percent >= 100 && config.enabled !== false;
-        const claimed = cooperationProgress.claims?.[definition.id] === true;
-        const canClaim = complete && hasReward && cooperationProgress.eligible !== false;
-        claimButton?.classList.toggle("hidden", !canClaim && !claimed);
-        if (claimButton) {
-            claimButton.disabled = claimed || isPlayerPreview;
-            claimButton.textContent = claimed ? "Récompense reçue" : isPlayerPreview ? "Aperçu" : "Réclamer";
-            claimButton.title = cooperationProgress.eligible === false ? "Les récompenses collectives ne sont pas activées pour ce compte." : "Récupérer la récompense collective";
-        }
-        if (!wasComplete && hasGoal && percent >= 100 && config.enabled !== false) {
-            cooperationCard.classList.remove("is-celebrating");
-            void cooperationCard.offsetWidth;
-            cooperationCard.classList.add("is-celebrating");
+        if (complete) value.textContent = "Objectif atteint";
+        if (!wasComplete && complete) {
+            cooperationCard.classList.remove("is-celebrating"); void cooperationCard.offsetWidth; cooperationCard.classList.add("is-celebrating");
             window.setTimeout(() => cooperationCard.classList.remove("is-celebrating"), 1900);
         }
     });
 }
-
-cooperationCard.addEventListener("click", async (event) => {
-    const button = event.target.closest("[data-claim-cooperation]");
-    if (!button || button.disabled || !auth.currentUser || isPlayerPreview) return;
-    const gaugeId = button.dataset.claimCooperation;
-    button.disabled = true;
-    button.textContent = "Attribution…";
-    try {
-        const response = await callClaimCooperationReward({ gaugeId });
-        applyCooperationProgress(response.data);
-        if (response.data?.tokens != null && auth.currentUser) {
-            document.getElementById("playerTokens").textContent = Number(response.data.tokens).toLocaleString("fr-FR");
-        }
-        if (response.data?.jetonsPremium != null && auth.currentUser) {
-            premiumBalanceCount = Number(response.data.jetonsPremium) || 0;
-            premiumBalanceDisplay.textContent = premiumBalanceCount.toLocaleString("fr-FR");
-            renderPremiumPrizeList(premiumPrizes);
-        }
-    } catch (error) {
-        console.error("Impossible de récupérer la récompense collective :", error);
-        await refreshCooperationProgress();
-        button.title = error.message || "Impossible de récupérer cette récompense.";
-        button.disabled = false;
-        button.textContent = "Réessayer";
-    }
-});
-
 async function loadAdminCooperationRewards() {
     if (!isCurrentUserAdmin() || isPlayerPreview) return;
     cooperationRewardsAdminStatus.textContent = "Chargement des récompenses et des cartes…";
@@ -8262,7 +8313,7 @@ async function loadAdminCooperationRewards() {
             row.append(title, tokensLabel, premiumLabel, modeLabel, cardLabel, rarityLabel);
             cooperationRewardAdminList.append(row);
         });
-        cooperationRewardsAdminStatus.textContent = "Choisis une ou plusieurs récompenses pour chaque jauge. Une récompense peut être récupérée une fois par joueur et par cycle.";
+        cooperationRewardsAdminStatus.textContent = "Choisis les récompenses automatiques attribuées à chaque joueur éligible, une fois par objectif et par cycle.";
     } catch (error) {
         console.error("Impossible de charger les récompenses collectives :", error);
         cooperationRewardsAdminStatus.textContent = error.message || "Chargement impossible. Vérifie les fonctions Firebase nécessaires.";
@@ -8337,9 +8388,11 @@ function updateCooperationAdminProgress() {
 }
 
 async function refreshCooperationProgress() {
-    if (!auth.currentUser) return;
+    const requestedUid = auth.currentUser?.uid;
+    if (!requestedUid) return;
     try {
         const response = await callGetCooperationProgress();
+        if (auth.currentUser?.uid !== requestedUid) return;
         applyCooperationProgress(response.data);
     } catch (error) {
         console.error("Impossible de charger les coopérations :", error);
@@ -8360,7 +8413,9 @@ function startCooperationListeners() {
     const applyLatest = () => {
         if (latestStats === null || latestSettings === null) return;
         applyCooperationProgress({ counters: latestStats, gauges: latestSettings.gauges || {} });
-    };
+        if (cooperationProgressRefreshTimer) window.clearTimeout(cooperationProgressRefreshTimer);
+        cooperationProgressRefreshTimer = window.setTimeout(() => { cooperationProgressRefreshTimer = null; void refreshCooperationProgress(); }, 500);
+    };;
     cooperationUnsubscribers.push(onSnapshot(statsRef, (snapshot) => {
         latestStats = snapshot.exists() ? snapshot.data() : {};
         applyLatest();
