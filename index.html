@@ -8468,12 +8468,12 @@ async function loadAdminCooperations() {
             const reset = document.createElement("button"); reset.type = "button"; reset.className = "secondary-button"; reset.textContent = "Réinitialiser";
             reset.addEventListener("click", async () => {
                 const liveCount = Number(cooperationProgress.counters?.[definition.id]) || 0;
-                if (!window.confirm(`Réinitialiser la jauge « ${definition.label} » (actuellement ${liveCount.toLocaleString("fr-FR")}) ?`)) return;
+                if (!window.confirm(`Démarrer un nouveau cycle pour « ${definition.label} » ? Le compteur actuel (${liveCount.toLocaleString("fr-FR")}) sera conservé. La récompense du nouveau cycle sera attribuée lorsque le prochain objectif sera atteint.`)) return;
                 reset.disabled = true; cooperationAdminStatus.textContent = `Réinitialisation de ${definition.label}…`;
                 try {
                     const result = await callResetCooperationGauge({ gaugeId:definition.id });
                     applyCooperationProgress(result.data);
-                    cooperationAdminStatus.textContent = `La jauge « ${definition.label} » a été réinitialisée.`;
+                    cooperationAdminStatus.textContent = `Nouveau cycle lancé pour « ${definition.label} ». Le compteur collectif a été conservé.`;
                 } catch (error) {
                     console.error("Impossible de réinitialiser la jauge :", error);
                     cooperationAdminStatus.textContent = error.message || "Réinitialisation refusée. Vérifie le déploiement des fonctions Coopérations.";
