@@ -1785,11 +1785,14 @@ body {
 .recycling-copy-option small { color: #d4dceb; font-size: 11px; }
 .player-collection #recycleDuplicatesButton { min-height: 46px; padding: 11px 18px; }
 .player-collection #recycleDuplicatesButton:disabled { opacity: .55; cursor: not-allowed; }
+.recycling-rarity-filter { display:flex; align-items:center; gap:9px; width:fit-content; max-width:100%; margin:12px 0; color:#fbfaf5; font-size:13px; font-weight:800; }
+.recycling-rarity-filter select { min-height:40px; max-width:100%; padding:8px 12px; border:1px solid rgba(243,191,56,.75); border-radius:10px; background:#fffdf7; color:#10264a; font:inherit; }
 .recycle-duplicates-status { grid-column: 1 / -1; min-height: 16px; margin: 0; color: #f6df9d; font-size: 12px; }
 .recycling-global-stat { display: flex; width: fit-content; align-items: baseline; gap: 7px; margin: 8px 0 14px; padding: 7px 11px; border: 1px solid rgba(243,191,56,.48); border-radius: 10px; background: rgba(16,38,74,.7); color: #d4dceb; font-size: 11px; }
 .recycling-global-stat strong { color: #f7d46b; font-size: 17px; }
 .admin-backup-button { margin: 0 0 10px; }
 @media (max-width: 420px) { .recycling-cards-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; } .recycling-copy-option { padding: 8px; } .recycling-copy-option img, .recycling-card-placeholder { max-width: 108px; } .recycle-selection-toolbar { font-size: 12px; } }
+@media (max-width: 600px) { #recyclingPage { padding-bottom: calc(170px + env(safe-area-inset-bottom, 0px)); } #recyclingPage #recycleDuplicatesButton { position:fixed; z-index:120; right:12px; bottom:calc(82px + env(safe-area-inset-bottom, 0px)); left:12px; width:min(calc(100% - 24px),500px); min-height:52px; margin:0 auto; box-shadow:0 6px 20px rgba(0,0,0,.4); } .recycling-rarity-filter { align-items:flex-start; flex-direction:column; gap:5px; } .recycling-rarity-filter select { width:100%; } }
 .collection-search-label { display: block; margin-top: 12px; color: #fbfaf5; font-size: 13px; font-weight: 700; }
 .collection-search-status { min-height: 18px; margin: 4px 0 8px; color: #c6d2e5; font-size: 12px; }
 .player-card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; margin-top: 16px; }
@@ -3131,6 +3134,7 @@ body {
         <h2 id="recyclingTitle">♻️ Recyclage</h2>
         <div class="recycling-global-stat" aria-label="Nombre total de recyclages effectués par tous les joueurs"><strong id="globalRecycleCount">0</strong><span>recyclages effectués par tous les joueurs</span></div>
         <p class="admin-note">Choisis cinq doubles de la même rareté. Un exemplaire de chaque carte restera dans ta collection. Communes : 1 jeton • Rares : 2 jetons • Légendaires : 3 jetons.</p>
+        <label class="recycling-rarity-filter" for="recyclingRarityFilter">Filtrer par rareté<select id="recyclingRarityFilter"><option value="">Toutes les raretés</option><option value="commune">Communes</option><option value="rare">Rares</option><option value="legendaire">Légendaires</option></select></label>
         <button id="recycleDuplicatesButton" class="primary-button" type="button" disabled>Recycler 5 cartes</button>
         <p id="recyclingStatus" class="admin-status" role="status" aria-live="polite">Chargement de tes doubles…</p>
         <div class="recycle-selection-toolbar">
@@ -4640,6 +4644,7 @@ const recyclingPage = document.getElementById("recyclingPage");
 const recyclingBackButton = document.getElementById("recyclingBackButton");
 const recyclingStatus = document.getElementById("recyclingStatus");
 const recyclingCardsList = document.getElementById("recyclingCardsList");
+const recyclingRarityFilter = document.getElementById("recyclingRarityFilter");
 const recycleSelectionCount = document.getElementById("recycleSelectionCount");
 const collectionSearchInput = document.getElementById("collectionSearchInput");
 const collectionRarityFilter = document.getElementById("collectionRarityFilter");
@@ -4664,6 +4669,7 @@ const recyclingNavButton = document.getElementById("recyclingNavButton");
 let ownedAlbumCards = [];
 let allOwnedAlbumCards = [];
 let recyclableCardCopies = [];
+let recyclingRarityFilterValue = "";
 const selectedRecycleCopyIds = new Set();
 let collectionMaxCardNumber = 0;
 let collectionSeason = "Saison 1";
@@ -7862,7 +7868,9 @@ function updateRecycleControls() {
 
 function renderRecyclingCopies() {
     recyclingCardsList.replaceChildren();
-    recyclableCardCopies.forEach((copy) => {
+    const normalizeRecycleRarity = (value) => String(value || "").toLocaleLowerCase("fr").normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/s$/, "");
+    const visibleCopies = recyclableCardCopies.filter((copy) => !recyclingRarityFilterValue || normalizeRecycleRarity(copy.rarity) === recyclingRarityFilterValue);
+    visibleCopies.forEach((copy) => {
         const label = document.createElement("label");
         label.className = "recycling-copy-option";
         label.style.setProperty("--recycle-rarity", getCardRarityColor(copy));
@@ -7914,10 +7922,12 @@ function renderRecyclingCopies() {
         label.append(details);
         recyclingCardsList.append(label);
     });
-    if (!recyclableCardCopies.length) {
+    if (!visibleCopies.length) {
         const empty = document.createElement("p");
         empty.className = "admin-note";
-        empty.textContent = "Tu n’as pas encore de doubles à recycler.";
+        empty.textContent = recyclableCardCopies.length
+            ? "Aucun double disponible dans cette catégorie de rareté."
+            : "Tu n’as pas encore de doubles à recycler.";
         recyclingCardsList.append(empty);
     }
     updateRecycleSelectionStatus();
@@ -9044,6 +9054,10 @@ recyclingNavButton.addEventListener("click", async () => {
 });
 
 recyclingBackButton.addEventListener("click", showHomePage);
+recyclingRarityFilter.addEventListener("change", () => {
+    recyclingRarityFilterValue = recyclingRarityFilter.value;
+    renderRecyclingCopies();
+});
 
 async function loadGlobalRecyclingCount() {
     const counter = document.getElementById("globalRecycleCount");
