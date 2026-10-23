@@ -2306,6 +2306,14 @@ body {
 .exchange-rarity-common { color: #626b78 !important; }
 .exchange-rarity-rare { color: #1765bd !important; }
 .exchange-rarity-legendary { color: #9a6a00 !important; }
+.exchange-success-cards { display:grid; grid-template-columns:minmax(0,1fr) auto minmax(0,1fr); align-items:center; gap:12px; margin:18px 0; }
+.exchange-success-card { min-width:0; padding:12px; border:1px solid rgba(243,191,56,.75); border-radius:14px; background:linear-gradient(145deg,#10264a,#1d4276); color:#fff7df; text-align:center; box-shadow:0 6px 15px rgba(0,0,0,.25),inset 0 1px rgba(255,255,255,.12); }
+.exchange-success-card img { display:block; width:min(100%,130px); aspect-ratio:2/3; object-fit:cover; margin:0 auto 8px; border:2px solid #f3bf38; border-radius:9px; background:#071327; }
+.exchange-success-card strong,.exchange-success-card span { display:block; overflow-wrap:anywhere; }
+.exchange-success-card strong { margin-bottom:4px; color:#ffdc69; font-size:12px; }
+.exchange-success-card span { font-size:12px; }
+.exchange-success-arrow { color:#ffdc69; font-size:24px; font-weight:900; }
+@media(max-width:480px){.exchange-success-cards{gap:7px}.exchange-success-card{padding:8px}.exchange-success-card img{width:min(100%,100px)}}
 .exchange-ads-heading { margin-top: 27px; font-size: 19px; }
 .exchange-ads-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr)); gap: 13px; }
 .exchange-ad { position: relative; padding: 17px 18px 16px; border: 1px solid #b9aa87; border-radius: 5px; background: repeating-linear-gradient(0deg, rgba(116,93,54,.045) 0 1px, transparent 1px 4px), linear-gradient(135deg, #fffdf5, #eee6d2); color: #292b31; box-shadow: 0 8px 18px rgba(0,0,0,.24), inset 0 0 0 4px rgba(255,255,255,.48); }
@@ -2947,6 +2955,11 @@ body {
                     <span class="profile-stat-label">Cartes collectées</span>
                 </article>
                 <article class="profile-stat">
+                    <span class="profile-stat-icon" aria-hidden="true">🤝</span>
+                    <span id="profileExchangesCount" class="profile-stat-value">0</span>
+                    <span class="profile-stat-label">Échanges effectués</span>
+                </article>
+                <article class="profile-stat">
                     <span class="profile-stat-icon" aria-hidden="true">🕒</span>
                     <span id="profileServiceTime" class="profile-stat-value">0 h 00</span>
                     <span class="profile-stat-label">Temps de Service</span>
@@ -3457,6 +3470,16 @@ body {
         </div>
     </section>
 
+    <section id="exchangeSuccessModal" class="site-updates-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="exchangeSuccessTitle" aria-hidden="true">
+        <div class="site-updates-card">
+            <h2 id="exchangeSuccessTitle">🤝 Échange réussi !</h2>
+            <p id="exchangeSuccessMessage"></p>
+            <div id="exchangeSuccessCards" class="exchange-success-cards"></div>
+            <p class="admin-note">Les deux cartes ont été transférées dans vos collections.</p>
+            <div class="exchange-modal-actions"><button id="exchangeSuccessClose" class="primary-button" type="button">Super !</button></div>
+        </div>
+    </section>
+
     <section id="adminPage" class="admin-page hidden">
         <button id="adminBackButton" class="admin-back" type="button">← Retour au menu Admin</button>
         <h2>🛡️ Administration</h2>
@@ -3837,6 +3860,8 @@ const callGetPollResults = httpsCallable(functions, "getPollResults");
 const callGetPendingPolls = httpsCallable(functions, "getPendingPolls");
 const callSubmitPollResponse = httpsCallable(functions, "submitPollResponse");
 const callGetPendingExchangeOffers = httpsCallable(functions, "getPendingExchangeOffers");
+const callGetPendingExchangeSuccessNotices = httpsCallable(functions, "getPendingExchangeSuccessNotices");
+const callAcknowledgeExchangeSuccessNotice = httpsCallable(functions, "acknowledgeExchangeSuccessNotice");
 const callCreateExchangeOffer = httpsCallable(functions, "createExchangeOffer");
 const callAcceptExchangeOffer = httpsCallable(functions, "acceptExchangeOffer");
 const callRefuseExchangeOffer = httpsCallable(functions, "refuseExchangeOffer");
@@ -3875,6 +3900,15 @@ const exchangeOfferDetails = document.getElementById("exchangeOfferDetails");
 const exchangeOfferStatus = document.getElementById("exchangeOfferStatus");
 const exchangeOfferAccept = document.getElementById("exchangeOfferAccept");
 const exchangeOfferRefuse = document.getElementById("exchangeOfferRefuse");
+const exchangeSuccessModal = document.getElementById("exchangeSuccessModal");
+const exchangeSuccessMessage = document.getElementById("exchangeSuccessMessage");
+const exchangeSuccessCards = document.getElementById("exchangeSuccessCards");
+const exchangeSuccessClose = document.getElementById("exchangeSuccessClose");
+let pendingExchangeSuccessNotices = [];
+let activeExchangeSuccessNotice = null;
+let exchangeSuccessPollInFlight = false;
+let exchangeSuccessNoticeActionBusy = false;
+let exchangeSuccessPollTimer = null;
 const serviceReadyModal = document.getElementById("serviceReadyModal");
 const serviceReadyMessage = document.getElementById("serviceReadyMessage");
 const serviceReadyImage = document.getElementById("serviceReadyImage");
@@ -3919,7 +3953,7 @@ async function loadAndClaimMysticPullRewards() {
 
 function tryShowMysticPullReward() {
     if (!auth.currentUser || isPlayerPreview || !pendingMysticPullNotices.length || !mysticRewardModal.classList.contains("hidden")) return;
-    const blocked = [eventBoosterPromptModal, boosterResultModal, siteUpdatesModal, serviceReadyModal, pollPromptModal, exchangeOfferModal, exchangeComposeModal]
+    const blocked = [eventBoosterPromptModal, boosterResultModal, siteUpdatesModal, serviceReadyModal, pollPromptModal, exchangeOfferModal, exchangeComposeModal, exchangeSuccessModal]
         .some((modal) => modal && !modal.classList.contains("hidden"));
     if (blocked) return;
     if (mysticRewardShowTimer) window.clearInterval(mysticRewardShowTimer);
@@ -3946,7 +3980,7 @@ function tryShowMysticPullReward() {
 
 function tryShowPendingPoll() {
     if (!auth.currentUser || isPlayerPreview || activePoll || !pendingPolls.length) return;
-    const blocked = [eventBoosterPromptModal, boosterResultModal, siteUpdatesModal, serviceReadyModal, exchangeOfferModal]
+    const blocked = [eventBoosterPromptModal, boosterResultModal, siteUpdatesModal, serviceReadyModal, exchangeOfferModal, exchangeSuccessModal]
         .some((modal) => modal && !modal.classList.contains("hidden"));
     if (blocked) return;
     activePoll = pendingPolls[0];
@@ -3988,7 +4022,7 @@ function continueStartupNoticesAfterPoll() {
 
 function tryShowPendingExchangeOffer() {
     if (!auth.currentUser || isPlayerPreview || activeExchangeOffer || !pendingExchangeOffers.length) return;
-    const blocked = [eventBoosterPromptModal, boosterResultModal, siteUpdatesModal, serviceReadyModal, pollPromptModal, exchangeComposeModal]
+    const blocked = [eventBoosterPromptModal, boosterResultModal, siteUpdatesModal, serviceReadyModal, pollPromptModal, exchangeComposeModal, exchangeSuccessModal]
         .some((modal) => modal && !modal.classList.contains("hidden"));
     if (blocked) return;
     activeExchangeOffer = pendingExchangeOffers[0];
@@ -4001,6 +4035,66 @@ function tryShowPendingExchangeOffer() {
     exchangeOfferModal.setAttribute("aria-hidden", "false");
     exchangeOfferAccept.focus();
 }
+
+function appendExchangeSuccessCard(label, card) {
+    const article = document.createElement("article"); article.className = "exchange-success-card";
+    const image = document.createElement("img");
+    image.src = card?.imageUrl || "./Dos%20cartes.png"; image.alt = card?.name || `Carte n° ${card?.number || "?"}`;
+    image.loading = "lazy"; image.decoding = "async";
+    image.addEventListener("error", () => { image.src = "./Dos%20cartes.png"; }, { once: true });
+    const direction = document.createElement("strong"); direction.textContent = label;
+    const name = document.createElement("span"); name.textContent = card?.name || `Carte n° ${Number(card?.number) || "?"}`;
+    const number = document.createElement("span"); number.textContent = `N° ${Number(card?.number) || "?"}`;
+    article.append(image, direction, name, number); exchangeSuccessCards.append(article);
+}
+
+function tryShowPendingExchangeSuccessNotice() {
+    if (!auth.currentUser || isPlayerPreview || activeExchangeSuccessNotice || !pendingExchangeSuccessNotices.length) return;
+    const blocked = Array.from(document.querySelectorAll("[role=dialog]:not(.hidden)"))
+        .some((dialog) => dialog !== exchangeSuccessModal);
+    if (blocked) return;
+    activeExchangeSuccessNotice = pendingExchangeSuccessNotices[0];
+    exchangeSuccessMessage.textContent = `Ton échange avec ${activeExchangeSuccessNotice.otherPseudo || "un joueur"} a été réalisé avec succès.`;
+    exchangeSuccessCards.replaceChildren();
+    appendExchangeSuccessCard("Tu as donné", activeExchangeSuccessNotice.sentCard);
+    const arrow = document.createElement("div"); arrow.className = "exchange-success-arrow"; arrow.textContent = "⇄"; arrow.setAttribute("aria-hidden", "true");
+    exchangeSuccessCards.append(arrow);
+    appendExchangeSuccessCard("Tu as reçu", activeExchangeSuccessNotice.receivedCard);
+    exchangeSuccessModal.classList.remove("hidden"); exchangeSuccessModal.setAttribute("aria-hidden", "false");
+    exchangeSuccessClose.focus();
+}
+
+async function loadPendingExchangeSuccessNotices() {
+    if (!auth.currentUser || isPlayerPreview || exchangeSuccessPollInFlight) return;
+    exchangeSuccessPollInFlight = true;
+    try {
+        const response = await callGetPendingExchangeSuccessNotices();
+        const notices = Array.isArray(response.data?.notices) ? response.data.notices : [];
+        const known = new Set();
+        if (activeExchangeSuccessNotice?.id) known.add(activeExchangeSuccessNotice.id);
+        pendingExchangeSuccessNotices = notices.filter((notice) => notice?.id && !known.has(notice.id));
+        if (activeExchangeSuccessNotice) pendingExchangeSuccessNotices.unshift(activeExchangeSuccessNotice);
+        tryShowPendingExchangeSuccessNotice();
+    } catch (error) {
+        console.warn("Impossible de charger les annonces d’échange réussi :", error);
+    } finally { exchangeSuccessPollInFlight = false; }
+}
+
+exchangeSuccessClose.addEventListener("click", async () => {
+    const notice = activeExchangeSuccessNotice;
+    if (!notice || exchangeSuccessNoticeActionBusy) return;
+    exchangeSuccessNoticeActionBusy = true; exchangeSuccessClose.disabled = true;
+    try {
+        await callAcknowledgeExchangeSuccessNotice({ noticeId: notice.id });
+        pendingExchangeSuccessNotices = pendingExchangeSuccessNotices.filter((item) => item.id !== notice.id);
+        activeExchangeSuccessNotice = null;
+        exchangeSuccessModal.classList.add("hidden"); exchangeSuccessModal.setAttribute("aria-hidden", "true");
+        tryShowPendingExchangeSuccessNotice();
+    } catch (error) {
+        console.error("Impossible de confirmer l’annonce d’échange réussi :", error);
+        exchangeSuccessMessage.textContent = "Impossible d’enregistrer la fermeture. Vérifie ta connexion puis réessaie.";
+    } finally { exchangeSuccessNoticeActionBusy = false; exchangeSuccessClose.disabled = false; }
+});
 
 async function loadPendingExchangeOffers() {
     if (!auth.currentUser || isPlayerPreview || exchangeOfferPollInFlight) return;
@@ -4041,6 +4135,7 @@ async function answerExchangeOffer(accept) {
             exchangeOfferModal.setAttribute("aria-hidden", "true");
             activeExchangeOffer = null;
             exchangeOfferActionBusy = false;
+            if (accept) void loadPendingExchangeSuccessNotices();
             void loadPendingExchangeOffers();
         }, 900);
     } catch (error) {
@@ -5053,6 +5148,13 @@ onAuthStateChanged(
             pendingExchangeOffers = [];
             activeExchangeOffer = null;
             exchangeOfferActionBusy = false;
+            if (exchangeSuccessPollTimer) window.clearInterval(exchangeSuccessPollTimer);
+            exchangeSuccessPollTimer = null;
+            pendingExchangeSuccessNotices = [];
+            activeExchangeSuccessNotice = null;
+            exchangeSuccessNoticeActionBusy = false;
+            exchangeSuccessModal.classList.add("hidden");
+            exchangeSuccessModal.setAttribute("aria-hidden", "true");
             exchangeOfferModal.classList.add("hidden");
             exchangeOfferModal.setAttribute("aria-hidden", "true");
             exchangeComposeModal.classList.add("hidden");
@@ -5300,9 +5402,13 @@ onAuthStateChanged(
         await checkPendingEventBoosters(user.uid);
         await loadPendingPolls();
         await loadPendingExchangeOffers();
+        await loadPendingExchangeSuccessNotices();
         await loadAndClaimMysticPullRewards();
         if (!exchangeOfferPollTimer) {
             exchangeOfferPollTimer = window.setInterval(() => { void loadPendingExchangeOffers(); }, 15000);
+        }
+        if (!exchangeSuccessPollTimer) {
+            exchangeSuccessPollTimer = window.setInterval(() => { void loadPendingExchangeSuccessNotices(); }, 15000);
         }
 
     }
@@ -5442,8 +5548,8 @@ async function showExchangePage() {
             exchangeAdsList.append(article);
         });
         exchangeAdsStatus.textContent = ads.length
-            ? `${ads.length} petite${ads.length > 1 ? "s" : ""} annonce${ads.length > 1 ? "s" : ""} correspond${ads.length > 1 ? "ent" : ""} à tes doubles.`
-            : "Aucune annonce ne correspond pour le moment aux cartes que tu as en double.";
+            ? `${ads.length} petite${ads.length > 1 ? "s" : ""} annonce${ads.length > 1 ? "s" : ""} de joueurs affichée${ads.length > 1 ? "s" : "e"}. Le bouton Échanger apparaît lorsqu’un échange est possible.`
+            : "Aucun joueur n’a de carte échangeable manquante pour le moment.";
     } catch (error) {
         console.error("Impossible de charger la page Échanges :", error);
         exchangeMissingStatus.textContent = "Impossible de charger les cartes manquantes. Vérifie que la fonction getExchangeBoard est déployée.";
@@ -7015,6 +7121,7 @@ async function loadPersonalProfile(playerId = auth.currentUser?.uid) {
             profilePageTitle.textContent = player.pseudo || "Profil joueur";
         }
         const createdAt = player.createdAt || player.accountCreatedAt || player.dateCreation;
+        document.getElementById("profileExchangesCount").textContent = (Number(player.echangesEffectues) || 0).toLocaleString("fr-FR");
         document.getElementById("profileAccountDates").textContent = createdAt ? "Compte créé le " + formatProfileDate(createdAt) : "Date de création indisponible";
         profileServiceTime.textContent = formatServiceWorkDuration(player.serviceTimeMs ?? player.archivesTotalWorkMs ?? 0);
         renderDailyStreakBadge(document.getElementById("profileDailyStreak"), Number(player.boosterJournalierStreak) || 0, "profileDailyStreakCount");
