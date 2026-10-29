@@ -1138,7 +1138,7 @@ body {
 .home-overview-premium { display: flex; min-width: 0; min-height: 62px; align-items: center; justify-content: center; justify-self: stretch; padding: 5px; border: 0; border-radius: 12px; background: transparent; box-shadow: none; font: inherit; cursor: pointer; }
 .home-overview-premium img { width: 48px; height: 48px; object-fit: contain; }
 .home-overview-premium:focus-visible { outline: 3px solid #f7d46b; outline-offset: 2px; }
-.home-overview-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; margin: 12px 0 18px; }
+.home-overview-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; margin: 12px 0 18px; }
 .home-card-count, .home-overview-grid .home-overview-premium { min-width: 0; min-height: 86px; margin: 0; padding: 10px; border: 1px solid rgba(243,191,56,.75); border-radius: 13px; background: linear-gradient(110deg, #10264a, #183966); color: #fbfaf5; box-shadow: 0 7px 17px rgba(0,0,0,.22); }
 .home-card-count { width: 100%; font: inherit; cursor: default; }
 .home-card-count:not(:disabled) { cursor: pointer; }
@@ -1149,6 +1149,9 @@ body {
 .home-overview-activity { display:flex; width:100%; min-width:0; min-height:86px; align-items:center; justify-content:center; padding:0; border:0; border-radius:0; background:transparent; box-shadow:none; cursor:pointer; }
 .home-overview-activity img { width:min(100%,88px); height:82px; object-fit:contain; }
 .home-overview-activity:focus-visible { outline:3px solid #f7d46b; outline-offset:3px; }
+.home-overview-sale { display:flex; width:100%; min-width:0; min-height:86px; align-items:center; justify-content:center; padding:0; border:0; border-radius:0; background:transparent; box-shadow:none; cursor:pointer; }
+.home-overview-sale img { width:min(100%,88px); height:82px; object-fit:contain; }
+.home-overview-sale:focus-visible { outline:3px solid #f7d46b; outline-offset:3px; }
 .home-overview-leaderboard:focus-visible { outline: 3px solid #f7d46b; outline-offset: 3px; }
 .home-card-count-icon { width: 28px; height: 38px; }
 .home-card-count-value { font-size: 21px; }
@@ -1252,7 +1255,7 @@ body {
 .service-active-countdown { margin:14px 0; padding:10px; border:2px inset #eee; background:#000080; color:#fff; font-size:20px; font-weight:bold; text-align:center; font-variant-numeric:tabular-nums; }
 .service-win-status { min-height:22px; margin:10px 0 0; }
 @media(max-width:760px){.service-admin-grid{grid-template-columns:1fr}.service-admin-header{display:none}.service-admin-row{grid-template-columns:1fr 1fr}.service-admin-row>*:first-child,.service-admin-row>*:last-child{grid-column:1/-1}.service-row-actions{display:flex;flex-wrap:wrap}}
-@media (max-width: 600px) { .home-overview-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; } .home-overview-leaderboard, .home-overview-activity { min-height: 78px; padding: 0; } .home-overview-leaderboard img, .home-overview-activity img { height: 70px; } }
+@media (max-width: 600px) { .home-overview-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; } .home-overview-leaderboard, .home-overview-activity, .home-overview-sale { min-height: 78px; padding: 0; } .home-overview-leaderboard img, .home-overview-activity img, .home-overview-sale img { height: 70px; } }
 .home-site-note { display: grid; justify-items: center; gap: 7px; margin: 20px 0 88px; color: #c6d2e5; font-size: 11px; line-height: 1.45; text-align: center; }
 .home-site-note p { margin: 0; }
 .home-site-note a { color: #f7d46b; text-decoration: underline; text-underline-offset: 3px; }
@@ -2329,6 +2332,22 @@ body {
 .exchange-ad-numbers { display: inline-flex; flex-wrap: wrap; gap: 5px; margin: 7px 4px; vertical-align: middle; }
 .exchange-ad-numbers span { padding: 2px 6px; border: 1px solid currentColor; border-radius: 4px; background: rgba(255,255,255,.7); font-family: system-ui, sans-serif; font-size: 12px; font-weight: 900; }
 .exchange-status { margin: 12px 0; color: #c6d2e5; font-size: 13px; line-height: 1.5; }
+.sale-page { width:100%; max-width:1100px; min-height:calc(100dvh - 70px); margin:auto; padding:24px 16px 100px; color:var(--theme-cream); }
+.sale-page h2 { margin:20px 0 8px; color:var(--theme-gold-light); font-size:25px; }
+.sale-intro,.sale-status { color:#c6d2e5; font-size:13px; line-height:1.5; }
+.sale-section { margin:22px 0; padding:16px; border:1px solid rgba(243,191,56,.68); border-radius:15px; background:linear-gradient(145deg,#183766,#10264a); box-shadow:0 8px 20px rgba(0,0,0,.22),inset 0 1px rgba(255,255,255,.08); }
+.sale-section h3 { margin:0 0 12px; color:var(--theme-gold-light); }
+.sale-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(145px,1fr)); gap:12px; }
+.sale-card { min-width:0; padding:10px; border:1px solid rgba(243,191,56,.55); border-radius:12px; background:linear-gradient(145deg,#0c1b35,#16335d); color:#fff7df; text-align:center; box-shadow:0 5px 13px rgba(0,0,0,.22); }
+.sale-card img { display:block; width:min(100%,145px); aspect-ratio:2/3; object-fit:cover; margin:0 auto 8px; border:1px solid #d6b64e; border-radius:8px; background:#071327; }
+.sale-card strong,.sale-card span { display:block; overflow-wrap:anywhere; }
+.sale-card span { margin:4px 0; color:#d5deed; font-size:12px; }
+.sale-card button { width:100%; min-height:36px; margin-top:6px; padding:7px; border:1px solid #e8bf45; border-radius:8px; background:linear-gradient(135deg,#ffe17b,#edb52b); color:#10264a; font:inherit; font-size:12px; font-weight:900; cursor:pointer; box-shadow:0 3px 0 #a8780b; }
+.sale-card button.secondary { background:linear-gradient(135deg,#eaf2ff,#b9cce8); border-color:#8fa8ca; box-shadow:0 3px 0 #617a9e; }
+.sale-form { display:flex; flex-wrap:wrap; justify-content:center; align-items:center; gap:6px; margin-top:6px; }
+.sale-form input { width:74px; min-height:34px; padding:5px; border:1px solid #9baec7; border-radius:7px; text-align:center; font:inherit; }
+.sale-inventory { margin-top:15px; padding-top:12px; border-top:1px solid rgba(255,255,255,.15); }
+@media(max-width:620px){.sale-page{padding:18px 11px 92px}.sale-section{padding:12px}.sale-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.sale-card{padding:8px}.sale-card img{width:min(100%,120px)}}
 @media (max-width: 620px) { .exchange-page { padding: 18px 11px 92px; } .exchange-ad p { font-size: 15px; } .exchange-modal-actions > button { flex: 1 1 100%; } }
 .statistics-page { width: 100%; max-width: 1200px; min-height: calc(100dvh - 70px); margin: auto; padding: 24px 16px 100px; color: var(--theme-cream); }
 .statistics-page h2 { margin-top: 20px; color: var(--theme-gold-light); font-size: 24px; }
@@ -2714,9 +2733,12 @@ body {
             <span id="playerCards" class="hidden">0</span>
         </section>
 
-        <section class="home-overview-grid" aria-label="Classement et Service">
+        <section class="home-overview-grid" aria-label="Classement, Vente et Activité">
             <button id="leaderboardMenuButton" class="home-overview-leaderboard" type="button" aria-label="Ouvrir le classement" title="Classement">
                 <img loading="lazy" decoding="async" src="./Classement.png?v=20261019" alt="">
+            </button>
+            <button id="saleHomeButton" class="home-overview-sale" type="button" aria-label="Ouvrir la page Vente" title="Vente">
+                <img loading="lazy" decoding="async" src="./Vente.png?v=20261029" alt="">
             </button>
             <button id="activityHomeButton" class="home-overview-activity" type="button" aria-label="Ouvrir la page Activité" title="Activité">
                 <img loading="lazy" decoding="async" src="./Activité.png" alt="">
@@ -3140,6 +3162,17 @@ body {
         <h3 class="exchange-ads-heading">Petites annonces</h3>
         <p id="exchangeAdsStatus" class="exchange-status" role="status" aria-live="polite">Chargement des annonces…</p>
         <div id="exchangeAdsList" class="exchange-ads-list" aria-live="polite"></div>
+    </section>
+
+    <section id="salePage" class="sale-page hidden" aria-labelledby="saleTitle">
+        <button id="saleBackButton" class="admin-back" type="button">← Retour à l’accueil</button>
+        <h2 id="saleTitle">🛒 Vente entre joueurs</h2>
+        <p class="sale-intro">Vends tes cartes en double contre des jetons classiques. Les cartes mystiques ne sont pas vendables.</p>
+        <p id="saleStatus" class="sale-status" role="status" aria-live="polite">Chargement du marché…</p>
+        <section class="sale-section" aria-labelledby="saleDirectTitle"><h3 id="saleDirectTitle">Vente directe</h3><p class="sale-intro">Prix fixé par rareté : commune 1 jeton, rare 2 jetons, légendaire 3 jetons.</p><div id="saleDirectListings" class="sale-grid"></div><div class="sale-inventory"><h4>Mettre un double en vente directe</h4><div id="saleDirectInventory" class="sale-grid"></div></div></section>
+        <section class="sale-section" aria-labelledby="saleOffersTitle"><h3 id="saleOffersTitle">Annonces et propositions de prix</h3><div id="saleOfferListings" class="sale-grid"></div><div class="sale-inventory"><h4>Publier une annonce à ton prix</h4><div id="saleOfferInventory" class="sale-grid"></div></div></section>
+        <section class="sale-section" aria-labelledby="saleReceivedTitle"><h3 id="saleReceivedTitle">Propositions reçues</h3><div id="saleReceivedOffers" class="sale-grid"></div></section>
+        <section class="sale-section" aria-labelledby="saleOwnTitle"><h3 id="saleOwnTitle">Mes annonces</h3><div id="saleOwnListings" class="sale-grid"></div></section>
     </section>
 
     <section id="recyclingPage" class="player-collection hidden" aria-labelledby="recyclingTitle">
@@ -3818,6 +3851,12 @@ const callGetAdminGavSettings = httpsCallable(functions, "getAdminGavSettings");
 const callSaveAdminGavSettings = httpsCallable(functions, "saveAdminGavSettings");
 const callGetOwnedCardNumbers = httpsCallable(functions, "getOwnedCardNumbers");
 const callGetExchangeBoard = httpsCallable(functions, "getExchangeBoard");
+const callGetSaleMarket = httpsCallable(functions, "getSaleMarket");
+const callCreateSaleListing = httpsCallable(functions, "createSaleListing");
+const callBuySaleListing = httpsCallable(functions, "buySaleListing");
+const callProposeSalePrice = httpsCallable(functions, "proposeSalePrice");
+const callRespondSaleOffer = httpsCallable(functions, "respondSaleOffer");
+const callCancelSaleListing = httpsCallable(functions, "cancelSaleListing");
 const callGetAdminPlayers = httpsCallable(functions, "getAdminPlayers");
 const callRecordHistoricalPremiumPayment = httpsCallable(functions, "recordHistoricalPremiumPayment");
 const callAdjustPlayerTokens = httpsCallable(functions, "adjustPlayerTokens");
@@ -4730,6 +4769,16 @@ const exchangeMissingNumbers = document.getElementById("exchangeMissingNumbers")
 const exchangeMissingStatus = document.getElementById("exchangeMissingStatus");
 const exchangeAdsStatus = document.getElementById("exchangeAdsStatus");
 const exchangeAdsList = document.getElementById("exchangeAdsList");
+const salePage = document.getElementById("salePage");
+const saleBackButton = document.getElementById("saleBackButton");
+const saleHomeButton = document.getElementById("saleHomeButton");
+const saleStatus = document.getElementById("saleStatus");
+const saleDirectListings = document.getElementById("saleDirectListings");
+const saleOfferListings = document.getElementById("saleOfferListings");
+const saleDirectInventory = document.getElementById("saleDirectInventory");
+const saleOfferInventory = document.getElementById("saleOfferInventory");
+const saleReceivedOffers = document.getElementById("saleReceivedOffers");
+const saleOwnListings = document.getElementById("saleOwnListings");
 const collectionBackButton = document.getElementById("collectionBackButton");
 const collectionSeasonOneButton = document.getElementById("collectionSeasonOneButton");
 const collectionSeasonTwoButton = document.getElementById("collectionSeasonTwoButton");
@@ -5194,6 +5243,7 @@ onAuthStateChanged(
             rulesPage.classList.add("hidden");
             profilePage.classList.add("hidden");
     exchangePage.classList.add("hidden");
+    salePage.classList.add("hidden");
             leaderboardPage.classList.add("hidden"); activityPage.classList.add("hidden");
             statisticsPage.classList.add("hidden");
             drawnCardsPage.classList.add("hidden");
@@ -5456,6 +5506,7 @@ function showHomePage() {
     financePage.classList.add("hidden");
     profilePage.classList.add("hidden");
     exchangePage.classList.add("hidden");
+    salePage.classList.add("hidden");
     leaderboardPage.classList.add("hidden"); activityPage.classList.add("hidden");
     statisticsPage.classList.add("hidden");
     drawnCardsPage.classList.add("hidden");
@@ -5482,7 +5533,7 @@ async function showExchangePage() {
     if (!auth.currentUser) return;
     dropdownMenu.classList.add("hidden");
     document.querySelector(".app-content").classList.add("hidden");
-    [termsPage, financePage, profilePage, leaderboardPage, activityPage, statisticsPage, drawnCardsPage, collectionPage, exchangePage, recyclingPage, adminPage, eventBoostersAdminPage, effectifPage, messagingPage, rulesPage, premiumPage, archivesPage, adminHubPage, pollsAdminPage].forEach((page) => page.classList.add("hidden"));
+    [termsPage, financePage, profilePage, leaderboardPage, activityPage, statisticsPage, drawnCardsPage, collectionPage, exchangePage, salePage, recyclingPage, adminPage, eventBoostersAdminPage, effectifPage, messagingPage, rulesPage, premiumPage, archivesPage, adminHubPage, pollsAdminPage].forEach((page) => page.classList.add("hidden"));
     exchangePage.classList.remove("hidden");
     bottomNav.classList.add("hidden");
     exchangeMissingNumbers.replaceChildren();
@@ -7671,7 +7722,7 @@ async function openActivityPage() {
     if (!auth.currentUser) return;
     dropdownMenu.classList.add("hidden");
     document.querySelector(".app-content").classList.add("hidden");
-    [termsPage, financePage, profilePage, leaderboardPage, activityPage, statisticsPage, drawnCardsPage, collectionPage, exchangePage, recyclingPage, adminPage, eventBoostersAdminPage, effectifPage, messagingPage, rulesPage, premiumPage, archivesPage, adminHubPage, pollsAdminPage].forEach((page) => page.classList.add("hidden"));
+    [termsPage, financePage, profilePage, leaderboardPage, activityPage, statisticsPage, drawnCardsPage, collectionPage, exchangePage, salePage, recyclingPage, adminPage, eventBoostersAdminPage, effectifPage, messagingPage, rulesPage, premiumPage, archivesPage, adminHubPage, pollsAdminPage].forEach((page) => page.classList.add("hidden"));
     activityPage.classList.remove("hidden");
     bottomNav.classList.add("hidden");
     await loadWeeklyActivity();
@@ -7680,6 +7731,78 @@ async function openActivityPage() {
 activityHomeButton.addEventListener("click", openActivityPage);
 activityBackButton.addEventListener("click", showHomePage);
 activityMetricSelect.addEventListener("change", loadWeeklyActivity);
+
+function saleCardImageUrl(card) {
+    const raw = String(card?.imageUrl || "").trim();
+    return raw || "./Dos%20cartes.png";
+}
+
+function makeSaleCard(card, detail, buttonLabel, onAction, secondary = false) {
+    const article = document.createElement("article"); article.className = "sale-card";
+    const image = document.createElement("img"); image.loading = "lazy"; image.decoding = "async"; image.src = saleCardImageUrl(card); image.alt = card?.name || "Carte";
+    image.addEventListener("error", () => { image.src = "./Dos%20cartes.png"; }, { once: true });
+    const title = document.createElement("strong"); title.textContent = card?.name || `Carte n° ${card?.number || "?"}`;
+    const info = document.createElement("span"); info.textContent = detail;
+    article.append(image, title, info);
+    if (buttonLabel && onAction) { const button = document.createElement("button"); button.type = "button"; button.textContent = buttonLabel; if (secondary) button.classList.add("secondary"); button.addEventListener("click", onAction); article.append(button); }
+    return article;
+}
+
+async function loadSaleMarket() {
+    [saleDirectListings, saleOfferListings, saleDirectInventory, saleOfferInventory, saleReceivedOffers, saleOwnListings].forEach((node) => node.replaceChildren());
+    saleStatus.textContent = "Chargement du marché…";
+    try {
+        const result = (await callGetSaleMarket()).data || {};
+        const listings = Array.isArray(result.listings) ? result.listings : [];
+        const inventory = Array.isArray(result.inventory) ? result.inventory : [];
+        const offers = Array.isArray(result.offers) ? result.offers : [];
+        const rarityName = (rarity) => ({ commune: "Commune", rare: "Rare", legendaire: "Légendaire" }[rarity] || rarity);
+        const run = async (action, successText) => { try { await action(); saleStatus.textContent = successText; await loadSaleMarket(); } catch (error) { console.error("Action du marché impossible :", error); saleStatus.textContent = error.message || "Action impossible. Réessaie."; } };
+        listings.filter((listing) => listing.mode === "direct" && !listing.own).forEach((listing) => {
+            saleDirectListings.append(makeSaleCard(listing.card, `${rarityName(listing.card?.rarity)} · ${listing.price} jeton${listing.price > 1 ? "s" : ""} · ${listing.sellerPseudo}`, `Acheter · ${listing.price} jeton${listing.price > 1 ? "s" : ""}`, () => void run(() => callBuySaleListing({ listingId: listing.id }), "Achat effectué !")));
+        });
+        listings.filter((listing) => listing.mode === "offer" && !listing.own).forEach((listing) => {
+            const article = makeSaleCard(listing.card, `${rarityName(listing.card?.rarity)} · Prix demandé : ${listing.price} jeton${listing.price > 1 ? "s" : ""} · ${listing.sellerPseudo}`, null, null);
+            const buy = document.createElement("button"); buy.type = "button"; buy.textContent = `Acheter · ${listing.price} jeton${listing.price > 1 ? "s" : ""}`; buy.addEventListener("click", () => void run(() => callBuySaleListing({ listingId: listing.id }), "Achat effectué !"));
+            const form = document.createElement("form"); form.className = "sale-form"; const input = document.createElement("input"); input.type = "number"; input.min = "1"; input.max = "100000"; input.step = "1"; input.required = true; input.value = String(listing.price); input.setAttribute("aria-label", "Ta proposition en jetons"); const propose = document.createElement("button"); propose.type = "submit"; propose.className = "secondary"; propose.textContent = "Proposer ce prix";
+            form.append(input, propose); form.addEventListener("submit", (event) => { event.preventDefault(); void run(() => callProposeSalePrice({ listingId: listing.id, price: Number(input.value) }), "Proposition envoyée au vendeur."); }); article.append(buy, form); saleOfferListings.append(article);
+        });
+        inventory.forEach((card) => {
+            const fixed = ({ commune: 1, rare: 2, legendaire: 3 })[card.rarity];
+            saleDirectInventory.append(makeSaleCard(card, `${rarityName(card.rarity)} · ${card.count} exemplaires · prix ${fixed} jeton${fixed > 1 ? "s" : ""}`, "Mettre en vente", () => void run(() => callCreateSaleListing({ copyId: card.copyId, mode: "direct", price: fixed }), "Carte mise en vente.")));
+            const article = makeSaleCard(card, `${rarityName(card.rarity)} · ${card.count} exemplaires`, null, null);
+            const form = document.createElement("form"); form.className = "sale-form"; const input = document.createElement("input"); input.type = "number"; input.min = "1"; input.max = "100000"; input.step = "1"; input.required = true; input.placeholder = "Prix"; input.setAttribute("aria-label", "Prix demandé en jetons"); const button = document.createElement("button"); button.type = "submit"; button.textContent = "Publier"; form.append(input, button); form.addEventListener("submit", (event) => { event.preventDefault(); void run(() => callCreateSaleListing({ copyId: card.copyId, mode: "offer", price: Number(input.value) }), "Annonce publiée."); }); article.append(form); saleOfferInventory.append(article);
+        });
+        offers.forEach((offer) => {
+            const article = document.createElement("article"); article.className = "sale-card"; const text = document.createElement("span"); text.textContent = `${offer.buyerPseudo || "Joueur"} propose ${offer.price} jeton${offer.price > 1 ? "s" : ""}.`;
+            const listing = listings.find((item) => item.id === offer.listingId); if (listing) { const image = document.createElement("img"); image.src = saleCardImageUrl(listing.card); image.alt = listing.card?.name || "Carte"; article.append(image); }
+            const accept = document.createElement("button"); accept.type = "button"; accept.textContent = "Accepter"; accept.addEventListener("click", () => void run(() => callRespondSaleOffer({ offerId: offer.id, accept: true }), "Vente conclue !")); const refuse = document.createElement("button"); refuse.type = "button"; refuse.className = "secondary"; refuse.textContent = "Refuser"; refuse.addEventListener("click", () => void run(() => callRespondSaleOffer({ offerId: offer.id, accept: false }), "Proposition refusée.")); article.append(text, accept, refuse); saleReceivedOffers.append(article);
+        });
+        listings.filter((listing) => listing.own).forEach((listing) => {
+            saleOwnListings.append(makeSaleCard(listing.card, `${listing.mode === "direct" ? "Vente directe" : "Prix libre"} · ${listing.price} jeton${listing.price > 1 ? "s" : ""}`, "Retirer l’annonce", () => void run(() => callCancelSaleListing({ listingId: listing.id }), "Annonce retirée."), true));
+        });
+        if (!saleDirectListings.childElementCount) saleDirectListings.innerHTML = '<p class="sale-intro">Aucune carte en vente directe pour le moment.</p>';
+        if (!saleOfferListings.childElementCount) saleOfferListings.innerHTML = '<p class="sale-intro">Aucune annonce à prix libre pour le moment.</p>';
+        if (!saleDirectInventory.childElementCount) saleDirectInventory.innerHTML = '<p class="sale-intro">Tu n’as pas de carte en double vendable.</p>';
+        if (!saleOfferInventory.childElementCount) saleOfferInventory.innerHTML = '<p class="sale-intro">Tu n’as pas de carte en double vendable.</p>';
+        if (!saleReceivedOffers.childElementCount) saleReceivedOffers.innerHTML = '<p class="sale-intro">Aucune proposition reçue.</p>';
+        if (!saleOwnListings.childElementCount) saleOwnListings.innerHTML = '<p class="sale-intro">Tu n’as aucune annonce active.</p>';
+        saleStatus.textContent = `Solde : ${Number(result.tokens) || 0} jeton${Number(result.tokens) === 1 ? "" : "s"} classique${Number(result.tokens) === 1 ? "" : "s"}. Les cartes en vente sont temporairement réservées.`;
+    } catch (error) {
+        console.error("Impossible de charger le marché :", error);
+        saleStatus.textContent = error.message || "Impossible de charger la page Vente. Vérifie que les fonctions Firebase du marché sont déployées.";
+    }
+}
+
+async function openSalePage() {
+    if (!auth.currentUser) return;
+    dropdownMenu.classList.add("hidden"); document.querySelector(".app-content").classList.add("hidden");
+    [termsPage, financePage, profilePage, leaderboardPage, activityPage, statisticsPage, drawnCardsPage, collectionPage, exchangePage, salePage, recyclingPage, adminPage, eventBoostersAdminPage, effectifPage, messagingPage, rulesPage, premiumPage, archivesPage, adminHubPage, pollsAdminPage].forEach((page) => page.classList.add("hidden"));
+    salePage.classList.remove("hidden"); bottomNav.classList.add("hidden"); await loadSaleMarket();
+}
+
+saleHomeButton.addEventListener("click", openSalePage);
+saleBackButton.addEventListener("click", showHomePage);
 
 async function loadOwnedPlayerCards() {
     ownedPlayerCardGrid.replaceChildren();
