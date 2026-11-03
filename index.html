@@ -3340,6 +3340,15 @@ body {
                 </div>
                 <p id="premiumPlayersStatus" class="premium-status" role="status" aria-live="polite"></p>
             </section>
+            <section class="premium-grant-card" aria-labelledby="premiumGiftTitle">
+                <h3 id="premiumGiftTitle">Donner des jetons Premium</h3>
+                <p>Attribution offerte : elle crédite le compte sans enregistrer de paiement ni de dépense en euros.</p>
+                <div class="premium-grant-fields">
+                    <div><label for="premiumGiftAmount">Nombre de jetons Premium</label><input id="premiumGiftAmount" class="admin-field" type="number" min="1" max="1000000" step="1" value="1"></div>
+                    <button id="premiumGiftSubmit" class="primary-button" type="button">Donner les jetons</button>
+                </div>
+                <p id="premiumGiftStatus" class="premium-status" role="status" aria-live="polite"></p>
+            </section>
             <section class="premium-player-table-card" aria-labelledby="premiumPlayersTableTitle">
                 <h3 id="premiumPlayersTableTitle">Soldes et utilisation par joueur</h3>
                 <div class="premium-player-table-wrap">
@@ -3879,6 +3888,7 @@ const callSavePremiumBoosterSettings = httpsCallable(functions, "savePremiumBoos
 const callOpenPremiumBooster = httpsCallable(functions, "openPremiumBooster");
 const callTestPremiumWheel = httpsCallable(functions, "testPremiumWheel");
 const callAdjustPlayerPremiumTokens = httpsCallable(functions, "adjustPlayerPremiumTokens");
+const callGrantPremiumTokens = httpsCallable(functions, "grantPremiumTokens");
 const callInitializePremiumAssignedTokens = httpsCallable(functions, "initializePremiumAssignedTokens");
 const callGetPremiumWheelJournal = httpsCallable(functions, "getPremiumWheelJournal");
 const callGetPremiumRewardCards = httpsCallable(functions, "getPremiumRewardCards");
@@ -4628,6 +4638,9 @@ const premiumPlayerSelect = document.getElementById("premiumPlayerSelect");
 const premiumAdjustDirection = document.getElementById("premiumAdjustDirection");
 const premiumAdjustAmount = document.getElementById("premiumAdjustAmount");
 const premiumAdjustSubmit = document.getElementById("premiumAdjustSubmit");
+const premiumGiftAmount = document.getElementById("premiumGiftAmount");
+const premiumGiftSubmit = document.getElementById("premiumGiftSubmit");
+const premiumGiftStatus = document.getElementById("premiumGiftStatus");
 const premiumPlayersTableBody = document.getElementById("premiumPlayersTableBody");
 const premiumJournalStatus = document.getElementById("premiumJournalStatus");
 const premiumJournalList = document.getElementById("premiumJournalList");
@@ -6926,6 +6939,33 @@ premiumAdjustSubmit.addEventListener("click", async () => {
         premiumPlayersStatus.textContent = error.message || "Impossible de modifier le solde Premium.";
     } finally {
         premiumAdjustSubmit.disabled = false;
+    }
+});
+
+premiumGiftSubmit.addEventListener("click", async () => {
+    if (!isCurrentUserAdmin() || isPlayerPreview) return;
+    const playerId = premiumPlayerSelect.value;
+    const amount = Number(premiumGiftAmount.value);
+    if (!playerId || !Number.isSafeInteger(amount) || amount < 1 || amount > 1_000_000) {
+        premiumGiftStatus.textContent = "Choisis un joueur et indique un nombre entier de jetons entre 1 et 1 000 000.";
+        return;
+    }
+    premiumGiftSubmit.disabled = true;
+    premiumGiftStatus.textContent = "Attribution des jetons…";
+    try {
+        const response = await callGrantPremiumTokens({ playerId, amount });
+        if (playerId === auth.currentUser.uid) {
+            premiumBalanceCount = Number(response.data.jetonsPremium) || 0;
+            premiumBalanceDisplay.textContent = premiumBalanceCount.toLocaleString("fr-FR");
+            renderPremiumPrizeList(premiumPrizes);
+        }
+        premiumGiftStatus.textContent = `${amount.toLocaleString("fr-FR")} jeton(s) Premium offert(s) à ${premiumPlayerSelect.selectedOptions[0]?.textContent || "ce joueur"}. Aucun paiement n’a été enregistré.`;
+        await loadPremiumAdminPlayers();
+    } catch (error) {
+        console.error("Erreur lors de l’attribution offerte de jetons Premium :", error);
+        premiumGiftStatus.textContent = error.message || "Impossible d’attribuer les jetons Premium.";
+    } finally {
+        premiumGiftSubmit.disabled = false;
     }
 });
 
