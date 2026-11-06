@@ -4989,9 +4989,9 @@ function openExchangeComposer(ad) {
         select.replaceChildren();
         cards.forEach((card) => {
             const option = document.createElement("option");
-            option.value = String(card.number);
+            option.value = `${Number(card.season) || 1}|${card.number}`;
             const rarity = card.rarity === "rare" ? "Rare" : card.rarity === "legendaire" ? "Légendaire" : "Commune";
-            option.textContent = `N° ${card.number} — ${rarity}`;
+            option.textContent = `Saison ${Number(card.season) || 1} · N° ${card.number} — ${rarity}`;
             select.append(option);
         });
     };
@@ -5005,8 +5005,10 @@ function openExchangeComposer(ad) {
 
 exchangeComposeSubmit.addEventListener("click", async () => {
     if (!exchangeOfferTarget || !auth.currentUser) return;
-    const offeredNumber = Number(exchangeSendNumber.value);
-    const requestedNumber = Number(exchangeReceiveNumber.value);
+    const [offeredSeason, offeredNumberText] = exchangeSendNumber.value.split("|");
+    const [requestedSeason, requestedNumberText] = exchangeReceiveNumber.value.split("|");
+    const offeredNumber = Number(offeredNumberText);
+    const requestedNumber = Number(requestedNumberText);
     if (!Number.isSafeInteger(offeredNumber) || !Number.isSafeInteger(requestedNumber)) {
         exchangeComposeStatus.textContent = "Sélectionne les deux cartes avant d’envoyer la demande.";
         return;
@@ -5014,7 +5016,7 @@ exchangeComposeSubmit.addEventListener("click", async () => {
     exchangeComposeSubmit.disabled = true;
     exchangeComposeStatus.textContent = "Envoi de la demande…";
     try {
-        await callCreateExchangeOffer({ recipientId: exchangeOfferTarget.id, offeredNumber, requestedNumber });
+        await callCreateExchangeOffer({ recipientId: exchangeOfferTarget.id, offeredNumber, offeredSeason, requestedNumber, requestedSeason });
         const targetPseudo = exchangeOfferTarget.pseudo || "ce joueur";
         exchangeComposeStatus.textContent = `Demande envoyée à ${targetPseudo}. Il la recevra sur le site.`;
         exchangeAdsStatus.textContent = `Ta demande d’échange a été envoyée à ${targetPseudo}.`;
@@ -5692,7 +5694,7 @@ async function showExchangePage() {
                 : card.rarity === "legendaire" ? "exchange-rarity-legendary" : "exchange-rarity-common";
             item.className = rarityClass;
             item.textContent = String(card.number);
-            item.title = card.rarity === "rare" ? "Carte rare" : card.rarity === "legendaire" ? "Carte légendaire" : "Carte commune";
+            item.title = `Saison ${Number(card.season) || 1} · ` + (card.rarity === "rare" ? "Carte rare" : card.rarity === "legendaire" ? "Carte légendaire" : "Carte commune");
             exchangeMissingNumbers.append(item);
         });
         exchangeMissingStatus.textContent = missingCards.length
@@ -5719,8 +5721,8 @@ async function showExchangePage() {
                         const number = document.createElement("span");
                         number.className = card.rarity === "rare" ? "exchange-rarity-rare"
                             : card.rarity === "legendaire" ? "exchange-rarity-legendary" : "exchange-rarity-common";
-                        number.textContent = String(card.number);
-                        number.title = card.rarity === "rare" ? "Carte rare" : card.rarity === "legendaire" ? "Carte légendaire" : "Carte commune";
+                        number.textContent = `${Number(card.season) || 1}-${card.number}`;
+                        number.title = `Saison ${Number(card.season) || 1} · ` + (card.rarity === "rare" ? "Carte rare" : card.rarity === "legendaire" ? "Carte légendaire" : "Carte commune");
                         numbers.append(number);
                     });
                     paragraph.append(numbers);
