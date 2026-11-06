@@ -1440,6 +1440,7 @@ body {
 .card-entry legend { padding: 0 6px; color: var(--theme-ink); font-size: 13px; font-weight: 800; }
 .card-entry label { display: block; margin-top: 6px; color: var(--theme-ink); font-size: 11px; line-height: 1.35; }
 .card-entry .admin-field { margin: 7px 0; padding: 9px 8px; font-size: 12px; }
+.card-entry .card-rarity-chance { display:block; min-height:2.6em; margin:-2px 0 7px; color:#36547a; font-size:10px; font-weight:750; line-height:1.35; }
 .card-entry textarea.admin-field { min-height: 62px; }
 .card-entry .admin-card-preview { width: 100%; max-width: 160px; max-height: 130px; margin: 6px auto; }
 .card-form-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
@@ -3633,10 +3634,14 @@ body {
                         <input id="cardCategory" data-card-field="category" class="admin-field" type="text" maxlength="50" placeholder="Catégorie (ex. Unité, Véhicule, Minage)">
                         <input id="cardNumber" data-card-field="number" class="admin-field" type="number" min="1" max="1000000" step="1" inputmode="numeric" placeholder="Numéro (facultatif)">
                         <label>Saison de la carte</label>
-                        <input data-card-field="season" class="admin-field" type="text" maxlength="40" placeholder="Ex. Saison 1 (par défaut)">
+                        <select data-card-field="season" class="admin-field">
+                            <option value="Saison 1">Saison 1</option>
+                            <option value="Saison 2">Saison 2</option>
+                        </select>
                         <select id="cardRarity" data-card-field="rarity" class="admin-field">
                             <option value="">Choisir une rareté</option>
                         </select>
+                        <small class="card-rarity-chance" data-card-rarity-chance aria-live="polite">Choisis une saison et une rareté pour voir son taux dans le booster normal.</small>
                         <label for="cardImageFile">Visuel (JPG, PNG ou WebP, 5 Mo maximum)</label>
                         <input id="cardImageFile" data-card-field="file" class="admin-field" type="file" accept="image/jpeg,image/png,image/webp">
                         <img loading="lazy" decoding="async" id="cardImagePreview" class="admin-card-preview hidden" alt="Aperçu du visuel">
@@ -5045,6 +5050,7 @@ for (let index = 2; index <= 5; index += 1) {
         if (field.type === "file") field.value = "";
         else field.value = "";
     });
+    entry.querySelector('[data-card-field="season"]').value = "Saison 1";
     entry.querySelector("img").classList.add("hidden");
     entry.querySelector("img").removeAttribute("src");
     cardEntryGrid.append(entry);
@@ -5078,6 +5084,41 @@ function isNoRarityCardCategory(value) {
     return isMinageCategory(value) || isCassosCategory(value);
 }
 
+function normalizeCardRarityKey(value) {
+    return String(value || "").trim().toLocaleLowerCase("fr").normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/s$/, "");
+}
+
+function updateCardRarityChance(entry) {
+    if (!entry) return;
+    const note = entry.querySelector("[data-card-rarity-chance]");
+    const category = entry.querySelector('[data-card-field="category"]')?.value || "";
+    const season = entry.querySelector('[data-card-field="season"]')?.value || "Saison 1";
+    const rarityField = entry.querySelector('[data-card-field="rarity"]');
+    const rarity = rarityField?.value || "";
+    if (!note) return;
+    const seasonChances = normalBoosterSettings?.[season]?.rarityChances || {};
+    rarityField?.querySelectorAll("option").forEach((option) => {
+        if (!option.value) return;
+        const optionChance = seasonChances[normalizeCardRarityKey(option.value)];
+        option.textContent = Number.isFinite(Number(optionChance))
+            ? `${option.value} (${Number(optionChance).toLocaleString("fr-FR")} % · ${season})`
+            : `${option.value} (${season} : taux indisponible)`;
+    });
+    if (isNoRarityCardCategory(category)) {
+        note.textContent = `Les cartes ${isCassosCategory(category) ? "Cassos" : "Minage"} n’ont pas de rareté et ne sont pas incluses dans les boosters normaux.`;
+        return;
+    }
+    if (!rarity) {
+        note.textContent = `Choisis une rareté pour voir son taux dans le booster normal ${season}.`;
+        return;
+    }
+    const rarityKey = normalizeCardRarityKey(rarity);
+    const chance = normalBoosterSettings?.[season]?.rarityChances?.[rarityKey];
+    note.textContent = Number.isFinite(Number(chance))
+        ? `Taux de ${rarity} par carte dans le booster normal ${season} : ${Number(chance).toLocaleString("fr-FR")} %.`
+        : `Aucun taux configuré pour ${rarity} dans le booster normal ${season}.`;
+}
+
 function syncCardRarityField(entry) {
     if (!entry) return;
     const categoryField = entry.querySelector('[data-card-field="category"]');
@@ -5095,6 +5136,7 @@ function syncCardRarityField(entry) {
         rarityField.options[0].textContent = "Choisir une rareté";
         rarityField.removeAttribute("aria-label");
     }
+    updateCardRarityChance(entry);
 }
 
 function getCardRarityColor(card) {
@@ -5107,10 +5149,15 @@ cardForm.addEventListener("change", (event) => {
         syncCardRarityField(event.target.closest(".card-entry"));
         return;
     }
+    if (event.target.matches('[data-card-field="season"]')) {
+        updateCardRarityChance(event.target.closest(".card-entry"));
+        return;
+    }
     if (!event.target.matches('[data-card-field="rarity"]')) return;
     const color = getRarityColor(event.target.value);
     event.target.style.borderColor = color;
     event.target.style.boxShadow = "0 0 0 2px " + color + "33";
+    updateCardRarityChance(event.target.closest(".card-entry"));
 });
 
 
@@ -9443,7 +9490,7 @@ async function loadRarities() {
             rarities.forEach((item) => {
                 const option = document.createElement("option");
                 option.value = item.name;
-                option.textContent = item.name + " (" + Number(item.percentage || 0) + " %)";
+                option.textContent = item.name;
                 select.append(option);
             });
             select.value = previousValue;
@@ -9968,6 +10015,7 @@ async function showAdminSection(sectionName) {
     if (sectionName === "rarities") await loadRarities();
     if (sectionName === "cards") {
         await loadRarities();
+        await loadNormalBoosterSettings(false);
         await loadCards();
     }
     if (sectionName === "gav") await loadAdminGavSettings();
@@ -9994,6 +10042,7 @@ function applyNormalBoosterSettings(settingsBySeason, fillAdminFields = false) {
         updateNormalBoosterChanceTotal(season);
     });
     updateClassicBoosterPurchaseAvailability();
+    cardEntryGrid.querySelectorAll(".card-entry").forEach((entry) => updateCardRarityChance(entry));
 }
 
 async function loadNormalBoosterSettings(fillAdminFields = true) {
@@ -11508,6 +11557,7 @@ cardForm.addEventListener("submit", async (event) => {
             entry.classList.remove("hidden");
             entry.querySelectorAll("input, select, textarea").forEach((field) => { field.disabled = false; });
             clearCardEntryPreview(entry);
+            syncCardRarityField(entry);
         });
         cardSubmit.textContent = "Ajouter les cartes saisies";
         cardCancelEdit.classList.add("hidden");
