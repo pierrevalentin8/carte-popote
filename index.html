@@ -978,6 +978,10 @@ body {
 .booster-classic button { position: relative; z-index: 1; }
 .booster-classic #openNormalBoosterButton { background: linear-gradient(135deg, #153d70, #0b2146); border-color: #d8ad47; color: #fff6d8; box-shadow: 0 5px 12px rgba(9, 28, 58, .28), inset 0 1px 0 rgba(255,255,255,.22); }
 .booster-classic #openNormalBoosterButton:disabled { background: #d8d5cc; border-color: #c6c1b5; color: #696b70; box-shadow: none; }
+.booster-season-two { border-color: rgba(40, 174, 76, .9); box-shadow: 0 12px 28px rgba(7, 26, 57, .18), inset 0 0 18px rgba(20, 160, 70, .13); }
+.booster-season-two h4 { color: #c8ff9c; }
+.booster-season-two #openSeason2BoosterButton { background: linear-gradient(135deg, #16852f, #07531e); border-color: #e4c557; color: #fffde8; }
+.booster-season-two #openSeason2BoosterButton:disabled { background: #d8d5cc; border-color: #c6c1b5; color: #696b70; }
 @keyframes classicBoosterSmokeRise { 0% { opacity: .42; transform: translate3d(-2%, 9%, 0) scale(.94) skewX(-4deg); } 38% { opacity: .78; transform: translate3d(2%, 1%, 0) scale(1.02) skewX(5deg); } 72% { opacity: .58; transform: translate3d(-1%, -9%, 0) scale(1.08) skewX(-5deg); } 100% { opacity: .3; transform: translate3d(2%, -20%, 0) scale(1.14) skewX(4deg); } }
 @media (prefers-reduced-motion: reduce) { .booster-classic::before, .booster-classic::after, .booster-daily::before, .booster-daily::after { animation: none; } }
 
@@ -2105,6 +2109,12 @@ body {
 .admin-panel .message-category-button[aria-pressed="true"] { background: linear-gradient(135deg, var(--theme-gold-light), #edb52b); color: var(--theme-navy); }
 .admin-panel .admin-message-copy { color: var(--theme-ink); }
 .admin-panel .admin-message-item small { color: var(--theme-muted); }
+.normal-booster-settings-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%,330px),1fr)); gap:12px; margin-top:12px; }
+.normal-booster-settings-card { display:grid; gap:9px; padding:14px; border:1px solid rgba(198,155,57,.62); border-radius:12px; background:linear-gradient(145deg,#fffdf6,#f1e8d2); }
+.normal-booster-settings-card h4 { margin:0; color:#17365d; font-size:17px; }
+.normal-booster-settings-card label { display:grid; gap:4px; color:#25364b; font-size:12px; font-weight:800; }
+.normal-booster-settings-card .admin-field { margin:0; }
+.normal-booster-chance-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; }
 .admin-menu { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; margin: 18px 0 12px; }
 .admin-menu-button { min-height: 56px; padding: 11px 12px; border: 1px solid rgba(243, 191, 56, .72); border-radius: 13px; background: #10264a; color: var(--theme-cream); font: inherit; font-weight: 700; cursor: pointer; transition: background .16s ease, transform .16s ease, color .16s ease; }
 .admin-menu-button:hover { transform: translateY(-1px); background: #183966; }
@@ -2675,6 +2685,7 @@ body {
             <button class="admin-menu-button" type="button" data-admin-section="cards" aria-controls="adminCardsSection" aria-pressed="false">🃏 Création de cartes</button>
             <button class="admin-menu-button" type="button" data-admin-section="serviceMissions" aria-controls="adminServiceMissionsSection" aria-pressed="false">📋 Gestion des missions</button>
             <button class="admin-menu-button" type="button" data-admin-section="cooperations" aria-controls="adminCooperationsSection" aria-pressed="false">🤝 Coopérations</button>
+            <button class="admin-menu-button" type="button" data-admin-section="normalBoosters" aria-controls="adminNormalBoostersSection" aria-pressed="false">🎴 Boosters normaux</button>
             <button class="admin-hub-card" type="button" data-admin-hub-action="tirages"><span class="admin-hub-card-icon">🃏</span><span><strong>Cartes tirées</strong><small>Total tiré par les joueurs</small></span></button>
             <button class="admin-hub-card" type="button" data-admin-hub-action="effectif"><span class="admin-hub-card-icon">👥</span><span><strong>Effectif</strong><small>Suivi mensuel des joueurs</small></span></button>
             <button class="admin-hub-card" type="button" data-admin-hub-action="boosters"><span class="admin-hub-card-icon">🎁</span><span><strong>Boosters évènementiels</strong><small>Programmation et attribution</small></span></button>
@@ -2820,7 +2831,7 @@ body {
                 </span>
 
                 <h4>
-                    Booster classique
+                    Booster classique · Saison 1
                 </h4>
 
                 <p>
@@ -2828,12 +2839,23 @@ body {
                 </p>
 
                 <button id="buyNormalBoosterButton" class="hidden" type="button">
-                    3 jeton
+                    3 jetons
                 </button>
                 <button id="openNormalBoosterButton" type="button" disabled>
                     Ouvrir un booster (0)
                 </button>
 
+            </article>
+
+            <article class="booster booster-classic booster-season-two">
+                <span class="booster-visual">
+                    <img loading="lazy" decoding="async" class="booster-image" src="./Booster%20normal%20Saison%202.png" alt="Illustration du booster classique Saison 2 Cartes & Popote">
+                    <strong class="booster-stock-badge"><span id="season2BoosterStockCount">0</span> en stock</strong>
+                </span>
+                <h4>Booster classique · Saison 2</h4>
+                <p>5 cartes</p>
+                <button id="buySeason2BoosterButton" class="hidden" type="button">3 jetons</button>
+                <button id="openSeason2BoosterButton" type="button" disabled>Ouvrir un booster</button>
             </article>
 
 
@@ -3570,6 +3592,38 @@ body {
             <p id="rarityStatus" class="admin-status" role="status"></p>
             <div id="raritiesList"></div>
         </div>
+        <div id="adminNormalBoostersSection" class="admin-panel admin-section hidden" style="margin-bottom:16px">
+            <h3>🎴 Réglages des boosters normaux</h3>
+            <p class="admin-note">Configure séparément le prix et les probabilités par rareté pour chaque saison. Chaque série de probabilités doit totaliser 100 %.</p>
+            <div class="normal-booster-settings-grid">
+                <section class="normal-booster-settings-card" aria-labelledby="normalBoosterSeason1Title">
+                    <h4 id="normalBoosterSeason1Title">Saison 1</h4>
+                    <label>Prix en jetons classiques<input id="normalBoosterSeason1Price" class="admin-field" type="number" min="1" max="1000000" step="1"></label>
+                    <div class="normal-booster-chance-grid">
+                        <label>Communes (%)<input class="admin-field normal-booster-chance" data-season="Saison 1" data-rarity="commune" type="number" min="0" max="100" step="0.01"></label>
+                        <label>Rares (%)<input class="admin-field normal-booster-chance" data-season="Saison 1" data-rarity="rare" type="number" min="0" max="100" step="0.01"></label>
+                        <label>Légendaires (%)<input class="admin-field normal-booster-chance" data-season="Saison 1" data-rarity="legendaire" type="number" min="0" max="100" step="0.01"></label>
+                        <label>Mystiques (%)<input class="admin-field normal-booster-chance" data-season="Saison 1" data-rarity="mystique" type="number" min="0" max="100" step="0.01"></label>
+                    </div>
+                    <p id="normalBoosterSeason1Total" class="admin-status" aria-live="polite">Total : 100 %</p>
+                    <button id="normalBoosterSeason1Save" class="primary-button" type="button">Enregistrer Saison 1</button>
+                    <p id="normalBoosterSeason1Status" class="admin-status" role="status" aria-live="polite"></p>
+                </section>
+                <section class="normal-booster-settings-card" aria-labelledby="normalBoosterSeason2Title">
+                    <h4 id="normalBoosterSeason2Title">Saison 2</h4>
+                    <label>Prix en jetons classiques<input id="normalBoosterSeason2Price" class="admin-field" type="number" min="1" max="1000000" step="1"></label>
+                    <div class="normal-booster-chance-grid">
+                        <label>Communes (%)<input class="admin-field normal-booster-chance" data-season="Saison 2" data-rarity="commune" type="number" min="0" max="100" step="0.01"></label>
+                        <label>Rares (%)<input class="admin-field normal-booster-chance" data-season="Saison 2" data-rarity="rare" type="number" min="0" max="100" step="0.01"></label>
+                        <label>Légendaires (%)<input class="admin-field normal-booster-chance" data-season="Saison 2" data-rarity="legendaire" type="number" min="0" max="100" step="0.01"></label>
+                        <label>Mystiques (%)<input class="admin-field normal-booster-chance" data-season="Saison 2" data-rarity="mystique" type="number" min="0" max="100" step="0.01"></label>
+                    </div>
+                    <p id="normalBoosterSeason2Total" class="admin-status" aria-live="polite">Total : 100 %</p>
+                    <button id="normalBoosterSeason2Save" class="primary-button" type="button">Enregistrer Saison 2</button>
+                    <p id="normalBoosterSeason2Status" class="admin-status" role="status" aria-live="polite"></p>
+                </section>
+            </div>
+        </div>
         <div id="adminCardsSection" class="admin-panel admin-section hidden">
             <form id="cardForm">
                 <div id="cardEntryGrid" class="card-entry-grid">
@@ -3879,6 +3933,8 @@ const callGetLeaderboard = httpsCallable(functions, "getLeaderboard");
 const callGetWeeklyActivity = httpsCallable(functions, "getWeeklyActivity");
 const callClaimMysticPullRewards = httpsCallable(functions, "claimMysticPullRewards");
 const callBuyClassicBooster = httpsCallable(functions, "buyClassicBooster");
+const callGetNormalBoosterSettings = httpsCallable(functions, "getNormalBoosterSettings");
+const callSaveNormalBoosterSettings = httpsCallable(functions, "saveNormalBoosterSettings");
 const callGetPublicCardCount = httpsCallable(functions, "getPublicCardCount");
 const callGetPremiumWheel = httpsCallable(functions, "getPremiumWheel");
 const callGetPremiumRules = httpsCallable(functions, "getPremiumRules");
@@ -4679,13 +4735,25 @@ let premiumAdminPlayers = [];
 let premiumRewardCards = [];
 const buyNormalBoosterButton = document.getElementById("buyNormalBoosterButton");
 const openNormalBoosterButton = document.getElementById("openNormalBoosterButton");
+const buySeason2BoosterButton = document.getElementById("buySeason2BoosterButton");
+const openSeason2BoosterButton = document.getElementById("openSeason2BoosterButton");
 const playerTokensDisplay = document.getElementById("playerTokens");
+let normalBoosterSettings = {
+    "Saison 1": { price: 3, rarityChances: { commune: 60, rare: 30, legendaire: 9, mystique: 1 } },
+    "Saison 2": { price: 3, rarityChances: { commune: 60, rare: 30, legendaire: 9, mystique: 1 } }
+};
+let season2BoosterStock = 0;
 function updateClassicBoosterPurchaseAvailability() {
     const tokenDigits = (playerTokensDisplay.textContent || "").match(/^\s*[\d\s\u202f\u00a0.,]+/);
     const tokenBalance = Number((tokenDigits?.[0] || "0").replace(/[^\d]/g, "")) || 0;
-    const canBuy = Boolean(auth.currentUser) && !isPlayerPreview && tokenBalance >= 3;
-    buyNormalBoosterButton.classList.toggle("hidden", !canBuy);
-    buyNormalBoosterButton.disabled = !canBuy;
+    const canBuySeason1 = Boolean(auth.currentUser) && !isPlayerPreview && tokenBalance >= normalBoosterSettings["Saison 1"].price;
+    const canBuySeason2 = Boolean(auth.currentUser) && !isPlayerPreview && tokenBalance >= normalBoosterSettings["Saison 2"].price;
+    buyNormalBoosterButton.textContent = `${Number(normalBoosterSettings["Saison 1"].price).toLocaleString("fr-FR")} jetons`;
+    buySeason2BoosterButton.textContent = `${Number(normalBoosterSettings["Saison 2"].price).toLocaleString("fr-FR")} jetons`;
+    buyNormalBoosterButton.classList.toggle("hidden", !canBuySeason1);
+    buyNormalBoosterButton.disabled = !canBuySeason1;
+    buySeason2BoosterButton.classList.toggle("hidden", !canBuySeason2);
+    buySeason2BoosterButton.disabled = !canBuySeason2;
 }
 new MutationObserver(updateClassicBoosterPurchaseAvailability).observe(playerTokensDisplay, { childList: true, characterData: true, subtree: true });
 const dailyBoosterArticle = document.getElementById("dailyBoosterArticle");
@@ -4747,6 +4815,7 @@ const adminSections = {
     gav: document.getElementById("adminGavSection"),
     serviceMissions: document.getElementById("adminServiceMissionsSection"),
     cooperations: document.getElementById("adminCooperationsSection"),
+    normalBoosters: document.getElementById("adminNormalBoostersSection"),
 };
 const minageAdminSelect = document.getElementById("minageAdminSelect");
 const minageCreateButton = document.getElementById("minageCreateButton");
@@ -5429,8 +5498,8 @@ onAuthStateChanged(
                         "playerBoosters"
                     )
                     .textContent =
-                        player.boostersDisponibles || 0;
-                setOpenBoosterButton(player.boostersDisponibles || 0);
+                        (Number(player.boostersDisponibles) || 0) + (Number(player.boostersSaison2Disponibles) || 0);
+                setOpenBoosterButton(player.boostersDisponibles || 0, player.boostersSaison2Disponibles || 0);
 
 
 
@@ -5449,6 +5518,7 @@ onAuthStateChanged(
                     cartesTirees: 0,
                     boostersAchetes: 0,
                     boostersDisponibles: 0,
+                    boostersSaison2Disponibles: 0,
                     createdAt: new Date().toISOString()
                 };
                 await setDoc(playerRef, newPlayer);
@@ -5459,7 +5529,7 @@ onAuthStateChanged(
                 document.getElementById("playerTokens").textContent = "0";
                 document.getElementById("playerCards").textContent = "0";
                 document.getElementById("playerBoosters").textContent = "0";
-                setOpenBoosterButton(0);
+                setOpenBoosterButton(0, 0);
                 pendingSignupPseudo = "";
                 pendingSignupAvatar = "";
             }
@@ -5474,6 +5544,8 @@ onAuthStateChanged(
             );
 
         }
+
+        void loadNormalBoosterSettings(false);
 
         await checkPendingEventBoosters(user.uid);
         await loadPendingPolls();
@@ -5493,24 +5565,20 @@ onAuthStateChanged(
 
 
 
-buyNormalBoosterButton.addEventListener("click", async () => {
-    if (isPlayerPreview) return;
-    if (!auth.currentUser) return;
-
-    buyNormalBoosterButton.disabled = true;
-    boosterPurchaseStatus.textContent = "Achat en cours...";
-
+async function buyNormalBooster(season, button) {
+    if (isPlayerPreview || !auth.currentUser) return;
+    button.disabled = true;
+    boosterPurchaseStatus.textContent = `Achat du booster ${season} en cours…`;
     try {
-        const response = await callBuyClassicBooster();
-        const { tokens, boostersDisponibles } = response.data;
-        document.getElementById("playerTokens").textContent = tokens;
-        document.getElementById("playerBoosters").textContent = boostersDisponibles;
-        setOpenBoosterButton(boostersDisponibles);
-        boosterPurchaseStatus.textContent = "Booster classique acheté ! Il est ajouté à ton stock.";
+        const response = await callBuyClassicBooster({ season });
+        const result = response.data;
+        document.getElementById("playerTokens").textContent = Number(result.tokens).toLocaleString("fr-FR");
+        setOpenBoosterButton(result.boostersDisponibles, result.boostersSaison2Disponibles);
+        boosterPurchaseStatus.textContent = `Booster ${season} acheté et ajouté à ton stock.`;
     } catch (error) {
-        console.error("Erreur pendant l’achat du booster :", error);
-        if (error.code === "functions/failed-precondition" && /3 jetons/.test(error.message || "")) {
-            boosterPurchaseStatus.textContent = "Il te faut au moins 3 jetons pour acheter ce booster.";
+        console.error(`Erreur pendant l’achat du booster ${season} :`, error);
+        if (error.code === "functions/failed-precondition") {
+            boosterPurchaseStatus.textContent = error.message || `Tu n’as pas assez de jetons classiques pour acheter le booster ${season}.`;
         } else if (error.code === "functions/not-found") {
             boosterPurchaseStatus.textContent = "Profil joueur introuvable. Déconnecte-toi puis reconnecte-toi.";
         } else {
@@ -5519,7 +5587,9 @@ buyNormalBoosterButton.addEventListener("click", async () => {
     } finally {
         updateClassicBoosterPurchaseAvailability();
     }
-});
+}
+buyNormalBoosterButton.addEventListener("click", () => buyNormalBooster("Saison 1", buyNormalBoosterButton));
+buySeason2BoosterButton.addEventListener("click", () => buyNormalBooster("Saison 2", buySeason2BoosterButton));
 
 function showHomePage() {
     if (serviceCollectiveRefreshTimer) window.clearInterval(serviceCollectiveRefreshTimer);
@@ -8358,12 +8428,15 @@ document.addEventListener("keydown", (event) => {
     if (event.key === "Escape" && !cardZoomModal.classList.contains("hidden")) closeCardZoom();
 });
 
-function setOpenBoosterButton(count) {
+function setOpenBoosterButton(count, season2Count) {
     const available = Number(count) || 0;
-    document.getElementById("playerBoosters").textContent = available.toLocaleString("fr-FR");
+    if (season2Count !== undefined && Number.isFinite(Number(season2Count))) season2BoosterStock = Number(season2Count) || 0;
+    document.getElementById("playerBoosters").textContent = (available + season2BoosterStock).toLocaleString("fr-FR");
     document.getElementById("normalBoosterStockCount").textContent = available.toLocaleString("fr-FR");
+    document.getElementById("season2BoosterStockCount").textContent = season2BoosterStock.toLocaleString("fr-FR");
     openNormalBoosterButton.textContent = "Ouvrir un booster";
     openNormalBoosterButton.disabled = available < 1;
+    openSeason2BoosterButton.disabled = season2BoosterStock < 1;
     openNextBoosterButton.classList.toggle("hidden", available < 1);
 }
 
@@ -9112,30 +9185,31 @@ openNextBoosterButton.addEventListener("click", () => {
     openNormalBoosterButton.click();
 });
 
-openNormalBoosterButton.addEventListener("click", async () => {
-    if (isPlayerPreview) return;
-    if (!auth.currentUser || openNormalBoosterButton.disabled) return;
-    openNormalBoosterButton.disabled = true;
-    boosterPurchaseStatus.textContent = "Ouverture du booster...";
+async function openNormalBooster(season, button) {
+    if (isPlayerPreview || !auth.currentUser || button.disabled) return;
+    button.disabled = true;
+    boosterPurchaseStatus.textContent = `Ouverture du booster ${season}…`;
     try {
         const previouslyOwnedIds = await getPreviouslyOwnedCardIds();
-        const response = await callOpenClassicBooster();
+        const response = await callOpenClassicBooster({ season });
         void refreshCooperationProgress();
         const result = response.data;
-        const count = Number(result.boostersDisponibles) || 0;
-        setOpenBoosterButton(count);
+        setOpenBoosterButton(result.boostersDisponibles, result.boostersSaison2Disponibles);
         document.getElementById("playerCards").textContent = Number(result.cartesTirees) || 0;
         updatePlayerXpDisplay(result.xp);
-        boosterPurchaseStatus.textContent = "Booster ouvert : 5 cartes ajoutées à ta collection.";
-        await showBoosterResults(markNewlyDiscoveredCards(result.cards || [], previouslyOwnedIds), result.boostersOfferts, "classique");
+        boosterPurchaseStatus.textContent = `Booster ${season} ouvert : 5 cartes ajoutées à ta collection.`;
+        await showBoosterResults(markNewlyDiscoveredCards(result.cards || [], previouslyOwnedIds), result.boostersOfferts, "classique", {
+            name: `Booster classique · ${season}`,
+            imageUrl: season === "Saison 2" ? "./Booster%20normal%20Saison%202.png" : "./Booster%20normal.png"
+        });
     } catch (error) {
-        console.error("Erreur pendant l’ouverture du booster :", error);
+        console.error(`Erreur pendant l’ouverture du booster ${season} :`, error);
         if (error.code === "functions/unauthenticated") {
             boosterPurchaseStatus.textContent = "Connecte-toi pour ouvrir un booster.";
         } else if (error.code === "functions/not-found") {
-            boosterPurchaseStatus.textContent = "Tu n’as aucun booster classique dans ton stock.";
+            boosterPurchaseStatus.textContent = `Tu n’as aucun booster ${season} dans ton stock.`;
         } else if (error.code === "functions/failed-precondition") {
-            boosterPurchaseStatus.textContent = error.message || "Aucune carte n’est disponible pour le tirage.";
+            boosterPurchaseStatus.textContent = error.message || `Aucune carte disponible dans le booster ${season}.`;
         } else {
             boosterPurchaseStatus.textContent = "Impossible d’ouvrir le booster. Vérifie le déploiement de la fonction Firebase.";
         }
@@ -9143,14 +9217,17 @@ openNormalBoosterButton.addEventListener("click", async () => {
         if (auth.currentUser) {
             try {
                 const snapshot = await getDoc(doc(db, "players", auth.currentUser.uid));
-                if (snapshot.exists()) setOpenBoosterButton(snapshot.data().boostersDisponibles || 0);
+                if (snapshot.exists()) setOpenBoosterButton(snapshot.data().boostersDisponibles || 0, snapshot.data().boostersSaison2Disponibles || 0);
             } catch (error) {
                 console.error("Impossible d’actualiser le stock de boosters :", error);
-                openNormalBoosterButton.disabled = false;
+                button.disabled = false;
             }
         }
     }
-});
+}
+
+openNormalBoosterButton.addEventListener("click", () => openNormalBooster("Saison 1", openNormalBoosterButton));
+openSeason2BoosterButton.addEventListener("click", () => openNormalBooster("Saison 2", openSeason2BoosterButton));
 
 openDailyBoosterButton.addEventListener("click", async () => {
     if (isPlayerPreview) return;
@@ -9896,7 +9973,88 @@ async function showAdminSection(sectionName) {
     if (sectionName === "gav") await loadAdminGavSettings();
     if (sectionName === "serviceMissions") await loadAdminServiceMissions();
     if (sectionName === "cooperations") await loadAdminCooperations();
+    if (sectionName === "normalBoosters") await loadNormalBoosterSettings();
 }
+
+function applyNormalBoosterSettings(settingsBySeason, fillAdminFields = false) {
+    ["Saison 1", "Saison 2"].forEach((season) => {
+        const incoming = settingsBySeason?.[season];
+        if (!incoming) return;
+        normalBoosterSettings[season] = {
+            price: Number(incoming.price) || 3,
+            rarityChances: { ...incoming.rarityChances }
+        };
+        if (!fillAdminFields) return;
+        const seasonKey = season === "Saison 2" ? "Season2" : "Season1";
+        const priceInput = document.getElementById(`normalBooster${seasonKey}Price`);
+        if (priceInput) priceInput.value = String(normalBoosterSettings[season].price);
+        document.querySelectorAll(`.normal-booster-chance[data-season="${season}"]`).forEach((input) => {
+            input.value = String(normalBoosterSettings[season].rarityChances[input.dataset.rarity] ?? 0);
+        });
+        updateNormalBoosterChanceTotal(season);
+    });
+    updateClassicBoosterPurchaseAvailability();
+}
+
+async function loadNormalBoosterSettings(fillAdminFields = true) {
+    try {
+        const response = await callGetNormalBoosterSettings();
+        applyNormalBoosterSettings(response.data.seasons, fillAdminFields);
+    } catch (error) {
+        console.error("Impossible de charger les réglages des boosters normaux :", error);
+        if (fillAdminFields) {
+            document.getElementById("normalBoosterSeason1Status").textContent = "Impossible de charger les réglages des boosters.";
+            document.getElementById("normalBoosterSeason2Status").textContent = "Impossible de charger les réglages des boosters.";
+        }
+    }
+}
+
+function readNormalBoosterSeasonForm(season) {
+    const seasonKey = season === "Saison 2" ? "Season2" : "Season1";
+    const price = Number(document.getElementById(`normalBooster${seasonKey}Price`).value);
+    const rarityChances = {};
+    document.querySelectorAll(`.normal-booster-chance[data-season="${season}"]`).forEach((input) => {
+        rarityChances[input.dataset.rarity] = Number(input.value);
+    });
+    return { price, rarityChances };
+}
+
+function updateNormalBoosterChanceTotal(season) {
+    const form = readNormalBoosterSeasonForm(season);
+    const total = Object.values(form.rarityChances).reduce((sum, chance) => sum + (Number.isFinite(chance) ? chance : 0), 0);
+    const seasonKey = season === "Saison 2" ? "Season2" : "Season1";
+    const totalElement = document.getElementById(`normalBooster${seasonKey}Total`);
+    if (totalElement) totalElement.textContent = `Total des probabilités : ${total.toLocaleString("fr-FR", { maximumFractionDigits: 2 })} %${Math.abs(total - 100) > 0.011 ? " · le total doit faire 100 %" : ""}`;
+    return Math.abs(total - 100) <= 0.011;
+}
+
+async function saveNormalBoosterSeason(season) {
+    if (!isCurrentUserAdmin() || isPlayerPreview) return;
+    const seasonKey = season === "Saison 2" ? "Season2" : "Season1";
+    const status = document.getElementById(`normalBooster${seasonKey}Status`);
+    const button = document.getElementById(`normalBooster${seasonKey}Save`);
+    const values = readNormalBoosterSeasonForm(season);
+    if (!Number.isSafeInteger(values.price) || values.price < 1 || values.price > 1_000_000 || !updateNormalBoosterChanceTotal(season)) {
+        status.textContent = "Vérifie le prix et règle les probabilités pour obtenir un total exact de 100 %.";
+        return;
+    }
+    button.disabled = true;
+    status.textContent = "Enregistrement des réglages…";
+    try {
+        const response = await callSaveNormalBoosterSettings({ season, ...values });
+        applyNormalBoosterSettings({ [season]: response.data });
+        status.textContent = `Réglages de ${season} enregistrés : ${values.price} jetons par booster.`;
+    } catch (error) {
+        console.error(`Impossible d’enregistrer les réglages de ${season} :`, error);
+        status.textContent = error.message || `Impossible d’enregistrer les réglages de ${season}.`;
+    } finally {
+        button.disabled = false;
+    }
+}
+
+document.getElementById("normalBoosterSeason1Save").addEventListener("click", () => saveNormalBoosterSeason("Saison 1"));
+document.getElementById("normalBoosterSeason2Save").addEventListener("click", () => saveNormalBoosterSeason("Saison 2"));
+document.querySelectorAll(".normal-booster-chance").forEach((input) => input.addEventListener("input", () => updateNormalBoosterChanceTotal(input.dataset.season)));
 
 let adminEffectifMonths = [];
 let adminEffectifPlayers = [];
