@@ -8056,16 +8056,14 @@ function setCollectionSeason(season) {
     const isSeasonTwo = collectionSeason === "Saison 2";
     collectionSeasonOneButton.setAttribute("aria-pressed", String(!isSeasonTwo));
     collectionSeasonTwoButton.setAttribute("aria-pressed", String(isSeasonTwo));
-    collectionSeasonContent.classList.toggle("hidden", isSeasonTwo);
-    collectionSeasonComingSoon.classList.toggle("hidden", !isSeasonTwo);
-    if (!isSeasonTwo) {
-        collectionSearchInput.value = "";
-        collectionSearchQuery = "";
-        collectionRarityFilter.value = "";
-        collectionRarityFilterValue = "";
-        collectionAlbumPage = 0;
-        applyCollectionSeasonData();
-    }
+    collectionSeasonContent.classList.remove("hidden");
+    collectionSeasonComingSoon.classList.add("hidden");
+    collectionSearchInput.value = "";
+    collectionSearchQuery = "";
+    collectionRarityFilter.value = "";
+    collectionRarityFilterValue = "";
+    collectionAlbumPage = 0;
+    applyCollectionSeasonData();
 }
 
 function renderCollectionAlbum() {
@@ -11494,12 +11492,14 @@ cardForm.addEventListener("submit", async (event) => {
         incomplete.entry.querySelector('[data-card-field="' + missingField + '"]').focus();
         return;
     }
-    const requestedNumbers = records.map(({ card }) => card.cardNumber).filter((number) => number !== null);
-    if (requestedNumbers.some((number) => !Number.isSafeInteger(number) || number < 1)) {
+    const requestedNumbers = records.filter(({ card }) => card.cardNumber !== null)
+        .map(({ card }) => ({ season: normalizeCollectionSeason(card.season), number: card.cardNumber }));
+    if (requestedNumbers.some(({ number }) => !Number.isSafeInteger(number) || number < 1)) {
         adminStatus.textContent = "Chaque numéro renseigné doit être un entier supérieur à zéro.";
         return;
     }
-    if (new Set(requestedNumbers).size !== requestedNumbers.length) {
+    const requestedSeasonNumbers = requestedNumbers.map(({ season, number }) => `${season}|${number}`);
+    if (new Set(requestedSeasonNumbers).size !== requestedSeasonNumbers.length) {
         adminStatus.textContent = "Deux cartes du lot ont le même numéro. Choisis un numéro différent pour chacune.";
         return;
     }
@@ -11520,8 +11520,8 @@ cardForm.addEventListener("submit", async (event) => {
             const existingCards = await getDocs(collection(db, "cards"));
             const existingNumbers = new Set(existingCards.docs
                 .filter((item) => item.id !== editingCardId)
-                .map((item) => Number(item.data().cardNumber)));
-            if (requestedNumbers.some((number) => existingNumbers.has(number))) {
+                .map((item) => `${normalizeCollectionSeason(item.data().season || item.data().seasonNumber)}|${Number(item.data().cardNumber)}`));
+            if (requestedNumbers.some(({ season, number }) => existingNumbers.has(`${season}|${number}`))) {
                 adminStatus.textContent = "Un des numéros saisis est déjà utilisé. Modifie les numéros en conflit.";
                 return;
             }
