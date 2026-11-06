@@ -11480,8 +11480,8 @@ cardForm.addEventListener("submit", async (event) => {
             }
         };
     });
-    const records = enteredRecords.filter(({ card, file, entry }) =>
-        Boolean(card.name || card.category || card.cardNumber !== null || entry.querySelector('[data-card-field="season"]').value.trim() || card.rarity || card.imageUrl || card.description || file)
+    const records = enteredRecords.filter(({ card, file }) =>
+        Boolean(card.name || card.category || card.cardNumber !== null || card.rarity || card.imageUrl || card.description || file)
     );
     if (!records.length) {
         adminStatus.textContent = "Renseigne au moins une fiche avant d’enregistrer.";
