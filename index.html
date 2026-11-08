@@ -2501,6 +2501,50 @@ body {
   .booster-season-two h4 { margin-top:3px; }
   .booster-season-two button { width:100%; }
 }
+
+/* Seasonal home palette and restored quick access row */
+body:has(.app-content:not(.hidden)) { background:#fff; color:#173b52; }
+#appPage:has(.app-content:not(.hidden)) { background:#fff; }
+#appPage:has(.app-content:not(.hidden)) .app-content { color:#173b52; }
+#appPage:has(.app-content:not(.hidden)) .app-header { background:#fff; border-bottom:2px solid #329447; box-shadow:0 3px 12px rgba(24,91,43,.12); }
+#appPage:has(.app-content:not(.hidden)) .home-player-summary { border:2px solid #329447; background:#fff; box-shadow:0 5px 16px rgba(28,105,48,.12); }
+#appPage:has(.app-content:not(.hidden)) .home-resource-tile strong { color:#246e36; }
+#appPage:has(.app-content:not(.hidden)) .home-profile-button { border:2px solid #329447; background:#f3fff4; }
+#appPage:has(.app-content:not(.hidden)) .home-profile-button .avatar { border-color:#329447; }
+#appPage:has(.app-content:not(.hidden)) .boosters { grid-template-columns:minmax(0,1.15fr) minmax(0,1fr); }
+#appPage:has(.app-content:not(.hidden)) #dailyBoosterArticle,
+#appPage:has(.app-content:not(.hidden)) #cooperationCard { grid-column:1; grid-row:1; }
+#appPage:has(.app-content:not(.hidden)) .booster-season-one { grid-column:1; grid-row:2; }
+#appPage:has(.app-content:not(.hidden)) .booster-season-two { grid-column:2; grid-row:1 / 3; }
+#appPage:has(.app-content:not(.hidden)) .booster,
+#appPage:has(.app-content:not(.hidden)) .booster-season-two,
+#appPage:has(.app-content:not(.hidden)) #cooperationCard { border:2px solid #329447; background:#fff; color:#173b52; box-shadow:0 8px 22px rgba(25,103,46,.12),inset 0 1px rgba(255,255,255,.9); }
+#appPage:has(.app-content:not(.hidden)) .booster-classic h4,
+#appPage:has(.app-content:not(.hidden)) .booster-daily h4 { color:#236f37; -webkit-text-stroke:0; text-shadow:none; }
+#appPage:has(.app-content:not(.hidden)) .booster-classic p,
+#appPage:has(.app-content:not(.hidden)) .booster-daily p { color:#355244; text-shadow:none; }
+#appPage:has(.app-content:not(.hidden)) #cooperationCard h4,
+#appPage:has(.app-content:not(.hidden)) .cooperation-gauge-label,
+#appPage:has(.app-content:not(.hidden)) .cooperation-gauge-value,
+#appPage:has(.app-content:not(.hidden)) .cooperation-reward-note { color:#245f34; text-shadow:none; }
+#appPage:has(.app-content:not(.hidden)) .cooperation-reward-note { border-color:rgba(50,148,71,.3); }
+#appPage:has(.app-content:not(.hidden)) .booster button { border-color:#329447; }
+#appPage:has(.app-content:not(.hidden)) .home-season-banner { border-color:#329447; background:#effaf0; color:#246e36; text-shadow:none; box-shadow:0 4px 12px rgba(35,126,55,.1); }
+#appPage:has(.app-content:not(.hidden)) .home-overview-grid { grid-template-columns:repeat(4,minmax(0,1fr)); }
+#appPage:has(.app-content:not(.hidden)) .home-overview-grid > button,
+#appPage:has(.app-content:not(.hidden)) .home-overview-archive { border:2px solid #329447; background:#fff; box-shadow:0 5px 14px rgba(28,105,48,.12),inset 0 1px #fff; }
+#appPage:has(.app-content:not(.hidden)) .home-overview-grid > button:hover,
+#appPage:has(.app-content:not(.hidden)) .home-overview-archive:hover { box-shadow:0 8px 18px rgba(28,105,48,.2); }
+#appPage:has(.app-content:not(.hidden)) .bottom-nav { border-top:2px solid #329447; }
+#appPage:has(.app-content:not(.hidden)) .bottom-nav .nav-image-button { border:1px solid #329447; }
+@media (max-width:760px) {
+  #appPage:has(.app-content:not(.hidden)) .boosters { grid-template-columns:minmax(0,1fr); }
+  #appPage:has(.app-content:not(.hidden)) #dailyBoosterArticle,
+  #appPage:has(.app-content:not(.hidden)) #cooperationCard,
+  #appPage:has(.app-content:not(.hidden)) .booster-season-one,
+  #appPage:has(.app-content:not(.hidden)) .booster-season-two { grid-column:1; grid-row:auto; }
+  #appPage:has(.app-content:not(.hidden)) .home-overview-grid { grid-template-columns:repeat(2,minmax(0,1fr)); }
+}
 .premium-booster-status { min-height: 34px; margin: 9px 0 0; color: #e7d7f2; font-size: 11px; line-height: 1.45; }
 .premium-booster-settings { margin-top: 12px; padding: 14px; border: 1px solid rgba(220,178,244,.45); border-radius: 14px; background: radial-gradient(ellipse at 50% 4%, rgba(162,84,190,.55), transparent 43%), radial-gradient(ellipse at 50% 100%, rgba(237,174,57,.12), transparent 50%), linear-gradient(145deg,#100c25,#25113d 50%,#100b24); color: #fff8e8; }
 .premium-booster-settings h3 { margin: 0 0 6px; color: #ffe39a; font-size: 16px; }
@@ -2800,6 +2844,24 @@ body {
             <span id="playerCards" class="hidden">0</span>
         </section>
 
+        <section class="home-overview-grid" aria-label="Accès rapides">
+            <div class="home-overview-archive">
+                <button id="archivesHomeButton" type="button" aria-label="Ouvrir la page Service" title="Service">
+                    <img loading="lazy" decoding="async" src="./Service.png" alt="Service">
+                    <span id="archivesHomeCountdown" class="home-archive-countdown hidden" aria-live="polite"></span>
+                </button>
+            </div>
+            <button id="saleHomeButton" class="home-overview-sale" type="button" aria-label="Ouvrir la page Vente" title="Vente">
+                <img loading="lazy" decoding="async" src="./Vente.png?v=20261029" alt="Vente">
+            </button>
+            <button id="leaderboardMenuButton" class="home-overview-leaderboard" type="button" aria-label="Ouvrir le classement" title="Classement">
+                <img loading="lazy" decoding="async" src="./Classement.png?v=20261106" alt="Classement">
+            </button>
+            <button id="activityHomeButton" class="home-overview-activity" type="button" aria-label="Ouvrir la page Activité" title="Activité">
+                <img loading="lazy" decoding="async" src="./Activité.png" alt="Activité">
+            </button>
+        </section>
+
         <p class="home-season-banner" aria-label="La saison 2 est ouverte">SAISON 2 · OUVERTE</p>
 
 
@@ -2896,30 +2958,6 @@ body {
         </section>
 
         <p id="boosterPurchaseStatus" class="admin-status" role="status" aria-live="polite"></p>
-
-        <section class="home-overview-grid" aria-label="Accès rapides">
-            <button id="homeCollectionShortcut" type="button" aria-label="Ouvrir la collection" title="Collection">
-                <img loading="lazy" decoding="async" src="./Collection.png" alt="Collection">
-            </button>
-            <div class="home-overview-archive">
-                <button id="archivesHomeButton" type="button" aria-label="Ouvrir la page Service" title="Service">
-                    <img loading="lazy" decoding="async" src="./Service.png" alt="Service">
-                    <span id="archivesHomeCountdown" class="home-archive-countdown hidden" aria-live="polite"></span>
-                </button>
-            </div>
-            <button id="homeExchangeShortcut" type="button" aria-label="Ouvrir les échanges" title="Échanges">
-                <img loading="lazy" decoding="async" src="./Échange.png" alt="Échanges">
-            </button>
-            <button id="saleHomeButton" class="home-overview-sale" type="button" aria-label="Ouvrir la page Vente" title="Vente">
-                <img loading="lazy" decoding="async" src="./Vente.png?v=20261029" alt="Vente">
-            </button>
-            <button id="leaderboardMenuButton" class="home-overview-leaderboard" type="button" aria-label="Ouvrir le classement" title="Classement">
-                <img loading="lazy" decoding="async" src="./Classement.png?v=20261106" alt="Classement">
-            </button>
-            <button id="activityHomeButton" class="home-overview-activity" type="button" aria-label="Ouvrir la page Activité" title="Activité">
-                <img loading="lazy" decoding="async" src="./Activité.png" alt="Activité">
-            </button>
-        </section>
 
 
 
@@ -9482,9 +9520,6 @@ collectionNavButton.addEventListener("click", async () => {
     recyclingNavButton.classList.remove("active");
     await loadOwnedPlayerCards();
 });
-
-document.getElementById("homeCollectionShortcut").addEventListener("click", () => collectionNavButton.click());
-document.getElementById("homeExchangeShortcut").addEventListener("click", () => exchangeNavButton.click());
 
 recyclingNavButton.addEventListener("click", async () => {
     premiumPage.classList.add("hidden");
