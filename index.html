@@ -2459,12 +2459,12 @@ body {
 .home-player-summary { max-width:760px; margin:14px auto 12px; }
 .boosters { grid-template-columns:minmax(0,1.65fr) minmax(220px,.75fr); align-items:stretch; gap:14px; margin:8px 0 12px; }
 #dailyBoosterArticle,#cooperationCard { grid-column:1 / -1; }
-.booster-season-two { grid-column:1; grid-row:2; display:grid; grid-template-columns:minmax(210px,.85fr) minmax(0,1fr); grid-template-rows:auto auto auto auto; align-content:center; align-items:center; column-gap:clamp(12px,2.6vw,30px); padding:clamp(14px,2vw,24px); border-width:2px; border-radius:24px; background:radial-gradient(ellipse at 23% 48%,rgba(23,159,63,.27),transparent 58%),linear-gradient(145deg,rgba(11,39,36,.94),rgba(8,27,48,.97) 72%); box-shadow:0 15px 35px rgba(2,12,24,.36),inset 0 0 0 2px rgba(224,255,184,.09),inset 0 0 30px rgba(34,207,74,.12); }
-.booster-season-two .booster-visual { grid-column:1; grid-row:1 / 5; width:100%; max-width:320px; justify-self:center; }
-.booster-season-two .booster-image { width:100%; max-height:380px; object-fit:contain; filter:drop-shadow(0 12px 14px rgba(0,0,0,.42)) drop-shadow(0 0 18px rgba(61,225,82,.22)); }
-.booster-season-two h4 { grid-column:2; align-self:end; margin:0 0 7px; font-size:clamp(20px,2.6vw,29px); }
-.booster-season-two p { grid-column:2; margin:0 0 10px; font-size:16px; }
-.booster-season-two button { grid-column:2; width:min(100%,360px); justify-self:center; }
+.booster-season-two { grid-column:2; grid-row:1 / 3; display:flex; width:min(100%,360px); height:fit-content; flex-direction:column; justify-self:center; align-self:center; padding:16px 13px; border-width:2px; border-radius:20px; background:radial-gradient(ellipse at 23% 48%,rgba(23,159,63,.22),transparent 58%),linear-gradient(145deg,rgba(11,39,36,.94),rgba(8,27,48,.97) 72%); box-shadow:0 10px 24px rgba(2,12,24,.3),inset 0 0 0 2px rgba(224,255,184,.08),inset 0 0 22px rgba(34,207,74,.1); }
+.booster-season-two .booster-visual { display:block; width:100%; max-width:215px; margin:0 auto; }
+.booster-season-two .booster-image { width:min(100%,215px); max-height:245px; object-fit:contain; filter:drop-shadow(0 8px 10px rgba(0,0,0,.38)) drop-shadow(0 0 12px rgba(61,225,82,.18)); }
+.booster-season-two h4 { margin:10px 0 5px; font-size:16px; }
+.booster-season-two p { margin:4px 0 9px; font-size:14px; }
+.booster-season-two button { width:100%; }
 .booster-season-two .booster-stock-badge { font-size:12px; }
 .booster-season-one { grid-column:2; grid-row:2; align-self:center; padding:16px 13px; border:1px solid rgba(222,182,84,.55); border-radius:20px; background:linear-gradient(145deg,rgba(12,31,57,.95),rgba(7,20,40,.96)); }
 .booster-season-one .booster-image { width:min(100%,215px); max-height:245px; object-fit:contain; }
@@ -2486,20 +2486,13 @@ body {
   .home-overview-archive img { max-height:86px; }
   .boosters { grid-template-columns:minmax(0,1fr); gap:10px; }
   #dailyBoosterArticle,#cooperationCard,.booster-season-two,.booster-season-one { grid-column:1; grid-row:auto; }
-  .booster-season-two { grid-template-columns:minmax(110px,.8fr) minmax(0,1fr); column-gap:12px; padding:13px 10px; }
-  .booster-season-two .booster-visual { max-width:230px; }
-  .booster-season-two .booster-image { max-height:300px; }
-  .booster-season-two h4 { font-size:clamp(17px,4.4vw,22px); }
+  .booster-season-two { width:min(100%,340px); padding:14px 11px; }
 }
 @media (max-width:460px) {
   .home-overview-grid { grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; }
   .home-overview-grid > button,.home-overview-archive { min-height:100px; }
   .home-season-banner { margin-top:8px; font-size:11px; }
-  .booster-season-two { grid-template-columns:1fr; text-align:center; }
-  .booster-season-two .booster-visual { grid-column:1; grid-row:auto; width:min(70%,230px); }
-  .booster-season-two h4,.booster-season-two p,.booster-season-two button { grid-column:1; }
-  .booster-season-two h4 { margin-top:3px; }
-  .booster-season-two button { width:100%; }
+  .booster-season-two { width:min(100%,300px); text-align:center; }
 }
 
 /* Seasonal home palette and restored quick access row */
@@ -4843,6 +4836,10 @@ let normalBoosterSettings = {
     "Saison 2": { price: 3, rarityChances: { commune: 60, rare: 30, legendaire: 9, mystique: 1 } }
 };
 let season2BoosterStock = 0;
+let nextNormalBoosterSeason = "Saison 1";
+function hasNextNormalBoosterInStock() {
+    return nextNormalBoosterSeason === "Saison 2" ? season2BoosterStock > 0 : !openNormalBoosterButton.disabled;
+}
 function updateClassicBoosterPurchaseAvailability() {
     const tokenDigits = (playerTokensDisplay.textContent || "").match(/^\s*[\d\s\u202f\u00a0.,]+/);
     const tokenBalance = Number((tokenDigits?.[0] || "0").replace(/[^\d]/g, "")) || 0;
@@ -8579,7 +8576,9 @@ function setOpenBoosterButton(count, season2Count) {
     openNormalBoosterButton.textContent = "Ouvrir un booster";
     openNormalBoosterButton.disabled = available < 1;
     openSeason2BoosterButton.disabled = season2BoosterStock < 1;
-    openNextBoosterButton.classList.toggle("hidden", available < 1);
+    const nextAvailable = nextNormalBoosterSeason === "Saison 2" ? season2BoosterStock > 0 : available > 0;
+    openNextBoosterButton.textContent = `Ouvrir le booster suivant · ${nextNormalBoosterSeason}`;
+    openNextBoosterButton.classList.toggle("hidden", !nextAvailable);
 }
 
 async function getPreviouslyOwnedCardIds() {
@@ -9269,7 +9268,8 @@ async function advanceBoosterReveal(direction = 1) {
     viewOwnedCardsButton.disabled = false;
     viewOwnedCardsButton.classList.remove("hidden");
     openNextBoosterButton.disabled = false;
-    openNextBoosterButton.classList.toggle("hidden", mandatoryEventBoosterOpen || openNormalBoosterButton.disabled);
+    openNextBoosterButton.textContent = `Ouvrir le booster suivant · ${nextNormalBoosterSeason}`;
+    openNextBoosterButton.classList.toggle("hidden", mandatoryEventBoosterOpen || !hasNextNormalBoosterInStock());
     boosterRevealBusy = false;
 }
 
@@ -9322,13 +9322,14 @@ document.getElementById("viewOwnedCardsButton").addEventListener("click", async 
 
 openNextBoosterButton.addEventListener("click", () => {
     if (mandatoryEventBoosterOpen) return;
-    if (openNextBoosterButton.classList.contains("hidden") || openNormalBoosterButton.disabled) return;
+    if (openNextBoosterButton.classList.contains("hidden") || !hasNextNormalBoosterInStock()) return;
     boosterResultModal.classList.add("hidden");
-    openNormalBoosterButton.click();
+    (nextNormalBoosterSeason === "Saison 2" ? openSeason2BoosterButton : openNormalBoosterButton).click();
 });
 
 async function openNormalBooster(season, button) {
     if (isPlayerPreview || !auth.currentUser || button.disabled) return;
+    nextNormalBoosterSeason = season;
     button.disabled = true;
     boosterPurchaseStatus.textContent = `Ouverture du booster ${season}…`;
     try {
