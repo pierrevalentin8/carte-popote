@@ -3509,6 +3509,7 @@ body:has(.app-content:not(.hidden)) { background:#f3faf1; color:#173b52; }
                 <div class="event-booster-form-grid">
                     <label>Nom du booster<input id="eventBoosterName" class="admin-field" maxlength="80" required placeholder="Ex. Booster de Noël"></label>
                     <label>Date d’apparition<input id="eventBoosterDate" class="admin-field" type="date" required></label>
+                    <label>Saison des cartes<select id="eventBoosterSeason" class="admin-field" required><option value="Saison 1">Saison 1</option><option value="Saison 2">Saison 2</option></select></label>
                     <label>Nombre de cartes<input id="eventBoosterCardCount" class="admin-field" type="number" min="1" max="20" step="1" value="5" required></label>
                     <div class="full-width"><strong>Rareté de chaque carte</strong><div id="eventBoosterRarityRows" class="event-booster-rarity-rows"></div></div>
                     <label class="full-width">Image du booster (facultative, PNG/JPG/WebP, 5 Mo max)<input id="eventBoosterImageFile" class="admin-field" type="file" accept="image/png,image/jpeg,image/webp"><img loading="lazy" decoding="async" id="eventBoosterImagePreview" class="event-booster-image-preview hidden" alt="Aperçu du booster évènementiel"></label>
@@ -9137,7 +9138,7 @@ function showNextEventBoosterPrompt() {
         return;
     }
     eventBoosterPromptTitle.textContent = `🎁 ${activeEventBooster.name || "Un booster t’attend !"}`;
-    eventBoosterPromptDescription.textContent = `Un booster évènementiel de ${activeEventBooster.cardCount} carte${activeEventBooster.cardCount > 1 ? "s" : ""}${activeEventBooster.badge?.name ? ` avec le badge « ${activeEventBooster.badge.name} »` : ""} t’est réservé. Ouvre-le pour découvrir tes cartes et accéder au site.`;
+    eventBoosterPromptDescription.textContent = `Un booster évènementiel ${activeEventBooster.season || "Saison 1"} de ${activeEventBooster.cardCount} carte${activeEventBooster.cardCount > 1 ? "s" : ""}${activeEventBooster.badge?.name ? ` avec le badge « ${activeEventBooster.badge.name} »` : ""} t’est réservé. Ouvre-le pour découvrir tes cartes et accéder au site.`;
     eventBoosterPromptStatus.textContent = "";
     eventBoosterPromptImage.classList.toggle("hidden", !activeEventBooster.imageUrl);
     if (activeEventBooster.imageUrl) eventBoosterPromptImage.src = activeEventBooster.imageUrl;
@@ -9933,7 +9934,7 @@ function renderEventBoosterAdminList(events) {
         const details = document.createElement("div");
         const name = document.createElement("strong"); name.textContent = event.name;
         const target = event.allPlayers ? "Tous les joueurs" : event.recipientCount + " joueur" + (event.recipientCount === 1 ? "" : "s");
-        const meta = document.createElement("span"); meta.textContent = event.availableOn + " • " + event.cardRarities.length + " carte" + (event.cardRarities.length === 1 ? "" : "s") + " • " + target;
+        const meta = document.createElement("span"); meta.textContent = (event.season || "Saison 1") + " • " + event.availableOn + " • " + event.cardRarities.length + " carte" + (event.cardRarities.length === 1 ? "" : "s") + " • " + target;
         const rarities = document.createElement("small"); rarities.textContent = event.cardRarities.join(" · ");
         details.append(name, meta, rarities);
         if (event.badge?.name) { const badge = document.createElement("small"); badge.textContent = "Badge attribué : " + event.badge.name; details.append(badge); }
@@ -9959,6 +9960,7 @@ function resetEventBoosterForm() {
     form.reset();
     editingEventBooster = null;
     document.getElementById("eventBoosterCardCount").value = "5";
+    document.getElementById("eventBoosterSeason").value = "Saison 1";
     document.getElementById("eventBoosterAllPlayers").checked = true;
     document.getElementById("eventBoosterPlayersWrap").classList.add("hidden");
     document.getElementById("eventBoosterSaveButton").textContent = "Créer le booster évènementiel";
@@ -9978,6 +9980,7 @@ function editEventBooster(event) {
     editingEventBooster = event;
     document.getElementById("eventBoosterName").value = event.name || "";
     document.getElementById("eventBoosterDate").value = event.availableOn || "";
+    document.getElementById("eventBoosterSeason").value = event.season === "Saison 2" ? "Saison 2" : "Saison 1";
     document.getElementById("eventBoosterCardCount").value = String(event.cardRarities?.length || 1);
     renderEventBoosterRarityRows(event.cardRarities || []);
     const imagePreview = document.getElementById("eventBoosterImagePreview");
@@ -10081,7 +10084,8 @@ document.getElementById("eventBoosterForm").addEventListener("submit", async (ev
             } else if (!badge?.imageUrl) throw new Error("Ajoute l’image du badge associé.");
         }
         const payload = { eventId, name: document.getElementById("eventBoosterName").value.trim(),
-            availableOn: document.getElementById("eventBoosterDate").value, cardRarities, imageUrl, badge, allPlayers, recipientUids };
+            availableOn: document.getElementById("eventBoosterDate").value,
+            season: document.getElementById("eventBoosterSeason").value, cardRarities, imageUrl, badge, allPlayers, recipientUids };
         if (editingEventBooster) await callUpdateEventBooster(payload); else await callSaveEventBooster(payload);
         const wasEditing = Boolean(editingEventBooster);
         resetEventBoosterForm();
