@@ -2459,14 +2459,15 @@ body {
 .home-player-summary { max-width:760px; margin:14px auto 12px; }
 .boosters { grid-template-columns:minmax(0,1.65fr) minmax(220px,.75fr); align-items:stretch; gap:14px; margin:8px 0 12px; }
 #dailyBoosterArticle,#cooperationCard { grid-column:1 / -1; }
-.booster-season-two { grid-column:2; grid-row:1 / 3; display:flex; width:min(100%,360px); height:fit-content; flex-direction:column; justify-self:center; align-self:center; padding:16px 13px; border-width:2px; border-radius:20px; background:radial-gradient(ellipse at 23% 48%,rgba(23,159,63,.22),transparent 58%),linear-gradient(145deg,rgba(11,39,36,.94),rgba(8,27,48,.97) 72%); box-shadow:0 10px 24px rgba(2,12,24,.3),inset 0 0 0 2px rgba(224,255,184,.08),inset 0 0 22px rgba(34,207,74,.1); }
-.booster-season-two .booster-visual { display:block; width:100%; max-width:215px; margin:0 auto; }
-.booster-season-two .booster-image { width:min(100%,215px); max-height:245px; object-fit:contain; filter:drop-shadow(0 8px 10px rgba(0,0,0,.38)) drop-shadow(0 0 12px rgba(61,225,82,.18)); }
-.booster-season-two h4 { margin:10px 0 5px; font-size:16px; }
-.booster-season-two p { margin:4px 0 9px; font-size:14px; }
-.booster-season-two button { width:100%; }
+.booster-season-two { grid-column:1 / -1; grid-row:2; display:grid; width:min(100%,760px); grid-template-columns:minmax(180px,.7fr) minmax(0,1fr); grid-template-rows:auto auto auto auto; align-content:center; align-items:center; justify-self:center; padding:15px 20px; border-width:2px; border-radius:20px; background:radial-gradient(ellipse at 23% 48%,rgba(23,159,63,.22),transparent 58%),linear-gradient(145deg,rgba(11,39,36,.94),rgba(8,27,48,.97) 72%); box-shadow:0 12px 28px rgba(2,12,24,.32),inset 0 0 0 2px rgba(224,255,184,.1),inset 0 0 24px rgba(34,207,74,.12); }
+.booster-season-two .booster-visual { display:block; grid-column:1; grid-row:1 / 5; width:100%; max-width:235px; margin:0 auto; }
+.booster-season-two .booster-image { width:min(100%,235px); max-height:290px; object-fit:contain; filter:drop-shadow(0 9px 11px rgba(0,0,0,.4)) drop-shadow(0 0 14px rgba(61,225,82,.2)); }
+.booster-season-two h4,.booster-season-two p,.booster-season-two button { grid-column:2; }
+.booster-season-two h4 { align-self:end; margin:0 0 7px; font-size:clamp(18px,2.2vw,24px); }
+.booster-season-two p { margin:0 0 9px; font-size:15px; }
+.booster-season-two button { width:min(100%,360px); justify-self:center; }
 .booster-season-two .booster-stock-badge { font-size:12px; }
-.booster-season-one { grid-column:2; grid-row:2; align-self:center; padding:16px 13px; border:1px solid rgba(222,182,84,.55); border-radius:20px; background:linear-gradient(145deg,rgba(12,31,57,.95),rgba(7,20,40,.96)); }
+.booster-season-one { grid-column:2; grid-row:1; width:min(100%,320px); justify-self:center; align-self:center; padding:12px 10px; border:1px solid rgba(222,182,84,.55); border-radius:18px; background:linear-gradient(145deg,rgba(12,31,57,.95),rgba(7,20,40,.96)); }
 .booster-season-one .booster-image { width:min(100%,215px); max-height:245px; object-fit:contain; }
 .booster-season-one h4 { margin:10px 0 5px; font-size:16px; }
 .booster-season-one p { margin:4px 0 9px; }
@@ -2486,13 +2487,19 @@ body {
   .home-overview-archive img { max-height:86px; }
   .boosters { grid-template-columns:minmax(0,1fr); gap:10px; }
   #dailyBoosterArticle,#cooperationCard,.booster-season-two,.booster-season-one { grid-column:1; grid-row:auto; }
-  .booster-season-two { width:min(100%,340px); padding:14px 11px; }
+  .booster-season-two { width:100%; grid-template-columns:minmax(120px,.7fr) minmax(0,1fr); padding:13px 10px; }
+  .booster-season-two .booster-visual { max-width:190px; }
+  .booster-season-two .booster-image { max-height:230px; }
 }
 @media (max-width:460px) {
   .home-overview-grid { grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; }
   .home-overview-grid > button,.home-overview-archive { min-height:100px; }
   .home-season-banner { margin-top:8px; font-size:11px; }
-  .booster-season-two { width:min(100%,300px); text-align:center; }
+  .booster-season-two { width:100%; grid-template-columns:1fr; grid-template-rows:auto auto auto auto; text-align:center; }
+  .booster-season-two .booster-visual { grid-column:1; grid-row:auto; width:min(72%,190px); }
+  .booster-season-two h4,.booster-season-two p,.booster-season-two button { grid-column:1; }
+  .booster-season-two h4 { margin-top:4px; }
+  .booster-season-two button { width:100%; }
 }
 
 /* Seasonal home palette and restored quick access row */
@@ -2507,8 +2514,8 @@ body:has(.app-content:not(.hidden)) { background:#f3faf1; color:#173b52; }
 #appPage:has(.app-content:not(.hidden)) .boosters { grid-template-columns:minmax(0,1.15fr) minmax(0,1fr); }
 #appPage:has(.app-content:not(.hidden)) #dailyBoosterArticle,
 #appPage:has(.app-content:not(.hidden)) #cooperationCard { grid-column:1; grid-row:1; }
-#appPage:has(.app-content:not(.hidden)) .booster-season-one { grid-column:1; grid-row:2; }
-#appPage:has(.app-content:not(.hidden)) .booster-season-two { grid-column:2; grid-row:1 / 3; }
+#appPage:has(.app-content:not(.hidden)) .booster-season-one { grid-column:2; grid-row:1; }
+#appPage:has(.app-content:not(.hidden)) .booster-season-two { grid-column:1 / -1; grid-row:2; }
 #appPage:has(.app-content:not(.hidden)) .booster,
 #appPage:has(.app-content:not(.hidden)) .booster-season-two,
 #appPage:has(.app-content:not(.hidden)) #cooperationCard { border:2px solid #329447; background:#fff; color:#173b52; box-shadow:0 8px 22px rgba(25,103,46,.12),inset 0 1px rgba(255,255,255,.9); }
@@ -2536,6 +2543,10 @@ body:has(.app-content:not(.hidden)) { background:#f3faf1; color:#173b52; }
   #appPage:has(.app-content:not(.hidden)) #cooperationCard,
   #appPage:has(.app-content:not(.hidden)) .booster-season-one,
   #appPage:has(.app-content:not(.hidden)) .booster-season-two { grid-column:1; grid-row:auto; }
+  #appPage:has(.app-content:not(.hidden)) #dailyBoosterArticle,
+  #appPage:has(.app-content:not(.hidden)) #cooperationCard { order:0; }
+  #appPage:has(.app-content:not(.hidden)) .booster-season-two { order:1; }
+  #appPage:has(.app-content:not(.hidden)) .booster-season-one { order:2; }
   #appPage:has(.app-content:not(.hidden)) .home-overview-grid { grid-template-columns:repeat(2,minmax(0,1fr)); }
 }
 .premium-booster-status { min-height: 34px; margin: 9px 0 0; color: #e7d7f2; font-size: 11px; line-height: 1.45; }
