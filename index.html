@@ -3809,10 +3809,10 @@ body:has(.app-content:not(.hidden)) { background:#f3faf1; color:#173b52; }
                 <label>Description<textarea id="serviceMissionDescription" maxlength="500" rows="3"></textarea></label><label>Durée (heures)<input id="serviceMissionHours" type="number" min="0" max="72" value="2" required></label>
                 <label>Durée (minutes)<input id="serviceMissionMinutes" type="number" min="0" max="59" value="0" required></label><label>Ordre d’affichage<input id="serviceMissionOrder" type="number" min="0" max="9999" value="0"></label>
                 <label id="serviceMissionTokensField">Récompense en jetons classiques<input id="serviceMissionTokens" type="number" min="0" max="1000" value="0"></label>
-                <label id="serviceMissionChanceField">Probabilité de gagner une carte (%)<input id="serviceMissionChance" type="number" min="0" max="100" step="0.1" value="0"></label>
+                <label id="serviceMissionChanceField"><span id="serviceMissionChanceLabel">Probabilité de gagner une carte (%)</span><input id="serviceMissionChance" type="number" min="0" max="100" step="0.1" value="0"></label>
                 <label id="serviceMissionCardCountField">Nombre de cartes en cas de réussite<input id="serviceMissionCardCount" type="number" min="1" max="5" value="1"></label><label id="serviceMissionCardModeField">Cartes éligibles<select id="serviceMissionCardMode"><option value="all">Toutes les cartes distribuables</option><option value="categories">Catégories choisies</option><option value="cards">Cartes sélectionnées</option></select></label>
                 <label id="serviceMissionCategoriesField">Catégories (séparées par des virgules)<input id="serviceMissionCategories" placeholder="Ex. Cassos"><small>Pour attribuer les cartes Cassos, choisis une mission externe, « Catégories choisies », saisis Cassos et règle le pourcentage de réussite.</small></label><label id="serviceMissionCardsField">Cartes éligibles<select id="serviceMissionCards" multiple size="5"></select></label>
-                <div id="serviceMissionSpecialCardFields" class="hidden" style="grid-column:1/-1"><h5>Carte spéciale à gagner (hors saisons)</h5><p class="admin-note">La mission externe attribue toujours cette carte. Elle est propre à la mission et n’est pas choisie dans le catalogue des saisons.</p><div class="service-admin-grid"><label>Nom de la carte spéciale<input id="serviceMissionSpecialCardName" maxlength="100" placeholder="Nom de la carte"></label><label>Visuel de la carte (PNG/JPG/WebP, max 5 Mo)<input id="serviceMissionSpecialCardImage" type="file" accept="image/png,image/jpeg,image/webp"></label></div><p id="serviceMissionSpecialCardImageStatus" class="admin-note">Visuel obligatoire.</p><img id="serviceMissionSpecialCardPreview" class="hidden" alt="Aperçu de la carte spéciale" style="max-width:150px;max-height:210px;object-fit:contain;border-radius:10px"></div>
+                <div id="serviceMissionSpecialCardFields" class="hidden" style="grid-column:1/-1"><h5>Carte spéciale à gagner (hors saisons)</h5><p class="admin-note">Cette carte est propre à la mission et n’est pas choisie dans le catalogue des saisons. Sa probabilité est réglable ci-dessus.</p><div class="service-admin-grid"><label>Nom de la carte spéciale<input id="serviceMissionSpecialCardName" maxlength="100" placeholder="Nom de la carte"></label><label>Visuel de la carte (PNG/JPG/WebP, max 5 Mo)<input id="serviceMissionSpecialCardImage" type="file" accept="image/png,image/jpeg,image/webp"></label></div><p id="serviceMissionSpecialCardImageStatus" class="admin-note">Visuel requis si la probabilité est supérieure à 0 %.</p><img id="serviceMissionSpecialCardPreview" class="hidden" alt="Aperçu de la carte spéciale" style="max-width:150px;max-height:210px;object-fit:contain;border-radius:10px"></div>
                 <label>Illustration (PNG/JPG/WebP, max 5 Mo)<input id="serviceMissionImage" type="file" accept="image/png,image/jpeg,image/webp"></label><label>Activer la mission<input id="serviceMissionEnabled" type="checkbox" checked></label>
             </div><p id="serviceMissionImageStatus" class="admin-note">Image facultative.</p><button id="serviceMissionSave" class="primary-button" type="submit">Enregistrer la mission</button><button id="serviceMissionCancel" class="secondary-button hidden" type="button">Annuler</button></form><p id="serviceAdminStatus" class="admin-status" role="status" aria-live="polite"></p></div>
         </div>
@@ -6074,12 +6074,13 @@ document.getElementById("serviceMissionForm").addEventListener("submit", async (
         const isExternalMission = document.getElementById("serviceMissionType").value === "external";
         const rewardFile = document.getElementById("serviceMissionSpecialCardImage").files?.[0];
         const specialName = document.getElementById("serviceMissionSpecialCardName").value.trim();
-        if (isExternalMission && (!specialName || !(rewardFile || existing?.specialRewardCard?.imageUrl))) {
-            throw new Error("Renseigne le nom et le visuel de la carte spéciale : elle est la récompense garantie de cette mission.");
+        if (isExternalMission && Number(document.getElementById("serviceMissionChance").value) > 0
+            && (!specialName || !(rewardFile || existing?.specialRewardCard?.imageUrl))) {
+            throw new Error("Pour une probabilité supérieure à 0 %, renseigne le nom et le visuel de la carte spéciale.");
         }
         const data = { id, name: document.getElementById("serviceMissionName").value.trim(), description: document.getElementById("serviceMissionDescription").value.trim(),
             serviceType: document.getElementById("serviceMissionType").value, durationMinutes: Number(document.getElementById("serviceMissionHours").value)*60+Number(document.getElementById("serviceMissionMinutes").value),
-            sortOrder: Number(document.getElementById("serviceMissionOrder").value)||0, tokenReward: isExternalMission ? 0 : Number(document.getElementById("serviceMissionTokens").value), dropChance: isExternalMission ? 100 : Number(document.getElementById("serviceMissionChance").value),
+            sortOrder: Number(document.getElementById("serviceMissionOrder").value)||0, tokenReward: isExternalMission ? 0 : Number(document.getElementById("serviceMissionTokens").value), dropChance: Number(document.getElementById("serviceMissionChance").value),
             cardCount: document.getElementById("serviceMissionType").value === "external" ? 1 : Number(document.getElementById("serviceMissionCardCount").value),
             cardMode: document.getElementById("serviceMissionType").value === "external" ? "special" : document.getElementById("serviceMissionCardMode").value,
             eligibleCardCategories: document.getElementById("serviceMissionType").value === "external" ? [] : document.getElementById("serviceMissionCategories").value.split(",").map((v)=>v.trim()).filter(Boolean),
@@ -6111,7 +6112,8 @@ document.getElementById("serviceMissionCardMode").addEventListener("change",(eve
 function updateServiceMissionFormType() {
     const external = document.getElementById("serviceMissionType").value === "external";
     document.getElementById("serviceMissionSpecialCardFields").classList.toggle("hidden", !external);
-    ["serviceMissionTokensField","serviceMissionChanceField","serviceMissionCardCountField","serviceMissionCardModeField","serviceMissionCategoriesField","serviceMissionCardsField"].forEach((id)=>document.getElementById(id).classList.toggle("hidden", external));
+    ["serviceMissionTokensField","serviceMissionCardCountField","serviceMissionCardModeField","serviceMissionCategoriesField","serviceMissionCardsField"].forEach((id)=>document.getElementById(id).classList.toggle("hidden", external));
+    document.getElementById("serviceMissionChanceLabel").textContent = external ? "Probabilité de gagner la carte spéciale (%)" : "Probabilité de gagner une carte (%)";
     document.getElementById("serviceMissionChance").required = false;
 }
 document.getElementById("serviceMissionType").addEventListener("change", updateServiceMissionFormType);
@@ -10458,7 +10460,7 @@ async function resetAdminEffectifMonth(month, button) {
 function serviceRewardSummary(mission) {
     const rewards = [];
     if (Number(mission.tokenReward) > 0) rewards.push(`${mission.tokenReward} jeton${mission.tokenReward > 1 ? "s" : ""}`);
-    if (mission.serviceType === "external" && mission.cardMode === "special" && mission.specialRewardCard?.name) rewards.push(`Carte « ${mission.specialRewardCard.name} » garantie`);
+    if (mission.serviceType === "external" && mission.cardMode === "special" && Number(mission.dropChance) > 0 && mission.specialRewardCard?.name) rewards.push(`${mission.dropChance}% de chance d’obtenir « ${mission.specialRewardCard.name} »`);
     else if (Number(mission.dropChance) > 0) rewards.push(`${mission.dropChance}% de chance d’obtenir ${mission.cardCount || 1} carte(s)`);
     return rewards.join(" + ") || "Aucune récompense";
 }
