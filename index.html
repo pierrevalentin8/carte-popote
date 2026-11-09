@@ -5103,8 +5103,10 @@ function openExchangeComposer(ad) {
             select.append(option);
         });
     };
-    fillOptions(exchangeSendNumber, ad.numbers);
-    fillOptions(exchangeReceiveNumber, ad.offerNumbers);
+    // L'annonce liste d'abord les cartes manquantes du propriétaire (à recevoir),
+    // puis ses doubles que le joueur connecté cherche (à envoyer).
+    fillOptions(exchangeSendNumber, ad.offerNumbers);
+    fillOptions(exchangeReceiveNumber, ad.numbers);
     exchangeComposeStatus.textContent = "";
     exchangeComposeSubmit.disabled = false;
     exchangeComposeModal.classList.remove("hidden");
