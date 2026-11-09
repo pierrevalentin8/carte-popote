@@ -1482,6 +1482,7 @@ body {
 .collection-season-toggle .collection-season-card-button img { display:block; width:100%; height:100%; border-radius:8px; object-fit:cover; }
 .collection-season-toggle .collection-season-card-button[aria-pressed="true"] { border-color:#ffd35b; background:#10264a; box-shadow:0 0 0 2px rgba(255,211,91,.42),0 7px 16px rgba(0,0,0,.3); }
 .collection-season-toggle .collection-season-card-button:focus-visible { outline:3px solid #ffe17b; outline-offset:3px; }
+.collection-season-toggle .collection-service-cards-button { min-height:58px; border-color:#b8d7c4; background:linear-gradient(135deg,#174c3b,#102c35); color:#f5fff8; }
 .collection-season-notice { margin:18px 0; padding:42px 18px; border:2px solid #d7a51e; border-radius:16px; background:repeating-linear-gradient(to bottom,#fbf8ee 0,#fbf8ee 31px,#e9e0cc 32px); color:#173b52; font-size:22px; font-weight:900; text-align:center; box-shadow:0 10px 24px rgba(0,0,0,.2),inset 0 0 0 4px rgba(255,255,255,.5); }
 .collection-display-toggle button { padding: 8px 12px; border: 1px solid #c7b886; border-radius: 10px; background: #f8f5eb; color: #173b52; font: inherit; font-size: 13px; font-weight: 800; cursor: pointer; }
 .collection-display-toggle button[aria-pressed="true"] { border-color: #d7a51e; background: linear-gradient(135deg, #ffe17b, #edb52b); }
@@ -3256,6 +3257,7 @@ body:has(.app-content:not(.hidden)) { background:#f3faf1; color:#173b52; }
         <div class="collection-season-toggle" role="group" aria-label="Choisir la saison de la collection">
             <button id="collectionSeasonOneButton" class="collection-season-card-button" type="button" aria-label="Afficher la collection de la saison 1" title="Saison 1" aria-pressed="true"><img src="./Dos cartes.png" alt=""></button>
             <button id="collectionSeasonTwoButton" class="collection-season-card-button" type="button" aria-label="Afficher la collection de la saison 2" title="Saison 2" aria-pressed="false"><img src="./Dos de carte (saison 2).png" alt=""></button>
+            <button id="collectionServiceCardsButton" class="collection-service-cards-button" type="button" aria-pressed="false">🃏 Cartes de mission</button>
         </div>
         <p id="collectionSeasonComingSoon" class="collection-season-notice hidden" role="status">En cours de création</p>
         <div id="collectionSeasonContent">
@@ -3346,7 +3348,7 @@ body:has(.app-content:not(.hidden)) { background:#f3faf1; color:#173b52; }
             <div class="service-window-body">
                 <div id="serviceHomeView"><h2>Choisis ta mission</h2><div class="service-choice-grid"><button class="service-button service-choice" type="button" data-service-type="internal"><span>🗂️</span>Service interne</button><button class="service-button service-choice" type="button" data-service-type="external"><span>🌍</span>Service externe</button></div><section class="service-collective-hours" aria-labelledby="serviceCollectiveTitle"><div class="service-collective-heading"><span aria-hidden="true">⏱️</span><div><strong id="serviceCollectiveTitle">Temps de Service collectif</strong><span id="serviceCollectiveValue">0 h 00 cumulées</span></div></div><div id="serviceCollectiveTrack" class="service-collective-track" role="progressbar" aria-label="Progression du temps collectif vers le prochain repère de 100 heures" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><div id="serviceCollectiveFill" class="service-collective-fill"></div></div><p id="serviceCollectiveCaption" class="service-collective-caption">0 h / 100 h vers le prochain repère</p></section></div>
                 <div id="serviceMissionsView" class="hidden"><button id="serviceMissionsBack" type="button" class="service-button">← Retour</button><h2 id="serviceMissionsTitle"></h2><div id="serviceMissionsList" class="service-mission-grid"></div></div>
-                <div id="serviceActiveView" class="hidden"><h2>Mission en cours</h2><img loading="lazy" decoding="async" id="serviceActiveImage" class="service-active-image hidden" alt=""><div class="service-active-details"><strong id="serviceActiveName"></strong><p id="serviceActiveDescription"></p><p>Durée : <span id="serviceActiveDuration"></span></p><p>Récompense : <span id="serviceActiveReward"></span></p></div><p id="serviceActiveCountdown" class="service-active-countdown" aria-live="polite"></p><button id="serviceClaimButton" class="service-button hidden" type="button">Récupérer ma récompense</button></div>
+        <div id="serviceActiveView" class="hidden"><h2>Mission en cours</h2><img loading="lazy" decoding="async" id="serviceActiveImage" class="service-active-image hidden" alt=""><div class="service-active-details"><strong id="serviceActiveName"></strong><p id="serviceActiveDescription"></p><p>Durée : <span id="serviceActiveDuration"></span></p><p>Récompense : <span id="serviceActiveReward"></span></p><img loading="lazy" decoding="async" id="serviceActiveRewardImage" class="service-active-image hidden" alt="Carte spéciale à gagner"></div><p id="serviceActiveCountdown" class="service-active-countdown" aria-live="polite"></p><button id="serviceClaimButton" class="service-button hidden" type="button">Récupérer ma récompense</button></div>
                 <div id="archivesLegacyView" class="hidden"><label for="archivesMiningSelect">Minage existant</label><select id="archivesMiningSelect" class="admin-field" aria-describedby="archivesMiningDescription"></select><img loading="lazy" decoding="async" id="archivesMiningImage" class="archives-minage-image hidden" alt="Illustration du minage"><p id="archivesMiningDescription" class="archives-description">Envoie le GAV trier les archives. Il trouvera peut-être des jetons classiques pour toi.</p><div class="archives-action-wrap"><span id="archivesCountdown" class="archives-countdown hidden" aria-live="polite"></span><button id="sortArchivesButton" class="primary-button" type="button" disabled>Lancer le minage</button><p id="archivesStatus" class="archives-status" role="status" aria-live="polite"></p></div></div>
                 <p id="serviceStatus" class="service-win-status" role="status" aria-live="polite"></p>
             </div>
@@ -3806,9 +3808,10 @@ body:has(.app-content:not(.hidden)) { background:#f3faf1; color:#173b52; }
                 <label>Nom (obligatoire)<input id="serviceMissionName" maxlength="80" required></label><label>Type de service<select id="serviceMissionType"><option value="internal">Interne</option><option value="external">Externe</option></select></label>
                 <label>Description<textarea id="serviceMissionDescription" maxlength="500" rows="3"></textarea></label><label>Durée (heures)<input id="serviceMissionHours" type="number" min="0" max="72" value="2" required></label>
                 <label>Durée (minutes)<input id="serviceMissionMinutes" type="number" min="0" max="59" value="0" required></label><label>Ordre d’affichage<input id="serviceMissionOrder" type="number" min="0" max="9999" value="0"></label>
-                <label>Récompense en jetons classiques<input id="serviceMissionTokens" type="number" min="0" max="1000" value="0"></label><label>Probabilité de carte (%)<input id="serviceMissionChance" type="number" min="0" max="100" step="0.1" value="0"></label>
-                <label>Nombre de cartes en cas de réussite<input id="serviceMissionCardCount" type="number" min="1" max="5" value="1"></label><label>Cartes éligibles<select id="serviceMissionCardMode"><option value="all">Toutes les cartes distribuables</option><option value="categories">Catégories choisies</option><option value="cards">Cartes sélectionnées</option></select></label>
-                <label>Catégories (séparées par des virgules)<input id="serviceMissionCategories" placeholder="Ex. Cassos"><small>Pour attribuer les cartes Cassos, choisis une mission externe, « Catégories choisies », saisis Cassos et règle le pourcentage de réussite.</small></label><label>Cartes éligibles<select id="serviceMissionCards" multiple size="5"></select></label>
+                <label id="serviceMissionChanceField">Probabilité de gagner une carte (%)<input id="serviceMissionChance" type="number" min="0" max="100" step="0.1" value="0"></label>
+                <label id="serviceMissionCardCountField">Nombre de cartes en cas de réussite<input id="serviceMissionCardCount" type="number" min="1" max="5" value="1"></label><label id="serviceMissionCardModeField">Cartes éligibles<select id="serviceMissionCardMode"><option value="all">Toutes les cartes distribuables</option><option value="categories">Catégories choisies</option><option value="cards">Cartes sélectionnées</option></select></label>
+                <label id="serviceMissionCategoriesField">Catégories (séparées par des virgules)<input id="serviceMissionCategories" placeholder="Ex. Cassos"><small>Pour attribuer les cartes Cassos, choisis une mission externe, « Catégories choisies », saisis Cassos et règle le pourcentage de réussite.</small></label><label id="serviceMissionCardsField">Cartes éligibles<select id="serviceMissionCards" multiple size="5"></select></label>
+                <div id="serviceMissionSpecialCardFields" class="hidden" style="grid-column:1/-1"><h5>Carte spéciale à gagner (hors saisons)</h5><p class="admin-note">Cette carte est propre à la mission : elle n’est pas choisie dans le catalogue des saisons.</p><div class="service-admin-grid"><label>Nom de la carte spéciale<input id="serviceMissionSpecialCardName" maxlength="100" placeholder="Nom de la carte"></label><label>Visuel de la carte (PNG/JPG/WebP, max 5 Mo)<input id="serviceMissionSpecialCardImage" type="file" accept="image/png,image/jpeg,image/webp"></label></div><p id="serviceMissionSpecialCardImageStatus" class="admin-note">Visuel facultatif.</p><img id="serviceMissionSpecialCardPreview" class="hidden" alt="Aperçu de la carte spéciale" style="max-width:150px;max-height:210px;object-fit:contain;border-radius:10px"></div>
                 <label>Illustration (PNG/JPG/WebP, max 5 Mo)<input id="serviceMissionImage" type="file" accept="image/png,image/jpeg,image/webp"></label><label>Activer la mission<input id="serviceMissionEnabled" type="checkbox" checked></label>
             </div><p id="serviceMissionImageStatus" class="admin-note">Image facultative.</p><button id="serviceMissionSave" class="primary-button" type="submit">Enregistrer la mission</button><button id="serviceMissionCancel" class="secondary-button hidden" type="button">Annuler</button></form><p id="serviceAdminStatus" class="admin-status" role="status" aria-live="polite"></p></div>
         </div>
@@ -4987,6 +4990,7 @@ const saleOwnListings = document.getElementById("saleOwnListings");
 const collectionBackButton = document.getElementById("collectionBackButton");
 const collectionSeasonOneButton = document.getElementById("collectionSeasonOneButton");
 const collectionSeasonTwoButton = document.getElementById("collectionSeasonTwoButton");
+const collectionServiceCardsButton = document.getElementById("collectionServiceCardsButton");
 const collectionSeasonContent = document.getElementById("collectionSeasonContent");
 const collectionSeasonComingSoon = document.getElementById("collectionSeasonComingSoon");
 const recyclingPage = document.getElementById("recyclingPage");
@@ -6052,6 +6056,10 @@ document.getElementById("serviceMissionCancel").addEventListener("click", () => 
     editingServiceMissionId = ""; document.getElementById("serviceMissionForm").reset();
     document.getElementById("serviceMissionHours").value = "2"; document.getElementById("serviceMissionMinutes").value = "0";
     document.getElementById("serviceMissionCardMode").dispatchEvent(new Event("change"));
+    document.getElementById("serviceMissionType").dispatchEvent(new Event("change"));
+    document.getElementById("serviceMissionSpecialCardImage").value = "";
+    document.getElementById("serviceMissionSpecialCardPreview").classList.add("hidden");
+    document.getElementById("serviceMissionSpecialCardImageStatus").textContent = "Visuel facultatif.";
     document.getElementById("serviceAdminFormTitle").textContent = "Créer une mission";
     document.getElementById("serviceMissionCancel").classList.add("hidden"); document.getElementById("serviceMissionSave").textContent = "Enregistrer la mission";
     document.getElementById("serviceMissionEditor").classList.add("hidden");
@@ -6061,19 +6069,34 @@ document.getElementById("serviceMissionForm").addEventListener("submit", async (
     try {
         const id = editingServiceMissionId || (crypto.randomUUID ? crypto.randomUUID() : `mission-${Date.now()}`);
         const existing = adminServiceMissions.find((item) => item.id === editingServiceMissionId);
+        const isExternalMission = document.getElementById("serviceMissionType").value === "external";
+        const rewardFile = document.getElementById("serviceMissionSpecialCardImage").files?.[0];
+        const specialName = document.getElementById("serviceMissionSpecialCardName").value.trim();
+        if (isExternalMission && Number(document.getElementById("serviceMissionChance").value) > 0
+            && (!specialName || !(rewardFile || existing?.specialRewardCard?.imageUrl))) {
+            throw new Error("Pour une mission externe avec chance de carte, renseigne son nom et son visuel spécial.");
+        }
         const data = { id, name: document.getElementById("serviceMissionName").value.trim(), description: document.getElementById("serviceMissionDescription").value.trim(),
             serviceType: document.getElementById("serviceMissionType").value, durationMinutes: Number(document.getElementById("serviceMissionHours").value)*60+Number(document.getElementById("serviceMissionMinutes").value),
             sortOrder: Number(document.getElementById("serviceMissionOrder").value)||0, tokenReward: Number(document.getElementById("serviceMissionTokens").value), dropChance: Number(document.getElementById("serviceMissionChance").value),
-            cardCount: Number(document.getElementById("serviceMissionCardCount").value), cardMode: document.getElementById("serviceMissionCardMode").value,
-            eligibleCardCategories: document.getElementById("serviceMissionCategories").value.split(",").map((v)=>v.trim()).filter(Boolean),
-            eligibleCardIds: [...document.getElementById("serviceMissionCards").selectedOptions].map((option)=>option.value), enabled: document.getElementById("serviceMissionEnabled").checked,
-            archived: false, imageUrl: existing?.imageUrl||"", imagePath: existing?.imagePath||"" };
+            cardCount: document.getElementById("serviceMissionType").value === "external" ? 1 : Number(document.getElementById("serviceMissionCardCount").value),
+            cardMode: document.getElementById("serviceMissionType").value === "external" ? "special" : document.getElementById("serviceMissionCardMode").value,
+            eligibleCardCategories: document.getElementById("serviceMissionType").value === "external" ? [] : document.getElementById("serviceMissionCategories").value.split(",").map((v)=>v.trim()).filter(Boolean),
+            eligibleCardIds: document.getElementById("serviceMissionType").value === "external" ? [] : [...document.getElementById("serviceMissionCards").selectedOptions].map((option)=>option.value), enabled: document.getElementById("serviceMissionEnabled").checked,
+            archived: false, imageUrl: existing?.imageUrl||"", imagePath: existing?.imagePath||"",
+            specialRewardCard: document.getElementById("serviceMissionType").value === "external" ? { name: document.getElementById("serviceMissionSpecialCardName").value.trim(), imageUrl: existing?.specialRewardCard?.imageUrl || "", imagePath: existing?.specialRewardCard?.imagePath || "" } : null };
         const file = document.getElementById("serviceMissionImage").files?.[0];
         if (file) {
             if (!/^image\/(png|jpeg|webp)$/.test(file.type)||file.size>5*1024*1024) throw new Error("L’image doit être PNG, JPG ou WebP et ne pas dépasser 5 Mo.");
             const extension=file.type==="image/jpeg"?"jpg":file.type==="image/webp"?"webp":"png";
             data.imagePath=`serviceMissions/${auth.currentUser.uid}/${id}-${Date.now()}.${extension}`;
             const uploaded=await uploadBytes(ref(storage,data.imagePath),file,{contentType:file.type}); data.imageUrl=await getDownloadURL(uploaded.ref);
+        }
+        if (rewardFile && data.serviceType === "external") {
+            if (!/^image\/(png|jpeg|webp)$/.test(rewardFile.type)||rewardFile.size>5*1024*1024) throw new Error("Le visuel de la carte doit être PNG, JPG ou WebP et ne pas dépasser 5 Mo.");
+            const extension=rewardFile.type==="image/jpeg"?"jpg":rewardFile.type==="image/webp"?"webp":"png";
+            data.specialRewardCard.imagePath=`serviceMissions/${auth.currentUser.uid}/${id}-reward-${Date.now()}.${extension}`;
+            const uploaded=await uploadBytes(ref(storage,data.specialRewardCard.imagePath),rewardFile,{contentType:rewardFile.type}); data.specialRewardCard.imageUrl=await getDownloadURL(uploaded.ref);
         }
         await callSaveServiceMission(data); status.textContent="Mission enregistrée.";
         document.getElementById("serviceMissionCancel").click(); await loadAdminServiceMissions();
@@ -6083,6 +6106,19 @@ document.getElementById("serviceMissionForm").addEventListener("submit", async (
 document.getElementById("serviceMissionCardMode").addEventListener("change",(event)=>{
     document.getElementById("serviceMissionCategories").closest("label").classList.toggle("hidden",event.target.value!=="categories");
     document.getElementById("serviceMissionCards").closest("label").classList.toggle("hidden",event.target.value!=="cards");
+});
+function updateServiceMissionFormType() {
+    const external = document.getElementById("serviceMissionType").value === "external";
+    document.getElementById("serviceMissionSpecialCardFields").classList.toggle("hidden", !external);
+    ["serviceMissionCardCountField","serviceMissionCardModeField","serviceMissionCategoriesField","serviceMissionCardsField"].forEach((id)=>document.getElementById(id).classList.toggle("hidden", external));
+    document.getElementById("serviceMissionChance").required = false;
+}
+document.getElementById("serviceMissionType").addEventListener("change", updateServiceMissionFormType);
+document.getElementById("serviceMissionSpecialCardImage").addEventListener("change",(event)=>{
+    const file=event.target.files?.[0]; const preview=document.getElementById("serviceMissionSpecialCardPreview");
+    if(!file){preview.classList.add("hidden");return;}
+    if(!/^image\/(png|jpeg|webp)$/.test(file.type)||file.size>5*1024*1024){event.target.value="";document.getElementById("serviceMissionSpecialCardImageStatus").textContent="Choisis une image PNG, JPG ou WebP de 5 Mo maximum.";preview.classList.add("hidden");return;}
+    preview.src=URL.createObjectURL(file);preview.classList.remove("hidden");document.getElementById("serviceMissionSpecialCardImageStatus").textContent="Nouveau visuel prêt à être envoyé.";
 });
 archivesBackButton.addEventListener("click", showHomePage);
 sortArchivesButton.addEventListener("click", async () => {
@@ -8144,7 +8180,7 @@ async function loadOwnedPlayerCards() {
             .map((item) => {
                 const card = { id: item.id, ...item.data() };
                 card.cardNumber = Number(cardNumbers[card.cardId]) || Number(card.cardNumber) || null;
-                card.season = cardSeasons[card.cardId] || normalizeCollectionSeason(card.season || card.seasonNumber);
+                card.season = card.specialMissionCard === true ? "Missions" : (cardSeasons[card.cardId] || normalizeCollectionSeason(card.season || card.seasonNumber));
                 return card;
             })
             .sort((a, b) => (a.cardNumber || Number.MAX_SAFE_INTEGER) - (b.cardNumber || Number.MAX_SAFE_INTEGER));
@@ -8171,6 +8207,15 @@ function normalizeCollectionSeason(value) {
 }
 
 function applyCollectionSeasonData() {
+    if (collectionSeason === "Missions") {
+        collectionMaxCardNumber = 0; collectionCategories = []; collectionCategoryByNumber = {}; collectionCategoryFilter = "";
+        ownedAlbumCards = allOwnedAlbumCards.filter((card) => card.specialMissionCard === true);
+        const missionCopies = ownedAlbumCards.reduce((total, card) => total + (Number(card.quantity) || 1), 0);
+        ownedCardsStatus.textContent = missionCopies
+            ? `${missionCopies} exemplaire${missionCopies === 1 ? "" : "s"} obtenu${missionCopies === 1 ? "" : "s"} • ${ownedAlbumCards.length} carte${ownedAlbumCards.length === 1 ? "" : "s"} spéciale${ownedAlbumCards.length === 1 ? "" : "s"}`
+            : "Aucune carte spéciale de mission obtenue pour le moment.";
+        collectionDividers.replaceChildren(); renderCollectionAlbum(); return;
+    }
     const seasonData = collectionSeasonMetadata[collectionSeason] || {};
     if (Number.isSafeInteger(Number(seasonData.maxCardNumber))) collectionMaxCardNumber = Math.max(0, Number(seasonData.maxCardNumber));
     if (Array.isArray(seasonData.categories)) collectionCategories = seasonData.categories;
@@ -8188,10 +8233,18 @@ function applyCollectionSeasonData() {
 }
 
 function setCollectionSeason(season) {
-    collectionSeason = season === "Saison 2" ? "Saison 2" : "Saison 1";
+    collectionSeason = ["Saison 2", "Missions"].includes(season) ? season : "Saison 1";
+    if (collectionSeason === "Missions") {
+        collectionDisplayMode = "classique";
+        collectionClassicModeButton.setAttribute("aria-pressed", "true");
+        collectionDividerModeButton.setAttribute("aria-pressed", "false");
+    }
     const isSeasonTwo = collectionSeason === "Saison 2";
-    collectionSeasonOneButton.setAttribute("aria-pressed", String(!isSeasonTwo));
+    collectionSeasonOneButton.setAttribute("aria-pressed", String(collectionSeason === "Saison 1"));
     collectionSeasonTwoButton.setAttribute("aria-pressed", String(isSeasonTwo));
+    collectionServiceCardsButton.setAttribute("aria-pressed", String(collectionSeason === "Missions"));
+    document.querySelector(".collection-display-toggle").classList.toggle("hidden", collectionSeason === "Missions");
+    document.getElementById("collectionRarityFilter").classList.toggle("hidden", collectionSeason === "Missions");
     collectionSeasonContent.classList.remove("hidden");
     collectionSeasonComingSoon.classList.add("hidden");
     collectionSearchInput.value = "";
@@ -8221,7 +8274,7 @@ function renderCollectionAlbum() {
             return nameMatches && categoryMatches && (!selectedRarity || rarity === selectedRarity);
         })
         : null;
-    const totalItems = matchingCards ? matchingCards.length : (categoryNumbers ? categoryNumbers.length : collectionMaxCardNumber);
+    const totalItems = collectionSeason === "Missions" ? (matchingCards ? matchingCards.length : ownedAlbumCards.length) : (matchingCards ? matchingCards.length : (categoryNumbers ? categoryNumbers.length : collectionMaxCardNumber));
     const totalPages = Math.max(1, Math.ceil(totalItems / 9));
     collectionAlbumPage = Math.min(Math.max(0, collectionAlbumPage), totalPages - 1);
     const firstCardNumber = collectionAlbumPage * 9 + 1;
@@ -8245,6 +8298,10 @@ function renderCollectionAlbum() {
             const card = matchingCards[index];
             ownedPlayerCardGrid.append(card ? createAlbumCardElement(card) : createEmptyAlbumSlot());
         }
+    } else if (collectionSeason === "Missions") {
+        collectionSearchStatus.textContent = ownedAlbumCards.length ? "Cartes spéciales obtenues en Service externe." : "Les cartes gagnées lors des missions externes apparaîtront ici.";
+        const visible = ownedAlbumCards.slice(collectionAlbumPage * 9, collectionAlbumPage * 9 + 9);
+        for (let index = 0; index < 9; index += 1) ownedPlayerCardGrid.append(visible[index] ? createAlbumCardElement(visible[index]) : createEmptyAlbumSlot());
     } else {
         collectionSearchStatus.textContent = collectionDisplayMode === "intercalaires"
             ? "Catégorie : " + (collectionCategoryFilter || "aucune carte") + " • Les emplacements vides restent à découvrir."
@@ -8385,7 +8442,7 @@ function groupCardCopies(cards) {
 
 function updateRecycleControls() {
     recyclableCardCopies = allOwnedAlbumCards.flatMap((card) =>
-        typeof card.cardId === "string" && card.cardId && !isCassosCategory(card.category)
+        typeof card.cardId === "string" && card.cardId && card.specialMissionCard !== true && !isCassosCategory(card.category)
             ? (card.copies || []).slice(1).map((copy, index) => ({ ...copy, recycleCopyNumber: index + 2 }))
             : []
     );
@@ -9443,6 +9500,7 @@ homeHeaderButton.addEventListener("click", showHomePage);
 collectionBackButton.addEventListener("click", showHomePage);
 collectionSeasonOneButton.addEventListener("click", () => setCollectionSeason("Saison 1"));
 collectionSeasonTwoButton.addEventListener("click", () => setCollectionSeason("Saison 2"));
+collectionServiceCardsButton.addEventListener("click", () => setCollectionSeason("Missions"));
 rulesBackButton.addEventListener("click", showHomePage);
 collectionSearchInput.addEventListener("input", () => {
     collectionSearchQuery = collectionSearchInput.value;
@@ -10399,7 +10457,7 @@ async function resetAdminEffectifMonth(month, button) {
 function serviceRewardSummary(mission) {
     const rewards = [];
     if (Number(mission.tokenReward) > 0) rewards.push(`${mission.tokenReward} jeton${mission.tokenReward > 1 ? "s" : ""}`);
-    if (Number(mission.dropChance) > 0) rewards.push(`${mission.dropChance}% de chance d’obtenir ${mission.cardCount || 1} carte(s)`);
+    if (Number(mission.dropChance) > 0) rewards.push(`${mission.dropChance}% de chance d’obtenir ${mission.specialRewardCard?.name ? `« ${mission.specialRewardCard.name} »` : `${mission.cardCount || 1} carte(s)`}`);
     return rewards.join(" + ") || "Aucune récompense";
 }
 
@@ -10443,6 +10501,7 @@ function renderServiceMissions(type) {
     items.forEach((mission) => {
         const card = document.createElement("article"); card.className = "service-mission-card";
         if (mission.imageUrl) { const img = document.createElement("img"); img.src = mission.imageUrl; img.alt = `Illustration : ${mission.name}`; card.append(img); }
+        if (mission.serviceType === "external" && mission.specialRewardCard?.imageUrl) { const rewardImg = document.createElement("img"); rewardImg.src = mission.specialRewardCard.imageUrl; rewardImg.alt = `Carte spéciale à gagner : ${mission.specialRewardCard.name || ""}`; rewardImg.loading = "lazy"; card.append(rewardImg); }
         const title = document.createElement("h3"); title.textContent = mission.name;
         const description = document.createElement("p"); description.textContent = mission.description || "Aucune description.";
         const duration = document.createElement("p"); duration.textContent = `Durée : ${Math.floor(mission.durationMinutes / 60)} h ${String(mission.durationMinutes % 60).padStart(2,"0")}`;
@@ -10472,6 +10531,9 @@ function renderServiceActiveMission(active) {
     const duration = Number(active.durationMinutes) || Math.round((Date.parse(active.readyAt) - Date.parse(active.startedAt)) / 60000);
     document.getElementById("serviceActiveDuration").textContent = `${Math.floor(duration / 60)} h ${String(duration % 60).padStart(2,"0")}`;
     document.getElementById("serviceActiveReward").textContent = serviceRewardSummary(active);
+    const rewardImage = document.getElementById("serviceActiveRewardImage");
+    if (active.specialRewardCard?.imageUrl) { rewardImage.src = active.specialRewardCard.imageUrl; rewardImage.alt = `Carte spéciale à gagner : ${active.specialRewardCard.name || ""}`; rewardImage.classList.remove("hidden"); }
+    else { rewardImage.removeAttribute("src"); rewardImage.classList.add("hidden"); }
     setServiceView("active"); updateServiceMissionCountdown();
     if (serviceCountdownInterval) clearInterval(serviceCountdownInterval);
     serviceCountdownInterval = setInterval(updateServiceMissionCountdown, 1000);
@@ -10607,7 +10669,12 @@ function fillServiceMissionForm(mission) {
     document.getElementById("serviceMissionCategories").closest("label").classList.toggle("hidden", (mission.cardMode || "all") !== "categories");
     document.getElementById("serviceMissionCards").closest("label").classList.toggle("hidden", (mission.cardMode || "all") !== "cards");
     document.getElementById("serviceMissionEnabled").checked = mission.enabled !== false;
+    document.getElementById("serviceMissionSpecialCardName").value = mission.specialRewardCard?.name || "";
+    const specialPreview = document.getElementById("serviceMissionSpecialCardPreview");
+    if (mission.specialRewardCard?.imageUrl) { specialPreview.src = mission.specialRewardCard.imageUrl; specialPreview.classList.remove("hidden"); document.getElementById("serviceMissionSpecialCardImageStatus").textContent = "Visuel actuel conservé si aucun nouveau fichier n’est choisi."; }
+    else { specialPreview.classList.add("hidden"); document.getElementById("serviceMissionSpecialCardImageStatus").textContent = "Visuel facultatif."; }
     [...document.getElementById("serviceMissionCards").options].forEach((option) => { option.selected = (mission.eligibleCardIds || []).includes(option.value); });
+    updateServiceMissionFormType();
     document.getElementById("serviceMissionCancel").classList.remove("hidden"); document.getElementById("serviceMissionSave").textContent = "Enregistrer les modifications";
     document.getElementById("serviceMissionEditor").scrollIntoView({ behavior: "smooth", block: "start" });
     document.getElementById("serviceMissionName").focus({ preventScroll: true });
