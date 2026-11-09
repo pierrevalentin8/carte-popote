@@ -6113,6 +6113,7 @@ function updateServiceMissionFormType() {
     const external = document.getElementById("serviceMissionType").value === "external";
     document.getElementById("serviceMissionSpecialCardFields").classList.toggle("hidden", !external);
     ["serviceMissionTokensField","serviceMissionCardCountField","serviceMissionCardModeField","serviceMissionCategoriesField","serviceMissionCardsField"].forEach((id)=>document.getElementById(id).classList.toggle("hidden", external));
+    document.getElementById("serviceMissionChanceField").classList.remove("hidden");
     document.getElementById("serviceMissionChanceLabel").textContent = external ? "Probabilité de gagner la carte spéciale (%)" : "Probabilité de gagner une carte (%)";
     document.getElementById("serviceMissionChance").required = false;
 }
