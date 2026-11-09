@@ -927,12 +927,12 @@ body {
 @keyframes gaugeLiquidSurface { to { opacity:.55; transform:scaleX(.72); } }
 @keyframes gaugeBubbles { to { background-position:0 -108px; } }
 .cooperation-admin-list { display:grid; gap:10px; margin:12px 0; }
-.cooperation-admin-row { display:grid; grid-template-columns:minmax(100px,1.3fr) minmax(86px,.7fr) minmax(120px,1fr) auto auto; gap:9px; align-items:center; padding:10px; border:1px solid #d8c99f; border-radius:9px; background:#fffefa; }
+.cooperation-admin-row { display:grid; grid-template-columns:minmax(100px,1.2fr) minmax(86px,.7fr) minmax(86px,.7fr) minmax(120px,1fr) auto; gap:9px; align-items:center; padding:10px; border:1px solid #d8c99f; border-radius:9px; background:#fffefa; }
 .cooperation-admin-row strong { color:var(--theme-ink); }
 .cooperation-admin-progress { color:var(--theme-muted); font-size:12px; text-align:center; }
 .cooperation-admin-row input[type="number"] { width:100%; min-width:72px; }
 .cooperation-admin-row input[type="checkbox"] { width:19px; height:19px; accent-color:#19753c; }
-@media (max-width:520px) { #cooperationCard { min-height:320px; padding:12px 6px 9px; } .cooperation-gauges { gap:3px; } .cooperation-gauge { grid-template-rows:48px auto minmax(0,1fr) auto; gap:5px; } .cooperation-gauge img { width:46px; height:46px; } .cooperation-gauge-track { width:32px; } .cooperation-gauge-label,.cooperation-gauge-value { font-size:9px; } .cooperation-reward-note { font-size:9px; } .cooperation-admin-row { grid-template-columns:1fr 72px; } .cooperation-admin-progress { text-align:left; } }
+@media (max-width:520px) { #cooperationCard { min-height:320px; padding:12px 6px 9px; } .cooperation-gauges { gap:3px; } .cooperation-gauge { grid-template-rows:48px auto minmax(0,1fr) auto; gap:5px; } .cooperation-gauge img { width:46px; height:46px; } .cooperation-gauge-track { width:32px; } .cooperation-gauge-label,.cooperation-gauge-value { font-size:9px; } .cooperation-reward-note { font-size:9px; } .cooperation-admin-row { grid-template-columns:1fr 1fr; } .cooperation-admin-progress { text-align:left; } }
 @media (max-width:600px) { .home-maintenance-admin-toggle { left:8px; right:auto; gap:4px; padding:6px; font-size:0; } .home-maintenance-admin-toggle::before { content:"🛠"; font-size:15px; } .home-maintenance-admin-toggle input { width:27px; height:15px; flex-basis:27px; } .home-maintenance-admin-toggle input::after { width:9px; height:9px; } .home-maintenance-admin-toggle input:checked::after { transform:translateX(12px); } .cooperation-admin-reward-row { grid-template-columns:1fr 1fr; } .cooperation-admin-reward-title { grid-column:1 / -1; } }
 @media (prefers-reduced-motion:reduce) { .cooperation-gauge-fill,.cooperation-gauge-fill::before,.cooperation-gauge-fill::after { transition:none; animation:none; } #cooperationCard.is-celebrating { animation:none; } }
 
@@ -3809,12 +3809,12 @@ body:has(.app-content:not(.hidden)) { background:#f3faf1; color:#173b52; }
         </div>
         <div id="adminCooperationsSection" class="admin-panel admin-section hidden" style="margin-bottom:16px">
             <h3>🤝 Paramètres des coopérations</h3>
-            <p class="admin-note">Définis les objectifs, active les jauges et choisis leurs récompenses. Les progressions sont communes à tous les joueurs.</p>
+            <p class="admin-note">Définis le premier objectif et l’écart entre les paliers. À chaque palier atteint, la récompense configurée est attribuée automatiquement aux joueurs éligibles, puis l’objectif suivant est calculé automatiquement. La progression collective est conservée.</p>
             <div id="cooperationAdminList" class="cooperation-admin-list"></div>
             <button id="saveCooperationSettingsButton" class="primary-button admin-submit" type="button">Enregistrer les paramètres</button>
             <p id="cooperationAdminStatus" class="admin-status" role="status" aria-live="polite"></p>
             <h4>🎁 Récompenses collectives par jauge</h4>
-            <p class="admin-note">Choisis les jetons classiques, les jetons Premium, une carte précise ou une carte tirée au hasard dans la rareté choisie. Les joueurs autorisés dans Effectif pourront réclamer la récompense lorsque l’objectif sera atteint.</p>
+            <p class="admin-note">Choisis les jetons classiques, les jetons Premium, une carte précise ou une carte tirée au hasard dans la rareté choisie. Cette récompense est attribuée automatiquement à chaque palier atteint.</p>
             <div id="cooperationRewardAdminList" class="cooperation-admin-rewards"></div>
             <button id="saveCooperationRewardsButton" class="primary-button admin-submit" type="button">Enregistrer les récompenses</button>
             <p id="cooperationRewardsAdminStatus" class="admin-status" role="status" aria-live="polite"></p>
@@ -8962,9 +8962,12 @@ async function loadAdminCooperations() {
             const config = cooperationProgress.gauges?.[definition.id] || {};
             const row = document.createElement("div"); row.className = "cooperation-admin-row"; row.dataset.adminCooperation = definition.id;
             const label = document.createElement("strong"); label.textContent = definition.label;
-            const targetLabel = document.createElement("label"); targetLabel.textContent = "Objectif";
+            const targetLabel = document.createElement("label"); targetLabel.textContent = "Prochain palier";
             const target = document.createElement("input"); target.type = "number"; target.min = "1"; target.max = "1000000000"; target.step = "1";
-            target.className = "admin-field"; target.value = String(Number(config.goal) || ""); target.setAttribute("aria-label", `Objectif de ${definition.label}`); targetLabel.append(target);
+            target.className = "admin-field"; target.dataset.cooperationGoal = "true"; target.value = String(Number(config.goal) || ""); target.setAttribute("aria-label", `Prochain palier de ${definition.label}`); targetLabel.append(target);
+            const stepLabel = document.createElement("label"); stepLabel.textContent = "Écart entre paliers";
+            const step = document.createElement("input"); step.type = "number"; step.min = "1"; step.max = "1000000000"; step.step = "1";
+            step.className = "admin-field"; step.dataset.cooperationStep = "true"; step.value = String(Number(config.step) || Number(config.goal) || ""); step.setAttribute("aria-label", `Écart entre les paliers de ${definition.label}`); stepLabel.append(step);
             const progress = document.createElement("span"); progress.className = "cooperation-admin-progress";
             const enabledLabel = document.createElement("label"); enabledLabel.className = "effectif-eligibility";
             const enabled = document.createElement("input"); enabled.type = "checkbox"; enabled.checked = config.enabled !== false;
@@ -8972,24 +8975,10 @@ async function loadAdminCooperations() {
             const enabledText = document.createElement("span"); enabledText.textContent = "Activée";
             enabled.addEventListener("change", () => { enabledText.textContent = enabled.checked ? "Activée" : "En pause"; });
             enabledLabel.append(enabled, enabledText);
-            const reset = document.createElement("button"); reset.type = "button"; reset.className = "secondary-button"; reset.textContent = "Réinitialiser";
-            reset.addEventListener("click", async () => {
-                const liveCount = Number(cooperationProgress.counters?.[definition.id]) || 0;
-                if (!window.confirm(`Démarrer un nouveau cycle pour « ${definition.label} » ? Le compteur actuel (${liveCount.toLocaleString("fr-FR")}) sera conservé. La récompense du nouveau cycle sera attribuée lorsque le prochain objectif sera atteint.`)) return;
-                reset.disabled = true; cooperationAdminStatus.textContent = `Réinitialisation de ${definition.label}…`;
-                try {
-                    const result = await callResetCooperationGauge({ gaugeId:definition.id });
-                    applyCooperationProgress(result.data);
-                    cooperationAdminStatus.textContent = `Nouveau cycle lancé pour « ${definition.label} ». Le compteur collectif a été conservé.`;
-                } catch (error) {
-                    console.error("Impossible de réinitialiser la jauge :", error);
-                    cooperationAdminStatus.textContent = error.message || "Réinitialisation refusée. Vérifie le déploiement des fonctions Coopérations.";
-                } finally { reset.disabled = false; }
-            });
-            row.append(label, targetLabel, progress, enabledLabel, reset); cooperationAdminList.append(row);
+            row.append(label, targetLabel, stepLabel, progress, enabledLabel); cooperationAdminList.append(row);
         });
         updateCooperationAdminProgress();
-        cooperationAdminStatus.textContent = "Paramètres chargés. Les valeurs de progression sont communes à tous les joueurs.";
+        cooperationAdminStatus.textContent = "Paramètres chargés. Les récompenses et les paliers suivants seront gérés automatiquement.";
         await loadAdminCooperationRewards();
     } catch (error) {
         console.error("Impossible de charger les paramètres Coopérations :", error);
@@ -9002,18 +8991,20 @@ async function saveAdminCooperationSettings() {
     let valid = true;
     cooperationGaugeDefinitions.forEach(({ id }) => {
         const row = cooperationAdminList.querySelector(`[data-admin-cooperation="${id}"]`);
-        const goal = Number(row?.querySelector('input[type="number"]')?.value);
+        const goal = Number(row?.querySelector("[data-cooperation-goal]")?.value);
+        const step = Number(row?.querySelector("[data-cooperation-step]")?.value);
         const enabled = row?.querySelector('input[type="checkbox"]')?.checked === true;
-        if (!Number.isSafeInteger(goal) || goal < 1 || goal > 1_000_000_000) valid = false;
-        gauges[id] = { goal, enabled };
+        if (!Number.isSafeInteger(goal) || goal < 1 || goal > 1_000_000_000
+            || !Number.isSafeInteger(step) || step < 1 || step > 1_000_000_000 || goal + step > 1_000_000_000) valid = false;
+        gauges[id] = { goal, step, enabled };
     });
-    if (!valid) { cooperationAdminStatus.textContent = "Chaque objectif doit être un entier entre 1 et 1 000 000 000."; return; }
+    if (!valid) { cooperationAdminStatus.textContent = "Le premier palier et l’écart doivent être des entiers positifs, sans dépasser 1 000 000 000."; return; }
     const button = document.getElementById("saveCooperationSettingsButton"); button.disabled = true;
     cooperationAdminStatus.textContent = "Enregistrement des paramètres…";
     try {
         const response = await callSaveCooperationSettings({ gauges });
         applyCooperationProgress(response.data);
-        cooperationAdminStatus.textContent = "Paramètres des coopérations enregistrés.";
+        cooperationAdminStatus.textContent = "Paramètres enregistrés. La récompense sera attribuée automatiquement à chaque palier atteint, puis le suivant sera calculé.";
     } catch (error) {
         console.error("Impossible d’enregistrer les paramètres Coopérations :", error);
         cooperationAdminStatus.textContent = error.message || "Enregistrement refusé. Vérifie que saveCooperationSettings est déployée.";
