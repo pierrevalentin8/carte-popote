@@ -927,7 +927,7 @@ body {
 @keyframes gaugeLiquidSurface { to { opacity:.55; transform:scaleX(.72); } }
 @keyframes gaugeBubbles { to { background-position:0 -108px; } }
 .cooperation-admin-list { display:grid; gap:10px; margin:12px 0; }
-.cooperation-admin-row { display:grid; grid-template-columns:minmax(100px,1.2fr) minmax(86px,.7fr) minmax(86px,.7fr) minmax(120px,1fr) auto; gap:9px; align-items:center; padding:10px; border:1px solid #d8c99f; border-radius:9px; background:#fffefa; }
+.cooperation-admin-row { display:grid; grid-template-columns:minmax(100px,1.2fr) minmax(110px,.8fr) minmax(120px,1fr) auto; gap:9px; align-items:center; padding:10px; border:1px solid #d8c99f; border-radius:9px; background:#fffefa; }
 .cooperation-admin-row strong { color:var(--theme-ink); }
 .cooperation-admin-progress { color:var(--theme-muted); font-size:12px; text-align:center; }
 .cooperation-admin-row input[type="number"] { width:100%; min-width:72px; }
@@ -1498,6 +1498,7 @@ body {
 .collection-album-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: clamp(6px, 1.8vw, 12px); max-width: 720px; margin: 0 auto; }
 .album-slot { position: relative; display: flex; min-width: 0; aspect-ratio: .70; flex-direction: column; align-items: stretch; overflow: hidden; padding: 4px; border: 1px dashed #c5b68f; border-radius: 9px; background: rgba(255,255,255,.45); }
 .album-slot.is-empty { background: rgba(234,226,207,.32); }
+.album-missing-number { position:absolute; top:7px; left:7px; display:grid; min-width:25px; height:25px; place-items:center; padding:0 6px; border:1px solid rgba(246,211,111,.9); border-radius:999px; background:rgba(16,38,74,.92); color:#ffe49a; font-size:11px; font-weight:900; box-shadow:0 2px 6px rgba(0,0,0,.22); }
 .album-card { cursor: zoom-in; border-style: solid; border-width: 3px; padding: 3px; box-shadow: 0 3px 8px rgba(29,44,66,.2); transition: transform .16s ease, box-shadow .16s ease; }
 .album-card:hover { transform: translateY(-2px); box-shadow: 0 7px 14px rgba(29,44,66,.24); }
 .album-card:focus-visible { outline: 3px solid #f0bd36; outline-offset: 2px; }
@@ -2394,6 +2395,10 @@ body {
 .leaderboard-name { overflow: hidden; color: var(--theme-ink); font-size: 15px; font-weight: 800; text-overflow: ellipsis; }
 .leaderboard-level { color: #6d7890; font-size: 11px; font-weight: 700; white-space: nowrap; }
 .leaderboard-total { color: #8b650d; font-size: 12px; font-weight: 700; }
+.leaderboard-season-breakdowns { min-width:0; }
+.leaderboard-season-breakdown { display:grid; gap:5px; }
+.leaderboard-season-breakdown + .leaderboard-season-breakdown { margin-top:7px; }
+.leaderboard-season-breakdown > strong { color:#32445e; font-size:10px; letter-spacing:.04em; text-transform:uppercase; }
 .leaderboard-rarity-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; }
 .leaderboard-rarity { padding: 7px 5px; border-radius: 9px; text-align: center; font-size: 10px; font-weight: 700; line-height: 1.25; }
 .leaderboard-common { background: #e8e8e8; color: #4d4d4d; }
@@ -2402,7 +2407,7 @@ body {
 .leaderboard-mystic { background: #efe1ff; color: #7045a3; }
 @media (max-width: 390px) { .player-profile { padding-left: 11px; padding-right: 11px; } .profile-stats-grid { gap: 9px; } .profile-stat { min-height: 136px; padding: 14px 8px; } .profile-stat-label { font-size: 11px; } }
 @media (max-width: 390px) { .profile-roadmap-item { grid-template-columns: 46px minmax(0, 1fr); } .profile-roadmap-state { grid-column: 2; text-align: left; } }
-@media (max-width: 600px) { .leaderboard-page { padding-left: 11px; padding-right: 11px; } .leaderboard-row { grid-template-columns: 58px minmax(0, 1fr); gap: 10px; padding: 11px; } .leaderboard-rarity-grid { grid-column: 1 / -1; grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 600px) { .leaderboard-page { padding-left: 11px; padding-right: 11px; } .leaderboard-row { grid-template-columns: 58px minmax(0, 1fr); gap: 10px; padding: 11px; } .leaderboard-season-breakdowns { grid-column: 1 / -1; } .leaderboard-rarity-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 .player-card { position: relative; background: var(--theme-cream); box-shadow: 0 9px 22px rgba(0, 0, 0, .28); }
 .card-new-badge { position: absolute; z-index: 2; top: 8px; left: 8px; padding: 5px 8px; border: 1px solid #f7d46b; border-radius: 999px; background: #10264a; color: #ffe181; font-size: 10px; font-weight: 900; box-shadow: 0 2px 7px rgba(0,0,0,.3); }
 .player-card-image, .player-card-placeholder { background: #efe8d7; }
@@ -5090,7 +5095,7 @@ exchangeOfferAccept.addEventListener("click", () => { void answerExchangeOffer(t
 exchangeOfferRefuse.addEventListener("click", () => { void answerExchangeOffer(false); });
 
 function openExchangeComposer(ad) {
-    if (!ad?.id || !Array.isArray(ad.numbers) || !ad.numbers.length || !Array.isArray(ad.offerNumbers) || !ad.offerNumbers.length) return;
+    if (!ad?.id || !Array.isArray(ad.sendableNumbers) || !ad.sendableNumbers.length || !Array.isArray(ad.offerNumbers) || !ad.offerNumbers.length) return;
     exchangeOfferTarget = ad;
     exchangeComposeIntro.textContent = `Choisis une carte en double à proposer à ${ad.pseudo}, puis une carte en double que tu souhaites recevoir.`;
     const fillOptions = (select, cards) => {
@@ -5103,10 +5108,10 @@ function openExchangeComposer(ad) {
             select.append(option);
         });
     };
-    // L'annonce liste d'abord les cartes manquantes du propriétaire (à recevoir),
-    // puis ses doubles que le joueur connecté cherche (à envoyer).
-    fillOptions(exchangeSendNumber, ad.offerNumbers);
-    fillOptions(exchangeReceiveNumber, ad.numbers);
+    // "Cherche" correspond aux cartes que le joueur connecté doit envoyer;
+    // "Donne" correspond aux doubles du propriétaire que le joueur recevra.
+    fillOptions(exchangeSendNumber, ad.sendableNumbers);
+    fillOptions(exchangeReceiveNumber, ad.offerNumbers);
     exchangeComposeStatus.textContent = "";
     exchangeComposeSubmit.disabled = false;
     exchangeComposeModal.classList.remove("hidden");
@@ -5139,7 +5144,7 @@ exchangeComposeSubmit.addEventListener("click", async () => {
     } catch (error) {
         console.error("Envoi de la demande d’échange impossible :", error);
         exchangeComposeStatus.textContent = error.code === "functions/failed-precondition"
-            ? (error.message || "Ces cartes ne sont plus disponibles pour cet échange. Recharge les annonces.")
+            ? (error.message || "Ton inventaire a changé depuis l’affichage des annonces. Recharge la page Échanges puis réessaie.")
             : "Impossible d’envoyer la demande. Vérifie que les fonctions d’échange sont déployées.";
         exchangeComposeSubmit.disabled = false;
     }
@@ -5843,7 +5848,7 @@ async function showExchangePage() {
             };
             appendNumberLine("Cherche :", Array.isArray(ad.numbers) ? ad.numbers : [], "aucun numéro indiqué.");
             appendNumberLine("Donne :", Array.isArray(ad.offerNumbers) ? ad.offerNumbers : [], "aucune carte indiquée.");
-            if (Array.isArray(ad.numbers) && ad.numbers.length && Array.isArray(ad.offerNumbers) && ad.offerNumbers.length) {
+            if (Array.isArray(ad.sendableNumbers) && ad.sendableNumbers.length && Array.isArray(ad.offerNumbers) && ad.offerNumbers.length) {
                 const tradeButton = document.createElement("button");
                 tradeButton.type = "button";
                 tradeButton.className = "exchange-trade-button";
@@ -7859,20 +7864,31 @@ async function loadLeaderboard() {
             total.textContent = player.points + " points • " + player.cartesUniques + (player.cartesUniques > 1 ? " cartes uniques" : " carte unique");
             playerInfo.append(nameLine, total);
 
-            const rarityGrid = document.createElement("div");
-            rarityGrid.className = "leaderboard-rarity-grid";
-            [
-                ["Communes", player.communes, player.communesTotal, "leaderboard-common"],
-                ["Rares", player.rares, player.raresTotal, "leaderboard-rare"],
-                ["Légendaires", player.legendaires, player.legendairesTotal, "leaderboard-legendary"],
-                ["Mystiques", player.mystiques, player.mystiquesTotal, "leaderboard-mystic"],
-            ].forEach(([label, count, totalCount, className]) => {
-                const chip = document.createElement("span");
-                chip.className = "leaderboard-rarity " + className;
-                chip.textContent = label + " : " + count + "/" + totalCount;
-                rarityGrid.append(chip);
+            const rarityBreakdowns = document.createElement("div");
+            rarityBreakdowns.className = "leaderboard-season-breakdowns";
+            [1, 2].forEach((season) => {
+                const seasonStats = player.seasons?.[season] || {};
+                const seasonBreakdown = document.createElement("section");
+                seasonBreakdown.className = "leaderboard-season-breakdown";
+                const seasonTitle = document.createElement("strong");
+                seasonTitle.textContent = `Saison ${season}`;
+                const rarityGrid = document.createElement("div");
+                rarityGrid.className = "leaderboard-rarity-grid";
+                [
+                    ["Communes", "communes", "leaderboard-common"],
+                    ["Rares", "rares", "leaderboard-rare"],
+                    ["Légendaires", "legendaires", "leaderboard-legendary"],
+                    ["Mystiques", "mystiques", "leaderboard-mystic"],
+                ].forEach(([label, key, className]) => {
+                    const chip = document.createElement("span");
+                    chip.className = "leaderboard-rarity " + className;
+                    chip.textContent = `${label} : ${Number(seasonStats[key]) || 0}/${Number(seasonStats[`${key}Total`]) || 0}`;
+                    rarityGrid.append(chip);
+                });
+                seasonBreakdown.append(seasonTitle, rarityGrid);
+                rarityBreakdowns.append(seasonBreakdown);
             });
-            row.append(rank, playerInfo, rarityGrid);
+            row.append(rank, playerInfo, rarityBreakdowns);
             leaderboardList.append(row);
         });
     } catch (error) {
@@ -8235,7 +8251,7 @@ function renderCollectionAlbum() {
                 continue;
             }
             const card = cardsByNumber.get(number);
-            ownedPlayerCardGrid.append(card ? createAlbumCardElement(card) : createEmptyAlbumSlot());
+                ownedPlayerCardGrid.append(card ? createAlbumCardElement(card) : createEmptyAlbumSlot(number));
         }
     }
 
@@ -8286,10 +8302,16 @@ function setCollectionDisplayMode(mode) {
     renderCollectionAlbum();
 }
 
-function createEmptyAlbumSlot() {
+function createEmptyAlbumSlot(number = null) {
     const slot = document.createElement("div");
     slot.className = "album-slot is-empty";
-    slot.setAttribute("aria-label", "Emplacement vide");
+    if (Number.isSafeInteger(Number(number)) && Number(number) > 0) {
+        const missingNumber = document.createElement("span");
+        missingNumber.className = "album-missing-number";
+        missingNumber.textContent = String(Number(number));
+        slot.append(missingNumber);
+        slot.setAttribute("aria-label", `Carte numéro ${Number(number)} manquante`);
+    } else slot.setAttribute("aria-label", "Emplacement vide");
     return slot;
 }
 
@@ -8962,9 +8984,6 @@ async function loadAdminCooperations() {
             const config = cooperationProgress.gauges?.[definition.id] || {};
             const row = document.createElement("div"); row.className = "cooperation-admin-row"; row.dataset.adminCooperation = definition.id;
             const label = document.createElement("strong"); label.textContent = definition.label;
-            const targetLabel = document.createElement("label"); targetLabel.textContent = "Prochain palier";
-            const target = document.createElement("input"); target.type = "number"; target.min = "1"; target.max = "1000000000"; target.step = "1";
-            target.className = "admin-field"; target.dataset.cooperationGoal = "true"; target.value = String(Number(config.goal) || ""); target.setAttribute("aria-label", `Prochain palier de ${definition.label}`); targetLabel.append(target);
             const stepLabel = document.createElement("label"); stepLabel.textContent = "Écart entre paliers";
             const step = document.createElement("input"); step.type = "number"; step.min = "1"; step.max = "1000000000"; step.step = "1";
             step.className = "admin-field"; step.dataset.cooperationStep = "true"; step.value = String(Number(config.step) || Number(config.goal) || ""); step.setAttribute("aria-label", `Écart entre les paliers de ${definition.label}`); stepLabel.append(step);
@@ -8975,7 +8994,7 @@ async function loadAdminCooperations() {
             const enabledText = document.createElement("span"); enabledText.textContent = "Activée";
             enabled.addEventListener("change", () => { enabledText.textContent = enabled.checked ? "Activée" : "En pause"; });
             enabledLabel.append(enabled, enabledText);
-            row.append(label, targetLabel, stepLabel, progress, enabledLabel); cooperationAdminList.append(row);
+            row.append(label, stepLabel, progress, enabledLabel); cooperationAdminList.append(row);
         });
         updateCooperationAdminProgress();
         cooperationAdminStatus.textContent = "Paramètres chargés. Les récompenses et les paliers suivants seront gérés automatiquement.";
@@ -8991,14 +9010,12 @@ async function saveAdminCooperationSettings() {
     let valid = true;
     cooperationGaugeDefinitions.forEach(({ id }) => {
         const row = cooperationAdminList.querySelector(`[data-admin-cooperation="${id}"]`);
-        const goal = Number(row?.querySelector("[data-cooperation-goal]")?.value);
         const step = Number(row?.querySelector("[data-cooperation-step]")?.value);
         const enabled = row?.querySelector('input[type="checkbox"]')?.checked === true;
-        if (!Number.isSafeInteger(goal) || goal < 1 || goal > 1_000_000_000
-            || !Number.isSafeInteger(step) || step < 1 || step > 1_000_000_000 || goal + step > 1_000_000_000) valid = false;
-        gauges[id] = { goal, step, enabled };
+        if (!Number.isSafeInteger(step) || step < 1 || step > 1_000_000_000) valid = false;
+        gauges[id] = { step, enabled };
     });
-    if (!valid) { cooperationAdminStatus.textContent = "Le premier palier et l’écart doivent être des entiers positifs, sans dépasser 1 000 000 000."; return; }
+    if (!valid) { cooperationAdminStatus.textContent = "L’écart entre les paliers doit être un entier positif inférieur ou égal à 1 000 000 000."; return; }
     const button = document.getElementById("saveCooperationSettingsButton"); button.disabled = true;
     cooperationAdminStatus.textContent = "Enregistrement des paramètres…";
     try {
