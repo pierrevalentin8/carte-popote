@@ -1304,7 +1304,7 @@ body {
     display: grid;
 
     grid-template-columns:
-        repeat(3, minmax(0, 1fr));
+        repeat(4, minmax(0, 1fr));
 
     background: #ffffff;
 
@@ -1355,6 +1355,8 @@ body {
 .nav-icon svg { display: block; width: 22px; height: 22px; }
 .nav-image-button { width: 54px; height: 54px; align-self: center; justify-self: center; padding: 3px; border: 1px solid rgba(243, 191, 56, .85); border-radius: 50%; background: #10264a; box-shadow: 0 2px 9px rgba(0, 0, 0, .32); }
 .nav-image-button img { display: block; width: 100%; height: 100%; border-radius: 50%; object-fit: contain; }
+.nav-image-button.nav-season-shop-button { width:54px; height:54px; border-radius:13px; padding:2px; }
+.nav-image-button.nav-season-shop-button img { border-radius:10px; object-fit:cover; }
 
 
 .nav-item.active {
@@ -1408,6 +1410,24 @@ body {
 .rules-admin-panel label { display: block; margin: 12px 0 6px; color: var(--theme-cream); font-size: 13px; font-weight: 700; }
 .rules-admin-panel textarea { min-height: 230px; resize: vertical; white-space: pre-wrap; }
 .rules-page-status { min-height: 20px; margin-top: 8px; color: var(--theme-cream); font-size: 13px; }
+.season-one-shop-page { width:100%; max-width:920px; margin:0 auto; padding:20px 16px 105px; color:var(--theme-ink); }
+.season-one-shop-page h2 { margin:14px 0 6px; color:#184d32; }
+.season-shop-intro { color:#355344; line-height:1.5; }
+.season-shop-prices { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:10px; margin:18px 0; }
+.season-shop-prices button { min-height:58px; padding:10px 8px; border:2px solid #b9d6b8; border-radius:14px; background:linear-gradient(145deg,#fff,#eaf5e8); color:#183d2b; font:inherit; font-weight:850; box-shadow:0 4px 12px rgba(28,83,48,.12); cursor:pointer; }
+.season-shop-prices button[aria-pressed="true"] { border-color:#d4a62b; background:linear-gradient(145deg,#fff2b4,#f5d668); box-shadow:0 0 0 2px rgba(212,166,43,.18),0 6px 15px rgba(28,83,48,.16); }
+.season-shop-price { display:block; margin-top:3px; font-size:12px; }
+.season-shop-panel { padding:16px; border:2px solid #b9d6b8; border-radius:18px; background:linear-gradient(145deg,#fff,#f1f8ef); box-shadow:0 10px 24px rgba(24,77,50,.12); }
+.season-shop-panel label { display:grid; gap:6px; color:#244b35; font-weight:800; }
+.season-shop-panel select { width:100%; min-height:46px; padding:9px 11px; border:1px solid #9db89e; border-radius:10px; background:#fff; color:#183d2b; font:inherit; }
+.season-shop-preview { display:grid; grid-template-columns:minmax(100px,180px) minmax(0,1fr); gap:16px; align-items:center; margin-top:16px; }
+.season-shop-preview img { display:block; width:100%; max-height:245px; object-fit:contain; border-radius:12px; background:rgba(255,255,255,.65); }
+.season-shop-preview h3 { margin:0 0 7px; color:#173c2a; }
+.season-shop-buy-row { display:flex; flex-wrap:wrap; align-items:center; gap:12px; margin-top:16px; }
+.season-shop-buy-row strong { display:inline-flex; align-items:center; gap:6px; color:#173c2a; font-size:18px; }
+.season-shop-buy-row img { width:25px; height:25px; object-fit:contain; }
+.season-shop-status { min-height:22px; margin:12px 0 0; color:#31533b; }
+@media(max-width:520px) { .season-shop-prices { gap:6px; } .season-shop-prices button { min-height:54px; font-size:12px; } .season-shop-preview { grid-template-columns:minmax(80px,34%) minmax(0,1fr); gap:10px; } }
 .admin-panel { background: #fff; border-radius: 18px; padding: 18px; box-shadow: 0 6px 20px rgba(45,155,200,.08); }
 .admin-page h2 { margin-bottom: 8px; color: #173b52; }
 .admin-note, .admin-status { color: #68899b; font-size: 13px; line-height: 1.5; margin: 8px 0 14px; }
@@ -2427,6 +2447,7 @@ body {
 .nav-item.active { color: #a87900; }
 .nav-item:disabled { color: #8290a4; }
 .bottom-nav { box-sizing: border-box; height: calc(70px + env(safe-area-inset-bottom, 0px)); padding-bottom: env(safe-area-inset-bottom, 0px); }
+.bottom-nav { grid-template-columns:repeat(4,minmax(0,1fr)); }
 .app-content { padding-bottom: calc(100px + env(safe-area-inset-bottom, 0px)); }
 .booster-visual { position: relative; display: block; }
 .booster-stock-badge { position: absolute; top: 7px; right: 7px; padding: 5px 8px; border: 1px solid rgba(243,191,56,.9); border-radius: 999px; background: rgba(8,24,49,.92); color: #ffe181; font-size: 11px; font-weight: 800; box-shadow: 0 2px 8px rgba(0,0,0,.3); }
@@ -3288,6 +3309,27 @@ body:has(.app-content:not(.hidden)) { background:#f3faf1; color:#173b52; }
         </div>
     </section>
 
+    <section id="seasonOneShopPage" class="season-one-shop-page hidden" aria-labelledby="seasonOneShopTitle">
+        <button id="seasonOneShopBackButton" class="admin-back" type="button">← Retour à l’accueil</button>
+        <h2 id="seasonOneShopTitle">🛒 Acheter une carte · Saison 1</h2>
+        <p class="season-shop-intro">Choisis une rareté, puis le numéro de la carte. Les cartes déjà présentes dans ta collection ne peuvent pas être rachetées.</p>
+        <div class="season-shop-prices" role="group" aria-label="Choisir la rareté de la carte">
+            <button type="button" data-season-shop-rarity="commune" aria-pressed="true">Carte commune<span class="season-shop-price">10 jetons</span></button>
+            <button type="button" data-season-shop-rarity="rare" aria-pressed="false">Carte rare<span class="season-shop-price">13 jetons</span></button>
+            <button type="button" data-season-shop-rarity="legendaire" aria-pressed="false">Carte légendaire<span class="season-shop-price">15 jetons</span></button>
+        </div>
+        <div class="season-shop-panel">
+            <label for="seasonOneShopNumber">Numéro de carte</label>
+            <select id="seasonOneShopNumber" class="admin-field"><option value="">Chargement des cartes…</option></select>
+            <div class="season-shop-preview">
+                <img id="seasonOneShopPreviewImage" class="hidden" alt="Visuel de la carte choisie" loading="lazy" decoding="async">
+                <div><h3 id="seasonOneShopPreviewName">Choisis une carte</h3><p id="seasonOneShopPreviewDescription" class="season-shop-intro"></p></div>
+            </div>
+            <div class="season-shop-buy-row"><strong><img src="./Jeton.png" alt=""> <span id="seasonOneShopPrice">10</span> jetons classiques</strong><button id="seasonOneShopBuyButton" class="primary-button" type="button" disabled>Acheter la carte</button></div>
+            <p id="seasonOneShopStatus" class="season-shop-status" role="status" aria-live="polite">Chargement des cartes disponibles…</p>
+        </div>
+    </section>
+
     <section id="exchangePage" class="exchange-page hidden" aria-labelledby="exchangeTitle">
         <button id="exchangeBackButton" class="admin-back" type="button">← Retour à l’accueil</button>
         <h2 id="exchangeTitle">🤝 Échanges entre joueurs</h2>
@@ -3871,6 +3913,10 @@ body:has(.app-content:not(.hidden)) { background:#f3faf1; color:#173b52; }
             <img loading="lazy" decoding="async" src="./Collection.png" alt="" aria-hidden="true">
         </button>
 
+        <button id="seasonOneShopNavButton" class="nav-item nav-image-button nav-season-shop-button" type="button" aria-label="Acheter une carte de la saison 1" title="Acheter une carte · Saison 1">
+            <img loading="lazy" decoding="async" src="./Saison%201.png" alt="" aria-hidden="true">
+        </button>
+
         <button id="recyclingNavButton" class="nav-item nav-image-button" type="button" aria-label="Recyclage" title="Recyclage">
             <img loading="lazy" decoding="async" src="./Recyclage.png" alt="" aria-hidden="true">
         </button>
@@ -4037,6 +4083,8 @@ const callClaimServiceMissionReward = httpsCallable(functions, "claimServiceMiss
 const callGetAdminGavSettings = httpsCallable(functions, "getAdminGavSettings");
 const callSaveAdminGavSettings = httpsCallable(functions, "saveAdminGavSettings");
 const callGetOwnedCardNumbers = httpsCallable(functions, "getOwnedCardNumbers");
+const callGetSeasonOneShopCards = httpsCallable(functions, "getSeasonOneShopCards");
+const callPurchaseSeasonOneCard = httpsCallable(functions, "purchaseSeasonOneCard");
 const callGetExchangeBoard = httpsCallable(functions, "getExchangeBoard");
 const callGetSaleMarket = httpsCallable(functions, "getSaleMarket");
 const callCreateSaleListing = httpsCallable(functions, "createSaleListing");
@@ -4975,6 +5023,15 @@ const feedbackText = document.getElementById("feedbackText");
 const feedbackSubmitButton = document.getElementById("feedbackSubmitButton");
 const feedbackStatus = document.getElementById("feedbackStatus");
 const collectionPage = document.getElementById("collectionPage");
+const seasonOneShopPage = document.getElementById("seasonOneShopPage");
+const seasonOneShopBackButton = document.getElementById("seasonOneShopBackButton");
+const seasonOneShopNumber = document.getElementById("seasonOneShopNumber");
+const seasonOneShopPreviewImage = document.getElementById("seasonOneShopPreviewImage");
+const seasonOneShopPreviewName = document.getElementById("seasonOneShopPreviewName");
+const seasonOneShopPreviewDescription = document.getElementById("seasonOneShopPreviewDescription");
+const seasonOneShopPrice = document.getElementById("seasonOneShopPrice");
+const seasonOneShopBuyButton = document.getElementById("seasonOneShopBuyButton");
+const seasonOneShopStatus = document.getElementById("seasonOneShopStatus");
 const exchangePage = document.getElementById("exchangePage");
 const exchangeBackButton = document.getElementById("exchangeBackButton");
 const exchangeMissingNumbers = document.getElementById("exchangeMissingNumbers");
@@ -5020,6 +5077,7 @@ const rulesSaveButton = document.getElementById("rulesSaveButton");
 const rulesSaveStatus = document.getElementById("rulesSaveStatus");
 const homeHeaderButton = document.getElementById("homeHeaderButton");
 const collectionNavButton = document.getElementById("collectionNavButton");
+const seasonOneShopNavButton = document.getElementById("seasonOneShopNavButton");
 const recyclingNavButton = document.getElementById("recyclingNavButton");
 let ownedAlbumCards = [];
 let allOwnedAlbumCards = [];
@@ -5777,6 +5835,7 @@ function showHomePage() {
     statisticsPage.classList.add("hidden");
     drawnCardsPage.classList.add("hidden");
     collectionPage.classList.add("hidden");
+    seasonOneShopPage.classList.add("hidden");
     exchangePage.classList.add("hidden");
     recyclingPage.classList.add("hidden");
     adminPage.classList.add("hidden");
@@ -5792,6 +5851,7 @@ function showHomePage() {
     bottomNav.classList.remove("hidden");
     collectionNavButton.classList.remove("active");
     recyclingNavButton.classList.remove("active");
+    seasonOneShopNavButton.classList.remove("active");
     leaderboardMenuButton.classList.remove("active");
 }
 
@@ -5799,7 +5859,7 @@ async function showExchangePage() {
     if (!auth.currentUser) return;
     dropdownMenu.classList.add("hidden");
     document.querySelector(".app-content").classList.add("hidden");
-    [termsPage, financePage, profilePage, leaderboardPage, activityPage, statisticsPage, drawnCardsPage, collectionPage, exchangePage, salePage, recyclingPage, adminPage, eventBoostersAdminPage, effectifPage, messagingPage, rulesPage, premiumPage, archivesPage, adminHubPage, pollsAdminPage].forEach((page) => page.classList.add("hidden"));
+    [termsPage, financePage, profilePage, leaderboardPage, activityPage, statisticsPage, drawnCardsPage, collectionPage, seasonOneShopPage, exchangePage, salePage, recyclingPage, adminPage, eventBoostersAdminPage, effectifPage, messagingPage, rulesPage, premiumPage, archivesPage, adminHubPage, pollsAdminPage].forEach((page) => page.classList.add("hidden"));
     exchangePage.classList.remove("hidden");
     bottomNav.classList.add("hidden");
     exchangeMissingNumbers.replaceChildren();
@@ -8459,6 +8519,115 @@ function updateRecycleControls() {
     if (recyclingPage && !recyclingPage.classList.contains("hidden")) renderRecyclingCopies();
 }
 
+const seasonOneShopPrices = { commune: 10, rare: 13, legendaire: 15 };
+let seasonOneShopCards = [];
+let seasonOneShopRarity = "commune";
+
+function renderSeasonOneShopSelectedCard() {
+    const card = seasonOneShopCards.find((item) => item.id === seasonOneShopNumber.value);
+    const price = seasonOneShopPrices[seasonOneShopRarity];
+    seasonOneShopPrice.textContent = String(price);
+    seasonOneShopBuyButton.disabled = !card || card.owned || isPlayerPreview;
+    if (!card) {
+        seasonOneShopPreviewImage.classList.add("hidden");
+        seasonOneShopPreviewImage.removeAttribute("src");
+        seasonOneShopPreviewName.textContent = "Aucune carte disponible";
+        seasonOneShopPreviewDescription.textContent = "Tu as déjà toutes les cartes de cette rareté, ou aucune n’a encore été créée.";
+        return;
+    }
+    seasonOneShopPreviewName.textContent = `N° ${card.number} · ${card.name || "Carte sans nom"}`;
+    seasonOneShopPreviewDescription.textContent = card.description || (card.owned ? "Tu possèdes déjà cette carte." : `Carte ${seasonOneShopRarity} · Saison 1`);
+    if (card.imageUrl) {
+        seasonOneShopPreviewImage.src = card.imageUrl;
+        seasonOneShopPreviewImage.alt = `Visuel de ${card.name || `la carte numéro ${card.number}`}`;
+        seasonOneShopPreviewImage.classList.remove("hidden");
+    } else {
+        seasonOneShopPreviewImage.classList.add("hidden");
+        seasonOneShopPreviewImage.removeAttribute("src");
+    }
+    if (card.owned) seasonOneShopStatus.textContent = "Tu possèdes déjà cette carte. Choisis un autre numéro.";
+    else if (isPlayerPreview) seasonOneShopStatus.textContent = "L’achat est désactivé en mode aperçu.";
+    else seasonOneShopStatus.textContent = "Carte disponible à l’achat.";
+}
+
+function renderSeasonOneShopChoices(preferredCardId = "") {
+    const matching = seasonOneShopCards.filter((card) => card.rarity === seasonOneShopRarity);
+    seasonOneShopNumber.replaceChildren();
+    if (!matching.length) {
+        seasonOneShopNumber.add(new Option("Aucune carte disponible", ""));
+        seasonOneShopNumber.disabled = true;
+        renderSeasonOneShopSelectedCard();
+        return;
+    }
+    seasonOneShopNumber.disabled = false;
+    matching.forEach((card) => {
+        const option = new Option(`N° ${card.number} — ${card.name || "Carte sans nom"}${card.owned ? " · déjà obtenue" : ""}`, card.id);
+        option.disabled = card.owned;
+        seasonOneShopNumber.add(option);
+    });
+    const preferred = matching.find((card) => card.id === preferredCardId);
+    const available = matching.find((card) => !card.owned);
+    seasonOneShopNumber.value = (preferred || available || matching[0]).id;
+    renderSeasonOneShopSelectedCard();
+}
+
+async function loadSeasonOneShopCards() {
+    seasonOneShopStatus.textContent = "Chargement des cartes disponibles…";
+    seasonOneShopBuyButton.disabled = true;
+    seasonOneShopNumber.disabled = true;
+    try {
+        const response = (await callGetSeasonOneShopCards()).data || {};
+        seasonOneShopCards = Array.isArray(response.cards) ? response.cards : [];
+        if (Number.isFinite(Number(response.tokens))) playerTokensDisplay.textContent = Number(response.tokens).toLocaleString("fr-FR");
+        renderSeasonOneShopChoices();
+    } catch (error) {
+        console.error("Impossible de charger la boutique Saison 1 :", error);
+        seasonOneShopStatus.textContent = error.message || "Impossible de charger les cartes de la Saison 1.";
+        seasonOneShopNumber.replaceChildren(new Option("Chargement impossible", ""));
+    }
+}
+
+async function openSeasonOneShopPage() {
+    if (!auth.currentUser) return;
+    dropdownMenu.classList.add("hidden");
+    document.querySelector(".app-content").classList.add("hidden");
+    [termsPage, financePage, profilePage, leaderboardPage, activityPage, statisticsPage, drawnCardsPage, collectionPage, seasonOneShopPage, exchangePage, salePage, recyclingPage, adminPage, eventBoostersAdminPage, effectifPage, messagingPage, rulesPage, premiumPage, archivesPage, adminHubPage, pollsAdminPage].forEach((page) => page.classList.add("hidden"));
+    seasonOneShopPage.classList.remove("hidden");
+    bottomNav.classList.remove("hidden");
+    document.querySelectorAll(".bottom-nav .nav-item").forEach((button) => button.classList.remove("active"));
+    seasonOneShopNavButton.classList.add("active");
+    await loadSeasonOneShopCards();
+}
+
+document.querySelectorAll("[data-season-shop-rarity]").forEach((button) => button.addEventListener("click", () => {
+    seasonOneShopRarity = button.dataset.seasonShopRarity;
+    document.querySelectorAll("[data-season-shop-rarity]").forEach((choice) => choice.setAttribute("aria-pressed", String(choice === button)));
+    renderSeasonOneShopChoices();
+}));
+seasonOneShopNumber.addEventListener("change", renderSeasonOneShopSelectedCard);
+seasonOneShopBuyButton.addEventListener("click", async () => {
+    const card = seasonOneShopCards.find((item) => item.id === seasonOneShopNumber.value);
+    if (!card || card.owned || seasonOneShopBuyButton.disabled) return;
+    seasonOneShopBuyButton.disabled = true;
+    seasonOneShopStatus.textContent = "Achat en cours…";
+    try {
+        const result = (await callPurchaseSeasonOneCard({ cardId: card.id })).data || {};
+        playerTokensDisplay.textContent = Number(result.tokens || 0).toLocaleString("fr-FR");
+        card.owned = true;
+        renderSeasonOneShopChoices(card.id);
+        seasonOneShopStatus.textContent = `Carte n° ${card.number} ajoutée à ta collection pour ${Number(result.price) || seasonOneShopPrices[seasonOneShopRarity]} jetons.`;
+        void refreshCooperationProgress();
+    } catch (error) {
+        console.error("Achat de carte Saison 1 impossible :", error);
+        seasonOneShopStatus.textContent = error.message || "Impossible d’acheter cette carte.";
+        renderSeasonOneShopSelectedCard();
+    } finally {
+        seasonOneShopBuyButton.disabled = !card || card.owned || isPlayerPreview;
+    }
+});
+seasonOneShopNavButton.addEventListener("click", openSeasonOneShopPage);
+seasonOneShopBackButton.addEventListener("click", showHomePage);
+
 function renderRecyclingCopies() {
     recyclingCardsList.replaceChildren();
     const normalizeRecycleRarity = (value) => String(value || "").toLocaleLowerCase("fr").normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/s$/, "");
@@ -9612,6 +9781,7 @@ collectionNavButton.addEventListener("click", async () => {
     recyclingPage.classList.add("hidden");
     archivesPage.classList.add("hidden");
     collectionPage.classList.remove("hidden");
+    seasonOneShopPage.classList.add("hidden");
     bottomNav.classList.remove("hidden");
     collectionNavButton.classList.add("active");
     recyclingNavButton.classList.remove("active");
@@ -9626,6 +9796,7 @@ recyclingNavButton.addEventListener("click", async () => {
     leaderboardPage.classList.add("hidden"); activityPage.classList.add("hidden");
     statisticsPage.classList.add("hidden");
     collectionPage.classList.add("hidden");
+    seasonOneShopPage.classList.add("hidden");
     adminPage.classList.add("hidden");
     effectifPage.classList.add("hidden");
     messagingPage.classList.add("hidden");
