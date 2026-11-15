@@ -5912,8 +5912,8 @@ async function showExchangePage() {
                 }
                 article.append(paragraph);
             };
-            appendNumberLine("Cherche :", Array.isArray(ad.numbers) ? ad.numbers : [], "aucun numéro indiqué.");
-            appendNumberLine("Donne :", Array.isArray(ad.offerNumbers) ? ad.offerNumbers : [], "aucune carte indiquée.");
+            appendNumberLine("Tu as celles qui l’intéressent :", Array.isArray(ad.sendableNumbers) ? ad.sendableNumbers : [], "aucune de tes cartes en double ne l’intéresse.");
+            appendNumberLine("Il a celles qui t’intéressent :", Array.isArray(ad.offerNumbers) ? ad.offerNumbers : [], "aucune de ses cartes en double ne te manque.");
             if (Array.isArray(ad.sendableNumbers) && ad.sendableNumbers.length && Array.isArray(ad.offerNumbers) && ad.offerNumbers.length) {
                 const tradeButton = document.createElement("button");
                 tradeButton.type = "button";
