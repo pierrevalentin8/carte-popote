@@ -2835,7 +2835,6 @@ body:has(.app-content:not(.hidden)) { background:#f3faf1; color:#173b52; }
             <button id="saleMenuButton" type="button">🛒 Vente entre joueurs</button>
             <button id="seasonOneShopMenuButton" type="button">🃏 Acheter une carte · Saison 1</button>
             <button id="buyNormalBoosterButton" class="hidden" type="button">Booster Saison 1</button>
-            <button id="buySeason2BoosterButton" class="hidden" type="button">Booster Saison 2</button>
 
 
 
@@ -3037,6 +3036,7 @@ body:has(.app-content:not(.hidden)) { background:#f3faf1; color:#173b52; }
                 </span>
                 <h4>Booster classique · Saison 2</h4>
                 <p>5 cartes</p>
+                <button id="buySeason2BoosterButton" class="hidden" type="button">3 jetons</button>
                 <button id="openSeason2BoosterButton" type="button" disabled>Ouvrir un booster</button>
             </article>
 
@@ -5069,7 +5069,7 @@ function updateClassicBoosterPurchaseAvailability() {
     const canBuySeason1 = Boolean(auth.currentUser) && !isPlayerPreview && tokenBalance >= normalBoosterSettings["Saison 1"].price;
     const canBuySeason2 = Boolean(auth.currentUser) && !isPlayerPreview && tokenBalance >= normalBoosterSettings["Saison 2"].price;
     buyNormalBoosterButton.textContent = `Booster Saison 1 · ${Number(normalBoosterSettings["Saison 1"].price).toLocaleString("fr-FR")} jetons`;
-    buySeason2BoosterButton.textContent = `Booster Saison 2 · ${Number(normalBoosterSettings["Saison 2"].price).toLocaleString("fr-FR")} jetons`;
+    buySeason2BoosterButton.textContent = `${Number(normalBoosterSettings["Saison 2"].price).toLocaleString("fr-FR")} jetons`;
     buyNormalBoosterButton.classList.toggle("hidden", !canBuySeason1);
     buyNormalBoosterButton.disabled = !canBuySeason1;
     buySeason2BoosterButton.classList.toggle("hidden", !canBuySeason2);
