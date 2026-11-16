@@ -2336,6 +2336,34 @@ body {
 .profile-stat-value { color: #ffdc69; font-size: clamp(17px,2.4vw,23px); }
 .profile-stat-label { max-width: 110px; color: #d1d9e7; font-size: 11px; }
 .profile-tracking-note { margin: 9px 2px 0; color: #adbdd4; font-size: 10px; text-align: left; }
+.profile-dashboard { margin-top:18px; padding:16px; border:1px solid rgba(231,193,91,.58); border-radius:16px; background:linear-gradient(150deg,rgba(5,20,43,.94),rgba(15,43,79,.94)); color:#f8f3e6; box-shadow:0 8px 20px rgba(0,0,0,.2),inset 0 1px rgba(255,255,255,.06); }
+.profile-dashboard h3 { margin:0 0 13px; color:#ffdc69; font-size:18px; }
+.profile-dashboard h4 { margin:0 0 11px; color:#fff1bd; font-size:14px; }
+.profile-dashboard h5 { margin:14px 0 9px; color:#cfdaea; font-size:11px; }
+.profile-dashboard-subtitle { margin:16px 0 10px !important; }
+.profile-dashboard-collection-panel { padding:13px; border:1px solid rgba(231,193,91,.32); border-radius:12px; background:rgba(1,10,24,.34); }
+.profile-dashboard-collections { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; }
+.profile-dashboard-progress { min-width:0; }
+.profile-dashboard-progress-heading { display:flex; justify-content:space-between; gap:8px; margin-bottom:6px; color:#e8edf5; font-size:11px; }
+.profile-dashboard-progress-heading strong { color:#ffdc69; font-variant-numeric:tabular-nums; }
+.profile-dashboard-track { height:10px; overflow:hidden; border:1px solid rgba(255,220,105,.48); border-radius:999px; background:#07152e; box-shadow:inset 0 2px 4px rgba(0,0,0,.45); }
+.profile-dashboard-fill { height:100%; border-radius:inherit; background:linear-gradient(90deg,#167cc1,#67d6ed,#ffe17a); box-shadow:0 0 9px rgba(103,214,237,.4); transition:width .45s ease; }
+.profile-dashboard-rarity-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:8px; }
+.profile-dashboard-rarity { display:grid; grid-template-columns:30px minmax(0,1fr); align-items:center; gap:7px; min-width:0; padding:8px; border:1px solid rgba(231,193,91,.25); border-radius:10px; background:rgba(9,28,54,.72); }
+.profile-dashboard-rarity img { width:28px; height:28px; object-fit:contain; }
+.profile-dashboard-rarity-copy { min-width:0; }
+.profile-dashboard-rarity-copy strong,.profile-dashboard-rarity-copy span { display:block; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.profile-dashboard-rarity-copy strong { color:#fff1bd; font-size:10px; }
+.profile-dashboard-rarity-copy span { margin-top:3px; color:#c7d3e4; font-size:10px; font-variant-numeric:tabular-nums; }
+.profile-dashboard-upcoming { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; }
+.profile-dashboard-goal { display:grid; grid-template-columns:38px minmax(0,1fr); align-items:center; gap:9px; min-width:0; padding:10px; border:1px solid rgba(231,193,91,.35); border-radius:11px; background:linear-gradient(135deg,rgba(22,52,91,.9),rgba(6,22,46,.9)); }
+.profile-dashboard-goal img { width:36px; height:36px; object-fit:contain; filter:drop-shadow(0 2px 4px rgba(0,0,0,.3)); }
+.profile-dashboard-goal strong,.profile-dashboard-goal small { display:block; }
+.profile-dashboard-goal strong { overflow:hidden; color:#fff1bd; font-size:11px; text-overflow:ellipsis; white-space:nowrap; }
+.profile-dashboard-goal small { margin-top:3px; color:#c7d3e4; font-size:10px; line-height:1.35; }
+.profile-dashboard-goal .profile-dashboard-track { grid-column:1/-1; width:100%; }
+.profile-dashboard-done { color:#a9e7bf !important; }
+@media (max-width:620px) { .profile-dashboard { padding:12px; } .profile-dashboard-collections { grid-template-columns:1fr; } .profile-dashboard-rarity-grid { grid-template-columns:1fr; } .profile-dashboard-upcoming { grid-template-columns:1fr; } }
 .profile-history { margin-top: 20px; padding: 16px; border: 1px solid rgba(231,193,91,.55); border-radius: 15px; background: linear-gradient(145deg,rgba(7,22,45,.94),rgba(16,43,79,.94)); color: #f8f3e6; box-shadow: 0 9px 22px rgba(0,0,0,.22),inset 0 1px rgba(255,255,255,.07); }
 .profile-history > summary { position:relative; display:flex; align-items:center; justify-content:space-between; gap:12px; min-height:48px; padding:9px 12px 9px 15px; border:1px solid rgba(255,220,105,.72); border-radius:12px; background:linear-gradient(110deg,rgba(27,61,105,.98),rgba(10,28,55,.98) 62%,rgba(30,49,79,.98)); color:#fff0bb; font-size:14px; font-weight:900; letter-spacing:.02em; list-style:none; cursor:pointer; box-shadow:0 4px 0 rgba(100,67,12,.8),0 7px 15px rgba(0,0,0,.24),inset 0 1px rgba(255,255,255,.16); transition:transform .16s ease,filter .16s ease,box-shadow .16s ease; }
 .profile-history > summary::-webkit-details-marker { display:none; }
@@ -3211,6 +3239,17 @@ body:has(.app-content:not(.hidden)) { background:#dcebd5; color:#173b52; }
                     <span class="profile-stat-label">Dépensés en Premium</span>
                 </article>
             </div>
+            <section id="profileDashboard" class="profile-dashboard hidden" aria-labelledby="profileDashboardTitle">
+                <h3 id="profileDashboardTitle">Mon tableau de bord</h3>
+                <div class="profile-dashboard-collection-panel">
+                    <h4>Progression de ma collection</h4>
+                    <div id="profileDashboardCollections" class="profile-dashboard-collections"></div>
+                    <h5>Badges de rareté · Saison 1</h5>
+                    <div id="profileDashboardSeasonOneBadges" class="profile-dashboard-rarity-grid"></div>
+                </div>
+                <h4 class="profile-dashboard-subtitle">Prochains paliers</h4>
+                <div id="profileDashboardUpcoming" class="profile-dashboard-upcoming"></div>
+            </section>
             <p class="profile-tracking-note">Totaux cumulés, distincts des soldes disponibles. Les jetons reçus avant la mise en place du suivi peuvent manquer.</p>
             <details id="profileHistory" class="profile-history hidden">
                 <summary id="profileHistoryTitle">Mon historique</summary>
@@ -4957,6 +4996,10 @@ const profileIdentityStatus = document.getElementById("profileIdentityStatus");
 const profileBadgeList = document.getElementById("profileBadgeList");
 const profileBadgesSection = document.getElementById("profileBadgesSection");
 const profileBadgesEmpty = document.getElementById("profileBadgesEmpty");
+const profileDashboard = document.getElementById("profileDashboard");
+const profileDashboardCollections = document.getElementById("profileDashboardCollections");
+const profileDashboardSeasonOneBadges = document.getElementById("profileDashboardSeasonOneBadges");
+const profileDashboardUpcoming = document.getElementById("profileDashboardUpcoming");
 let loadedProfileIdentity = { pseudo: "", avatar: "" };
 const profilePremiumSpendingCard = document.getElementById("profilePremiumSpendingCard");
 const profilePremiumSpending = document.getElementById("profilePremiumSpending");
@@ -7805,6 +7848,119 @@ profileHistorySection?.addEventListener("toggle", () => {
     if (profileHistorySection.open && auth.currentUser && viewedOtherPlayerId === null) loadProfileRewardHistory();
 });
 
+function appendProfileDashboardProgress(container, label, currentValue, targetValue) {
+    const current = Math.max(0, Number(currentValue) || 0);
+    const target = Math.max(1, Number(targetValue) || 1);
+    const row = document.createElement("div");
+    row.className = "profile-dashboard-progress";
+    const heading = document.createElement("div");
+    heading.className = "profile-dashboard-progress-heading";
+    const name = document.createElement("span");
+    name.textContent = label;
+    const total = document.createElement("strong");
+    total.textContent = `${Math.min(current, target).toLocaleString("fr-FR")} / ${target.toLocaleString("fr-FR")}`;
+    heading.append(name, total);
+    const track = document.createElement("div");
+    track.className = "profile-dashboard-track";
+    track.setAttribute("role", "progressbar");
+    track.setAttribute("aria-label", `${label} : ${current} sur ${target}`);
+    track.setAttribute("aria-valuemin", "0");
+    track.setAttribute("aria-valuemax", String(target));
+    track.setAttribute("aria-valuenow", String(Math.min(current, target)));
+    const fill = document.createElement("div");
+    fill.className = "profile-dashboard-fill";
+    fill.style.width = `${Math.min(100, (current / target) * 100)}%`;
+    track.append(fill);
+    row.append(heading, track);
+    container.append(row);
+}
+
+function appendProfileDashboardGoal(container, { label, image, current, target, unit }) {
+    const card = document.createElement("article");
+    card.className = "profile-dashboard-goal";
+    const badgeImage = document.createElement("img");
+    badgeImage.src = image;
+    badgeImage.alt = "";
+    badgeImage.loading = "lazy";
+    const copy = document.createElement("div");
+    const heading = document.createElement("strong");
+    const detail = document.createElement("small");
+    if (target === null) {
+        heading.textContent = label;
+        detail.className = "profile-dashboard-done";
+        detail.textContent = `${current.toLocaleString("fr-FR")} ${unit} · tous les paliers atteints`;
+        card.append(badgeImage, copy);
+        copy.append(heading, detail);
+        container.append(card);
+        return;
+    }
+    heading.textContent = label;
+    detail.textContent = `${Math.min(current, target).toLocaleString("fr-FR")} / ${target.toLocaleString("fr-FR")} ${unit}`;
+    const track = document.createElement("div");
+    track.className = "profile-dashboard-track";
+    track.setAttribute("role", "progressbar");
+    track.setAttribute("aria-label", `${label} : ${current} sur ${target} ${unit}`);
+    track.setAttribute("aria-valuemin", "0");
+    track.setAttribute("aria-valuemax", String(target));
+    track.setAttribute("aria-valuenow", String(Math.min(current, target)));
+    const fill = document.createElement("div");
+    fill.className = "profile-dashboard-fill";
+    fill.style.width = `${Math.min(100, (current / target) * 100)}%`;
+    track.append(fill);
+    copy.append(heading, detail);
+    card.append(badgeImage, copy, track);
+    container.append(card);
+}
+
+function renderProfileDashboard(player, seasonProgress) {
+    profileDashboard.classList.toggle("hidden", !seasonProgress);
+    if (!seasonProgress) return;
+    profileDashboardCollections.replaceChildren();
+    profileDashboardSeasonOneBadges.replaceChildren();
+    profileDashboardUpcoming.replaceChildren();
+    ["Saison 1", "Saison 2"].forEach((season) => {
+        const progress = seasonProgress[season] || { owned: 0, total: season === "Saison 1" ? 74 : 70 };
+        appendProfileDashboardProgress(profileDashboardCollections, season, progress.owned, progress.total);
+    });
+
+    const rarityMilestones = [
+        { label: "Communes", value: player.commonSeasonOneProgress, target: 27, image: "./badge-communes-27.png" },
+        { label: "Rares", value: player.rareSeasonOneProgress, target: 30, image: "./Cartes%20rares.png" },
+        { label: "Légendaires", value: player.legendarySeasonOneProgress, target: 17, image: "./Cartes%20l%C3%A9gendaires.png" }
+    ];
+    rarityMilestones.forEach((milestone) => {
+        const card = document.createElement("div");
+        card.className = "profile-dashboard-rarity";
+        const image = document.createElement("img");
+        image.src = milestone.image;
+        image.alt = "";
+        image.loading = "lazy";
+        const copy = document.createElement("div");
+        copy.className = "profile-dashboard-rarity-copy";
+        const label = document.createElement("strong");
+        label.textContent = milestone.label;
+        const value = document.createElement("span");
+        value.textContent = `${Math.min(Number(milestone.value) || 0, milestone.target)} / ${milestone.target}`;
+        copy.append(label, value);
+        card.append(image, copy);
+        profileDashboardSeasonOneBadges.append(card);
+    });
+
+    const streak = Math.max(0, Number(player.boosterJournalierStreak) || 0);
+    const hours = Math.max(0, Number(player.serviceTimeMs) || 0) / 3600000;
+    const level = Math.max(1, Number(player.niveau) || 1);
+    const classicTokens = Math.max(0, Number(player.classicTokensEarned ?? player.jetonsGagnes) || 0);
+    const nextMilestone = (thresholds, current) => thresholds.find((threshold) => current < threshold) ?? null;
+    const streakTarget = nextMilestone([2, 10, 30, 100], streak);
+    const serviceTarget = nextMilestone([50, 200, 500], hours);
+    const levelTarget = nextMilestone([5, 10, 15], level);
+    const tokenTarget = nextMilestone([100, 300, 500], classicTokens);
+    appendProfileDashboardGoal(profileDashboardUpcoming, { label: streakTarget ? `Flamme ${streakTarget === 2 ? "bleue" : streakTarget === 10 ? "rouge" : streakTarget === 30 ? "or" : "violette"}` : "Série quotidienne", image: streakTarget === 100 ? "./flamme-violette.png" : streakTarget === 30 ? "./flamme-or.png" : streakTarget === 10 ? "./flamme-rouge.png" : "./flamme-bleue.png", current: streak, target: streakTarget, unit: "jours" });
+    appendProfileDashboardGoal(profileDashboardUpcoming, { label: serviceTarget ? `Badge Service ${serviceTarget} h` : "Service · paliers terminés", image: serviceTarget === 500 ? "./badge-500h.png" : serviceTarget === 200 ? "./badge-200h.png" : "./badge-50h.png", current: hours, target: serviceTarget, unit: "h" });
+    appendProfileDashboardGoal(profileDashboardUpcoming, { label: levelTarget ? `Badge niveau ${levelTarget}` : "Niveaux · paliers terminés", image: levelTarget === 15 ? "./badge%20niv%2015.png" : levelTarget === 10 ? "./badge%20niv%2010.png" : "./badge%20niv%205.png", current: level, target: levelTarget, unit: "niveau" });
+    appendProfileDashboardGoal(profileDashboardUpcoming, { label: tokenTarget ? `Badge ${tokenTarget} jetons gagnés` : "Jetons · paliers terminés", image: tokenTarget === 500 ? "./badge-jetons-classiques-500.png" : tokenTarget === 300 ? "./badge-jetons-classiques-300.png" : "./badge-jetons-classiques-100.png", current: classicTokens, target: tokenTarget, unit: "jetons" });
+}
+
 async function loadPersonalProfile(playerId = auth.currentUser?.uid) {
     if (!auth.currentUser || !playerId) return;
     const isOwnProfile = playerId === auth.currentUser.uid;
@@ -7817,16 +7973,33 @@ async function loadPersonalProfile(playerId = auth.currentUser?.uid) {
         profilePremiumSpendingCard.classList.toggle("hidden", !isOwnProfile);
         document.getElementById("profileTokensEarnedCard").classList.toggle("hidden", !isOwnProfile);
         profileHistorySection.classList.toggle("hidden", !isOwnProfile);
+        profileDashboard.classList.add("hidden");
         let player;
         let openedClassics = 0;
+        let dashboardSeasonProgress = null;
         if (isOwnProfile) {
             const playerRef = doc(db, "players", playerId);
-            const [snapshot, collectionSnapshot] = await Promise.all([
+            const [snapshot, collectionSnapshot, numberResponse] = await Promise.all([
                 getDoc(playerRef),
-                getDocs(collection(db, "players", playerId, "collection"))
+                getDocs(collection(db, "players", playerId, "collection")),
+                callGetOwnedCardNumbers()
             ]);
             if (!snapshot.exists()) throw new Error("PLAYER_PROFILE_MISSING");
             player = snapshot.data();
+            const cardSeasons = numberResponse.data?.cardSeasons || {};
+            const seasonData = numberResponse.data?.seasonData || {};
+            const ownedSeasonCards = { "Saison 1": new Set(), "Saison 2": new Set() };
+            collectionSnapshot.docs.forEach((item) => {
+                const card = item.data();
+                if (card.specialMissionCard === true) return;
+                const season = cardSeasons[card.cardId] || normalizeCollectionSeason(card.season || card.seasonNumber);
+                const uniqueId = card.cardId || [card.name, card.rarity, card.category].join("|");
+                if (ownedSeasonCards[season] && uniqueId && uniqueId !== "||") ownedSeasonCards[season].add(uniqueId);
+            });
+            dashboardSeasonProgress = {
+                "Saison 1": { owned: ownedSeasonCards["Saison 1"].size, total: Math.max(74, new Set(seasonData["Saison 1"]?.numbers || []).size) },
+                "Saison 2": { owned: ownedSeasonCards["Saison 2"].size, total: Math.max(70, new Set(seasonData["Saison 2"]?.numbers || []).size) }
+            };
             loadedProfileIdentity = {
                 pseudo: player.pseudo || "",
                 avatar: player.avatar || ""
@@ -7857,11 +8030,14 @@ async function loadPersonalProfile(playerId = auth.currentUser?.uid) {
                 const serverTokenTotal = Number(badgeResponse.data.classicTokensEarned);
                 if (Number.isSafeInteger(serverTokenTotal) && serverTokenTotal >= 0) {
                     profileTokensEarned.textContent = serverTokenTotal.toLocaleString("fr-FR");
+                    player.classicTokensEarned = serverTokenTotal;
                 }
                 player.unlockedBadgeIds = badgeResponse.data.unlockedBadgeIds || [];
                 player.eventBadges = badgeResponse.data.eventBadges || [];
                 player.badgeEquipped = badgeResponse.data.badgeEquipped || "";
                 player.commonSeasonOneProgress = Number(badgeResponse.data.commonSeasonOneProgress) || 0;
+                player.rareSeasonOneProgress = Number(badgeResponse.data.rareSeasonOneProgress) || 0;
+                player.legendarySeasonOneProgress = Number(badgeResponse.data.legendarySeasonOneProgress) || 0;
                 player.boosterJournalierStreak = Number(badgeResponse.data.boosterJournalierStreak) || 0;
                 const formattedSpending = (totalAmountCents / 100).toLocaleString("fr-FR", { style: "currency", currency: "EUR" });
                 profilePremiumSpending.textContent = formattedSpending;
@@ -7915,6 +8091,7 @@ async function loadPersonalProfile(playerId = auth.currentUser?.uid) {
             equippedBadgeElement.setAttribute("aria-label", badgeDetails.label);
         }
         renderProfileBadges(player, isOwnProfile);
+        renderProfileDashboard(player, dashboardSeasonProgress);
         const avatarPath = PLAYER_AVATARS[player.avatar];
         if (avatarPath) {
             const avatarImage = document.createElement("img");
