@@ -1158,7 +1158,7 @@ body {
 .home-card-count-copy { display: flex; align-items: baseline; flex-wrap: wrap; gap: 5px; }
 .home-card-count-value { color: #f7d46b; font-size: 23px; font-weight: 900; line-height: 1; }
 .home-card-count-label { color: #fbfaf5; font-size: 12px; font-weight: 700; }
-.home-player-summary { display: grid; grid-template-columns: minmax(0, 1fr) 82px minmax(0, 1fr); align-items: center; gap: 8px; margin: 12px 0; padding: 8px 12px; border: 1px solid rgba(243,191,56,.72); border-radius: 18px; background: linear-gradient(145deg, #10264a, #183966); box-shadow: 0 7px 17px rgba(0,0,0,.22); }
+.home-player-summary { display:grid; grid-template-columns:minmax(0,1fr) 82px; align-items:center; gap:8px; margin:12px auto; padding:0; border:0; border-radius:0; background:transparent; box-shadow:none; }
 .home-profile-button, .home-resource-tile { min-width: 0; min-height: 62px; padding: 5px; border: 0; border-radius: 12px; background: transparent; color: #fbfaf5; box-shadow: none; }
 .home-profile-button { display: flex; width: 78px; height: 78px; align-items: center; justify-content: center; justify-self: center; padding: 5px; border: 1px solid rgba(243,191,56,.72); border-radius: 50%; background: linear-gradient(145deg, #183966, #10264a); font: inherit; cursor: pointer; }
 .home-profile-button:focus-visible, .home-overview-premium:focus-visible { outline: 3px solid #f7d46b; outline-offset: 3px; }
@@ -1307,7 +1307,7 @@ body {
 .finance-history-fields label { display: grid; gap: 5px; font-size: 12px; font-weight: 700; }
 .finance-history-fields .admin-field { min-width: 0; }
 @media (max-width: 560px) { .finance-history-fields { grid-template-columns: 1fr; } }
-@media (max-width: 380px) { .home-player-summary { grid-template-columns: minmax(0, 1fr) 70px minmax(0, 1fr); gap: 4px; padding: 7px; } .home-profile-button { width: 68px; height: 68px; min-height: 68px; padding: 3px; } .home-profile-button .avatar { width: 58px; height: 58px; } .home-resource-tile { min-height: 54px; padding: 4px 2px; } .home-resource-tile strong { font-size: clamp(17px, 5.5vw, 22px); } .home-resource-tile img { width: 28px; height: 28px; } .home-overview-premium { min-height: 54px; padding: 3px; } .home-overview-premium img { width: 42px; height: 42px; } }
+@media (max-width: 380px) { .home-player-summary { grid-template-columns:minmax(0,1fr) 68px; gap:4px; padding:0; } .home-profile-button { width:68px; height:68px; min-height:68px; padding:3px; } .home-profile-button .avatar { width:58px; height:58px; } .home-resource-tile { min-height:54px; padding:4px 2px; } .home-resource-tile strong { font-size:clamp(17px,5.5vw,22px); } .home-resource-tile img { width:28px; height:28px; } }
 
 
 /* ==================================================
@@ -1331,7 +1331,7 @@ body {
     display: grid;
 
     grid-template-columns:
-        repeat(4, minmax(0, 1fr));
+        repeat(5, minmax(0, 1fr));
 
     background: #ffffff;
 
@@ -2557,7 +2557,7 @@ body {
 .nav-item.active { color: #a87900; }
 .nav-item:disabled { color: #8290a4; }
 .bottom-nav { box-sizing: border-box; height: calc(70px + env(safe-area-inset-bottom, 0px)); padding-bottom: env(safe-area-inset-bottom, 0px); }
-.bottom-nav { grid-template-columns:repeat(4,minmax(0,1fr)); }
+.bottom-nav { grid-template-columns:repeat(5,minmax(0,1fr)); }
 .app-content { padding-bottom: calc(100px + env(safe-area-inset-bottom, 0px)); }
 .booster-visual { position: relative; display: block; }
 .booster-stock-badge { position: absolute; top: 7px; right: 7px; padding: 5px 8px; border: 1px solid rgba(243,191,56,.9); border-radius: 999px; background: rgba(8,24,49,.92); color: #ffe181; font-size: 11px; font-weight: 800; box-shadow: 0 2px 8px rgba(0,0,0,.3); }
@@ -2593,7 +2593,13 @@ body {
 .app-content { max-width: 1160px; }
 .home-season-banner { display:flex; align-items:center; justify-content:center; gap:10px; margin:8px auto 14px; padding:8px 18px; width:fit-content; max-width:100%; border:1px solid rgba(159,242,139,.7); border-radius:999px; background:linear-gradient(100deg,rgba(11,72,37,.9),rgba(15,42,53,.94)); color:#e5ffd7; font-size:13px; font-weight:900; letter-spacing:.08em; text-shadow:0 1px 4px #05200e; box-shadow:0 0 20px rgba(53,203,87,.2),inset 0 1px rgba(255,255,255,.16); }
 .home-season-banner::before,.home-season-banner::after { content:"✦"; color:#f5d56c; }
-.home-player-summary { max-width:760px; margin:14px auto 12px; }
+.home-player-summary { max-width:760px; margin:14px auto 12px; grid-template-columns:minmax(0,1fr) 82px; padding:0; border:0; background:transparent; box-shadow:none; }
+.daily-objectives-header { list-style:none; cursor:pointer; }
+.daily-objectives-header::-webkit-details-marker { display:none; }
+.daily-objectives-header::after { content:"⌄"; flex:none; color:#397249; font-size:20px; line-height:1; transition:transform .18s ease; }
+.daily-objectives-card[open] .daily-objectives-header::after { transform:rotate(180deg); }
+.daily-objectives-card:not([open]) { padding-top:11px; padding-bottom:11px; }
+@media(max-width:380px){.home-player-summary{grid-template-columns:minmax(0,1fr) 68px}}
 .boosters { grid-template-columns:minmax(0,1.15fr) minmax(0,1fr); align-items:stretch; gap:14px; margin:8px 0 12px; }
 #dailyBoosterArticle,#cooperationCard { grid-column:1 / -1; }
 .booster-season-two { grid-column:2; grid-row:1; display:grid; width:100%; grid-template-columns:minmax(150px,.78fr) minmax(0,1fr); grid-template-rows:auto auto auto auto; align-content:center; align-items:center; justify-self:stretch; padding:15px 14px; border-width:2px; border-radius:20px; background:radial-gradient(ellipse at 23% 48%,rgba(23,159,63,.22),transparent 58%),linear-gradient(145deg,rgba(11,39,36,.94),rgba(8,27,48,.97) 72%); box-shadow:0 12px 28px rgba(2,12,24,.32),inset 0 0 0 2px rgba(224,255,184,.1),inset 0 0 24px rgba(34,207,74,.12); }
@@ -2645,7 +2651,7 @@ body:has(.app-content:not(.hidden)) { background:#dcebd5; color:#173b52; }
 #appPage:has(.app-content:not(.hidden)) { background:#dcebd5; }
 #appPage:has(.app-content:not(.hidden)) .app-content { color:#173b52; }
 #appPage:has(.app-content:not(.hidden)) .app-header { background:#fff; border-bottom:2px solid #329447; box-shadow:0 3px 12px rgba(24,91,43,.12); }
-#appPage:has(.app-content:not(.hidden)) .home-player-summary { border:2px solid #329447; background:#fff; box-shadow:0 5px 16px rgba(28,105,48,.12); }
+#appPage:has(.app-content:not(.hidden)) .home-player-summary { border:0; background:transparent; box-shadow:none; }
 #appPage:has(.app-content:not(.hidden)) .home-resource-tile strong { color:#246e36; }
 #appPage:has(.app-content:not(.hidden)) .home-profile-button { border:2px solid #329447; background:#f3fff4; }
 #appPage:has(.app-content:not(.hidden)) .home-profile-button .avatar { border-color:#329447; }
@@ -2667,7 +2673,7 @@ body:has(.app-content:not(.hidden)) { background:#dcebd5; color:#173b52; }
 #appPage:has(.app-content:not(.hidden)) .cooperation-reward-note { color:#245f34; text-shadow:none; }
 #appPage:has(.app-content:not(.hidden)) .cooperation-reward-note { border-color:rgba(50,148,71,.3); }
 #appPage:has(.app-content:not(.hidden)) .booster button { border-color:#329447; }
-#appPage:has(.app-content:not(.hidden)) .home-season-banner { border-color:#329447; background:#effaf0; color:#246e36; text-shadow:none; box-shadow:0 4px 12px rgba(35,126,55,.1); }
+
 #appPage:has(.app-content:not(.hidden)) .home-overview-grid { grid-template-columns:repeat(4,minmax(0,1fr)); }
 #appPage:has(.app-content:not(.hidden)) .home-overview-grid > button,
 #appPage:has(.app-content:not(.hidden)) .home-overview-archive { border:2px solid #329447; background:#fff; box-shadow:0 5px 14px rgba(28,105,48,.12),inset 0 1px #fff; }
@@ -2995,9 +3001,7 @@ body:has(.app-content:not(.hidden)) { background:#dcebd5; color:#173b52; }
             <button id="playerProfileHomeButton" class="home-profile-button" type="button" aria-label="Ouvrir le profil">
                 <span class="avatar" id="playerAvatar" aria-hidden="true">👤</span>
             </button>
-            <button id="premiumHomeButton" class="home-overview-premium" type="button" aria-label="Ouvrir la page Premium">
-                <img loading="lazy" decoding="async" src="./Jeton%20premium.png" alt="Jeton Premium">
-            </button>
+            
             <span id="playerPseudo" class="hidden">Joueur</span>
             <span id="playerBoosters" class="hidden">0</span>
             <span id="playerLevel" class="hidden">Niveau 1 • 0 XP</span>
@@ -3020,8 +3024,15 @@ body:has(.app-content:not(.hidden)) { background:#dcebd5; color:#173b52; }
             </button>
         </section>
 
-        <p class="home-season-banner" aria-label="La saison 2 est ouverte">SAISON 2 · OUVERTE</p>
-<section id="dailyObjectivesCard" class="daily-objectives-card hidden" aria-labelledby="dailyObjectivesTitle"><div class="daily-objectives-header"><h3 id="dailyObjectivesTitle">🎯 Objectifs du jour</h3><span id="dailyObjectivesDate" class="daily-objectives-date"></span></div><div id="dailyObjectivesList" class="daily-objectives-list" aria-live="polite"></div><p id="dailyObjectivesReward" class="daily-objectives-reward">Complète les 3 objectifs pour gagner 1 booster classique Saison 2.</p></section>
+        
+<details id="dailyObjectivesCard" class="daily-objectives-card hidden" aria-labelledby="dailyObjectivesTitle">
+            <summary class="daily-objectives-header">
+                <h3 id="dailyObjectivesTitle">🎯 Objectifs du jour</h3>
+                <span id="dailyObjectivesDate" class="daily-objectives-date"></span>
+            </summary>
+            <div id="dailyObjectivesList" class="daily-objectives-list" aria-live="polite"></div>
+            <p id="dailyObjectivesReward" class="daily-objectives-reward">Complète les 3 objectifs pour gagner 1 booster classique Saison 2.</p>
+        </details>
 
 
         <!-- BOOSTERS -->
@@ -4095,6 +4106,10 @@ body:has(.app-content:not(.hidden)) { background:#dcebd5; color:#173b52; }
 
         <button id="exchangeNavButton" class="nav-item nav-image-button" type="button" aria-label="Échanges" title="Échanges" aria-describedby="exchangeUnlockNotice">
             <img loading="lazy" decoding="async" src="./%C3%89change.png" alt="" aria-hidden="true">
+        </button>
+
+        <button id="premiumHomeButton" class="nav-item nav-image-button" type="button" aria-label="Premium" title="Premium">
+            <img loading="lazy" decoding="async" src="./Jeton%20premium.png" alt="" aria-hidden="true">
         </button>
 
 
@@ -5835,6 +5850,10 @@ onAuthStateChanged(
            ========================================== */
 
         if (!user) {
+            if (dailyObjectivesUnsubscribe) dailyObjectivesUnsubscribe();
+            dailyObjectivesUnsubscribe = null;
+            dailyObjectivesDayKey = "";
+            dailyObjectivesCard.open = false;
             if (dailyObjectivesUnsubscribe) dailyObjectivesUnsubscribe();
             dailyObjectivesUnsubscribe = null;
             dailyObjectivesDayKey = "";
@@ -9412,7 +9431,7 @@ async function loadDailyObjectives(uid){
  if(dailyObjectivesUnsubscribe)dailyObjectivesUnsubscribe();dailyObjectivesUnsubscribe=null;
  try{
   const response=await callGetDailyObjectives();if(!auth.currentUser||auth.currentUser.uid!==uid)return;
-  const state=response.data||{};dailyObjectivesDayKey=state.dayKey||getParisDateKey();
+  const state=response.data||{};dailyObjectivesDayKey=state.dayKey||getParisDateKey();dailyObjectivesCard.open=false;
   const date=new Date(`${dailyObjectivesDayKey}T12:00:00+01:00`);
   dailyObjectivesDate.textContent=new Intl.DateTimeFormat("fr-FR",{weekday:"long",day:"numeric",month:"long"}).format(date);
   dailyObjectivesUnsubscribe=onSnapshot(doc(db,"players",uid,"dailyObjectives",dailyObjectivesDayKey),snapshot=>{
