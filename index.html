@@ -3464,7 +3464,7 @@ body:has(.app-content:not(.hidden)) { background:#dcebd5; color:#173b52; }
             </section>
         </div>
         <details id="premiumSettingsDisclosure" class="premium-admin-disclosure hidden">
-            <summary>⚙️ Paramètres</summary>
+            <summary>⚙️ Paramètres Premium et récompenses de la roue</summary>
             <div class="premium-admin-disclosure-content">
                 <section class="premium-booster-settings" aria-labelledby="premiumBoosterSettingsTitle">
                     <h3 id="premiumBoosterSettingsTitle">Booster Premium</h3>
@@ -3480,11 +3480,14 @@ body:has(.app-content:not(.hidden)) { background:#dcebd5; color:#173b52; }
                     <button id="premiumBoosterSettingsSave" class="primary-button" type="button">Enregistrer les réglages</button>
                     <p id="premiumBoosterSettingsStatus" class="premium-status" role="status" aria-live="polite"></p>
                 </section>
-                <p class="admin-note">Configure les cadeaux et leurs taux. Le total des taux doit faire 100 %.</p>
+                <section class="premium-booster-settings" aria-labelledby="premiumWheelRewardsTitle">
+                <h3 id="premiumWheelRewardsTitle">🎡 Récompenses de la roue</h3>
+                <p class="admin-note">Configure ici les cadeaux de la roue et leurs taux. Le total des taux doit faire 100 %.</p>
                 <div id="premiumPrizeEditor"></div>
                 <button id="premiumAddPrizeButton" class="secondary-button" type="button">Créer un cadeau</button>
                 <button id="premiumSavePrizesButton" class="primary-button admin-submit" type="button">Enregistrer la roue</button>
                 <p id="premiumAdminStatus" class="premium-status" role="status" aria-live="polite"></p>
+                </section>
             </div>
         </details>
         <div class="premium-game-layout">
