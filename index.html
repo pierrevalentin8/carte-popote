@@ -2557,7 +2557,7 @@ body {
 .nav-item.active { color: #a87900; }
 .nav-item:disabled { color: #8290a4; }
 .bottom-nav { box-sizing: border-box; height: calc(70px + env(safe-area-inset-bottom, 0px)); padding-bottom: env(safe-area-inset-bottom, 0px); }
-.bottom-nav { display:flex; align-items:center; justify-content:center; gap:clamp(8px,3vw,20px); }
+.bottom-nav { display:flex; align-items:center; justify-content:space-evenly; gap:0; }
 .app-content { padding-bottom: calc(100px + env(safe-area-inset-bottom, 0px)); }
 .booster-visual { position: relative; display: block; }
 .booster-stock-badge { position: absolute; top: 7px; right: 7px; padding: 5px 8px; border: 1px solid rgba(243,191,56,.9); border-radius: 999px; background: rgba(8,24,49,.92); color: #ffe181; font-size: 11px; font-weight: 800; box-shadow: 0 2px 8px rgba(0,0,0,.3); }
@@ -2600,7 +2600,7 @@ body {
 .daily-objectives-card[open] .daily-objectives-header::after { transform:rotate(180deg); }
 .daily-objectives-card:not([open]) { padding-top:11px; padding-bottom:11px; }
 @media(max-width:380px){.home-player-summary{grid-template-columns:minmax(0,1fr) 68px}}
-@media(max-width:380px){.home-player-summary{gap:12px}.bottom-nav{gap:8px}.bottom-nav .nav-image-button{width:50px;height:50px}}
+@media(max-width:380px){.home-player-summary{gap:12px}.bottom-nav .nav-image-button{width:50px;height:50px}}
 .boosters { grid-template-columns:minmax(0,1.15fr) minmax(0,1fr); align-items:stretch; gap:14px; margin:8px 0 12px; }
 #dailyBoosterArticle,#cooperationCard { grid-column:1 / -1; }
 .booster-season-two { grid-column:2; grid-row:1; display:grid; width:100%; grid-template-columns:minmax(150px,.78fr) minmax(0,1fr); grid-template-rows:auto auto auto auto; align-content:center; align-items:center; justify-self:stretch; padding:15px 14px; border-width:2px; border-radius:20px; background:radial-gradient(ellipse at 23% 48%,rgba(23,159,63,.22),transparent 58%),linear-gradient(145deg,rgba(11,39,36,.94),rgba(8,27,48,.97) 72%); box-shadow:0 12px 28px rgba(2,12,24,.32),inset 0 0 0 2px rgba(224,255,184,.1),inset 0 0 24px rgba(34,207,74,.12); }
