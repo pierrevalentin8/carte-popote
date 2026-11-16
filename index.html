@@ -1443,6 +1443,18 @@ body {
 .admin-category-heading::-webkit-details-marker { display: none; }
 .admin-category-heading::before { content: "▾"; color: #f7d46b; transition: transform .15s ease; }
 .admin-card-category:not([open]) .admin-category-heading::before { transform: rotate(-90deg); }
+.card-pdf-export { margin:18px 0 22px; padding:16px; border:1px solid #d8c58b; border-radius:14px; background:linear-gradient(145deg,#fffdf6,#f3f7f4); }
+.card-pdf-toolbar { display:grid; grid-template-columns:minmax(150px,.7fr) minmax(190px,1.3fr); gap:10px; }
+.card-pdf-toolbar .admin-field { margin:0 0 10px; }
+.card-pdf-options { display:grid; gap:7px; max-height:280px; overflow:auto; padding:4px; }
+.card-pdf-option { display:grid; grid-template-columns:auto 42px minmax(0,1fr); align-items:center; gap:10px; padding:7px 9px; border:1px solid #e2e8df; border-radius:10px; background:#fff; cursor:pointer; }
+.card-pdf-option img,.card-pdf-placeholder { width:42px; height:56px; object-fit:contain; border-radius:6px; background:#eef3ed; }
+.card-pdf-option-copy { min-width:0; }
+.card-pdf-option-copy strong,.card-pdf-option-copy small { display:block; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.card-pdf-option-copy small { margin-top:3px; color:#687b71; font-size:12px; }
+.card-pdf-actions { display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; margin-top:12px; }
+.card-pdf-status { min-height:18px; margin:8px 0 0; color:#52685b; font-size:12px; }
+@media(max-width:560px) { .card-pdf-toolbar { grid-template-columns:1fr; } .card-pdf-actions .primary-button { width:100%; } }
 .admin-category-cards { padding: 0 10px 8px; }
 .admin-actions { display: flex; gap: 6px; }
 .admin-actions button, .admin-back { padding: 9px 12px; border: 0; border-radius: 9px; background: #eefaff; color: #1687b9; font-weight: 700; cursor: pointer; }
@@ -3832,6 +3844,24 @@ body:has(.app-content:not(.hidden)) { background:#f3faf1; color:#173b52; }
                 </div>
             </form>
             <p id="adminStatus" class="admin-status" role="status"></p>
+            <section class="card-pdf-export" aria-labelledby="cardPdfTitle">
+                <h3 id="cardPdfTitle">📄 Créer un PDF de cartes</h3>
+                <p class="admin-note">Recherche par nom ou numéro, puis sélectionne les cartes des saisons 1 et 2. Le PDF est préparé en A4, avec 9 cartes maximum par page.</p>
+                <div class="card-pdf-toolbar">
+                    <select id="cardPdfSeason" class="admin-field" aria-label="Filtrer par saison">
+                        <option value="">Toutes les saisons</option>
+                        <option value="Saison 1">Saison 1</option>
+                        <option value="Saison 2">Saison 2</option>
+                    </select>
+                    <input id="cardPdfSearch" class="admin-field" type="search" maxlength="100" placeholder="Rechercher un nom ou un numéro" aria-label="Rechercher une carte par nom ou numéro">
+                </div>
+                <div id="cardPdfOptions" class="card-pdf-options" aria-label="Cartes disponibles pour le PDF"></div>
+                <div class="card-pdf-actions">
+                    <span id="cardPdfSelectionCount" class="admin-note">0 carte sélectionnée</span>
+                    <button id="cardPdfGenerateButton" class="primary-button" type="button" disabled>Créer le PDF</button>
+                </div>
+                <p id="cardPdfStatus" class="card-pdf-status" role="status" aria-live="polite"></p>
+            </section>
             <h3>Cartes enregistrées</h3>
             <p id="cardsCount" class="admin-note">Nombre total de cartes créées : —</p>
             <div id="cardsList"></div>
@@ -5198,6 +5228,14 @@ const cardCancelEdit = document.getElementById("cardCancelEdit");
 const adminStatus = document.getElementById("adminStatus");
 const cardsList = document.getElementById("cardsList");
 const cardsCount = document.getElementById("cardsCount");
+const cardPdfSeason = document.getElementById("cardPdfSeason");
+const cardPdfSearch = document.getElementById("cardPdfSearch");
+const cardPdfOptions = document.getElementById("cardPdfOptions");
+const cardPdfSelectionCount = document.getElementById("cardPdfSelectionCount");
+const cardPdfGenerateButton = document.getElementById("cardPdfGenerateButton");
+const cardPdfStatus = document.getElementById("cardPdfStatus");
+let adminCardsForPdf = [];
+const selectedCardPdfIds = new Set();
 const bottomNav = document.querySelector(".bottom-nav");
 const exchangeNavButton = document.getElementById("exchangeNavButton");
 const exchangeUnlockNotice = document.getElementById("exchangeUnlockNotice");
@@ -10194,12 +10232,182 @@ function createAdminCardRow(cardDoc) {
     return row;
 }
 
+function updateCardPdfSelectionSummary() {
+    const count = selectedCardPdfIds.size;
+    cardPdfSelectionCount.textContent = count + (count === 1 ? " carte sélectionnée" : " cartes sélectionnées");
+    cardPdfGenerateButton.disabled = count === 0;
+}
+
+function renderCardPdfPicker() {
+    cardPdfOptions.replaceChildren();
+    const seasonFilter = cardPdfSeason.value;
+    const search = cardPdfSearch.value.trim().toLocaleLowerCase("fr");
+    const cards = adminCardsForPdf.filter((card) => {
+        const season = normalizeCollectionSeason(card.season || card.seasonNumber);
+        if (!(["Saison 1", "Saison 2"].includes(season))) return false;
+        if (seasonFilter && season !== seasonFilter) return false;
+        const number = Number(card.cardNumber);
+        const searchable = `${card.name || ""} ${Number.isSafeInteger(number) ? number : ""} ${season}`.toLocaleLowerCase("fr");
+        return !search || searchable.includes(search);
+    }).sort((left, right) => {
+        const seasonDiff = Number(normalizeCollectionSeason(left.season || left.seasonNumber).match(/\d+/)?.[0])
+            - Number(normalizeCollectionSeason(right.season || right.seasonNumber).match(/\d+/)?.[0]);
+        return seasonDiff || (Number(left.cardNumber) || 0) - (Number(right.cardNumber) || 0)
+            || String(left.name || "").localeCompare(String(right.name || ""), "fr", { sensitivity: "base" });
+    });
+
+    if (!cards.length) {
+        const empty = document.createElement("p");
+        empty.className = "admin-note";
+        empty.textContent = adminCardsForPdf.length ? "Aucune carte ne correspond à cette recherche." : "Chargement des cartes disponibles…";
+        cardPdfOptions.append(empty);
+        updateCardPdfSelectionSummary();
+        return;
+    }
+
+    cards.forEach((card) => {
+        const option = document.createElement("label");
+        option.className = "card-pdf-option";
+        const checkbox = document.createElement("input");
+        checkbox.type = "checkbox";
+        checkbox.checked = selectedCardPdfIds.has(card.id);
+        checkbox.setAttribute("aria-label", `Sélectionner ${card.name || "carte sans nom"}, ${normalizeCollectionSeason(card.season || card.seasonNumber)}, numéro ${card.cardNumber || "inconnu"}`);
+        checkbox.addEventListener("change", () => {
+            if (checkbox.checked) selectedCardPdfIds.add(card.id);
+            else selectedCardPdfIds.delete(card.id);
+            updateCardPdfSelectionSummary();
+        });
+
+        const source = card.imageUrl || card.image || card.visuel || "";
+        let thumbnail;
+        if (source) {
+            thumbnail = document.createElement("img");
+            thumbnail.src = source;
+            thumbnail.alt = "";
+            thumbnail.loading = "lazy";
+            thumbnail.onerror = () => {
+                const fallback = document.createElement("span");
+                fallback.className = "card-pdf-placeholder";
+                fallback.textContent = "🃏";
+                thumbnail.replaceWith(fallback);
+            };
+        } else {
+            thumbnail = document.createElement("span");
+            thumbnail.className = "card-pdf-placeholder";
+            thumbnail.textContent = "🃏";
+        }
+
+        const copy = document.createElement("span");
+        copy.className = "card-pdf-option-copy";
+        const name = document.createElement("strong");
+        name.textContent = card.name || "Carte sans nom";
+        const meta = document.createElement("small");
+        meta.textContent = `${normalizeCollectionSeason(card.season || card.seasonNumber)} · N° ${card.cardNumber || "—"}`;
+        copy.append(name, meta);
+        option.append(checkbox, thumbnail, copy);
+        cardPdfOptions.append(option);
+    });
+    updateCardPdfSelectionSummary();
+}
+
+function prepareSelectedCardsPdf() {
+    const selected = adminCardsForPdf.filter((card) => selectedCardPdfIds.has(card.id));
+    if (!selected.length) return;
+    const printWindow = window.open("", "_blank");
+    if (!printWindow) {
+        cardPdfStatus.textContent = "Autorise l’ouverture de la fenêtre d’impression pour préparer le PDF.";
+        return;
+    }
+
+    const documentRef = printWindow.document;
+    documentRef.open();
+    documentRef.write(`<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8"><title>Cartes &amp; Popote — sélection</title><style>
+        @page{size:A4 portrait;margin:8mm}
+        *{box-sizing:border-box}
+        html,body{margin:0;padding:0;font-family:Arial,sans-serif;color:#10264a}
+        .pdf-page{width:194mm;height:281mm;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));grid-template-rows:repeat(3,minmax(0,1fr));gap:4mm;break-after:page;page-break-after:always}
+        .pdf-page:last-child{break-after:auto;page-break-after:auto}
+        .pdf-card{min-width:0;min-height:0;display:flex;flex-direction:column;align-items:center;justify-content:center;overflow:hidden;padding:2mm;border:0.25mm solid #d7deea;border-radius:2mm;text-align:center}
+        .pdf-card img{display:block;width:100%;height:73mm;object-fit:contain}
+        .pdf-card .pdf-placeholder{width:100%;height:73mm;display:grid;place-items:center;background:#f0f3f8;color:#77849a;font-size:22pt}
+        .pdf-meta{width:100%;padding-top:1mm;font-size:8.5pt;line-height:1.2}
+        .pdf-meta strong,.pdf-meta span{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+        .pdf-meta span{margin-top:1mm;color:#52627a;font-size:7.5pt}
+        @media screen{body{background:#e8edf3}.pdf-page{margin:12mm auto;padding:0;background:#fff;box-shadow:0 2mm 8mm #9ba7b5}}
+    </style></head><body></body></html>`);
+    documentRef.close();
+
+    for (let start = 0; start < selected.length; start += 9) {
+        const page = documentRef.createElement("section");
+        page.className = "pdf-page";
+        selected.slice(start, start + 9).forEach((card) => {
+            const tile = documentRef.createElement("article");
+            tile.className = "pdf-card";
+            const source = card.imageUrl || card.image || card.visuel || "";
+            let image = null;
+            if (source) {
+                try {
+                    const imageUrl = new URL(source, window.location.href);
+                    if (["https:", "http:", "data:", "blob:"].includes(imageUrl.protocol)) {
+                        image = documentRef.createElement("img");
+                        image.src = imageUrl.href;
+                        image.alt = card.name || "Visuel de carte";
+                    }
+                } catch (_) {}
+            }
+            if (image) {
+                image.onerror = () => {
+                    const placeholder = documentRef.createElement("div");
+                    placeholder.className = "pdf-placeholder";
+                    placeholder.textContent = "Visuel indisponible";
+                    image.replaceWith(placeholder);
+                };
+                tile.append(image);
+            } else {
+                const placeholder = documentRef.createElement("div");
+                placeholder.className = "pdf-placeholder";
+                placeholder.textContent = "Visuel indisponible";
+                tile.append(placeholder);
+            }
+            const meta = documentRef.createElement("div");
+            meta.className = "pdf-meta";
+            const name = documentRef.createElement("strong");
+            name.textContent = card.name || "Carte sans nom";
+            const details = documentRef.createElement("span");
+            details.textContent = `${normalizeCollectionSeason(card.season || card.seasonNumber)} · N° ${card.cardNumber || "—"}`;
+            meta.append(name, details);
+            tile.append(meta);
+            page.append(tile);
+        });
+        documentRef.body.append(page);
+    }
+
+    cardPdfStatus.textContent = "Le document est prêt. Dans la fenêtre d’impression, choisis « Enregistrer au format PDF ».";
+    const images = Array.from(documentRef.images);
+    Promise.all(images.map((image) => image.complete ? Promise.resolve() : new Promise((resolve) => {
+        image.onload = resolve;
+        image.onerror = resolve;
+        window.setTimeout(resolve, 8000);
+    }))).then(() => {
+        printWindow.focus();
+        printWindow.print();
+    });
+}
+
+cardPdfSeason.addEventListener("change", renderCardPdfPicker);
+cardPdfSearch.addEventListener("input", renderCardPdfPicker);
+cardPdfGenerateButton.addEventListener("click", prepareSelectedCardsPdf);
+
 async function loadCards() {
     cardsList.replaceChildren();
     adminStatus.textContent = "Chargement des cartes...";
     cardsCount.textContent = "Nombre total de cartes créées : —";
     try {
         const snapshot = await getDocs(collection(db, "cards"));
+        adminCardsForPdf = snapshot.docs.map((cardDoc) => ({ id: cardDoc.id, ...cardDoc.data() }));
+        const availableIds = new Set(adminCardsForPdf.map((card) => card.id));
+        selectedCardPdfIds.forEach((id) => { if (!availableIds.has(id)) selectedCardPdfIds.delete(id); });
+        renderCardPdfPicker();
         const groupedCards = new Map();
         snapshot.docs.forEach((cardDoc) => {
             const card = cardDoc.data();
