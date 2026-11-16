@@ -1789,6 +1789,13 @@ body {
 .site-updates-card { width: min(100%, 520px); max-height: min(82dvh, 680px); overflow: auto; padding: 24px; border: 2px solid var(--theme-gold, #e5b530); border-radius: 22px; background: var(--theme-cream, #fffdf7); color: var(--theme-ink, #10264a); box-shadow: 0 22px 65px rgba(0,0,0,.45); }
 .site-updates-card h2 { margin: 0 0 8px; color: var(--theme-ink, #10264a); }
 .site-updates-card p { margin: 0 0 16px; }
+.site-update-comment { display:grid; gap:8px; margin-top:18px; padding:14px; border:1px solid rgba(180,137,28,.42); border-radius:14px; background:linear-gradient(145deg,#fff9e8,#f6eed9); }
+.site-update-comment label { color:#17365c; font-size:13px; font-weight:800; }
+.site-update-comment textarea { width:100%; min-height:88px; padding:10px 11px; border:1px solid #c8b987; border-radius:9px; background:#fffefa; color:#182944; font:inherit; font-size:14px; resize:vertical; }
+.site-update-comment button { justify-self:end; min-height:40px; padding:8px 14px; border:1px solid #bb8d16; border-radius:9px; background:linear-gradient(135deg,#ffe28b,#edb52b); color:#10264a; font:inherit; font-weight:850; cursor:pointer; }
+.site-update-comment button:disabled { opacity:.58; cursor:wait; }
+.site-update-comment-status { min-height:18px; margin:0 !important; color:#40536d; font-size:12px; }
+.admin-message-update-context { display:block; margin-top:8px; color:#9b7413; font-weight:800; }
 .site-updates-list { display: grid; gap: 11px; margin: 0; padding-left: 22px; line-height: 1.5; }
 .site-updates-actions { display: flex; justify-content: flex-end; margin-top: 22px; }
 @media (max-width: 480px) { .site-updates-card { padding: 19px; border-radius: 18px; } .site-updates-actions button { width: 100%; } }
@@ -3630,6 +3637,12 @@ body:has(.app-content:not(.hidden)) { background:#f3faf1; color:#173b52; }
             <h2 id="siteUpdatesTitle">✨ Nouveautés</h2>
             <p>Voici les dernières améliorations du site.</p>
             <ul id="siteUpdatesList" class="site-updates-list"></ul>
+            <form id="siteUpdateCommentForm" class="site-update-comment">
+                <label for="siteUpdateCommentText">Un commentaire sur cette mise à jour ?</label>
+                <textarea id="siteUpdateCommentText" maxlength="2000" rows="3" placeholder="Écris ton commentaire librement…"></textarea>
+                <button id="siteUpdateCommentSubmit" type="submit">Envoyer à l’Admin</button>
+                <p id="siteUpdateCommentStatus" class="site-update-comment-status" role="status" aria-live="polite"></p>
+            </form>
             <div class="site-updates-actions"><button id="siteUpdatesCloseButton" class="primary-button" type="button">C’est compris</button></div>
         </div>
     </section>
@@ -3907,6 +3920,7 @@ body:has(.app-content:not(.hidden)) { background:#f3faf1; color:#173b52; }
             <div class="message-category-tabs" role="tablist" aria-label="Catégories de messages">
                 <button class="message-category-button" type="button" data-message-category="idee" role="tab" aria-selected="false" aria-pressed="false">💡 Boîte à idée</button>
                 <button class="message-category-button" type="button" data-message-category="probleme" role="tab" aria-selected="false" aria-pressed="false">🛠️ Problème</button>
+                <button class="message-category-button" type="button" data-message-category="maj" role="tab" aria-selected="false" aria-pressed="false">🆕 Commentaires MAJ</button>
             </div>
             <div class="message-category-tabs" aria-label="Archives des messages">
                 <button id="messageArchivesButton" class="message-category-button" type="button" aria-pressed="false">🗄️ Archives</button>
@@ -4157,6 +4171,10 @@ const callRefuseExchangeOffer = httpsCallable(functions, "refuseExchangeOffer");
 const siteUpdatesModal = document.getElementById("siteUpdatesModal");
 const siteUpdatesList = document.getElementById("siteUpdatesList");
 const siteUpdatesCloseButton = document.getElementById("siteUpdatesCloseButton");
+const siteUpdateCommentForm = document.getElementById("siteUpdateCommentForm");
+const siteUpdateCommentText = document.getElementById("siteUpdateCommentText");
+const siteUpdateCommentSubmit = document.getElementById("siteUpdateCommentSubmit");
+const siteUpdateCommentStatus = document.getElementById("siteUpdateCommentStatus");
 const pollPromptModal = document.getElementById("pollPromptModal");
 const pollPromptTitle = document.getElementById("pollPromptTitle");
 const pollPromptQuestion = document.getElementById("pollPromptQuestion");
@@ -4207,6 +4225,7 @@ const mysticRewardIntro = document.getElementById("mysticRewardIntro");
 const mysticRewardList = document.getElementById("mysticRewardList");
 const mysticRewardCloseButton = document.getElementById("mysticRewardCloseButton");
 let pendingSiteUpdateIds = [];
+let activeSiteUpdateCommentContext = null;
 let pendingServiceReadyMission = null;
 let announcementsWaitingForServiceModal = [];
 let lastNotifiedServiceTaskId = "";
@@ -4538,6 +4557,11 @@ function showSiteUpdatesIfNeeded(updates) {
     const unseen = updates.filter((update) => !seen.includes(update.id));
     if (unseen.length === 0) return;
     pendingSiteUpdateIds = unseen.map((update) => update.id);
+    const relatedUpdate = unseen[unseen.length - 1];
+    activeSiteUpdateCommentContext = { id: relatedUpdate.id, title: relatedUpdate.title || "Mise à jour" };
+    siteUpdateCommentForm.reset();
+    siteUpdateCommentSubmit.disabled = false;
+    siteUpdateCommentStatus.textContent = "";
     siteUpdatesList.replaceChildren();
     unseen.forEach((update) => {
         const item = document.createElement("li");
@@ -4555,6 +4579,45 @@ function showSiteUpdatesIfNeeded(updates) {
 }
 
 siteUpdatesCloseButton.addEventListener("click", closeSiteUpdates);
+siteUpdateCommentForm.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    const user = auth.currentUser;
+    const message = siteUpdateCommentText.value.trim();
+    const context = activeSiteUpdateCommentContext;
+    if (!user || !context?.id) {
+        siteUpdateCommentStatus.textContent = "Connecte-toi pour envoyer un commentaire.";
+        return;
+    }
+    if (message.length < 3 || message.length > 2000) {
+        siteUpdateCommentStatus.textContent = "Écris un commentaire de 3 à 2 000 caractères.";
+        return;
+    }
+    siteUpdateCommentSubmit.disabled = true;
+    siteUpdateCommentStatus.textContent = "Envoi du commentaire…";
+    try {
+        const playerSnapshot = await getDoc(doc(db, "players", user.uid));
+        if (!playerSnapshot.exists()) throw new Error("PLAYER_PROFILE_MISSING");
+        await addDoc(collection(db, "messages"), {
+            senderUid: user.uid,
+            senderPseudo: playerSnapshot.data().pseudo || "Joueur",
+            senderEmail: user.email || "",
+            category: "maj",
+            message,
+            announcementId: context.id,
+            announcementTitle: context.title,
+            status: "nouveau",
+            createdAt: serverTimestamp()
+        });
+        siteUpdateCommentText.value = "";
+        siteUpdateCommentStatus.textContent = "Commentaire envoyé à l’Admin. Merci !";
+    } catch (error) {
+        console.error("Erreur d’envoi du commentaire MAJ :", error);
+        siteUpdateCommentStatus.textContent = error.code === "permission-denied"
+            ? "Envoi refusé. Publie les règles Firestore mises à jour."
+            : "Le commentaire n’a pas pu être envoyé. Réessaie dans un instant.";
+        siteUpdateCommentSubmit.disabled = false;
+    }
+});
 mysticRewardCloseButton.addEventListener("click", closeMysticPullReward);
 serviceReadyLaterButton.addEventListener("click", closeServiceReadyNotification);
 serviceReadyOpenButton.addEventListener("click", async () => {
@@ -11388,7 +11451,8 @@ async function loadAdminMessages(category = activeMessageCategory, status = acti
             adminMessagesStatus.textContent = status === "archives"
                 ? "Aucun message dans les archives pour cette catégorie."
                 : category === "idee" ? "Aucune idée reçue dans la boîte de réception."
-                    : "Aucun problème signalé dans la boîte de réception.";
+                    : category === "maj" ? "Aucun commentaire sur les MAJ reçu."
+                        : "Aucun problème signalé dans la boîte de réception.";
             return;
         }
 
@@ -11416,7 +11480,14 @@ async function loadAdminMessages(category = activeMessageCategory, status = acti
             const copy = document.createElement("p");
             copy.className = "admin-message-copy";
             copy.textContent = message.message || "Message vide";
-            item.append(title, meta, copy);
+            if (message.category === "maj") {
+                const updateContext = document.createElement("small");
+                updateContext.className = "admin-message-update-context";
+                updateContext.textContent = "Commentaire sur la MAJ : " + (message.announcementTitle || "Mise à jour");
+                item.append(title, meta, updateContext, copy);
+            } else {
+                item.append(title, meta, copy);
+            }
 
             const actions = document.createElement("div");
             actions.className = "admin-actions";
