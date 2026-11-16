@@ -11770,8 +11770,14 @@ async function loadPlayerInbox() {
     try {
         const snapshot = await getDocs(query(collection(db, "messages"), where("senderUid", "==", user.uid)));
         const unreadReplies = snapshot.docs.filter((messageDoc) => hasUnreadAdminReply(messageDoc.data()));
+        let readMarkingFailed = false;
         if (unreadReplies.length) {
-            await Promise.all(unreadReplies.map((messageDoc) => updateDoc(messageDoc.ref, { playerReplyReadAt: serverTimestamp() })));
+            try {
+                await Promise.all(unreadReplies.map((messageDoc) => updateDoc(messageDoc.ref, { playerReplyReadAt: serverTimestamp() })));
+            } catch (error) {
+                readMarkingFailed = true;
+                console.warn("Impossible de marquer les réponses comme lues. Vérifie les règles Firestore déployées.", error);
+            }
         }
         unreadMessageCount = 0;
         if (unreadMessageShowTimer) window.clearInterval(unreadMessageShowTimer);
@@ -11785,7 +11791,9 @@ async function loadPlayerInbox() {
             playerInboxStatus.textContent = "Ta boîte de réception est vide. Les messages que tu envoies à l’Admin apparaîtront ici.";
             return;
         }
-        playerInboxStatus.textContent = `${messages.length} message${messages.length > 1 ? "s" : ""} dans ta messagerie.`;
+        playerInboxStatus.textContent = readMarkingFailed
+            ? `${messages.length} message${messages.length > 1 ? "s" : ""} dans ta messagerie. Impossible de mémoriser leur lecture : les règles Firestore doivent être déployées.`
+            : `${messages.length} message${messages.length > 1 ? "s" : ""} dans ta messagerie.`;
         messages.forEach((messageDoc) => {
             const message = messageDoc.data();
             const article = document.createElement("article");
