@@ -544,7 +544,9 @@ body {
 
     right: 12px;
 
-    width: 190px;
+    width: min(280px, calc(100vw - 24px));
+    max-height: calc(100dvh - 78px);
+    overflow-y: auto;
 
     background: #ffffff;
 
@@ -2786,8 +2788,11 @@ body:has(.app-content:not(.hidden)) { background:#f3faf1; color:#173b52; }
 
 
         <button
-            class="menu-button hidden admin-menu-removed"
+            class="menu-button hidden"
             id="menuButton"
+            type="button"
+            aria-label="Ouvrir le menu"
+            aria-expanded="false"
         >
             ☰
         </button>
@@ -2805,7 +2810,7 @@ body:has(.app-content:not(.hidden)) { background:#f3faf1; color:#173b52; }
 
         <div
             id="dropdownMenu"
-            class="dropdown-menu hidden admin-menu-removed"
+            class="dropdown-menu hidden"
         >
             <button id="playerPreviewToggle" class="hidden" type="button">👤 Joueur normal</button>
             <button id="adminButton" class="hidden" type="button">
@@ -2819,6 +2824,10 @@ body:has(.app-content:not(.hidden)) { background:#f3faf1; color:#173b52; }
             <button id="adminMessagesMenuButton" class="hidden" type="button">
                 💬 Messagerie
             </button>
+
+            <button id="saleMenuButton" type="button">🛒 Vente entre joueurs</button>
+            <button id="seasonOneShopMenuButton" type="button">🃏 Acheter une carte · Saison 1</button>
+            <button id="buyNormalBoosterButton" class="hidden" type="button">3 jetons</button>
 
 
 
@@ -2927,9 +2936,6 @@ body:has(.app-content:not(.hidden)) { background:#f3faf1; color:#173b52; }
                     <span id="archivesHomeCountdown" class="home-archive-countdown hidden" aria-live="polite"></span>
                 </button>
             </div>
-            <button id="saleHomeButton" class="home-overview-sale" type="button" aria-label="Ouvrir la page Vente" title="Vente">
-                <img loading="lazy" decoding="async" src="./Vente.png?v=20261029" alt="Vente">
-            </button>
             <button id="leaderboardMenuButton" class="home-overview-leaderboard" type="button" aria-label="Ouvrir le classement" title="Classement">
                 <img loading="lazy" decoding="async" src="./Classement.png?v=20261106" alt="Classement">
             </button>
@@ -3010,9 +3016,6 @@ body:has(.app-content:not(.hidden)) { background:#f3faf1; color:#173b52; }
                     5 cartes
                 </p>
 
-                <button id="buyNormalBoosterButton" class="hidden" type="button">
-                    3 jetons
-                </button>
                 <button id="openNormalBoosterButton" type="button" disabled>
                     Ouvrir un booster (0)
                 </button>
@@ -3991,7 +3994,7 @@ body:has(.app-content:not(.hidden)) { background:#f3faf1; color:#173b52; }
             <img loading="lazy" decoding="async" src="./Collection.png" alt="" aria-hidden="true">
         </button>
 
-        <button id="seasonOneShopNavButton" class="nav-item nav-image-button nav-season-shop-button" type="button" aria-label="Acheter une carte de la saison 1" title="Acheter une carte · Saison 1">
+        <button id="seasonOneShopNavButton" class="nav-item nav-image-button nav-season-shop-button hidden" type="button" aria-label="Acheter une carte de la saison 1" title="Acheter une carte · Saison 1">
             <img loading="lazy" decoding="async" src="./Saison%201.png" alt="" aria-hidden="true">
         </button>
 
@@ -5058,7 +5061,7 @@ function updateClassicBoosterPurchaseAvailability() {
     const tokenBalance = Number((tokenDigits?.[0] || "0").replace(/[^\d]/g, "")) || 0;
     const canBuySeason1 = Boolean(auth.currentUser) && !isPlayerPreview && tokenBalance >= normalBoosterSettings["Saison 1"].price;
     const canBuySeason2 = Boolean(auth.currentUser) && !isPlayerPreview && tokenBalance >= normalBoosterSettings["Saison 2"].price;
-    buyNormalBoosterButton.textContent = `${Number(normalBoosterSettings["Saison 1"].price).toLocaleString("fr-FR")} jetons`;
+    buyNormalBoosterButton.textContent = `Booster Saison 1 · ${Number(normalBoosterSettings["Saison 1"].price).toLocaleString("fr-FR")} jetons`;
     buySeason2BoosterButton.textContent = `${Number(normalBoosterSettings["Saison 2"].price).toLocaleString("fr-FR")} jetons`;
     buyNormalBoosterButton.classList.toggle("hidden", !canBuySeason1);
     buyNormalBoosterButton.disabled = !canBuySeason1;
@@ -5179,7 +5182,7 @@ const exchangeAdsStatus = document.getElementById("exchangeAdsStatus");
 const exchangeAdsList = document.getElementById("exchangeAdsList");
 const salePage = document.getElementById("salePage");
 const saleBackButton = document.getElementById("saleBackButton");
-const saleHomeButton = document.getElementById("saleHomeButton");
+const saleHomeButton = document.getElementById("saleMenuButton");
 const saleStatus = document.getElementById("saleStatus");
 const saleOfferListings = document.getElementById("saleOfferListings");
 const saleOfferInventory = document.getElementById("saleOfferInventory");
@@ -5217,6 +5220,7 @@ const rulesSaveStatus = document.getElementById("rulesSaveStatus");
 const homeHeaderButton = document.getElementById("homeHeaderButton");
 const collectionNavButton = document.getElementById("collectionNavButton");
 const seasonOneShopNavButton = document.getElementById("seasonOneShopNavButton");
+const seasonOneShopMenuButton = document.getElementById("seasonOneShopMenuButton");
 const recyclingNavButton = document.getElementById("recyclingNavButton");
 let ownedAlbumCards = [];
 let allOwnedAlbumCards = [];
@@ -5764,7 +5768,7 @@ onAuthStateChanged(
         const isAdminAccount = (user.email || "").toLowerCase() === ADMIN_EMAIL;
         if (!isAdminAccount) isPlayerPreview = false;
         homeMaintenanceAdminToggle.classList.toggle("hidden", !isAdminAccount || isPlayerPreview);
-        menuButton.classList.toggle("hidden", !isAdminAccount || isPlayerPreview);
+        menuButton.classList.remove("hidden");
         adminHubOpenButton.classList.toggle("hidden", !isAdminAccount || isPlayerPreview);
         dropdownMenu.classList.add("hidden");
         playerLogoutButton.classList.toggle("hidden", isAdminAccount);
@@ -5944,6 +5948,7 @@ onAuthStateChanged(
 
 async function buyNormalBooster(season, button) {
     if (isPlayerPreview || !auth.currentUser) return;
+    dropdownMenu.classList.add("hidden");
     button.disabled = true;
     boosterPurchaseStatus.textContent = `Achat du booster ${season} en cours…`;
     try {
@@ -7496,7 +7501,7 @@ function setPlayerPreview(enabled) {
     if (!isCurrentUserAdmin()) return;
     isPlayerPreview = enabled;
     updateClassicBoosterPurchaseAvailability();
-    menuButton.classList.toggle("hidden", enabled);
+    menuButton.classList.remove("hidden");
     adminHubOpenButton.classList.toggle("hidden", enabled);
     homeMaintenanceAdminToggle.classList.toggle("hidden", enabled);
     dropdownMenu.classList.add("hidden");
@@ -8810,6 +8815,7 @@ seasonOneShopBuyButton.addEventListener("click", async () => {
     }
 });
 seasonOneShopNavButton.addEventListener("click", openSeasonOneShopPage);
+seasonOneShopMenuButton.addEventListener("click", openSeasonOneShopPage);
 seasonOneShopBackButton.addEventListener("click", showHomePage);
 
 function renderRecyclingCopies() {
@@ -12480,9 +12486,15 @@ menuButton.addEventListener(
         dropdownMenu.classList.toggle(
             "hidden"
         );
+        menuButton.setAttribute("aria-expanded", String(!dropdownMenu.classList.contains("hidden")));
 
     }
 );
+dropdownMenu.addEventListener("click", (event) => {
+    if (!event.target.closest("button")) return;
+    dropdownMenu.classList.add("hidden");
+    menuButton.setAttribute("aria-expanded", "false");
+});
 
 
 
