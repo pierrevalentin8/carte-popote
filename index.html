@@ -914,6 +914,21 @@ body {
 
 #cooperationCard { grid-column:auto; display:flex; flex-direction:column; min-width:0; min-height:350px; padding:13px 9px 11px; overflow:hidden; border:2px solid #e2ad3c; background:radial-gradient(ellipse at 50% 0%,rgba(39,91,150,.92) 0%,#112b50 42%,#091a34 100%); color:#f8f2df; box-shadow:inset 0 0 0 2px rgba(255,218,126,.15),inset 0 12px 24px rgba(82,171,255,.08),0 7px 18px rgba(5,15,33,.3); }
 #cooperationCard h4 { margin:0 0 12px; color:#ffd66b; font-size:16px; letter-spacing:.04em; text-align:center; text-shadow:0 0 9px rgba(255,193,54,.48); }
+.daily-objectives-card{margin:10px 0 16px;padding:14px 16px;border:1px solid #78aa70;border-radius:16px;color:#183b2b;background:linear-gradient(145deg,#f5fff0,#e6f5df);box-shadow:0 5px 16px rgba(30,82,43,.12),inset 0 1px 0 rgba(255,255,255,.9)}
+.daily-objectives-header{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px}
+.daily-objectives-header h3{margin:0;color:#174b2e;font-size:17px}
+.daily-objectives-date{color:#53745c;font-size:12px;font-weight:750}
+.daily-objectives-list{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px}
+.daily-objective{min-width:0;padding:10px 11px;border:1px solid rgba(84,143,84,.28);border-radius:12px;background:rgba(255,255,255,.82);box-shadow:0 2px 7px rgba(30,72,37,.07)}
+.daily-objective-top{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;min-height:34px;color:#254a33;font-size:12px;font-weight:800;line-height:1.35}
+.daily-objective-count{flex:none;color:#32643c;font-size:11px;font-variant-numeric:tabular-nums}
+.daily-objective-track{height:8px;margin-top:8px;overflow:hidden;border-radius:99px;background:#d9e9d5;box-shadow:inset 0 1px 2px rgba(30,70,38,.15)}
+.daily-objective-fill{height:100%;border-radius:inherit;background:linear-gradient(90deg,#68b95e,#2c8d48);transition:width .35s ease}
+.daily-objective.is-complete{border-color:rgba(43,133,62,.5);background:#f8fff5}
+.daily-objective.is-complete .daily-objective-top::after{content:"✓";color:#21823a;font-size:15px}
+.daily-objectives-reward{margin:10px 0 0;color:#52745a;font-size:12px;font-weight:700;text-align:center}
+.daily-objectives-reward.is-earned{color:#155d2b}
+@media(max-width:650px){.daily-objectives-card{padding:12px}.daily-objectives-list{grid-template-columns:1fr;gap:7px}.daily-objective{padding:9px 10px}.daily-objective-top{min-height:0}.daily-objectives-header h3{font-size:15px}}
 .cooperation-gauges { display:grid; flex:1; min-height:0; grid-template-columns:repeat(3,minmax(0,1fr)); gap:6px; align-items:stretch; }
 .cooperation-gauge { display:grid; min-width:0; grid-template-rows:56px auto minmax(0,1fr) auto; justify-items:center; align-content:stretch; gap:6px; text-align:center; }
 .cooperation-gauge img { width:54px; height:54px; object-fit:contain; filter:drop-shadow(0 0 7px var(--gauge-color)); }
@@ -3006,6 +3021,7 @@ body:has(.app-content:not(.hidden)) { background:#dcebd5; color:#173b52; }
         </section>
 
         <p class="home-season-banner" aria-label="La saison 2 est ouverte">SAISON 2 · OUVERTE</p>
+<section id="dailyObjectivesCard" class="daily-objectives-card hidden" aria-labelledby="dailyObjectivesTitle"><div class="daily-objectives-header"><h3 id="dailyObjectivesTitle">🎯 Objectifs du jour</h3><span id="dailyObjectivesDate" class="daily-objectives-date"></span></div><div id="dailyObjectivesList" class="daily-objectives-list" aria-live="polite"></div><p id="dailyObjectivesReward" class="daily-objectives-reward">Complète les 3 objectifs pour gagner 1 booster classique Saison 2.</p></section>
 
 
         <!-- BOOSTERS -->
@@ -4217,6 +4233,7 @@ const storage = getStorage(app);
 const functions = getFunctions(app, "europe-west1");
 const callOpenClassicBooster = httpsCallable(functions, "openClassicBooster");
 const callOpenDailyBooster = httpsCallable(functions, "openDailyBooster");
+const callGetDailyObjectives = httpsCallable(functions, "getDailyObjectives");
 const callGetArchivesTaskStatus = httpsCallable(functions, "getArchivesTaskStatus");
 const callStartArchivesSorting = httpsCallable(functions, "startArchivesSorting");
 const callClaimArchivesSortingReward = httpsCallable(functions, "claimArchivesSortingReward");
@@ -5203,6 +5220,8 @@ let cooperationProgress = { gauges:{}, counters:{}, claims:{}, eligible:true, pe
 let cooperationUnsubscribers = [];
 let homeMaintenanceRefreshInterval = null;
 let dailyBoosterLastOpenedDate = "";
+let dailyObjectivesUnsubscribe = null;
+let dailyObjectivesDayKey = "";
 let premiumAdminPlayers = [];
 let premiumRewardCards = [];
 const buyNormalBoosterButton = document.getElementById("buyNormalBoosterButton");
@@ -5816,6 +5835,11 @@ onAuthStateChanged(
            ========================================== */
 
         if (!user) {
+            if (dailyObjectivesUnsubscribe) dailyObjectivesUnsubscribe();
+            dailyObjectivesUnsubscribe = null;
+            dailyObjectivesDayKey = "";
+            dailyObjectivesCard.classList.add("hidden");
+            dailyObjectivesList.replaceChildren();
             if (unreadMessageShowTimer) window.clearInterval(unreadMessageShowTimer);
             unreadMessageShowTimer = null;
             unreadMessageCount = 0;
@@ -5934,6 +5958,7 @@ onAuthStateChanged(
             "hidden"
         );
         startCooperationListeners();
+        loadDailyObjectives(user.uid);
 
         // Affichage seulement : les règles Firestore protègent les données.
         const isAdminAccount = (user.email || "").toLowerCase() === ADMIN_EMAIL;
@@ -9380,6 +9405,32 @@ function getParisDateKey() {
     return `${part("year")}-${part("month")}-${part("day")}`;
 }
 
+const dailyObjectivesCard=document.getElementById("dailyObjectivesCard"),dailyObjectivesDate=document.getElementById("dailyObjectivesDate"),dailyObjectivesList=document.getElementById("dailyObjectivesList"),dailyObjectivesReward=document.getElementById("dailyObjectivesReward");
+async function loadDailyObjectives(uid){
+ if(!uid||!auth.currentUser||auth.currentUser.uid!==uid)return;
+ if(dailyObjectivesUnsubscribe)dailyObjectivesUnsubscribe();dailyObjectivesUnsubscribe=null;
+ try{
+  const response=await callGetDailyObjectives();if(!auth.currentUser||auth.currentUser.uid!==uid)return;
+  const state=response.data||{};dailyObjectivesDayKey=state.dayKey||getParisDateKey();
+  const date=new Date(`${dailyObjectivesDayKey}T12:00:00+01:00`);
+  dailyObjectivesDate.textContent=new Intl.DateTimeFormat("fr-FR",{weekday:"long",day:"numeric",month:"long"}).format(date);
+  dailyObjectivesUnsubscribe=onSnapshot(doc(db,"players",uid,"dailyObjectives",dailyObjectivesDayKey),snapshot=>{
+   const current=snapshot.exists()?snapshot.data():state,progress=current.progress||{};dailyObjectivesList.replaceChildren();
+   (state.objectives||[]).forEach(objective=>{
+    const value=Math.max(0,Number(progress[objective.metric]||0)),ratio=Math.min(100,value/Number(objective.target||1)*100),item=document.createElement("article");
+    item.className=`daily-objective${ratio>=100?" is-complete":""}`;
+    const top=document.createElement("div");top.className="daily-objective-top";
+    const label=document.createElement("span");label.textContent=objective.label;
+    const count=document.createElement("span");count.className="daily-objective-count";count.textContent=`${Math.min(value,Number(objective.target))} / ${objective.target}`;top.append(label,count);
+    const track=document.createElement("div");track.className="daily-objective-track";track.setAttribute("role","progressbar");track.setAttribute("aria-valuemin","0");track.setAttribute("aria-valuemax",String(objective.target));track.setAttribute("aria-valuenow",String(Math.min(value,Number(objective.target))));
+    const fill=document.createElement("div");fill.className="daily-objective-fill";fill.style.width=`${ratio}%`;track.append(fill);item.append(top,track);dailyObjectivesList.append(item);
+   });
+   const earned=current.rewardGranted===true;dailyObjectivesReward.textContent=earned?"🎉 Objectifs terminés : 1 booster classique Saison 2 ajouté à ton stock !":"Complète les 3 objectifs pour gagner 1 booster classique Saison 2.";dailyObjectivesReward.classList.toggle("is-earned",earned);dailyObjectivesCard.classList.remove("hidden");
+   if(earned)getDoc(doc(db,"players",uid)).then(p=>{if(p.exists()&&auth.currentUser?.uid===uid){const player=p.data();setOpenBoosterButton(player.boostersDisponibles||0,player.boostersSaison2Disponibles||0)}}).catch(e=>console.warn("Actualisation du stock de boosters impossible :",e));
+  },error=>{console.error("Suivi des objectifs impossible :",error);dailyObjectivesList.textContent="Les objectifs du jour sont momentanément indisponibles.";dailyObjectivesCard.classList.remove("hidden")});
+ }catch(error){console.error("Chargement des objectifs impossible :",error);dailyObjectivesList.textContent="Les objectifs du jour sont momentanément indisponibles.";dailyObjectivesCard.classList.remove("hidden")}
+}
+window.setInterval(()=>{if(auth.currentUser&&getParisDateKey()!==dailyObjectivesDayKey)loadDailyObjectives(auth.currentUser.uid)},30000);
 function setDailyBoosterButton(lastOpenedDate) {
     dailyBoosterLastOpenedDate = typeof lastOpenedDate === "string" ? lastOpenedDate : "";
     const alreadyOpened = lastOpenedDate === getParisDateKey();
