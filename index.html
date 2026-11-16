@@ -2557,7 +2557,7 @@ body {
 .nav-item.active { color: #a87900; }
 .nav-item:disabled { color: #8290a4; }
 .bottom-nav { box-sizing: border-box; height: calc(70px + env(safe-area-inset-bottom, 0px)); padding-bottom: env(safe-area-inset-bottom, 0px); }
-.bottom-nav { grid-template-columns:repeat(5,minmax(0,1fr)); }
+.bottom-nav { display:flex; align-items:center; justify-content:center; gap:clamp(4px,2vw,14px); }
 .app-content { padding-bottom: calc(100px + env(safe-area-inset-bottom, 0px)); }
 .booster-visual { position: relative; display: block; }
 .booster-stock-badge { position: absolute; top: 7px; right: 7px; padding: 5px 8px; border: 1px solid rgba(243,191,56,.9); border-radius: 999px; background: rgba(8,24,49,.92); color: #ffe181; font-size: 11px; font-weight: 800; box-shadow: 0 2px 8px rgba(0,0,0,.3); }
@@ -2593,13 +2593,14 @@ body {
 .app-content { max-width: 1160px; }
 .home-season-banner { display:flex; align-items:center; justify-content:center; gap:10px; margin:8px auto 14px; padding:8px 18px; width:fit-content; max-width:100%; border:1px solid rgba(159,242,139,.7); border-radius:999px; background:linear-gradient(100deg,rgba(11,72,37,.9),rgba(15,42,53,.94)); color:#e5ffd7; font-size:13px; font-weight:900; letter-spacing:.08em; text-shadow:0 1px 4px #05200e; box-shadow:0 0 20px rgba(53,203,87,.2),inset 0 1px rgba(255,255,255,.16); }
 .home-season-banner::before,.home-season-banner::after { content:"✦"; color:#f5d56c; }
-.home-player-summary { max-width:760px; margin:14px auto 12px; grid-template-columns:minmax(0,1fr) 82px; padding:0; border:0; background:transparent; box-shadow:none; }
+.home-player-summary { display:flex; max-width:760px; align-items:center; justify-content:center; gap:18px; margin:14px auto 12px; padding:0; border:0; background:transparent; box-shadow:none; }
 .daily-objectives-header { list-style:none; cursor:pointer; }
 .daily-objectives-header::-webkit-details-marker { display:none; }
 .daily-objectives-header::after { content:"⌄"; flex:none; color:#397249; font-size:20px; line-height:1; transition:transform .18s ease; }
 .daily-objectives-card[open] .daily-objectives-header::after { transform:rotate(180deg); }
 .daily-objectives-card:not([open]) { padding-top:11px; padding-bottom:11px; }
 @media(max-width:380px){.home-player-summary{grid-template-columns:minmax(0,1fr) 68px}}
+@media(max-width:380px){.home-player-summary{gap:12px}.bottom-nav{gap:3px}.bottom-nav .nav-image-button{width:50px;height:50px}}
 .boosters { grid-template-columns:minmax(0,1.15fr) minmax(0,1fr); align-items:stretch; gap:14px; margin:8px 0 12px; }
 #dailyBoosterArticle,#cooperationCard { grid-column:1 / -1; }
 .booster-season-two { grid-column:2; grid-row:1; display:grid; width:100%; grid-template-columns:minmax(150px,.78fr) minmax(0,1fr); grid-template-rows:auto auto auto auto; align-content:center; align-items:center; justify-self:stretch; padding:15px 14px; border-width:2px; border-radius:20px; background:radial-gradient(ellipse at 23% 48%,rgba(23,159,63,.22),transparent 58%),linear-gradient(145deg,rgba(11,39,36,.94),rgba(8,27,48,.97) 72%); box-shadow:0 12px 28px rgba(2,12,24,.32),inset 0 0 0 2px rgba(224,255,184,.1),inset 0 0 24px rgba(34,207,74,.12); }
