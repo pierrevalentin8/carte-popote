@@ -12277,7 +12277,7 @@ adminMessagesMenuButton.addEventListener("click", async () => {
     adminMessagesSection.classList.remove("hidden");
     messagingPageTitle.textContent = "💬 Messagerie Admin";
     messagingBackButton.textContent = "← Retour au menu Admin";
-    await loadAdminMessages("idee");
+    await loadAdminMessages("idee", "nouveau");
 });
 
 messagingBackButton.addEventListener("click", () => {
