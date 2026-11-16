@@ -3759,6 +3759,17 @@ body:has(.app-content:not(.hidden)) { background:#dcebd5; color:#173b52; }
         </div>
     </section>
 
+    <section id="unreadMessagesModal" class="site-updates-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="unreadMessagesTitle" aria-hidden="true">
+        <div class="site-updates-card">
+            <h2 id="unreadMessagesTitle">📬 Une réponse t’attend</h2>
+            <p id="unreadMessagesText">Tu as un message non lu dans ta messagerie.</p>
+            <div class="service-ready-actions">
+                <button id="unreadMessagesLaterButton" class="secondary-button" type="button">Plus tard</button>
+                <button id="unreadMessagesOpenButton" class="primary-button" type="button">Voir ma messagerie</button>
+            </div>
+        </div>
+    </section>
+
     <section id="adminPage" class="admin-page hidden">
         <button id="adminBackButton" class="admin-back" type="button">← Retour au menu Admin</button>
         <h2>🛡️ Administration</h2>
@@ -4297,6 +4308,76 @@ let exchangeOfferActionBusy = false;
 let exchangeOfferTarget = null;
 let pendingMysticPullNotices = [];
 let mysticRewardShowTimer = null;
+const unreadMessagesModal = document.getElementById("unreadMessagesModal");
+const unreadMessagesText = document.getElementById("unreadMessagesText");
+const unreadMessagesLaterButton = document.getElementById("unreadMessagesLaterButton");
+const unreadMessagesOpenButton = document.getElementById("unreadMessagesOpenButton");
+let unreadMessageCount = 0;
+let unreadMessageShowTimer = null;
+let unreadMessageNoticeDismissedThisSession = false;
+let unreadMessageSessionUid = "";
+
+function messageDateMillis(value) {
+    if (value && typeof value.toMillis === "function") return value.toMillis();
+    if (value && typeof value.toDate === "function") return value.toDate().getTime();
+    const parsed = Date.parse(value || "");
+    return Number.isFinite(parsed) ? parsed : 0;
+}
+
+function hasUnreadAdminReply(message) {
+    if (!String(message?.adminReply || "").trim()) return false;
+    const repliedAt = messageDateMillis(message.adminReplyAt);
+    const readAt = messageDateMillis(message.playerReplyReadAt);
+    return !readAt || !repliedAt || repliedAt > readAt;
+}
+
+async function loadUnreadPlayerMessages() {
+    const user = auth.currentUser;
+    if (!user || isPlayerPreview || (user.email || "").toLowerCase() === ADMIN_EMAIL) return;
+    if (unreadMessageSessionUid !== user.uid) {
+        unreadMessageSessionUid = user.uid;
+        unreadMessageNoticeDismissedThisSession = false;
+    }
+    try {
+        const snapshot = await getDocs(query(collection(db, "messages"), where("senderUid", "==", user.uid)));
+        unreadMessageCount = snapshot.docs.filter((messageDoc) => hasUnreadAdminReply(messageDoc.data())).length;
+        if (!unreadMessageCount) {
+            if (unreadMessageShowTimer) window.clearInterval(unreadMessageShowTimer);
+            unreadMessageShowTimer = null;
+            return;
+        }
+        unreadMessagesText.textContent = `Tu as ${unreadMessageCount} réponse${unreadMessageCount > 1 ? "s" : ""} non lue${unreadMessageCount > 1 ? "s" : ""} dans ta messagerie.`;
+        if (!unreadMessageShowTimer) unreadMessageShowTimer = window.setInterval(tryShowUnreadMessagesNotice, 1000);
+        tryShowUnreadMessagesNotice();
+    } catch (error) {
+        console.warn("Impossible de vérifier les messages non lus :", error);
+    }
+}
+
+function tryShowUnreadMessagesNotice() {
+    if (!auth.currentUser || isPlayerPreview || !unreadMessageCount || unreadMessageNoticeDismissedThisSession) return;
+    const blocked = Array.from(document.querySelectorAll("[role=dialog]:not(.hidden)"))
+        .some((dialog) => dialog !== unreadMessagesModal);
+    if (blocked || !unreadMessagesModal.classList.contains("hidden")) return;
+    if (unreadMessageShowTimer) window.clearInterval(unreadMessageShowTimer);
+    unreadMessageShowTimer = null;
+    unreadMessagesModal.classList.remove("hidden");
+    unreadMessagesModal.setAttribute("aria-hidden", "false");
+    unreadMessagesOpenButton.focus();
+}
+
+unreadMessagesLaterButton.addEventListener("click", () => {
+    unreadMessageNoticeDismissedThisSession = true;
+    unreadMessagesModal.classList.add("hidden");
+    unreadMessagesModal.setAttribute("aria-hidden", "true");
+    continueStartupNoticesAfterPoll();
+});
+unreadMessagesOpenButton.addEventListener("click", () => {
+    unreadMessageNoticeDismissedThisSession = true;
+    unreadMessagesModal.classList.add("hidden");
+    unreadMessagesModal.setAttribute("aria-hidden", "true");
+    void openPlayerMessagingPage();
+});
 
 async function loadAndClaimMysticPullRewards() {
     if (!auth.currentUser || isPlayerPreview) return;
@@ -4317,7 +4398,7 @@ async function loadAndClaimMysticPullRewards() {
 
 function tryShowMysticPullReward() {
     if (!auth.currentUser || isPlayerPreview || !pendingMysticPullNotices.length || !mysticRewardModal.classList.contains("hidden")) return;
-    const blocked = [eventBoosterPromptModal, boosterResultModal, siteUpdatesModal, serviceReadyModal, pollPromptModal, exchangeOfferModal, exchangeComposeModal, exchangeSuccessModal]
+    const blocked = [eventBoosterPromptModal, boosterResultModal, siteUpdatesModal, serviceReadyModal, pollPromptModal, exchangeOfferModal, exchangeComposeModal, exchangeSuccessModal, unreadMessagesModal]
         .some((modal) => modal && !modal.classList.contains("hidden"));
     if (blocked) return;
     if (mysticRewardShowTimer) window.clearInterval(mysticRewardShowTimer);
@@ -4344,7 +4425,7 @@ function tryShowMysticPullReward() {
 
 function tryShowPendingPoll() {
     if (!auth.currentUser || isPlayerPreview || activePoll || !pendingPolls.length) return;
-    const blocked = [eventBoosterPromptModal, boosterResultModal, siteUpdatesModal, serviceReadyModal, exchangeOfferModal, exchangeSuccessModal]
+    const blocked = [eventBoosterPromptModal, boosterResultModal, siteUpdatesModal, serviceReadyModal, exchangeOfferModal, exchangeSuccessModal, unreadMessagesModal]
         .some((modal) => modal && !modal.classList.contains("hidden"));
     if (blocked) return;
     activePoll = pendingPolls[0];
@@ -4386,7 +4467,7 @@ function continueStartupNoticesAfterPoll() {
 
 function tryShowPendingExchangeOffer() {
     if (!auth.currentUser || isPlayerPreview || activeExchangeOffer || !pendingExchangeOffers.length) return;
-    const blocked = [eventBoosterPromptModal, boosterResultModal, siteUpdatesModal, serviceReadyModal, pollPromptModal, exchangeComposeModal, exchangeSuccessModal]
+    const blocked = [eventBoosterPromptModal, boosterResultModal, siteUpdatesModal, serviceReadyModal, pollPromptModal, exchangeComposeModal, exchangeSuccessModal, unreadMessagesModal]
         .some((modal) => modal && !modal.classList.contains("hidden"));
     if (blocked) return;
     activeExchangeOffer = pendingExchangeOffers[0];
@@ -4573,7 +4654,7 @@ function closeMysticPullReward() {
 
 function showPendingServiceReadyNotification() {
     const mission = pendingServiceReadyMission;
-    if (!mission || !siteUpdatesModal.classList.contains("hidden") || !pollPromptModal.classList.contains("hidden")) return;
+    if (!mission || !siteUpdatesModal.classList.contains("hidden") || !pollPromptModal.classList.contains("hidden") || !unreadMessagesModal.classList.contains("hidden")) return;
     pendingServiceReadyMission = null;
     serviceReadyMessage.textContent = `La mission « ${mission.name || "Service"} » est terminée. Récompense : ${serviceRewardSummary(mission)}. Tu peux la récupérer dans Service.`;
     if (mission.imageUrl) {
@@ -4604,7 +4685,7 @@ function markSiteUpdatesSeen(ids, userId = auth.currentUser?.uid) {
 function showSiteUpdatesIfNeeded(updates) {
     const userId = auth.currentUser?.uid;
     if (!userId || updates.length === 0) return;
-    if (!serviceReadyModal.classList.contains("hidden") || !pollPromptModal.classList.contains("hidden")) {
+    if (!serviceReadyModal.classList.contains("hidden") || !pollPromptModal.classList.contains("hidden") || !unreadMessagesModal.classList.contains("hidden")) {
         announcementsWaitingForServiceModal = [...announcementsWaitingForServiceModal, ...updates];
         return;
     }
@@ -5656,6 +5737,13 @@ onAuthStateChanged(
            ========================================== */
 
         if (!user) {
+            if (unreadMessageShowTimer) window.clearInterval(unreadMessageShowTimer);
+            unreadMessageShowTimer = null;
+            unreadMessageCount = 0;
+            unreadMessageNoticeDismissedThisSession = false;
+            unreadMessageSessionUid = "";
+            unreadMessagesModal.classList.add("hidden");
+            unreadMessagesModal.setAttribute("aria-hidden", "true");
             if (serviceCollectiveRefreshTimer) window.clearInterval(serviceCollectiveRefreshTimer);
             serviceCollectiveRefreshTimer = null;
             serviceCollectiveActiveTasks = [];
@@ -5936,6 +6024,7 @@ onAuthStateChanged(
         await loadPendingExchangeOffers();
         await loadPendingExchangeSuccessNotices();
         await loadAndClaimMysticPullRewards();
+        await loadUnreadPlayerMessages();
         if (!exchangeOfferPollTimer) {
             exchangeOfferPollTimer = window.setInterval(() => { void loadPendingExchangeOffers(); }, 15000);
         }
@@ -11680,6 +11769,13 @@ async function loadPlayerInbox() {
     }
     try {
         const snapshot = await getDocs(query(collection(db, "messages"), where("senderUid", "==", user.uid)));
+        const unreadReplies = snapshot.docs.filter((messageDoc) => hasUnreadAdminReply(messageDoc.data()));
+        if (unreadReplies.length) {
+            await Promise.all(unreadReplies.map((messageDoc) => updateDoc(messageDoc.ref, { playerReplyReadAt: serverTimestamp() })));
+        }
+        unreadMessageCount = 0;
+        if (unreadMessageShowTimer) window.clearInterval(unreadMessageShowTimer);
+        unreadMessageShowTimer = null;
         const messages = [...snapshot.docs].sort((left, right) => {
             const leftTime = left.data().createdAt?.toMillis?.() || 0;
             const rightTime = right.data().createdAt?.toMillis?.() || 0;
@@ -12290,7 +12386,7 @@ adminMessagesMenuButton.addEventListener("click", async () => {
 });
 
 messagingBackButton.addEventListener("click", () => {
-    if (playerMessagingView) showHomePage();
+    if (playerMessagingView) { showHomePage(); continueStartupNoticesAfterPoll(); }
     else returnToAdminHubOrHome();
 });
 
