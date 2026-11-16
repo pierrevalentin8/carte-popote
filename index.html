@@ -5958,7 +5958,6 @@ onAuthStateChanged(
             "hidden"
         );
         startCooperationListeners();
-        loadDailyObjectives(user.uid);
 
         // Affichage seulement : les règles Firestore protègent les données.
         const isAdminAccount = (user.email || "").toLowerCase() === ADMIN_EMAIL;
@@ -6121,6 +6120,8 @@ onAuthStateChanged(
             );
 
         }
+
+        loadDailyObjectives(user.uid);
 
         void loadNormalBoosterSettings(false);
 
