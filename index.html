@@ -441,6 +441,31 @@ body {
 .header-logo img { display: block; max-width: 100%; max-height: 100%; object-fit: contain; }
 .header-logo:focus-visible { outline: 3px solid var(--theme-gold-light, #f7d46b); outline-offset: 2px; border-radius: 8px; }
 
+.notifications-bell { position:absolute; z-index:3; top:50%; left:calc(50% - 136px); display:grid; width:44px; height:44px; place-items:center; padding:0; border:1px solid #329447; border-radius:13px; background:linear-gradient(145deg,#fff,#eef9ed); color:#174b2e; font-size:21px; cursor:pointer; transform:translateY(-50%); box-shadow:0 3px 9px rgba(28,105,48,.16); }
+.notifications-bell:focus-visible { outline:3px solid #e7b845; outline-offset:2px; }
+.notification-count-badge { position:absolute; top:-5px; right:-5px; display:grid; min-width:19px; height:19px; place-items:center; padding:0 4px; border:1px solid #fff; border-radius:999px; background:#c62828; color:#fff; font-size:10px; font-weight:900; line-height:1; box-shadow:0 1px 4px rgba(0,0,0,.3); }
+.notifications-panel { position:absolute; z-index:200; top:calc(100% + 7px); left:12px; width:min(440px,calc(100vw - 24px)); max-height:min(72dvh,620px); overflow:auto; padding:12px; border:1px solid #329447; border-radius:16px; background:#fbfff9; color:#173b52; box-shadow:0 14px 32px rgba(8,31,20,.28); }
+.notifications-panel-header { position:sticky; top:-12px; z-index:2; display:flex; align-items:center; justify-content:space-between; gap:10px; margin:-12px -12px 9px; padding:11px 13px; border-bottom:1px solid #d8e9d4; border-radius:16px 16px 0 0; background:#f4fbf1; }
+.notifications-panel-header h2 { margin:0; color:#174b2e; font-size:16px; }
+.notifications-panel-header button { width:30px; height:30px; border:0; border-radius:9px; background:#e4f0e0; color:#234a31; font-size:22px; cursor:pointer; }
+.notifications-list { display:grid; gap:8px; }
+.notification-item { display:grid; gap:7px; padding:10px; border:1px solid #d7e4d3; border-radius:12px; background:#fff; box-shadow:0 2px 6px rgba(27,72,37,.06); }
+.notification-item.is-unread { border-left:4px solid #2b8d42; background:#f8fff5; }
+.notification-item-heading { display:flex; align-items:flex-start; justify-content:space-between; gap:8px; color:#23462f; font-size:12px; font-weight:850; }
+.notification-item-date { flex:none; color:#718171; font-size:10px; font-weight:600; }
+.notification-item p { margin:0; color:#405446; font-size:12px; line-height:1.45; white-space:pre-line; }
+.notification-item button { justify-self:start; min-height:33px; padding:6px 10px; border:1px solid #498c4a; border-radius:9px; background:#eef8e9; color:#245d32; font:inherit; font-size:11px; font-weight:800; cursor:pointer; }
+.notification-item button:hover { background:#e1f2da; }
+.notification-exchange-cards { display:grid; grid-template-columns:1fr auto 1fr; align-items:center; gap:5px; }
+.notification-exchange-card { display:grid; min-width:0; gap:3px; justify-items:center; color:#354c3b; font-size:10px; text-align:center; }
+.notification-exchange-card img { width:46px; height:62px; object-fit:contain; border-radius:5px; background:#edf3e9; }
+.notification-exchange-card strong { color:#27623a; font-size:9px; }
+.notification-exchange-arrow { color:#367f42; font-size:18px; font-weight:900; }
+.notification-service-image { width:72px; max-height:76px; object-fit:contain; border-radius:8px; }
+.notifications-empty { margin:10px 4px 5px; color:#68806b; font-size:12px; text-align:center; }
+#appPage:has(#adminHubOpenButton:not(.hidden)) .notifications-bell { left:calc(50% - 128px); }
+@media(max-width:380px){.notifications-bell{left:calc(50% - 117px);width:40px;height:40px}#appPage:has(#adminHubOpenButton:not(.hidden)) .notifications-bell{left:58px}}
+
 
 .header-logo span {
 
@@ -912,23 +937,24 @@ body {
     gap: 10px;
 }
 
+.daily-objectives-card { margin:10px 0 16px; padding:14px 16px; border:1px solid #78aa70; border-radius:16px; color:#183b2b; background:linear-gradient(145deg,#f5fff0,#e6f5df); box-shadow:0 5px 16px rgba(30,82,43,.12),inset 0 1px 0 rgba(255,255,255,.9); }
+.daily-objectives-header { display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:10px; }
+.daily-objectives-header h3 { margin:0; color:#174b2e; font-size:17px; }
+.daily-objectives-date { color:#53745c; font-size:12px; font-weight:750; }
+.daily-objectives-list { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:9px; }
+.daily-objective { min-width:0; padding:10px 11px; border:1px solid rgba(84,143,84,.28); border-radius:12px; background:rgba(255,255,255,.82); box-shadow:0 2px 7px rgba(30,72,37,.07); }
+.daily-objective-top { display:flex; align-items:flex-start; justify-content:space-between; gap:8px; min-height:34px; color:#254a33; font-size:12px; font-weight:800; line-height:1.35; }
+.daily-objective-count { flex:none; color:#32643c; font-size:11px; font-variant-numeric:tabular-nums; }
+.daily-objective-track { height:8px; margin-top:8px; overflow:hidden; border-radius:99px; background:#d9e9d5; box-shadow:inset 0 1px 2px rgba(30,70,38,.15); }
+.daily-objective-fill { height:100%; border-radius:inherit; background:linear-gradient(90deg,#68b95e,#2c8d48); transition:width .35s ease; }
+.daily-objective.is-complete { border-color:rgba(43,133,62,.5); background:#f8fff5; }
+.daily-objective.is-complete .daily-objective-top::after { content:"✓"; color:#21823a; font-size:15px; }
+.daily-objectives-reward { margin:10px 0 0; color:#52745a; font-size:12px; font-weight:700; text-align:center; }
+.daily-objectives-reward.is-earned { color:#155d2b; }
+@media(max-width:650px){.daily-objectives-card{padding:12px}.daily-objectives-list{grid-template-columns:1fr;gap:7px}.daily-objective{padding:9px 10px}.daily-objective-top{min-height:0}.daily-objectives-header h3{font-size:15px}}
+
 #cooperationCard { grid-column:auto; display:flex; flex-direction:column; min-width:0; min-height:350px; padding:13px 9px 11px; overflow:hidden; border:2px solid #e2ad3c; background:radial-gradient(ellipse at 50% 0%,rgba(39,91,150,.92) 0%,#112b50 42%,#091a34 100%); color:#f8f2df; box-shadow:inset 0 0 0 2px rgba(255,218,126,.15),inset 0 12px 24px rgba(82,171,255,.08),0 7px 18px rgba(5,15,33,.3); }
 #cooperationCard h4 { margin:0 0 12px; color:#ffd66b; font-size:16px; letter-spacing:.04em; text-align:center; text-shadow:0 0 9px rgba(255,193,54,.48); }
-.daily-objectives-card{margin:10px 0 16px;padding:14px 16px;border:1px solid #78aa70;border-radius:16px;color:#183b2b;background:linear-gradient(145deg,#f5fff0,#e6f5df);box-shadow:0 5px 16px rgba(30,82,43,.12),inset 0 1px 0 rgba(255,255,255,.9)}
-.daily-objectives-header{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px}
-.daily-objectives-header h3{margin:0;color:#174b2e;font-size:17px}
-.daily-objectives-date{color:#53745c;font-size:12px;font-weight:750}
-.daily-objectives-list{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px}
-.daily-objective{min-width:0;padding:10px 11px;border:1px solid rgba(84,143,84,.28);border-radius:12px;background:rgba(255,255,255,.82);box-shadow:0 2px 7px rgba(30,72,37,.07)}
-.daily-objective-top{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;min-height:34px;color:#254a33;font-size:12px;font-weight:800;line-height:1.35}
-.daily-objective-count{flex:none;color:#32643c;font-size:11px;font-variant-numeric:tabular-nums}
-.daily-objective-track{height:8px;margin-top:8px;overflow:hidden;border-radius:99px;background:#d9e9d5;box-shadow:inset 0 1px 2px rgba(30,70,38,.15)}
-.daily-objective-fill{height:100%;border-radius:inherit;background:linear-gradient(90deg,#68b95e,#2c8d48);transition:width .35s ease}
-.daily-objective.is-complete{border-color:rgba(43,133,62,.5);background:#f8fff5}
-.daily-objective.is-complete .daily-objective-top::after{content:"✓";color:#21823a;font-size:15px}
-.daily-objectives-reward{margin:10px 0 0;color:#52745a;font-size:12px;font-weight:700;text-align:center}
-.daily-objectives-reward.is-earned{color:#155d2b}
-@media(max-width:650px){.daily-objectives-card{padding:12px}.daily-objectives-list{grid-template-columns:1fr;gap:7px}.daily-objective{padding:9px 10px}.daily-objective-top{min-height:0}.daily-objectives-header h3{font-size:15px}}
 .cooperation-gauges { display:grid; flex:1; min-height:0; grid-template-columns:repeat(3,minmax(0,1fr)); gap:6px; align-items:stretch; }
 .cooperation-gauge { display:grid; min-width:0; grid-template-rows:56px auto minmax(0,1fr) auto; justify-items:center; align-content:stretch; gap:6px; text-align:center; }
 .cooperation-gauge img { width:54px; height:54px; object-fit:contain; filter:drop-shadow(0 0 7px var(--gauge-color)); }
@@ -1158,7 +1184,7 @@ body {
 .home-card-count-copy { display: flex; align-items: baseline; flex-wrap: wrap; gap: 5px; }
 .home-card-count-value { color: #f7d46b; font-size: 23px; font-weight: 900; line-height: 1; }
 .home-card-count-label { color: #fbfaf5; font-size: 12px; font-weight: 700; }
-.home-player-summary { display:grid; grid-template-columns:minmax(0,1fr) 82px; align-items:center; gap:8px; margin:12px auto; padding:0; border:0; border-radius:0; background:transparent; box-shadow:none; }
+.home-player-summary { display: grid; grid-template-columns: minmax(0,1fr) 82px; align-items: center; gap: 8px; margin: 12px auto; padding: 0; border: 0; border-radius: 0; background: transparent; box-shadow: none; }
 .home-profile-button, .home-resource-tile { min-width: 0; min-height: 62px; padding: 5px; border: 0; border-radius: 12px; background: transparent; color: #fbfaf5; box-shadow: none; }
 .home-profile-button { display: flex; width: 78px; height: 78px; align-items: center; justify-content: center; justify-self: center; padding: 5px; border: 1px solid rgba(243,191,56,.72); border-radius: 50%; background: linear-gradient(145deg, #183966, #10264a); font: inherit; cursor: pointer; }
 .home-profile-button:focus-visible, .home-overview-premium:focus-visible { outline: 3px solid #f7d46b; outline-offset: 3px; }
@@ -1307,7 +1333,7 @@ body {
 .finance-history-fields label { display: grid; gap: 5px; font-size: 12px; font-weight: 700; }
 .finance-history-fields .admin-field { min-width: 0; }
 @media (max-width: 560px) { .finance-history-fields { grid-template-columns: 1fr; } }
-@media (max-width: 380px) { .home-player-summary { grid-template-columns:minmax(0,1fr) 68px; gap:4px; padding:0; } .home-profile-button { width:68px; height:68px; min-height:68px; padding:3px; } .home-profile-button .avatar { width:58px; height:58px; } .home-resource-tile { min-height:54px; padding:4px 2px; } .home-resource-tile strong { font-size:clamp(17px,5.5vw,22px); } .home-resource-tile img { width:28px; height:28px; } }
+@media (max-width: 380px) { .home-player-summary { grid-template-columns: minmax(0,1fr) 68px; gap: 4px; padding: 0; } .home-profile-button { width: 68px; height: 68px; min-height: 68px; padding: 3px; } .home-profile-button .avatar { width: 58px; height: 58px; } .home-resource-tile { min-height: 54px; padding: 4px 2px; } .home-resource-tile strong { font-size: clamp(17px, 5.5vw, 22px); } .home-resource-tile img { width: 28px; height: 28px; } }
 
 
 /* ==================================================
@@ -2557,7 +2583,7 @@ body {
 .nav-item.active { color: #a87900; }
 .nav-item:disabled { color: #8290a4; }
 .bottom-nav { box-sizing: border-box; height: calc(70px + env(safe-area-inset-bottom, 0px)); padding-bottom: env(safe-area-inset-bottom, 0px); }
-.bottom-nav { display:flex; align-items:center; justify-content:space-evenly; gap:0; }
+.bottom-nav { grid-template-columns:repeat(5,minmax(0,1fr)); }
 .app-content { padding-bottom: calc(100px + env(safe-area-inset-bottom, 0px)); }
 .booster-visual { position: relative; display: block; }
 .booster-stock-badge { position: absolute; top: 7px; right: 7px; padding: 5px 8px; border: 1px solid rgba(243,191,56,.9); border-radius: 999px; background: rgba(8,24,49,.92); color: #ffe181; font-size: 11px; font-weight: 800; box-shadow: 0 2px 8px rgba(0,0,0,.3); }
@@ -2591,8 +2617,6 @@ body {
 
 /* Homepage refresh for the launch of Season 2 */
 .app-content { max-width: 1160px; }
-.home-season-banner { display:flex; align-items:center; justify-content:center; gap:10px; margin:8px auto 14px; padding:8px 18px; width:fit-content; max-width:100%; border:1px solid rgba(159,242,139,.7); border-radius:999px; background:linear-gradient(100deg,rgba(11,72,37,.9),rgba(15,42,53,.94)); color:#e5ffd7; font-size:13px; font-weight:900; letter-spacing:.08em; text-shadow:0 1px 4px #05200e; box-shadow:0 0 20px rgba(53,203,87,.2),inset 0 1px rgba(255,255,255,.16); }
-.home-season-banner::before,.home-season-banner::after { content:"✦"; color:#f5d56c; }
 .home-player-summary { display:flex; max-width:760px; align-items:center; justify-content:center; gap:18px; margin:14px auto 12px; padding:0; border:0; background:transparent; box-shadow:none; }
 .daily-objectives-header { list-style:none; cursor:pointer; }
 .daily-objectives-header::-webkit-details-marker { display:none; }
@@ -2600,6 +2624,7 @@ body {
 .daily-objectives-card[open] .daily-objectives-header::after { transform:rotate(180deg); }
 .daily-objectives-card:not([open]) { padding-top:11px; padding-bottom:11px; }
 @media(max-width:380px){.home-player-summary{grid-template-columns:minmax(0,1fr) 68px}}
+.bottom-nav { display:flex; align-items:center; justify-content:space-evenly; gap:0; }
 @media(max-width:380px){.home-player-summary{gap:12px}.bottom-nav .nav-image-button{width:50px;height:50px}}
 .boosters { grid-template-columns:minmax(0,1.15fr) minmax(0,1fr); align-items:stretch; gap:14px; margin:8px 0 12px; }
 #dailyBoosterArticle,#cooperationCard { grid-column:1 / -1; }
@@ -2638,7 +2663,6 @@ body {
 @media (max-width:460px) {
   .home-overview-grid { grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; }
   .home-overview-grid > button,.home-overview-archive { min-height:100px; }
-  .home-season-banner { margin-top:8px; font-size:11px; }
   .booster-season-two { width:100%; grid-template-columns:1fr; grid-template-rows:auto auto auto auto; text-align:center; }
   .booster-season-two .booster-visual { grid-column:1; grid-row:auto; width:min(72%,210px); }
   .booster-season-two .booster-image { max-height:315px; }
@@ -2674,7 +2698,6 @@ body:has(.app-content:not(.hidden)) { background:#dcebd5; color:#173b52; }
 #appPage:has(.app-content:not(.hidden)) .cooperation-reward-note { color:#245f34; text-shadow:none; }
 #appPage:has(.app-content:not(.hidden)) .cooperation-reward-note { border-color:rgba(50,148,71,.3); }
 #appPage:has(.app-content:not(.hidden)) .booster button { border-color:#329447; }
-
 #appPage:has(.app-content:not(.hidden)) .home-overview-grid { grid-template-columns:repeat(4,minmax(0,1fr)); }
 #appPage:has(.app-content:not(.hidden)) .home-overview-grid > button,
 #appPage:has(.app-content:not(.hidden)) .home-overview-archive { border:2px solid #329447; background:#fff; box-shadow:0 5px 14px rgba(28,105,48,.12),inset 0 1px #fff; }
@@ -2862,6 +2885,19 @@ body:has(.app-content:not(.hidden)) { background:#dcebd5; color:#173b52; }
 
     <header class="app-header">
 
+        <button id="notificationsBellButton" class="notifications-bell hidden" type="button" aria-label="Ouvrir les notifications" aria-expanded="false" aria-controls="notificationsPanel" title="Notifications">
+            <span aria-hidden="true">🔔</span>
+            <span id="notificationCountBadge" class="notification-count-badge hidden" aria-hidden="true">0</span>
+        </button>
+
+        <section id="notificationsPanel" class="notifications-panel hidden" aria-label="Notifications" aria-hidden="true">
+            <div class="notifications-panel-header">
+                <h2>Notifications</h2>
+                <button id="notificationsPanelClose" type="button" aria-label="Fermer les notifications">×</button>
+            </div>
+            <div id="notificationsList" class="notifications-list" aria-live="polite"></div>
+            <p id="notificationsEmpty" class="notifications-empty hidden">Aucune notification pour le moment.</p>
+        </section>
 
         <button id="homeHeaderButton" class="header-logo" type="button" aria-label="Retour à l’accueil" title="Accueil">
             <img loading="lazy" decoding="async" src="./Logo.png" alt="Cartes & Popote">
@@ -2994,7 +3030,7 @@ body:has(.app-content:not(.hidden)) { background:#dcebd5; color:#173b52; }
 
         <!-- PROFIL -->
 
-        <section class="home-player-summary" aria-label="Profil et ressources du joueur">
+        <section class="home-player-summary" aria-label="Profil et jetons classiques">
             <article class="home-resource-tile" aria-label="Jetons classiques disponibles">
                 <img loading="lazy" decoding="async" src="./Jeton.png" alt="">
                 <strong id="playerTokens">0</strong>
@@ -3002,7 +3038,6 @@ body:has(.app-content:not(.hidden)) { background:#dcebd5; color:#173b52; }
             <button id="playerProfileHomeButton" class="home-profile-button" type="button" aria-label="Ouvrir le profil">
                 <span class="avatar" id="playerAvatar" aria-hidden="true">👤</span>
             </button>
-            
             <span id="playerPseudo" class="hidden">Joueur</span>
             <span id="playerBoosters" class="hidden">0</span>
             <span id="playerLevel" class="hidden">Niveau 1 • 0 XP</span>
@@ -3025,8 +3060,7 @@ body:has(.app-content:not(.hidden)) { background:#dcebd5; color:#173b52; }
             </button>
         </section>
 
-        
-<details id="dailyObjectivesCard" class="daily-objectives-card hidden" aria-labelledby="dailyObjectivesTitle">
+        <details id="dailyObjectivesCard" class="daily-objectives-card hidden" aria-labelledby="dailyObjectivesTitle">
             <summary class="daily-objectives-header">
                 <h3 id="dailyObjectivesTitle">🎯 Objectifs du jour</h3>
                 <span id="dailyObjectivesDate" class="daily-objectives-date"></span>
@@ -4332,6 +4366,12 @@ const callAcceptExchangeOffer = httpsCallable(functions, "acceptExchangeOffer");
 const callRefuseExchangeOffer = httpsCallable(functions, "refuseExchangeOffer");
 
 const siteUpdatesModal = document.getElementById("siteUpdatesModal");
+const notificationsBellButton = document.getElementById("notificationsBellButton");
+const notificationCountBadge = document.getElementById("notificationCountBadge");
+const notificationsPanel = document.getElementById("notificationsPanel");
+const notificationsPanelClose = document.getElementById("notificationsPanelClose");
+const notificationsList = document.getElementById("notificationsList");
+const notificationsEmpty = document.getElementById("notificationsEmpty");
 const siteUpdatesList = document.getElementById("siteUpdatesList");
 const siteUpdatesCloseButton = document.getElementById("siteUpdatesCloseButton");
 const siteUpdateCommentForm = document.getElementById("siteUpdateCommentForm");
@@ -4388,6 +4428,8 @@ const mysticRewardIntro = document.getElementById("mysticRewardIntro");
 const mysticRewardList = document.getElementById("mysticRewardList");
 const mysticRewardCloseButton = document.getElementById("mysticRewardCloseButton");
 let pendingSiteUpdateIds = [];
+let notificationUpdateAnnouncements = [];
+let notificationAnnouncementsRefreshTimer = null;
 let activeSiteUpdateCommentContext = null;
 let pendingServiceReadyMission = null;
 let announcementsWaitingForServiceModal = [];
@@ -4570,12 +4612,12 @@ function continueStartupNoticesAfterPoll() {
     tryShowPendingExchangeOffer();
 }
 
-function tryShowPendingExchangeOffer() {
-    if (!auth.currentUser || isPlayerPreview || activeExchangeOffer || !pendingExchangeOffers.length) return;
+function tryShowPendingExchangeOffer(offerFromNotification = null) {
+    if (!offerFromNotification || !auth.currentUser || isPlayerPreview || activeExchangeOffer) return;
     const blocked = [eventBoosterPromptModal, boosterResultModal, siteUpdatesModal, serviceReadyModal, pollPromptModal, exchangeComposeModal, exchangeSuccessModal, unreadMessagesModal]
         .some((modal) => modal && !modal.classList.contains("hidden"));
     if (blocked) return;
-    activeExchangeOffer = pendingExchangeOffers[0];
+    activeExchangeOffer = pendingExchangeOffers.find((offer) => offer.id === offerFromNotification.id) || offerFromNotification;
     exchangeOfferMessage.textContent = `${activeExchangeOffer.senderPseudo || "Un joueur"} te propose un échange.`;
     const offeredSeason = Number(activeExchangeOffer.offeredSeason) || 1;
     const requestedSeason = Number(activeExchangeOffer.requestedSeason) || 1;
@@ -4601,19 +4643,7 @@ function appendExchangeSuccessCard(label, card) {
 }
 
 function tryShowPendingExchangeSuccessNotice() {
-    if (!auth.currentUser || isPlayerPreview || activeExchangeSuccessNotice || !pendingExchangeSuccessNotices.length) return;
-    const blocked = Array.from(document.querySelectorAll("[role=dialog]:not(.hidden)"))
-        .some((dialog) => dialog !== exchangeSuccessModal);
-    if (blocked) return;
-    activeExchangeSuccessNotice = pendingExchangeSuccessNotices[0];
-    exchangeSuccessMessage.textContent = `Ton échange avec ${activeExchangeSuccessNotice.otherPseudo || "un joueur"} a été réalisé avec succès.`;
-    exchangeSuccessCards.replaceChildren();
-    appendExchangeSuccessCard("Tu as donné", activeExchangeSuccessNotice.sentCard);
-    const arrow = document.createElement("div"); arrow.className = "exchange-success-arrow"; arrow.textContent = "⇄"; arrow.setAttribute("aria-hidden", "true");
-    exchangeSuccessCards.append(arrow);
-    appendExchangeSuccessCard("Tu as reçu", activeExchangeSuccessNotice.receivedCard);
-    exchangeSuccessModal.classList.remove("hidden"); exchangeSuccessModal.setAttribute("aria-hidden", "false");
-    exchangeSuccessClose.focus();
+    renderNotificationCenter();
 }
 
 async function loadPendingExchangeSuccessNotices() {
@@ -4626,7 +4656,7 @@ async function loadPendingExchangeSuccessNotices() {
         if (activeExchangeSuccessNotice?.id) known.add(activeExchangeSuccessNotice.id);
         pendingExchangeSuccessNotices = notices.filter((notice) => notice?.id && !known.has(notice.id));
         if (activeExchangeSuccessNotice) pendingExchangeSuccessNotices.unshift(activeExchangeSuccessNotice);
-        tryShowPendingExchangeSuccessNotice();
+        renderNotificationCenter();
     } catch (error) {
         console.warn("Impossible de charger les annonces d’échange réussi :", error);
     } finally { exchangeSuccessPollInFlight = false; }
@@ -4654,6 +4684,7 @@ async function loadPendingExchangeOffers() {
     try {
         const response = await callGetPendingExchangeOffers();
         pendingExchangeOffers = Array.isArray(response.data?.offers) ? response.data.offers : [];
+        renderNotificationCenter();
         if (activeExchangeOffer && pendingExchangeOffers.some((offer) => offer.id === activeExchangeOffer.id)) return;
         if (activeExchangeOffer) {
             exchangeOfferModal.classList.add("hidden");
@@ -4730,7 +4761,7 @@ function closeSiteUpdates() {
     siteUpdatesModal.classList.add("hidden");
     siteUpdatesModal.setAttribute("aria-hidden", "true");
     pendingSiteUpdateIds = [];
-    showPendingServiceReadyNotification();
+    renderNotificationCenter();
     if (serviceReadyModal.classList.contains("hidden")) tryShowPendingPoll();
     tryShowPendingExchangeOffer();
 }
@@ -4758,23 +4789,7 @@ function closeMysticPullReward() {
 }
 
 function showPendingServiceReadyNotification() {
-    const mission = pendingServiceReadyMission;
-    if (!mission || !siteUpdatesModal.classList.contains("hidden") || !pollPromptModal.classList.contains("hidden") || !unreadMessagesModal.classList.contains("hidden")) return;
-    pendingServiceReadyMission = null;
-    serviceReadyMessage.textContent = `La mission « ${mission.name || "Service"} » est terminée. Récompense : ${serviceRewardSummary(mission)}. Tu peux la récupérer dans Service.`;
-    if (mission.imageUrl) {
-        serviceReadyImage.src = mission.imageUrl;
-        serviceReadyImage.alt = `Illustration de la mission ${mission.name || "terminée"}`;
-        serviceReadyImage.onerror = () => serviceReadyImage.classList.add("hidden");
-        serviceReadyImage.classList.remove("hidden");
-    } else {
-        serviceReadyImage.removeAttribute("src");
-        serviceReadyImage.alt = "";
-        serviceReadyImage.classList.add("hidden");
-    }
-    serviceReadyModal.classList.remove("hidden");
-    serviceReadyModal.setAttribute("aria-hidden", "false");
-    serviceReadyOpenButton.focus();
+    renderNotificationCenter();
 }
 
 function markSiteUpdatesSeen(ids, userId = auth.currentUser?.uid) {
@@ -4787,43 +4802,132 @@ function markSiteUpdatesSeen(ids, userId = auth.currentUser?.uid) {
     } catch (error) { console.warn("Impossible de mémoriser les nouveautés vues.", error); }
 }
 
-function showSiteUpdatesIfNeeded(updates) {
-    const userId = auth.currentUser?.uid;
-    if (!userId || updates.length === 0) return;
-    if (!serviceReadyModal.classList.contains("hidden") || !pollPromptModal.classList.contains("hidden") || !unreadMessagesModal.classList.contains("hidden")) {
-        announcementsWaitingForServiceModal = [...announcementsWaitingForServiceModal, ...updates];
-        return;
-    }
-    let seen = [];
+function getSeenSiteUpdateIds(userId = auth.currentUser?.uid) {
+    if (!userId) return [];
     try {
-        seen = JSON.parse(localStorage.getItem(`cartes-popote-seen-updates:${userId}`) || "[]");
-        if (!Array.isArray(seen)) seen = [];
-    } catch (error) { console.warn("Impossible de vérifier les nouveautés déjà vues.", error); }
-    const unseen = updates.filter((update) => !seen.includes(update.id));
-    if (unseen.length === 0) return;
-    pendingSiteUpdateIds = unseen.map((update) => update.id);
-    const relatedUpdate = unseen[unseen.length - 1];
-    activeSiteUpdateCommentContext = {
-        id: relatedUpdate.id,
-        title: relatedUpdate.title || "Mise à jour"
-    };
-    siteUpdateCommentForm.reset();
-    siteUpdateCommentSubmit.disabled = false;
-    siteUpdateCommentStatus.textContent = "";
-    siteUpdatesList.replaceChildren();
-    unseen.forEach((update) => {
-        const item = document.createElement("li");
-        const heading = document.createElement("strong");
-        heading.textContent = update.title.replace(/^MAJ\s*\|\s*/, "") || "Mise à jour";
-        const message = document.createElement("p");
-        message.textContent = update.message;
-        message.style.cssText = "margin:5px 0 0;white-space:pre-line";
-        item.append(heading, message);
-        siteUpdatesList.append(item);
+        const value = JSON.parse(localStorage.getItem(`cartes-popote-seen-updates:${userId}`) || "[]");
+        return Array.isArray(value) ? value : [];
+    } catch { return []; }
+}
+
+function makeNotificationItem(type, title, dateValue, message) {
+    const item = document.createElement("article");
+    item.className = "notification-item";
+    item.dataset.notificationType = type;
+    const heading = document.createElement("div"); heading.className = "notification-item-heading";
+    const text = document.createElement("span"); text.textContent = title;
+    const date = document.createElement("time"); date.className = "notification-item-date";
+    date.textContent = dateValue ? formatAdminMessageDate(dateValue) : "";
+    heading.append(text, date); item.append(heading);
+    if (message) { const detail = document.createElement("p"); detail.textContent = message; item.append(detail); }
+    return item;
+}
+
+function closeNotificationsPanel() {
+    notificationsPanel.classList.add("hidden");
+    notificationsPanel.setAttribute("aria-hidden", "true");
+    notificationsBellButton.setAttribute("aria-expanded", "false");
+}
+
+function renderNotificationCenter() {
+    if (!notificationsList) return;
+    notificationsList.replaceChildren();
+    const updates = notificationUpdateAnnouncements.slice(0, 8);
+    const seen = new Set(getSeenSiteUpdateIds());
+    const serviceMission = pendingServiceReadyMission
+        && Date.parse(pendingServiceReadyMission.readyAt || "") <= Date.now() ? pendingServiceReadyMission : null;
+    const entries = [];
+    updates.forEach((update) => entries.push({ type:"update", date:timestampToMilliseconds(update.createdAt), update, unread:!seen.has(update.id) }));
+    pendingExchangeOffers.forEach((offer) => entries.push({ type:"offer", date:timestampToMilliseconds(offer.createdAt), offer, unread:true }));
+    pendingExchangeSuccessNotices.forEach((notice) => entries.push({ type:"success", date:timestampToMilliseconds(notice.createdAt), notice, unread:true }));
+    if (serviceMission) entries.push({ type:"service", date:Date.parse(serviceMission.readyAt) || Date.now(), mission:serviceMission, unread:true });
+    entries.sort((a,b) => b.date - a.date);
+
+    entries.forEach((entry) => {
+        if (entry.type === "update") {
+            const announcement = entry.update;
+            const item = makeNotificationItem("update", `📣 ${String(announcement.title || "Mise à jour").replace(/^MAJ\s*\|\s*/, "")}`, announcement.createdAt, announcement.message || "");
+            if (entry.unread) item.classList.add("is-unread");
+            const button = document.createElement("button"); button.type = "button"; button.textContent = "Lire l’annonce";
+            button.addEventListener("click", () => openSiteUpdateNotification(announcement)); item.append(button); notificationsList.append(item);
+            return;
+        }
+        if (entry.type === "offer") {
+            const offer = entry.offer;
+            const item = makeNotificationItem("offer", `🤝 Proposition de ${offer.senderPseudo || "un joueur"}`, offer.createdAt,
+                `Saison ${Number(offer.offeredSeason) || 1} · n° ${offer.offeredNumber} contre ta carte Saison ${Number(offer.requestedSeason) || 1} · n° ${offer.requestedNumber}.`);
+            item.classList.add("is-unread");
+            const button = document.createElement("button"); button.type = "button"; button.textContent = "Répondre à la proposition";
+            button.addEventListener("click", () => { closeNotificationsPanel(); tryShowPendingExchangeOffer(offer); }); item.append(button); notificationsList.append(item);
+            return;
+        }
+        if (entry.type === "success") {
+            const notice = entry.notice;
+            const item = makeNotificationItem("success", `✅ Échange réussi avec ${notice.otherPseudo || "un joueur"}`, notice.createdAt, "Voici les cartes qui ont été échangées.");
+            item.classList.add("is-unread");
+            const cards = document.createElement("div"); cards.className = "notification-exchange-cards";
+            [["Tu as donné",notice.sentCard], ["Tu as reçu",notice.receivedCard]].forEach(([label,card],index) => {
+                if (index) { const arrow=document.createElement("span"); arrow.className="notification-exchange-arrow"; arrow.textContent="⇄"; cards.append(arrow); }
+                const face=document.createElement("div"); face.className="notification-exchange-card";
+                const image=document.createElement("img"); image.src=card?.imageUrl||"./Dos%20cartes.png"; image.alt=card?.name||"Carte échangée"; image.loading="lazy"; image.decoding="async";
+                image.addEventListener("error",()=>{image.src="./Dos%20cartes.png"},{once:true});
+                const direction=document.createElement("strong"); direction.textContent=label;
+                const name=document.createElement("span"); name.textContent=card?.name||`Carte n° ${Number(card?.number)||"?"}`;
+                const number=document.createElement("span"); number.textContent=`N° ${Number(card?.number)||"?"}`;
+                face.append(image,direction,name,number); cards.append(face);
+            });
+            item.append(cards);
+            const button=document.createElement("button"); button.type="button"; button.textContent="Marquer comme lu";
+            button.addEventListener("click",async()=>{
+                button.disabled=true;
+                try { await callAcknowledgeExchangeSuccessNotice({noticeId:notice.id}); pendingExchangeSuccessNotices=pendingExchangeSuccessNotices.filter((value)=>value.id!==notice.id); renderNotificationCenter(); }
+                catch(error){ console.error("Impossible d’archiver cette notification d’échange :",error); button.disabled=false; }
+            });
+            item.append(button); notificationsList.append(item); return;
+        }
+        const mission=entry.mission;
+        const item=makeNotificationItem("service",`✅ Mission Service terminée · ${mission.name||"Service"}`,mission.readyAt,
+            `Récompense : ${serviceRewardSummary(mission)}. Elle t’attend dans Service.`);
+        item.classList.add("is-unread");
+        if(mission.imageUrl){const image=document.createElement("img");image.className="notification-service-image";image.src=mission.imageUrl;image.alt=`Mission ${mission.name||"Service"}`;image.loading="lazy";image.decoding="async";item.append(image);}
+        const button=document.createElement("button");button.type="button";button.textContent="Voir ma récompense";
+        button.addEventListener("click",()=>{closeNotificationsPanel();void openArchivesPage();});item.append(button);notificationsList.append(item);
     });
-    siteUpdatesModal.classList.remove("hidden");
-    siteUpdatesModal.setAttribute("aria-hidden", "false");
-    siteUpdatesCloseButton.focus();
+    const unreadUpdates=updates.filter((item)=>!seen.has(item.id)).length;
+    const count=unreadUpdates+pendingExchangeOffers.length+pendingExchangeSuccessNotices.length+(serviceMission?1:0);
+    notificationCountBadge.textContent=count>9?"9+":String(count);
+    notificationCountBadge.classList.toggle("hidden",count===0);
+    notificationsBellButton.setAttribute("aria-label",count?`Ouvrir les notifications, ${count} non lue${count>1?"s":""}`:"Ouvrir les notifications");
+    notificationsEmpty.classList.toggle("hidden",entries.length>0);
+}
+
+function openSiteUpdateNotification(announcement) {
+    pendingSiteUpdateIds=[announcement.id];
+    activeSiteUpdateCommentContext={id:announcement.id,title:String(announcement.title||"Mise à jour").replace(/^MAJ\s*\|\s*/,"")};
+    siteUpdateCommentForm.reset(); siteUpdateCommentSubmit.disabled=false; siteUpdateCommentStatus.textContent="";
+    siteUpdatesList.replaceChildren();
+    const item=document.createElement("li"),heading=document.createElement("strong"),message=document.createElement("p");
+    heading.textContent=activeSiteUpdateCommentContext.title; message.textContent=announcement.message||""; message.style.cssText="margin:5px 0 0;white-space:pre-line";
+    item.append(heading,message);siteUpdatesList.append(item);
+    closeNotificationsPanel();siteUpdatesModal.classList.remove("hidden");siteUpdatesModal.setAttribute("aria-hidden","false");siteUpdatesCloseButton.focus();
+}
+
+notificationsBellButton.addEventListener("click",()=>{
+    const opening=notificationsPanel.classList.contains("hidden");
+    notificationsPanel.classList.toggle("hidden",!opening);
+    notificationsPanel.setAttribute("aria-hidden",String(!opening));
+    notificationsBellButton.setAttribute("aria-expanded",String(opening));
+    if(opening)renderNotificationCenter();
+});
+notificationsPanelClose.addEventListener("click",closeNotificationsPanel);
+document.addEventListener("click",(event)=>{
+    if(!notificationsPanel.classList.contains("hidden")&&!notificationsPanel.contains(event.target)&&!notificationsBellButton.contains(event.target))closeNotificationsPanel();
+});
+
+function showSiteUpdatesIfNeeded(updates) {
+    if (!auth.currentUser || !Array.isArray(updates)) return;
+    notificationUpdateAnnouncements=updates.slice().sort((a,b)=>timestampToMilliseconds(b.createdAt)-timestampToMilliseconds(a.createdAt));
+    renderNotificationCenter();
 }
 
 siteUpdatesCloseButton.addEventListener("click", closeSiteUpdates);
@@ -5855,9 +5959,6 @@ onAuthStateChanged(
             dailyObjectivesUnsubscribe = null;
             dailyObjectivesDayKey = "";
             dailyObjectivesCard.open = false;
-            if (dailyObjectivesUnsubscribe) dailyObjectivesUnsubscribe();
-            dailyObjectivesUnsubscribe = null;
-            dailyObjectivesDayKey = "";
             dailyObjectivesCard.classList.add("hidden");
             dailyObjectivesList.replaceChildren();
             if (unreadMessageShowTimer) window.clearInterval(unreadMessageShowTimer);
@@ -5886,6 +5987,13 @@ onAuthStateChanged(
             if (exchangeOfferPollTimer) window.clearInterval(exchangeOfferPollTimer);
             exchangeOfferPollTimer = null;
             pendingExchangeOffers = [];
+            notificationUpdateAnnouncements = [];
+            if (notificationAnnouncementsRefreshTimer) window.clearInterval(notificationAnnouncementsRefreshTimer);
+            notificationAnnouncementsRefreshTimer = null;
+            notificationsBellButton.classList.add("hidden");
+            closeNotificationsPanel();
+            notificationCountBadge.classList.add("hidden");
+            notificationsList.replaceChildren();
             activeExchangeOffer = null;
             exchangeOfferActionBusy = false;
             if (exchangeSuccessPollTimer) window.clearInterval(exchangeSuccessPollTimer);
@@ -5996,9 +6104,12 @@ onAuthStateChanged(
         playerPreviewToggle.textContent = isPlayerPreview ? "🛡️ Revenir au mode Admin" : "👤 Joueur normal";
         playerPreviewBanner.classList.toggle("hidden", !isPlayerPreview);
         premiumHomeButton.classList.remove("hidden");
+        notificationsBellButton.classList.remove("hidden");
         premiumAdminPanel.classList.toggle("hidden", !isAdminAccount || isPlayerPreview);
         if (!isAdminAccount) messagingPage.classList.add("hidden");
         loadHomeAnnouncements();
+        if (notificationAnnouncementsRefreshTimer) window.clearInterval(notificationAnnouncementsRefreshTimer);
+        notificationAnnouncementsRefreshTimer = window.setInterval(() => { if (auth.currentUser) void loadHomeAnnouncements(); }, 60_000);
         refreshHomeMaintenanceStatus();
         if (homeMaintenanceRefreshInterval) window.clearInterval(homeMaintenanceRefreshInterval);
         homeMaintenanceRefreshInterval = window.setInterval(refreshHomeMaintenanceStatus, 45_000);
@@ -6501,6 +6612,8 @@ document.getElementById("serviceClaimButton").addEventListener("click", async ()
     const button = document.getElementById("serviceClaimButton"); button.disabled = true; serviceStatus.textContent = "Récupération de ta récompense…";
     try {
         const result = (await callClaimServiceMissionReward({ taskId: serviceActiveMission?.taskId })).data || {};
+        pendingServiceReadyMission = null;
+        renderNotificationCenter();
         void refreshCooperationProgress();
         const details = [`${result.tokenReward || 0} jeton(s)`];
         if (result.cardDropChance > 0 && !result.cardDropSucceeded) details.push("aucune carte n’a été obtenue cette fois");
@@ -9426,32 +9539,81 @@ function getParisDateKey() {
     return `${part("year")}-${part("month")}-${part("day")}`;
 }
 
-const dailyObjectivesCard=document.getElementById("dailyObjectivesCard"),dailyObjectivesDate=document.getElementById("dailyObjectivesDate"),dailyObjectivesList=document.getElementById("dailyObjectivesList"),dailyObjectivesReward=document.getElementById("dailyObjectivesReward");
-async function loadDailyObjectives(uid){
- if(!uid||!auth.currentUser||auth.currentUser.uid!==uid)return;
- if(dailyObjectivesUnsubscribe)dailyObjectivesUnsubscribe();dailyObjectivesUnsubscribe=null;
- try{
-  const response=await callGetDailyObjectives();if(!auth.currentUser||auth.currentUser.uid!==uid)return;
-  const state=response.data||{};dailyObjectivesDayKey=state.dayKey||getParisDateKey();dailyObjectivesCard.open=false;
-  const date=new Date(`${dailyObjectivesDayKey}T12:00:00+01:00`);
-  dailyObjectivesDate.textContent=new Intl.DateTimeFormat("fr-FR",{weekday:"long",day:"numeric",month:"long"}).format(date);
-  dailyObjectivesUnsubscribe=onSnapshot(doc(db,"players",uid,"dailyObjectives",dailyObjectivesDayKey),snapshot=>{
-   const current=snapshot.exists()?snapshot.data():state,progress=current.progress||{};dailyObjectivesList.replaceChildren();
-   (state.objectives||[]).forEach(objective=>{
-    const value=Math.max(0,Number(progress[objective.metric]||0)),ratio=Math.min(100,value/Number(objective.target||1)*100),item=document.createElement("article");
-    item.className=`daily-objective${ratio>=100?" is-complete":""}`;
-    const top=document.createElement("div");top.className="daily-objective-top";
-    const label=document.createElement("span");label.textContent=objective.label;
-    const count=document.createElement("span");count.className="daily-objective-count";count.textContent=`${Math.min(value,Number(objective.target))} / ${objective.target}`;top.append(label,count);
-    const track=document.createElement("div");track.className="daily-objective-track";track.setAttribute("role","progressbar");track.setAttribute("aria-valuemin","0");track.setAttribute("aria-valuemax",String(objective.target));track.setAttribute("aria-valuenow",String(Math.min(value,Number(objective.target))));
-    const fill=document.createElement("div");fill.className="daily-objective-fill";fill.style.width=`${ratio}%`;track.append(fill);item.append(top,track);dailyObjectivesList.append(item);
-   });
-   const earned=current.rewardGranted===true;dailyObjectivesReward.textContent=earned?"🎉 Objectifs terminés : 1 booster classique Saison 2 ajouté à ton stock !":"Complète les 3 objectifs pour gagner 1 booster classique Saison 2.";dailyObjectivesReward.classList.toggle("is-earned",earned);dailyObjectivesCard.classList.remove("hidden");
-   if(earned)getDoc(doc(db,"players",uid)).then(p=>{if(p.exists()&&auth.currentUser?.uid===uid){const player=p.data();setOpenBoosterButton(player.boostersDisponibles||0,player.boostersSaison2Disponibles||0)}}).catch(e=>console.warn("Actualisation du stock de boosters impossible :",e));
-  },error=>{console.error("Suivi des objectifs impossible :",error);dailyObjectivesList.textContent="Les objectifs du jour sont momentanément indisponibles.";dailyObjectivesCard.classList.remove("hidden")});
- }catch(error){console.error("Chargement des objectifs impossible :",error);dailyObjectivesList.textContent="Les objectifs du jour sont momentanément indisponibles.";dailyObjectivesCard.classList.remove("hidden")}
+const dailyObjectivesCard = document.getElementById("dailyObjectivesCard");
+const dailyObjectivesDate = document.getElementById("dailyObjectivesDate");
+const dailyObjectivesList = document.getElementById("dailyObjectivesList");
+const dailyObjectivesReward = document.getElementById("dailyObjectivesReward");
+
+async function loadDailyObjectives(uid) {
+    if (!uid || !auth.currentUser || auth.currentUser.uid !== uid) return;
+    if (dailyObjectivesUnsubscribe) dailyObjectivesUnsubscribe();
+    dailyObjectivesUnsubscribe = null;
+    try {
+        const response = await callGetDailyObjectives();
+        if (!auth.currentUser || auth.currentUser.uid !== uid) return;
+        const state = response.data || {};
+        dailyObjectivesDayKey = state.dayKey || getParisDateKey();
+        dailyObjectivesCard.open = false;
+        const date = new Date(`${dailyObjectivesDayKey}T12:00:00+01:00`);
+        dailyObjectivesDate.textContent = new Intl.DateTimeFormat("fr-FR", { weekday:"long", day:"numeric", month:"long" }).format(date);
+        const progressRef = doc(db, "players", uid, "dailyObjectives", dailyObjectivesDayKey);
+        dailyObjectivesUnsubscribe = onSnapshot(progressRef, (snapshot) => {
+            const current = snapshot.exists() ? snapshot.data() : state;
+            const progress = current.progress || {};
+            dailyObjectivesList.replaceChildren();
+            (state.objectives || []).forEach((objective) => {
+                const value = Math.max(0, Number(progress[objective.metric] || 0));
+                const ratio = Math.min(100, value / Number(objective.target || 1) * 100);
+                const item = document.createElement("article");
+                item.className = `daily-objective${ratio >= 100 ? " is-complete" : ""}`;
+                const top = document.createElement("div");
+                top.className = "daily-objective-top";
+                const label = document.createElement("span");
+                label.textContent = objective.label;
+                const count = document.createElement("span");
+                count.className = "daily-objective-count";
+                count.textContent = `${Math.min(value, Number(objective.target))} / ${objective.target}`;
+                top.append(label, count);
+                const track = document.createElement("div");
+                track.className = "daily-objective-track";
+                track.setAttribute("role", "progressbar");
+                track.setAttribute("aria-valuemin", "0");
+                track.setAttribute("aria-valuemax", String(objective.target));
+                track.setAttribute("aria-valuenow", String(Math.min(value, Number(objective.target))));
+                const fill = document.createElement("div");
+                fill.className = "daily-objective-fill";
+                fill.style.width = `${ratio}%`;
+                track.append(fill);
+                item.append(top, track);
+                dailyObjectivesList.append(item);
+            });
+            const earned = current.rewardGranted === true;
+            dailyObjectivesReward.textContent = earned
+                ? "🎉 Objectifs terminés : 1 booster classique Saison 2 ajouté à ton stock !"
+                : "Complète les 3 objectifs pour gagner 1 booster classique Saison 2.";
+            dailyObjectivesReward.classList.toggle("is-earned", earned);
+            dailyObjectivesCard.classList.remove("hidden");
+            if (current.rewardGranted === true) getDoc(doc(db, "players", uid)).then((playerSnapshot) => {
+                if (!playerSnapshot.exists() || !auth.currentUser || auth.currentUser.uid !== uid) return;
+                const player = playerSnapshot.data();
+                setOpenBoosterButton(player.boostersDisponibles || 0, player.boostersSaison2Disponibles || 0);
+            }).catch((error) => console.warn("Actualisation du stock de boosters impossible :", error));
+        }, (error) => {
+            console.error("Impossible de suivre les objectifs du jour :", error);
+            dailyObjectivesList.textContent = "Les objectifs du jour sont momentanément indisponibles.";
+            dailyObjectivesCard.classList.remove("hidden");
+        });
+    } catch (error) {
+        console.error("Impossible de charger les objectifs du jour :", error);
+        dailyObjectivesList.textContent = "Les objectifs du jour sont momentanément indisponibles.";
+        dailyObjectivesCard.classList.remove("hidden");
+    }
 }
-window.setInterval(()=>{if(auth.currentUser&&getParisDateKey()!==dailyObjectivesDayKey)loadDailyObjectives(auth.currentUser.uid)},30000);
+
+window.setInterval(() => {
+    if (auth.currentUser && getParisDateKey() !== dailyObjectivesDayKey) loadDailyObjectives(auth.currentUser.uid);
+}, 30_000);
+
 function setDailyBoosterButton(lastOpenedDate) {
     dailyBoosterLastOpenedDate = typeof lastOpenedDate === "string" ? lastOpenedDate : "";
     const alreadyOpened = lastOpenedDate === getParisDateKey();
@@ -11462,6 +11624,14 @@ function updateServiceMissionCountdown() {
     archivesHomeCountdown.textContent = remaining > 0 ? text : "Récompense Service prête";
     archivesHomeCountdown.classList.remove("hidden");
     document.getElementById("serviceClaimButton").classList.toggle("hidden", remaining > 0);
+    if (remaining <= 0) {
+        const taskId = serviceActiveMission.taskId || `${serviceActiveMission.id || "service"}-${serviceActiveMission.readyAt}`;
+        if (taskId !== lastNotifiedServiceTaskId) {
+            lastNotifiedServiceTaskId = taskId;
+            pendingServiceReadyMission = serviceActiveMission;
+            renderNotificationCenter();
+        }
+    }
 }
 
 async function syncServiceMissionHomeCountdown() {
@@ -11478,7 +11648,7 @@ async function syncServiceMissionHomeCountdown() {
         if (Number.isFinite(readyAt) && readyAt <= Date.now() && taskId !== lastNotifiedServiceTaskId) {
             lastNotifiedServiceTaskId = taskId;
             pendingServiceReadyMission = serviceActiveMission;
-            showPendingServiceReadyNotification();
+            renderNotificationCenter();
         }
     } catch (error) { console.warn("Le compte à rebours du Service sera actualisé à l’ouverture de la page.", error); }
 }
