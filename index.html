@@ -1479,7 +1479,7 @@ body {
 @media (max-width: 1100px) { .card-entry-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
 @media (max-width: 700px) { .card-entry-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 @media (max-width: 480px) { .card-entry-grid { grid-template-columns: 1fr; } }
-.message-compose-card { display: flex; justify-content: flex-end; margin: 10px 0 4px; }
+.message-compose-card { display: flex; justify-content: flex-end; gap:8px; flex-wrap:wrap; margin: 10px 0 4px; }
 .message-compose-toggle { display: inline-flex; align-items: center; gap: 7px; padding: 5px 9px; border: 1px solid rgba(243, 191, 56, .45); border-radius: 999px; background: rgba(16, 38, 74, .72); color: #fbfaf5; font: inherit; font-size: 12px; font-weight: 700; cursor: pointer; }
 .message-compose-toggle img { display: block; width: 34px; height: 30px; object-fit: contain; }
 .feedback-form-panel { margin: 0 0 14px auto; max-width: 470px; padding: 14px; border: 1px solid rgba(243, 191, 56, .65); border-radius: 14px; background: #10264a; color: #fbfaf5; }
@@ -1504,6 +1504,17 @@ body {
 .admin-message-copy { margin-top: 9px; white-space: pre-wrap; overflow-wrap: anywhere; line-height: 1.5; }
 .admin-message-item.is-read { opacity: .72; }
 .admin-message-item .admin-actions { margin-top: 10px; }
+.admin-message-reply-form { display:grid; gap:8px; margin-top:12px; padding:12px; border:1px solid #e6d39c; border-radius:12px; background:#fffdf7; }
+.admin-message-reply-form label { color:#173b52; font-size:13px; font-weight:800; }
+.admin-message-reply-form textarea { width:100%; min-height:82px; padding:10px; border:1px solid #d6c89e; border-radius:9px; font:inherit; resize:vertical; }
+.admin-message-reply-form button { justify-self:end; }
+.admin-message-reply { margin-top:12px; padding:11px 13px; border-left:3px solid #d7a51e; border-radius:8px; background:#fff8e5; white-space:pre-wrap; overflow-wrap:anywhere; }
+.player-inbox-list { display:grid; gap:12px; margin-top:12px; }
+.player-message-item { padding:14px; border:1px solid #d7c898; border-radius:14px; background:linear-gradient(145deg,#fffefa,#f5f7f1); color:#173b52; }
+.player-message-item h3 { margin:0 0 6px; font-size:15px; }
+.player-message-meta { display:block; margin-bottom:10px; color:#6e7e7b; font-size:12px; }
+.player-message-copy { white-space:pre-wrap; overflow-wrap:anywhere; line-height:1.5; }
+.player-message-reply { margin-top:12px; padding:12px; border-left:4px solid #d7a51e; border-radius:8px; background:#fff3ce; white-space:pre-wrap; overflow-wrap:anywhere; line-height:1.5; }
 .player-collection { width: 100%; max-width: 900px; margin: auto; padding: 20px 16px 100px; }
 .player-collection h2 { margin-bottom: 8px; color: #173b52; }
 .collection-display-toggle { display: flex; flex-wrap: wrap; gap: 8px; margin: 14px 0; }
@@ -3045,6 +3056,10 @@ body:has(.app-content:not(.hidden)) { background:#f3faf1; color:#173b52; }
         </details>
 
         <div class="message-compose-card">
+            <button id="playerInboxOpenButton" class="message-compose-toggle" type="button" aria-label="Ouvrir ma boîte de réception">
+                <img loading="lazy" decoding="async" src="./enveloppe.png" alt="">
+                <span>Ma messagerie</span>
+            </button>
             <button id="feedbackToggleButton" class="message-compose-toggle" type="button" aria-expanded="false" aria-controls="feedbackFormPanel" aria-label="Envoyer un message à l’Admin">
                 <img loading="lazy" decoding="async" src="./enveloppe.png" alt="">
                 <span>Envoyer un message</span>
@@ -3945,14 +3960,22 @@ body:has(.app-content:not(.hidden)) { background:#f3faf1; color:#173b52; }
     <section id="messagingPage" class="admin-page messaging-page hidden" aria-labelledby="messagingPageTitle">
         <button id="messagingBackButton" class="admin-back" type="button">← Retour au menu Admin</button>
         <h2 id="messagingPageTitle">💬 Messagerie</h2>
-        <p class="admin-note">Les messages des joueurs sont rangés par sujet.</p>
+        <div id="playerInboxSection" class="admin-panel hidden" style="margin-bottom:16px">
+            <h3>Boîte de réception</h3>
+            <p class="admin-note">Tes idées, signalements et commentaires sur les annonces MAJ sont conservés ici, avec les réponses de l’Admin.</p>
+            <button id="playerInboxRefreshButton" class="secondary-button" type="button">Actualiser</button>
+            <p id="playerInboxStatus" class="admin-status" role="status" aria-live="polite">Chargement de ta messagerie…</p>
+            <div id="playerInboxList" class="player-inbox-list" aria-live="polite"></div>
+        </div>
         <div id="adminMessagesSection" class="admin-panel" style="margin-bottom:16px">
+            <p class="admin-note">Lis les messages des joueurs, réponds-leur et retrouve tes réponses dans la boîte d’envoi.</p>
             <div class="message-category-tabs" role="tablist" aria-label="Catégories de messages">
                 <button class="message-category-button" type="button" data-message-category="idee" role="tab" aria-selected="false" aria-pressed="false">💡 Boîte à idée</button>
                 <button class="message-category-button" type="button" data-message-category="probleme" role="tab" aria-selected="false" aria-pressed="false">🛠️ Problème</button>
                 <button class="message-category-button" type="button" data-message-category="maj" role="tab" aria-selected="false" aria-pressed="false">🆕 Commentaires MAJ</button>
             </div>
             <div class="message-category-tabs" aria-label="Archives des messages">
+                <button id="adminMessagesOutboxButton" class="message-category-button" type="button" aria-pressed="false">📤 Boîte d’envoi</button>
                 <button id="messageArchivesButton" class="message-category-button" type="button" aria-pressed="false">🗄️ Archives</button>
             </div>
             <p id="adminMessagesStatus" class="admin-status" role="status" aria-live="polite">Choisis une catégorie pour afficher les messages.</p>
@@ -4466,7 +4489,7 @@ async function answerExchangeOffer(accept) {
         const completedOffer = activeExchangeOffer;
         pendingExchangeOffers = pendingExchangeOffers.filter((offer) => offer.id !== completedOffer.id);
         exchangeOfferStatus.textContent = accept ? "Échange effectué ! Les deux cartes ont été transférées." : "Demande refusée.";
-        if (accept && !exchangePage.classList.contains("hidden")) void showExchangePage();
+        if (!exchangePage.classList.contains("hidden")) void showExchangePage();
         window.setTimeout(() => {
             exchangeOfferModal.classList.add("hidden");
             exchangeOfferModal.setAttribute("aria-hidden", "true");
@@ -4588,7 +4611,10 @@ function showSiteUpdatesIfNeeded(updates) {
     if (unseen.length === 0) return;
     pendingSiteUpdateIds = unseen.map((update) => update.id);
     const relatedUpdate = unseen[unseen.length - 1];
-    activeSiteUpdateCommentContext = { id: relatedUpdate.id, title: relatedUpdate.title || "Mise à jour" };
+    activeSiteUpdateCommentContext = {
+        id: relatedUpdate.id,
+        title: relatedUpdate.title || "Mise à jour"
+    };
     siteUpdateCommentForm.reset();
     siteUpdateCommentSubmit.disabled = false;
     siteUpdateCommentStatus.textContent = "";
@@ -4639,7 +4665,7 @@ siteUpdateCommentForm.addEventListener("submit", async (event) => {
             createdAt: serverTimestamp()
         });
         siteUpdateCommentText.value = "";
-        siteUpdateCommentStatus.textContent = "Commentaire envoyé à l’Admin. Merci !";
+        siteUpdateCommentStatus.textContent = "Commentaire envoyé à l’Admin. Tu le retrouveras aussi dans Ma messagerie.";
     } catch (error) {
         console.error("Erreur d’envoi du commentaire MAJ :", error);
         siteUpdateCommentStatus.textContent = error.code === "permission-denied"
@@ -4975,6 +5001,15 @@ const premiumPlayersTableBody = document.getElementById("premiumPlayersTableBody
 const premiumJournalStatus = document.getElementById("premiumJournalStatus");
 const premiumJournalList = document.getElementById("premiumJournalList");
 const messagingPage = document.getElementById("messagingPage");
+const messagingPageTitle = document.getElementById("messagingPageTitle");
+const playerInboxSection = document.getElementById("playerInboxSection");
+const playerInboxStatus = document.getElementById("playerInboxStatus");
+const playerInboxList = document.getElementById("playerInboxList");
+const playerInboxOpenButton = document.getElementById("playerInboxOpenButton");
+const playerInboxRefreshButton = document.getElementById("playerInboxRefreshButton");
+const adminMessagesSection = document.getElementById("adminMessagesSection");
+const adminMessagesOutboxButton = document.getElementById("adminMessagesOutboxButton");
+let playerMessagingView = false;
 const messagingBackButton = document.getElementById("messagingBackButton");
 const ADMIN_EMAIL = "pierre.valentin8@gmail.com";
 let isPlayerPreview = false;
@@ -6010,8 +6045,8 @@ async function showExchangePage(expandPlayerId = "") {
             if (possibleCount > 0) {
                 const badge = document.createElement("span");
                 badge.className = "exchange-possible-count";
-                badge.textContent = "↔ " + possibleCount;
-                badge.title = possibleCount + " échange" + (possibleCount > 1 ? "s" : "") + " possible" + (possibleCount > 1 ? "s" : "") + " avec ce joueur";
+                badge.textContent = `↔ ${possibleCount}`;
+                badge.title = `${possibleCount} échange${possibleCount > 1 ? "s" : ""} possible${possibleCount > 1 ? "s" : ""} avec ce joueur`;
                 badge.setAttribute("aria-label", badge.title);
                 title.append(badge);
             }
@@ -6031,8 +6066,8 @@ async function showExchangePage(expandPlayerId = "") {
                         const number = document.createElement("span");
                         number.className = card.rarity === "rare" ? "exchange-rarity-rare"
                             : card.rarity === "legendaire" ? "exchange-rarity-legendary" : "exchange-rarity-common";
-                        number.textContent = (Number(card.season) || 1) + "-" + card.number;
-                        number.title = "Saison " + (Number(card.season) || 1) + " · " + (card.rarity === "rare" ? "Carte rare" : card.rarity === "legendaire" ? "Carte légendaire" : "Carte commune");
+                        number.textContent = `${Number(card.season) || 1}-${card.number}`;
+                        number.title = `Saison ${Number(card.season) || 1} · ` + (card.rarity === "rare" ? "Carte rare" : card.rarity === "legendaire" ? "Carte légendaire" : "Carte commune");
                         numbers.append(number);
                     });
                     paragraph.append(numbers);
@@ -6053,11 +6088,11 @@ async function showExchangePage(expandPlayerId = "") {
                 pendingTrades.forEach((trade) => {
                     const line = document.createElement("p");
                     line.className = "exchange-pending-trade";
-                    const offered = "Saison " + (Number(trade.offeredSeason) || 1) + " · n° " + (Number(trade.offeredNumber) || "?");
-                    const requested = "Saison " + (Number(trade.requestedSeason) || 1) + " · n° " + (Number(trade.requestedNumber) || "?");
+                    const offered = `Saison ${Number(trade.offeredSeason) || 1} · n° ${Number(trade.offeredNumber) || "?"}`;
+                    const requested = `Saison ${Number(trade.requestedSeason) || 1} · n° ${Number(trade.requestedNumber) || "?"}`;
                     line.textContent = trade.direction === "sent"
-                        ? "Tu proposes " + offered + " contre " + requested + " ; sa réponse est attendue."
-                        : (ad.pseudo || "Ce joueur") + " propose " + offered + " contre ta carte " + requested + " ; ta réponse est attendue.";
+                        ? `Tu proposes ${offered} contre ${requested} ; sa réponse est attendue.`
+                        : `${ad.pseudo || "Ce joueur"} propose ${offered} contre ta carte ${requested} ; ta réponse est attendue.`;
                     pendingSection.append(line);
                 });
                 details.append(pendingSection);
@@ -11626,6 +11661,89 @@ function formatAdminMessageDate(value) {
     }).format(date);
 }
 
+async function loadPlayerInbox() {
+    playerInboxList.replaceChildren();
+    playerInboxStatus.textContent = "Chargement de ta messagerie…";
+    const user = auth.currentUser;
+    if (!user) {
+        playerInboxStatus.textContent = "Connecte-toi pour consulter ta boîte de réception.";
+        return;
+    }
+    try {
+        const snapshot = await getDocs(query(collection(db, "messages"), where("senderUid", "==", user.uid)));
+        const messages = [...snapshot.docs].sort((left, right) => {
+            const leftTime = left.data().createdAt?.toMillis?.() || 0;
+            const rightTime = right.data().createdAt?.toMillis?.() || 0;
+            return rightTime - leftTime;
+        });
+        if (!messages.length) {
+            playerInboxStatus.textContent = "Ta boîte de réception est vide. Les messages que tu envoies à l’Admin apparaîtront ici.";
+            return;
+        }
+        playerInboxStatus.textContent = `${messages.length} message${messages.length > 1 ? "s" : ""} dans ta messagerie.`;
+        messages.forEach((messageDoc) => {
+            const message = messageDoc.data();
+            const article = document.createElement("article");
+            article.className = "player-message-item";
+            const title = document.createElement("h3");
+            title.textContent = message.category === "maj" ? "Commentaire sur une annonce MAJ"
+                : message.category === "probleme" ? "Problème signalé" : "Idée envoyée";
+            const meta = document.createElement("small");
+            meta.className = "player-message-meta";
+            meta.textContent = "Envoyé le " + formatAdminMessageDate(message.createdAt);
+            const copy = document.createElement("p");
+            copy.className = "player-message-copy";
+            copy.textContent = message.message || "Message vide";
+            article.append(title, meta);
+            if (message.category === "maj" && message.announcementTitle) {
+                const context = document.createElement("small");
+                context.className = "player-message-meta";
+                context.textContent = message.announcementTitle;
+                article.append(context);
+            }
+            article.append(copy);
+            if (message.adminReply) {
+                const reply = document.createElement("div");
+                reply.className = "player-message-reply";
+                const replyTitle = document.createElement("strong");
+                replyTitle.textContent = "Réponse de l’Admin · " + formatAdminMessageDate(message.adminReplyAt);
+                const replyText = document.createElement("p");
+                replyText.textContent = message.adminReply;
+                reply.append(replyTitle, replyText);
+                article.append(reply);
+            } else {
+                const waiting = document.createElement("small");
+                waiting.className = "player-message-meta";
+                waiting.textContent = "En attente d’une réponse de l’Admin.";
+                article.append(waiting);
+            }
+            playerInboxList.append(article);
+        });
+    } catch (error) {
+        console.error("Impossible de charger la boîte de réception du joueur :", error);
+        playerInboxStatus.textContent = error.code === "permission-denied"
+            ? "Accès refusé. Publie les règles Firestore mises à jour."
+            : "Impossible de charger ta messagerie. Réessaie dans un instant.";
+    }
+}
+
+async function openPlayerMessagingPage() {
+    if (!auth.currentUser || isPlayerPreview) return;
+    playerMessagingView = true;
+    dropdownMenu.classList.add("hidden");
+    document.querySelector(".app-content").classList.add("hidden");
+    [termsPage, financePage, profilePage, leaderboardPage, activityPage, statisticsPage, drawnCardsPage, collectionPage,
+        seasonOneShopPage, exchangePage, salePage, recyclingPage, adminPage, eventBoostersAdminPage, effectifPage,
+        rulesPage, premiumPage, archivesPage, adminHubPage, pollsAdminPage].forEach((page) => page.classList.add("hidden"));
+    messagingPage.classList.remove("hidden");
+    playerInboxSection.classList.remove("hidden");
+    adminMessagesSection.classList.add("hidden");
+    messagingPageTitle.textContent = "💬 Ma messagerie";
+    messagingBackButton.textContent = "← Retour à l’accueil";
+    bottomNav.classList.add("hidden");
+    await loadPlayerInbox();
+}
+
 async function loadAdminMessages(category = activeMessageCategory, status = activeMessageStatus) {
     activeMessageCategory = category;
     activeMessageStatus = status;
@@ -11642,6 +11760,8 @@ async function loadAdminMessages(category = activeMessageCategory, status = acti
         button.setAttribute("aria-pressed", String(selected));
         button.setAttribute("aria-selected", String(selected));
     });
+    adminMessagesOutboxButton.setAttribute("aria-pressed", String(status === "envoyes"));
+    adminMessagesOutboxButton.textContent = status === "envoyes" ? "📥 Boîte de réception" : "📤 Boîte d’envoi";
     messageArchivesButton.setAttribute("aria-pressed", String(status === "archives"));
     messageArchivesButton.textContent = status === "archives" ? "↩ Retour aux messages" : "🗄️ Archives";
 
@@ -11652,20 +11772,23 @@ async function loadAdminMessages(category = activeMessageCategory, status = acti
         );
         const snapshot = await getDocs(messagesQuery);
 
-        const matchingMessages = snapshot.docs.filter((item) => status === "archives"
-            ? ["valide", "rejete", "traite"].includes(item.data().status)
-            : item.data().status === status);
+        const matchingMessages = snapshot.docs.filter((item) => status === "envoyes"
+            ? item.data().adminReplyBy === auth.currentUser.uid
+            : status === "archives"
+                ? ["valide", "rejete", "traite"].includes(item.data().status)
+                : item.data().status === status);
         if (!matchingMessages.length) {
             adminMessagesStatus.textContent = status === "archives"
                 ? "Aucun message dans les archives pour cette catégorie."
-                : category === "idee" ? "Aucune idée reçue dans la boîte de réception."
-                    : category === "maj" ? "Aucun commentaire sur les MAJ reçu."
-                        : "Aucun problème signalé dans la boîte de réception.";
+                : status === "envoyes" ? "Aucune réponse envoyée dans cette catégorie."
+                    : category === "idee" ? "Aucune idée reçue dans la boîte de réception."
+                        : category === "maj" ? "Aucun commentaire sur les MAJ reçu."
+                            : "Aucun problème signalé dans la boîte de réception.";
             return;
         }
 
         adminMessagesStatus.textContent = matchingMessages.length + (matchingMessages.length > 1 ? " message(s)" : " message")
-            + (status === "archives" ? " dans les archives" : " dans les messages reçus");
+            + (status === "archives" ? " dans les archives" : status === "envoyes" ? " dans la boîte d’envoi" : " dans les messages reçus");
         const sortedMessages = [...matchingMessages].sort((left, right) => {
             const leftDate = left.data().createdAt;
             const rightDate = right.data().createdAt;
@@ -11684,7 +11807,7 @@ async function loadAdminMessages(category = activeMessageCategory, status = acti
             const meta = document.createElement("small");
             meta.textContent = (message.senderEmail || "Adresse e-mail inconnue")
                 + " • " + formatAdminMessageDate(message.createdAt)
-                + " • " + (columnStatus === "valide" ? "Validé" : columnStatus === "rejete" ? "Rejeté" : columnStatus === "traite" ? "Ancien message traité" : "À lire");
+                + " • " + (status === "envoyes" ? "Réponse envoyée" : columnStatus === "valide" ? "Validé" : columnStatus === "rejete" ? "Rejeté" : columnStatus === "traite" ? "Ancien message traité" : "À lire");
             const copy = document.createElement("p");
             copy.className = "admin-message-copy";
             copy.textContent = message.message || "Message vide";
@@ -11695,6 +11818,58 @@ async function loadAdminMessages(category = activeMessageCategory, status = acti
                 item.append(title, meta, updateContext, copy);
             } else {
                 item.append(title, meta, copy);
+            }
+
+            if (message.adminReply) {
+                const reply = document.createElement("div");
+                reply.className = "admin-message-reply";
+                const replyTitle = document.createElement("strong");
+                replyTitle.textContent = "Réponse de l’Admin · " + formatAdminMessageDate(message.adminReplyAt);
+                const replyCopy = document.createElement("p");
+                replyCopy.textContent = message.adminReply;
+                reply.append(replyTitle, replyCopy);
+                item.append(reply);
+            }
+
+            if (status !== "envoyes") {
+                const replyForm = document.createElement("form");
+                replyForm.className = "admin-message-reply-form";
+                const replyLabel = document.createElement("label");
+                replyLabel.textContent = message.adminReply ? "Modifier ta réponse" : "Répondre au joueur";
+                const replyInput = document.createElement("textarea");
+                replyInput.maxLength = 2000;
+                replyInput.required = true;
+                replyInput.value = message.adminReply || "";
+                replyInput.placeholder = "Écris ta réponse…";
+                const replySubmit = document.createElement("button");
+                replySubmit.type = "submit";
+                replySubmit.className = "primary-button";
+                replySubmit.textContent = message.adminReply ? "Mettre à jour la réponse" : "Envoyer la réponse";
+                replyForm.append(replyLabel, replyInput, replySubmit);
+                replyForm.addEventListener("submit", async (event) => {
+                    event.preventDefault();
+                    const replyText = replyInput.value.trim();
+                    if (replyText.length < 3 || replyText.length > 2000) {
+                        adminMessagesStatus.textContent = "La réponse doit contenir entre 3 et 2 000 caractères.";
+                        return;
+                    }
+                    replySubmit.disabled = true;
+                    try {
+                        await updateDoc(doc(db, "messages", messageDoc.id), {
+                            adminReply: replyText,
+                            adminReplyAt: serverTimestamp(),
+                            adminReplyBy: auth.currentUser.uid
+                        });
+                        await loadAdminMessages(category, status);
+                    } catch (error) {
+                        console.error("Impossible d’envoyer la réponse au joueur :", error);
+                        adminMessagesStatus.textContent = error.code === "permission-denied"
+                            ? "Réponse refusée. Publie les règles Firestore mises à jour."
+                            : "La réponse n’a pas pu être envoyée. Réessaie.";
+                        replySubmit.disabled = false;
+                    }
+                });
+                item.append(replyForm);
             }
 
             const actions = document.createElement("div");
@@ -11719,8 +11894,8 @@ async function loadAdminMessages(category = activeMessageCategory, status = acti
                 return button;
             };
             if (status === "archives") actions.append(makeAction("Supprimer", "delete"));
-            else actions.append(makeAction("Valider", "valide"), makeAction("Rejeter", "rejete"), makeAction("Supprimer", "delete"));
-            item.append(actions);
+            else if (status !== "envoyes") actions.append(makeAction("Valider", "valide"), makeAction("Rejeter", "rejete"), makeAction("Supprimer", "delete"));
+            if (actions.childElementCount) item.append(actions);
             return item;
         };
 
@@ -11762,6 +11937,8 @@ feedbackToggleButton.addEventListener("click", () => {
     feedbackToggleButton.setAttribute("aria-expanded", String(willOpen));
     if (willOpen) feedbackCategory.focus();
 });
+playerInboxOpenButton.addEventListener("click", () => { void openPlayerMessagingPage(); });
+playerInboxRefreshButton.addEventListener("click", () => { void loadPlayerInbox(); });
 
 feedbackForm.addEventListener("submit", async (event) => {
     event.preventDefault();
@@ -11793,7 +11970,7 @@ feedbackForm.addEventListener("submit", async (event) => {
             createdAt: serverTimestamp()
         });
         feedbackForm.reset();
-        feedbackStatus.textContent = "Message envoyé à l’Admin. Merci !";
+        feedbackStatus.textContent = "Message envoyé à l’Admin. Tu le retrouveras aussi dans Ma messagerie.";
     } catch (error) {
         console.error("Erreur d’envoi du message :", error);
         feedbackStatus.textContent = error.code === "permission-denied"
@@ -11809,6 +11986,9 @@ document.querySelectorAll("[data-message-category]").forEach((button) => {
 });
 messageArchivesButton.addEventListener("click", () => {
     loadAdminMessages(activeMessageCategory, activeMessageStatus === "archives" ? "nouveau" : "archives");
+});
+adminMessagesOutboxButton.addEventListener("click", () => {
+    loadAdminMessages(activeMessageCategory, activeMessageStatus === "envoyes" ? "nouveau" : "envoyes");
 });
 
 function buildUniqueCardsWorkbookXml(players, effectifMonths = [], effectifPlayers = []) {
@@ -12092,10 +12272,18 @@ adminMessagesMenuButton.addEventListener("click", async () => {
     bottomNav.classList.add("hidden");
     archivesPage.classList.add("hidden");
     messagingPage.classList.remove("hidden");
+    playerMessagingView = false;
+    playerInboxSection.classList.add("hidden");
+    adminMessagesSection.classList.remove("hidden");
+    messagingPageTitle.textContent = "💬 Messagerie Admin";
+    messagingBackButton.textContent = "← Retour au menu Admin";
     await loadAdminMessages("idee");
 });
 
-messagingBackButton.addEventListener("click", returnToAdminHubOrHome);
+messagingBackButton.addEventListener("click", () => {
+    if (playerMessagingView) showHomePage();
+    else returnToAdminHubOrHome();
+});
 
 document.querySelectorAll(".admin-menu-button").forEach((button) => {
     button.addEventListener("click", () => {
@@ -12402,4 +12590,5 @@ if ("serviceWorker" in navigator) {
 </body>
 
 </html>
+
 
