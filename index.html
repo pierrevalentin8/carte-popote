@@ -6406,7 +6406,7 @@ termsBackButton.addEventListener("click", showHomePage);
 const PREMIUM_REWARD_TYPES = [
     { value: "tokens", label: "Jetons classiques" },
     { value: "premium", label: "Jetons Premium" },
-    { value: "booster", label: "Booster classique" },
+    { value: "booster", label: "Booster classique · Saison 2" },
     { value: "premiumBooster", label: "Booster Premium (3 cartes)" },
     { value: "card", label: "Carte de la collection" }
 ];
@@ -6427,7 +6427,7 @@ function premiumRewardDescription(prize) {
     const labels = {
         tokens: amount + (amount > 1 ? " jetons" : " jeton"),
         premium: amount + (amount > 1 ? " jetons Premium" : " jeton Premium"),
-        booster: amount + (amount > 1 ? " boosters classiques" : " booster classique"),
+        booster: amount + (amount > 1 ? " boosters classiques · Saison 2" : " booster classique · Saison 2"),
         premiumBooster: "Booster Premium • 3 cartes selon les probabilités configurées",
         card: prize.rewardCardName ? (amount > 1 ? amount + " exemplaires de « " + prize.rewardCardName + " »" : "Carte « " + prize.rewardCardName + " »") : "Carte surprise"
     };
@@ -6444,7 +6444,7 @@ function showPremiumPrizeReveal(prize, isTest = false) {
     const iconPaths = {
         tokens: "./Jeton.png",
         premium: "./Jeton%20premium.png",
-        booster: "./Booster%20normal.png",
+        booster: "./Booster%20normal%20Saison%202.png",
         premiumBooster: "./Booster%20premium.png"
     };
     const imagePath = iconPaths[prize.rewardType];
@@ -6484,7 +6484,7 @@ function renderPremiumPrizeList(prizes) {
     const stepDegrees = slotCount ? 360 / slotCount : 0;
     const colors = ["#7422a5", "#1667bc", "#bc8118", "#b72b91", "#a32634", "#4c38aa", "#167f9c", "#8244b3"];
     const icons = { premium: "💎", card: "🃏" };
-    const iconImages = { tokens: "./Jeton.png", booster: "./Booster%20normal.png", premiumBooster: "./Booster%20premium.png" };
+    const iconImages = { tokens: "./Jeton.png", booster: "./Booster%20normal%20Saison%202.png", premiumBooster: "./Booster%20premium.png" };
     const stageHeight = premiumWheel.parentElement.clientHeight || 320;
     const reelRadius = Math.max(110, stageHeight * 0.455);
     const panelHeight = Math.max(52, 2 * reelRadius * Math.tan(Math.PI / Math.max(slotCount, 1)));
@@ -7392,8 +7392,8 @@ premiumSpinButton.addEventListener("click", async () => {
         premiumBalanceDisplay.textContent = premiumBalanceCount.toLocaleString("fr-FR");
         updatePremiumBoosterButton();
         document.getElementById("playerTokens").textContent = Number(data.tokens).toLocaleString("fr-FR");
-        document.getElementById("playerBoosters").textContent = Number(data.boostersDisponibles).toLocaleString("fr-FR");
-        setOpenBoosterButton(data.boostersDisponibles);
+        document.getElementById("playerBoosters").textContent = (Number(data.boostersDisponibles || 0) + Number(data.boostersSaison2Disponibles || 0)).toLocaleString("fr-FR");
+        setOpenBoosterButton(data.boostersDisponibles, data.boostersSaison2Disponibles);
         if (Number.isFinite(Number(data.cartesTirees))) document.getElementById("playerCards").textContent = Number(data.cartesTirees).toLocaleString("fr-FR");
         if (Number.isFinite(Number(data.xp))) updatePlayerXpDisplay(data.xp);
         const boosterResult = data.prize.boosterResult;
