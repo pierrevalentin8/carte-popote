@@ -2991,6 +2991,145 @@ body:has(#appPage .app-content:not(.hidden)) {
   .player-profile, .exchange-page, .activity-page, .admin-page { animation:none; }
   .cooperation-gauge-track.is-complete { animation:none; }
 }
+
+/* Classement, Catalogue et Recyclage */
+#appPage:has(.leaderboard-page:not(.hidden)),
+#appPage:has(#collectionPage:not(.hidden)),
+#appPage:has(#recyclingPage:not(.hidden)) {
+  background:
+    radial-gradient(ellipse at 8% 5%,rgba(255,255,255,.84),transparent 34rem),
+    radial-gradient(ellipse at 92% 22%,rgba(179,218,161,.3),transparent 30rem),
+    linear-gradient(155deg,#e4efdf,#d6e7d0 52%,#edf4e9);
+}
+.leaderboard-page, #collectionPage, #recyclingPage {
+  color:#24442d;
+  animation:seasonPageEnter .22s ease-out both;
+}
+.leaderboard-page h2, #collectionPage h2, #recyclingPage h2 { color:#205c32; }
+.leaderboard-intro, .leaderboard-status,
+.collection-search-label, .collection-search-status,
+.recycling-rarity-filter, .recycle-duplicates-status { color:#526d58; }
+.leaderboard-list { gap:12px; }
+.leaderboard-row {
+  border-color:rgba(51,119,63,.32);
+  border-radius:16px;
+  background:linear-gradient(145deg,#fff,#f0f7ec);
+  box-shadow:0 6px 0 rgba(37,94,48,.06),0 10px 20px rgba(24,75,38,.12),inset 0 1px #fff;
+  transition:transform .17s ease,box-shadow .17s ease,border-color .17s ease;
+}
+.leaderboard-row:hover { transform:translateY(-2px); border-color:rgba(51,119,63,.58); box-shadow:0 8px 0 rgba(37,94,48,.05),0 14px 24px rgba(24,75,38,.17),inset 0 1px #fff; }
+.leaderboard-row:nth-child(1) { border-color:rgba(202,159,51,.68); background:linear-gradient(145deg,#fffdf2,#f8f0d8); }
+.leaderboard-row:nth-child(2) { background:linear-gradient(145deg,#fff,#eef2f2); }
+.leaderboard-row:nth-child(3) { background:linear-gradient(145deg,#fff9f3,#f5e9df); }
+.leaderboard-rank { background:linear-gradient(145deg,#39824a,#174b2b); color:#fff0b6; box-shadow:0 3px 7px rgba(20,71,34,.22),inset 0 1px rgba(255,255,255,.28); }
+.leaderboard-rank-avatar { background:#1d5932; box-shadow:0 0 0 3px rgba(40,117,61,.1),0 4px 10px rgba(21,69,34,.2); }
+.leaderboard-rank-avatar span { border-color:#fff; }
+.leaderboard-name { color:#214d2e; }
+.leaderboard-total { color:#805d13; }
+.player-collection { color:#24442d; }
+.player-collection h2 { color:#205c32; }
+.collection-season-toggle button:not(.collection-season-card-button) {
+  border-color:#347b43;
+  background:linear-gradient(145deg,#39824a,#174b2b);
+  color:#fff;
+  box-shadow:0 4px 0 #164327,0 7px 13px rgba(24,75,38,.18),inset 0 1px rgba(255,255,255,.25);
+  transition:transform .15s ease,box-shadow .15s ease,filter .15s ease;
+}
+.collection-season-toggle button:not(.collection-season-card-button):hover { transform:translateY(-2px); filter:brightness(1.06); box-shadow:0 6px 0 #164327,0 10px 16px rgba(24,75,38,.2),inset 0 1px rgba(255,255,255,.33); }
+.collection-season-toggle button[aria-pressed="true"]:not(.collection-season-card-button) { border-color:#b38c2b; background:linear-gradient(145deg,#f6df91,#dcae36); color:#28452b; box-shadow:0 4px 0 #9d7823,0 7px 13px rgba(76,59,18,.16),inset 0 1px rgba(255,255,255,.72); }
+.collection-season-toggle .collection-season-card-button { border-color:#39824a; box-shadow:0 5px 0 rgba(28,76,39,.13),0 9px 15px rgba(24,75,38,.18); transition:transform .16s ease,box-shadow .16s ease; }
+.collection-season-toggle .collection-season-card-button:hover { transform:translateY(-3px); box-shadow:0 7px 0 rgba(28,76,39,.1),0 13px 19px rgba(24,75,38,.22); }
+.collection-season-toggle .collection-season-card-button[aria-pressed="true"] { border-color:#d8ae45; box-shadow:0 0 0 2px rgba(216,174,69,.32),0 7px 16px rgba(24,75,38,.22); }
+.collection-display-toggle button, .collection-page-nav button {
+  border-color:#3d8048;
+  border-radius:10px;
+  background:linear-gradient(145deg,#fff,#eaf4e6);
+  color:#245331;
+  box-shadow:0 3px 0 rgba(35,92,46,.12),0 5px 9px rgba(24,75,38,.1),inset 0 1px #fff;
+  transition:transform .14s ease,box-shadow .14s ease,filter .14s ease;
+}
+.collection-display-toggle button:hover, .collection-page-nav button:hover:not(:disabled) { transform:translateY(-2px); box-shadow:0 5px 0 rgba(35,92,46,.1),0 8px 12px rgba(24,75,38,.15),inset 0 1px #fff; }
+.collection-display-toggle button[aria-pressed="true"], .collection-page-nav button:not(:disabled) { border-color:#b38c2b; background:linear-gradient(145deg,#f6df91,#dcae36); color:#28452b; }
+.collection-album-sheet {
+  border-color:#b6973e;
+  box-shadow:0 10px 24px rgba(29,75,38,.2),inset 0 0 0 4px rgba(255,255,255,.58);
+}
+.collection-search, .collection-rarity-filter, .recycling-rarity-filter select {
+  border-color:#9ab892;
+  border-radius:10px;
+  box-shadow:0 3px 9px rgba(24,75,38,.08),inset 0 1px #fff;
+}
+.album-slot { border-color:rgba(106,136,95,.42); }
+.album-slot.is-empty { background:rgba(224,237,218,.48); }
+.album-card { box-shadow:0 4px 10px rgba(29,65,35,.18); transition:transform .16s ease,box-shadow .16s ease; }
+.album-card:hover { transform:translateY(-3px) scale(1.015); box-shadow:0 9px 17px rgba(29,65,35,.25); }
+.recycling-global-stat {
+  border-color:rgba(52,126,64,.32);
+  background:linear-gradient(145deg,#fff,#e9f4e5);
+  color:#526d58;
+  box-shadow:0 4px 12px rgba(24,75,38,.1),inset 0 1px #fff;
+}
+.recycling-global-stat strong { color:#1c6735; }
+.recycle-selection-toolbar {
+  border-color:rgba(52,126,64,.35);
+  border-radius:14px;
+  background:linear-gradient(145deg,#fff,#edf6e9);
+  color:#31563a;
+  box-shadow:0 6px 16px rgba(24,75,38,.1),inset 0 1px #fff;
+}
+.recycling-copy-option {
+  border-color:rgba(52,126,64,.3);
+  border-radius:14px;
+  background:linear-gradient(145deg,#fff,#eef6eb);
+  color:#24442d;
+  box-shadow:0 5px 12px rgba(24,75,38,.1),inset 0 1px #fff;
+  transition:transform .15s ease,box-shadow .15s ease,border-color .15s ease;
+}
+.recycling-copy-option:hover { transform:translateY(-2px); box-shadow:0 8px 16px rgba(24,75,38,.15),inset 0 1px #fff; }
+.recycling-copy-option:has(input:checked) { border-color:#38854a; background:linear-gradient(145deg,#f7fff3,#e3f3dc); box-shadow:0 0 0 2px rgba(56,133,74,.16),0 7px 15px rgba(24,75,38,.14); }
+.recycling-copy-option input { accent-color:#28753d; }
+.recycling-copy-option small { color:#607565; }
+.recycling-rarity-filter { color:#31563a; }
+.recycle-duplicates-status { padding:7px 10px; border-radius:9px; background:rgba(255,255,255,.65); }
+.player-collection #recycleDuplicatesButton {
+  border:1px solid #2d713e;
+  border-radius:11px;
+  background:linear-gradient(145deg,#39874b,#1d6033);
+  color:#fff;
+  box-shadow:0 4px 0 #17492a,0 7px 12px rgba(20,71,34,.18),inset 0 1px rgba(255,255,255,.28);
+  transition:transform .14s ease,box-shadow .14s ease,filter .14s ease;
+}
+.player-collection #recycleDuplicatesButton:hover:not(:disabled) { transform:translateY(-2px); filter:brightness(1.07); box-shadow:0 6px 0 #17492a,0 10px 15px rgba(20,71,34,.22),inset 0 1px rgba(255,255,255,.34); }
+.player-collection #recycleDuplicatesButton:disabled { border-color:#a7b3a4; background:linear-gradient(145deg,#d9e1d6,#c8d1c4); color:#667263; box-shadow:0 2px 0 #a9b3a5; opacity:1; }
+@media (max-width:620px) {
+  .leaderboard-page, .player-collection { padding:16px 12px calc(102px + env(safe-area-inset-bottom,0px)); }
+  .leaderboard-row { gap:8px; padding:10px; }
+  .leaderboard-name-line { align-items:flex-start; }
+  .collection-season-toggle { gap:8px; }
+  .collection-season-toggle .collection-season-card-button { width:78px; height:112px; }
+  .collection-album-sheet { margin-top:12px; padding:12px 8px 14px 25px; }
+  .collection-album-sheet::before { left:6px; width:12px; background-size:12px 50px; }
+  .collection-album-grid { gap:6px; }
+  .recycling-cards-grid { grid-template-columns:repeat(2,minmax(0,1fr)); gap:9px; }
+  .recycling-copy-option { padding:9px 7px; }
+  .recycling-copy-option img, .recycling-card-placeholder { max-width:105px; }
+  .recycle-selection-toolbar { align-items:stretch; }
+  .player-collection #recycleDuplicatesButton { width:100%; }
+}
+@media (max-width:380px) {
+  .collection-season-toggle .collection-season-card-button { width:68px; height:98px; }
+  .collection-album-sheet { padding-left:20px; }
+  .collection-album-grid { gap:4px; }
+  .album-slot { padding:3px; border-radius:7px; }
+  .album-missing-number { top:4px; left:4px; min-width:21px; height:21px; font-size:10px; }
+  .leaderboard-row { grid-template-columns:48px minmax(0,1fr); }
+  .leaderboard-rank-avatar { width:48px; height:48px; }
+  .leaderboard-rarity-grid { gap:4px; }
+}
+@media (prefers-reduced-motion:reduce) {
+  .leaderboard-page, #collectionPage, #recyclingPage { animation:none; }
+  .leaderboard-row, .collection-season-toggle button, .album-card, .recycling-copy-option { transition:none; }
+}
 </style>
 
 </head>
