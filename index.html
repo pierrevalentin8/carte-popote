@@ -603,6 +603,9 @@ body {
     background: #eefaff;
 }
 
+.dropdown-menu #openNormalBoosterButton { border:1px solid #329447; background:#f3fff4; color:#246e36; }
+.dropdown-menu #openNormalBoosterButton:disabled { border-color:#d7ddd7; background:#f0f1ee; color:#858b85; cursor:not-allowed; }
+
 
 .dropdown-menu .logout {
 
@@ -2835,6 +2838,8 @@ body:has(.app-content:not(.hidden)) { background:#f3faf1; color:#173b52; }
             <button id="saleMenuButton" type="button">🛒 Vente entre joueurs</button>
             <button id="seasonOneShopMenuButton" type="button">🃏 Acheter une carte · Saison 1</button>
             <button id="buyNormalBoosterButton" class="hidden" type="button">Booster Saison 1</button>
+            <button id="openNormalBoosterButton" type="button" disabled>Ouvrir un booster Saison 1</button>
+            <span id="normalBoosterStockCount" class="hidden">0</span>
 
 
 
@@ -3007,27 +3012,6 @@ body:has(.app-content:not(.hidden)) { background:#f3faf1; color:#173b52; }
                 <p class="cooperation-reward-note">Une récompense collective lorsqu’une jauge est complétée</p>
             </article>
 
-
-            <article class="booster booster-classic booster-season-one">
-
-                <span class="booster-visual">
-                    <img loading="lazy" decoding="async" class="booster-image" src="./Booster%20normal.png" alt="Illustration du booster classique Cartes & Popote">
-                    <strong class="booster-stock-badge"><span id="normalBoosterStockCount">0</span> en stock</strong>
-                </span>
-
-                <h4>
-                    Booster classique · Saison 1
-                </h4>
-
-                <p>
-                    5 cartes
-                </p>
-
-                <button id="openNormalBoosterButton" type="button" disabled>
-                    Ouvrir un booster (0)
-                </button>
-
-            </article>
 
             <article class="booster booster-classic booster-season-two">
                 <span class="booster-visual">
@@ -9048,7 +9032,7 @@ function setOpenBoosterButton(count, season2Count) {
     document.getElementById("playerBoosters").textContent = (available + season2BoosterStock).toLocaleString("fr-FR");
     document.getElementById("normalBoosterStockCount").textContent = available.toLocaleString("fr-FR");
     document.getElementById("season2BoosterStockCount").textContent = season2BoosterStock.toLocaleString("fr-FR");
-    openNormalBoosterButton.textContent = "Ouvrir un booster";
+    openNormalBoosterButton.textContent = "Ouvrir un booster Saison 1";
     openNormalBoosterButton.disabled = available < 1;
     openSeason2BoosterButton.disabled = season2BoosterStock < 1;
     const nextAvailable = nextNormalBoosterSeason === "Saison 2" ? season2BoosterStock > 0 : available > 0;
