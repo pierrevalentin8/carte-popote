@@ -4391,7 +4391,9 @@ function tryShowPendingExchangeOffer() {
     if (blocked) return;
     activeExchangeOffer = pendingExchangeOffers[0];
     exchangeOfferMessage.textContent = `${activeExchangeOffer.senderPseudo || "Un joueur"} te propose un échange.`;
-    exchangeOfferDetails.textContent = `${activeExchangeOffer.senderPseudo || "Un joueur"} te propose sa carte n° ${activeExchangeOffer.offeredNumber} contre ta carte n° ${activeExchangeOffer.requestedNumber}.`;
+    const offeredSeason = Number(activeExchangeOffer.offeredSeason) || 1;
+    const requestedSeason = Number(activeExchangeOffer.requestedSeason) || 1;
+    exchangeOfferDetails.textContent = `${activeExchangeOffer.senderPseudo || "Un joueur"} te propose sa carte Saison ${offeredSeason} · n° ${activeExchangeOffer.offeredNumber} contre ta carte Saison ${requestedSeason} · n° ${activeExchangeOffer.requestedNumber}.`;
     exchangeOfferStatus.textContent = "";
     exchangeOfferAccept.disabled = false;
     exchangeOfferRefuse.disabled = false;
