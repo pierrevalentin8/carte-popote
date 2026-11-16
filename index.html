@@ -1494,6 +1494,11 @@ body {
 .message-compose-card { display: flex; justify-content: flex-end; gap:8px; flex-wrap:wrap; margin: 10px 0 4px; }
 .message-compose-toggle { display: inline-flex; align-items: center; gap: 7px; padding: 5px 9px; border: 1px solid rgba(243, 191, 56, .45); border-radius: 999px; background: rgba(16, 38, 74, .72); color: #fbfaf5; font: inherit; font-size: 12px; font-weight: 700; cursor: pointer; }
 .message-compose-toggle img { display: block; width: 34px; height: 30px; object-fit: contain; }
+.message-compose-toggle { position:relative; }
+.inbox-unread-badge { position:absolute; top:-7px; right:-7px; min-width:22px; height:22px; padding:0 6px; display:inline-flex; align-items:center; justify-content:center; border:2px solid #fff; border-radius:999px; background:#c93636; color:#fff; font-size:12px; font-weight:900; box-shadow:0 2px 6px rgba(0,0,0,.24); }
+.inbox-filter-row { display:flex; flex-wrap:wrap; gap:12px; margin:12px 0; }
+.inbox-filter-row label { flex:1 1 180px; color:#173b52; font-size:13px; font-weight:800; }
+.inbox-filter-row .admin-field { margin:5px 0 0; }
 .feedback-form-panel { margin: 0 0 14px auto; max-width: 470px; padding: 14px; border: 1px solid rgba(243, 191, 56, .65); border-radius: 14px; background: #10264a; color: #fbfaf5; }
 .feedback-form-panel label { color: #fbfaf5; font-size: 13px; }
 .feedback-form-panel .admin-field { margin: 6px 0 12px; }
@@ -1527,6 +1532,15 @@ body {
 .player-message-meta { display:block; margin-bottom:10px; color:#6e7e7b; font-size:12px; }
 .player-message-copy { white-space:pre-wrap; overflow-wrap:anywhere; line-height:1.5; }
 .player-message-reply { margin-top:12px; padding:12px; border-left:4px solid #d7a51e; border-radius:8px; background:#fff3ce; white-space:pre-wrap; overflow-wrap:anywhere; line-height:1.5; }
+.player-message-preview { margin:8px 0 0; color:#425c69; font-size:13px; }
+.player-message-thread-toggle { margin-top:10px; padding:8px 11px; border:1px solid #b9c9c2; border-radius:9px; background:#fff; color:#173b52; font:inherit; font-weight:800; cursor:pointer; }
+.message-thread { display:grid; gap:9px; margin-top:11px; padding-top:11px; border-top:1px solid #d8dfd9; }
+.message-thread-reply { padding:10px 12px; border-radius:10px; background:#f1f5f3; white-space:pre-wrap; overflow-wrap:anywhere; }
+.message-thread-reply.is-admin { border-left:3px solid #d7a51e; background:#fff3ce; }
+.message-thread-reply small { display:block; margin-bottom:5px; color:#6e7e7b; }
+.message-thread-compose { display:grid; gap:8px; margin-top:4px; }
+.message-thread-compose textarea { width:100%; min-height:72px; padding:10px; border:1px solid #c9d2ca; border-radius:9px; font:inherit; resize:vertical; }
+.message-archive-toggle { margin-left:8px; }
 .player-collection { width: 100%; max-width: 900px; margin: auto; padding: 20px 16px 100px; }
 .player-collection h2 { margin-bottom: 8px; color: #173b52; }
 .collection-display-toggle { display: flex; flex-wrap: wrap; gap: 8px; margin: 14px 0; }
@@ -3060,6 +3074,7 @@ body:has(.app-content:not(.hidden)) { background:#dcebd5; color:#173b52; }
             <button id="playerInboxOpenButton" class="message-compose-toggle" type="button" aria-label="Ouvrir ma boîte de réception">
                 <img loading="lazy" decoding="async" src="./enveloppe.png" alt="">
                 <span>Ma messagerie</span>
+                <span id="playerInboxUnreadBadge" class="inbox-unread-badge hidden" aria-live="polite"></span>
             </button>
             <button id="feedbackToggleButton" class="message-compose-toggle" type="button" aria-expanded="false" aria-controls="feedbackFormPanel" aria-label="Envoyer un message à l’Admin">
                 <img loading="lazy" decoding="async" src="./enveloppe.png" alt="">
@@ -3978,6 +3993,14 @@ body:has(.app-content:not(.hidden)) { background:#dcebd5; color:#173b52; }
         <div id="playerInboxSection" class="admin-panel hidden" style="margin-bottom:16px">
             <h3>Boîte de réception</h3>
             <p class="admin-note">Tes idées, signalements et commentaires sur les annonces MAJ sont conservés ici, avec les réponses de l’Admin.</p>
+            <div class="inbox-filter-row">
+                <label>Catégorie
+                    <select id="playerInboxCategoryFilter" class="admin-field"><option value="all">Toutes</option><option value="idee">Idées</option><option value="probleme">Problèmes</option><option value="maj">Commentaires MAJ</option></select>
+                </label>
+                <label>Afficher
+                    <select id="playerInboxStatusFilter" class="admin-field"><option value="all">Tous les messages</option><option value="unread">Réponses non lues</option><option value="answered">Avec réponse Admin</option><option value="waiting">En attente de réponse</option><option value="archived">Archives</option></select>
+                </label>
+            </div>
             <button id="playerInboxRefreshButton" class="secondary-button" type="button">Actualiser</button>
             <p id="playerInboxStatus" class="admin-status" role="status" aria-live="polite">Chargement de ta messagerie…</p>
             <div id="playerInboxList" class="player-inbox-list" aria-live="polite"></div>
@@ -4325,10 +4348,19 @@ function messageDateMillis(value) {
 }
 
 function hasUnreadAdminReply(message) {
-    if (!String(message?.adminReply || "").trim()) return false;
-    const repliedAt = messageDateMillis(message.adminReplyAt);
+    if (!String(message?.adminReply || "").trim() && !message?.adminLastReplyAt) return false;
+    const repliedAt = messageDateMillis(message.adminLastReplyAt || message.adminReplyAt);
     const readAt = messageDateMillis(message.playerReplyReadAt);
     return !readAt || !repliedAt || repliedAt > readAt;
+}
+
+function updatePlayerInboxUnreadBadge(count) {
+    const unreadCount = Math.max(0, Number(count) || 0);
+    playerInboxUnreadBadge.textContent = unreadCount > 9 ? "9+" : String(unreadCount);
+    playerInboxUnreadBadge.classList.toggle("hidden", unreadCount === 0);
+    playerInboxOpenButton.setAttribute("aria-label", unreadCount
+        ? `Ouvrir ma boîte de réception, ${unreadCount} réponse${unreadCount > 1 ? "s" : ""} non lue${unreadCount > 1 ? "s" : ""}`
+        : "Ouvrir ma boîte de réception");
 }
 
 async function loadUnreadPlayerMessages() {
@@ -4341,6 +4373,7 @@ async function loadUnreadPlayerMessages() {
     try {
         const snapshot = await getDocs(query(collection(db, "messages"), where("senderUid", "==", user.uid)));
         unreadMessageCount = snapshot.docs.filter((messageDoc) => hasUnreadAdminReply(messageDoc.data())).length;
+        updatePlayerInboxUnreadBadge(unreadMessageCount);
         if (!unreadMessageCount) {
             if (unreadMessageShowTimer) window.clearInterval(unreadMessageShowTimer);
             unreadMessageShowTimer = null;
@@ -5094,6 +5127,9 @@ const playerInboxStatus = document.getElementById("playerInboxStatus");
 const playerInboxList = document.getElementById("playerInboxList");
 const playerInboxOpenButton = document.getElementById("playerInboxOpenButton");
 const playerInboxRefreshButton = document.getElementById("playerInboxRefreshButton");
+const playerInboxUnreadBadge = document.getElementById("playerInboxUnreadBadge");
+const playerInboxCategoryFilter = document.getElementById("playerInboxCategoryFilter");
+const playerInboxStatusFilter = document.getElementById("playerInboxStatusFilter");
 const adminMessagesSection = document.getElementById("adminMessagesSection");
 const adminMessagesOutboxButton = document.getElementById("adminMessagesOutboxButton");
 let playerMessagingView = false;
@@ -5740,6 +5776,7 @@ onAuthStateChanged(
             if (unreadMessageShowTimer) window.clearInterval(unreadMessageShowTimer);
             unreadMessageShowTimer = null;
             unreadMessageCount = 0;
+            updatePlayerInboxUnreadBadge(0);
             unreadMessageNoticeDismissedThisSession = false;
             unreadMessageSessionUid = "";
             unreadMessagesModal.classList.add("hidden");
@@ -11759,6 +11796,102 @@ function formatAdminMessageDate(value) {
     }).format(date);
 }
 
+async function loadMessageThread(messageDoc) {
+    const repliesSnapshot = await getDocs(collection(db, "messages", messageDoc.id, "replies"));
+    return repliesSnapshot.docs.map((replyDoc) => ({ id: replyDoc.id, ...replyDoc.data() }))
+        .sort((left, right) => messageDateMillis(left.createdAt) - messageDateMillis(right.createdAt));
+}
+
+function appendThreadReply(container, reply, adminReply = false) {
+    const entry = document.createElement("div");
+    entry.className = "message-thread-reply" + (adminReply ? " is-admin" : "");
+    const meta = document.createElement("small");
+    meta.textContent = `${adminReply ? "Admin" : (reply.senderPseudo || "Joueur")} · ${formatAdminMessageDate(reply.createdAt)}`;
+    const body = document.createElement("p");
+    body.textContent = reply.text || "";
+    entry.append(meta, body);
+    container.append(entry);
+}
+
+async function markMessageReplyRead(messageDoc, message) {
+    if (!hasUnreadAdminReply(message)) return true;
+    try {
+        await updateDoc(messageDoc.ref, { playerReplyReadAt: serverTimestamp() });
+        unreadMessageCount = Math.max(0, unreadMessageCount - 1);
+        updatePlayerInboxUnreadBadge(unreadMessageCount);
+        return true;
+    } catch (error) {
+        console.warn("Impossible de confirmer la lecture de la réponse :", error);
+        return false;
+    }
+}
+
+async function populateMessageThread(thread, messageDoc, message, viewer) {
+    thread.replaceChildren();
+    if (message.adminReply) appendThreadReply(thread, { text: message.adminReply, createdAt: message.adminReplyAt }, true);
+    try {
+        const replies = await loadMessageThread(messageDoc);
+        replies.forEach((reply) => appendThreadReply(thread, reply, reply.senderRole === "admin"));
+    } catch (error) {
+        console.error("Impossible de charger les réponses de la conversation :", error);
+        const warning = document.createElement("p");
+        warning.className = "admin-note";
+        warning.textContent = "Impossible de charger le fil. Vérifie les règles Firestore publiées.";
+        thread.append(warning);
+    }
+
+    const form = document.createElement("form");
+    form.className = "message-thread-compose";
+    const input = document.createElement("textarea");
+    input.maxLength = 2000;
+    input.required = true;
+    input.placeholder = viewer === "admin" ? "Répondre au joueur…" : "Écrire une réponse à l’Admin…";
+    const submit = document.createElement("button");
+    submit.type = "submit";
+    submit.className = "primary-button";
+    submit.textContent = "Envoyer";
+    form.append(input, submit);
+    form.addEventListener("submit", async (event) => {
+        event.preventDefault();
+        const text = input.value.trim();
+        if (text.length < 3 || text.length > 2000) return;
+        submit.disabled = true;
+        try {
+            const user = auth.currentUser;
+            const playerSnapshot = viewer === "admin" ? null : await getDoc(doc(db, "players", user.uid));
+            const replyData = {
+                senderUid: user.uid,
+                senderPseudo: viewer === "admin" ? "Admin" : (playerSnapshot?.data()?.pseudo || "Joueur"),
+                senderRole: viewer,
+                text,
+                createdAt: serverTimestamp()
+            };
+            if (viewer === "admin") {
+                const batch = writeBatch(db);
+                batch.set(doc(collection(db, "messages", messageDoc.id, "replies")), replyData);
+                batch.update(messageDoc.ref, {
+                    adminLastReplyAt: serverTimestamp(),
+                    playerReplyReadAt: null
+                });
+                await batch.commit();
+            } else await addDoc(collection(db, "messages", messageDoc.id, "replies"), replyData);
+            await populateMessageThread(thread, messageDoc, { ...message, ...(viewer === "admin" ? { adminLastReplyAt: new Date(), playerReplyReadAt: null } : {}) }, viewer);
+            if (viewer === "admin") await loadAdminMessages(activeMessageCategory, activeMessageStatus);
+            else await loadPlayerInbox();
+        } catch (error) {
+            console.error("Impossible d’envoyer la réponse dans la conversation :", error);
+            const warning = document.createElement("p");
+            warning.className = "admin-status";
+            warning.textContent = error.code === "permission-denied"
+                ? "Envoi refusé. Publie les règles Firestore mises à jour."
+                : "La réponse n’a pas pu être envoyée. Réessaie.";
+            form.before(warning);
+            submit.disabled = false;
+        }
+    });
+    thread.append(form);
+}
+
 async function loadPlayerInbox() {
     playerInboxList.replaceChildren();
     playerInboxStatus.textContent = "Chargement de ta messagerie…";
@@ -11769,33 +11902,23 @@ async function loadPlayerInbox() {
     }
     try {
         const snapshot = await getDocs(query(collection(db, "messages"), where("senderUid", "==", user.uid)));
-        const unreadReplies = snapshot.docs.filter((messageDoc) => hasUnreadAdminReply(messageDoc.data()));
-        let readMarkingFailed = false;
-        if (unreadReplies.length) {
-            try {
-                await Promise.all(unreadReplies.map((messageDoc) => updateDoc(messageDoc.ref, { playerReplyReadAt: serverTimestamp() })));
-            } catch (error) {
-                readMarkingFailed = true;
-                console.warn("Impossible de marquer les réponses comme lues. Vérifie les règles Firestore déployées.", error);
-            }
-        }
-        unreadMessageCount = 0;
-        if (unreadMessageShowTimer) window.clearInterval(unreadMessageShowTimer);
-        unreadMessageShowTimer = null;
-        const messages = [...snapshot.docs].sort((left, right) => {
-            const leftTime = left.data().createdAt?.toMillis?.() || 0;
-            const rightTime = right.data().createdAt?.toMillis?.() || 0;
-            return rightTime - leftTime;
-        });
+        const messages = [...snapshot.docs].sort((left, right) => messageDateMillis(right.data().createdAt) - messageDateMillis(left.data().createdAt));
         if (!messages.length) {
             playerInboxStatus.textContent = "Ta boîte de réception est vide. Les messages que tu envoies à l’Admin apparaîtront ici.";
+            updatePlayerInboxUnreadBadge(0);
             return;
         }
-        playerInboxStatus.textContent = readMarkingFailed
-            ? `${messages.length} message${messages.length > 1 ? "s" : ""} dans ta messagerie. Impossible de mémoriser leur lecture : les règles Firestore doivent être déployées.`
-            : `${messages.length} message${messages.length > 1 ? "s" : ""} dans ta messagerie.`;
-        messages.forEach((messageDoc) => {
+        let visibleCount = 0;
+        const categoryFilter = playerInboxCategoryFilter.value;
+        const statusFilter = playerInboxStatusFilter.value;
+        for (const messageDoc of messages) {
             const message = messageDoc.data();
+            if (categoryFilter !== "all" && message.category !== categoryFilter) continue;
+            if (statusFilter === "archived" ? message.playerArchived !== true : message.playerArchived === true) continue;
+            if (statusFilter === "unread" && !hasUnreadAdminReply(message)) continue;
+            if (statusFilter === "answered" && !message.adminReply && !message.adminLastReplyAt) continue;
+            if (statusFilter === "waiting" && (message.adminReply || message.adminLastReplyAt)) continue;
+            visibleCount++;
             const article = document.createElement("article");
             article.className = "player-message-item";
             const title = document.createElement("h3");
@@ -11815,23 +11938,60 @@ async function loadPlayerInbox() {
                 article.append(context);
             }
             article.append(copy);
-            if (message.adminReply) {
-                const reply = document.createElement("div");
-                reply.className = "player-message-reply";
-                const replyTitle = document.createElement("strong");
-                replyTitle.textContent = "Réponse de l’Admin · " + formatAdminMessageDate(message.adminReplyAt);
-                const replyText = document.createElement("p");
-                replyText.textContent = message.adminReply;
-                reply.append(replyTitle, replyText);
-                article.append(reply);
-            } else {
-                const waiting = document.createElement("small");
-                waiting.className = "player-message-meta";
-                waiting.textContent = "En attente d’une réponse de l’Admin.";
-                article.append(waiting);
-            }
+            const status = document.createElement("small");
+            status.className = "player-message-meta";
+            status.textContent = hasUnreadAdminReply(message) ? "Réponse de l’Admin · non lue"
+                : (message.adminReply || message.adminLastReplyAt) ? "Réponse de l’Admin · lue" : "En attente d’une réponse de l’Admin";
+            article.append(status);
+            const threadButton = document.createElement("button");
+            threadButton.type = "button";
+            threadButton.className = "player-message-thread-toggle";
+            threadButton.textContent = "Ouvrir la conversation";
+            const thread = document.createElement("div");
+            thread.className = "message-thread hidden";
+            threadButton.addEventListener("click", async () => {
+                const opening = thread.classList.contains("hidden");
+                thread.classList.toggle("hidden", !opening);
+                threadButton.textContent = opening ? "Fermer la conversation" : "Ouvrir la conversation";
+                if (opening) {
+                    const readConfirmed = await markMessageReplyRead(messageDoc, message);
+                    if (readConfirmed && (message.adminReply || message.adminLastReplyAt)) status.textContent = "Réponse de l’Admin · lue";
+                    await populateMessageThread(thread, messageDoc, message, "player");
+                }
+            });
+            const archiveButton = document.createElement("button");
+            archiveButton.type = "button";
+            archiveButton.className = "secondary-button message-archive-toggle";
+            archiveButton.textContent = message.playerArchived ? "Désarchiver" : "Archiver";
+            archiveButton.addEventListener("click", async () => {
+                archiveButton.disabled = true;
+                try {
+                    await updateDoc(messageDoc.ref, { playerArchived: !message.playerArchived });
+                    await loadPlayerInbox();
+                } catch (error) {
+                    console.error("Impossible d’archiver le message :", error);
+                    playerInboxStatus.textContent = "Archivage refusé. Publie les règles Firestore mises à jour.";
+                    archiveButton.disabled = false;
+                }
+            });
+            const actions = document.createElement("div");
+            actions.append(threadButton, archiveButton);
+            article.append(actions, thread);
+            const preview = document.createElement("p");
+            preview.className = "player-message-preview";
+            article.append(preview);
+            void loadMessageThread(messageDoc).then((replies) => {
+                const latest = replies[replies.length - 1];
+                const latestText = latest?.text || message.adminReply || "";
+                if (latestText) preview.textContent = `Dernier échange · ${formatAdminMessageDate(latest?.createdAt || message.adminReplyAt)} · ${latest?.senderPseudo || "Admin"} : ${latestText.slice(0, 130)}${latestText.length > 130 ? "…" : ""}`;
+            }).catch(() => {});
             playerInboxList.append(article);
-        });
+        }
+        unreadMessageCount = messages.filter((messageDoc) => hasUnreadAdminReply(messageDoc.data())).length;
+        updatePlayerInboxUnreadBadge(unreadMessageCount);
+        playerInboxStatus.textContent = visibleCount
+            ? `${visibleCount} conversation${visibleCount > 1 ? "s" : ""} affichée${visibleCount > 1 ? "s" : ""}.`
+            : "Aucune conversation ne correspond à ces filtres.";
     } catch (error) {
         console.error("Impossible de charger la boîte de réception du joueur :", error);
         playerInboxStatus.textContent = error.code === "permission-denied"
@@ -11885,11 +12045,16 @@ async function loadAdminMessages(category = activeMessageCategory, status = acti
         );
         const snapshot = await getDocs(messagesQuery);
 
-        const matchingMessages = snapshot.docs.filter((item) => status === "envoyes"
-            ? item.data().adminReplyBy === auth.currentUser.uid
-            : status === "archives"
-                ? ["valide", "rejete", "traite"].includes(item.data().status)
-                : item.data().status === status);
+        const matchingMessages = [];
+        for (const item of snapshot.docs) {
+            const message = item.data();
+            if (status === "envoyes") {
+                const replies = await loadMessageThread(item);
+                if (message.adminReplyBy === auth.currentUser.uid || replies.some((reply) => reply.senderRole === "admin")) matchingMessages.push(item);
+            } else if (status === "archives" ? ["valide", "rejete", "traite"].includes(message.status) : message.status === status) {
+                matchingMessages.push(item);
+            }
+        }
         if (!matchingMessages.length) {
             adminMessagesStatus.textContent = status === "archives"
                 ? "Aucun message dans les archives pour cette catégorie."
@@ -11933,57 +12098,36 @@ async function loadAdminMessages(category = activeMessageCategory, status = acti
                 item.append(title, meta, copy);
             }
 
-            if (message.adminReply) {
-                const reply = document.createElement("div");
-                reply.className = "admin-message-reply";
-                const replyTitle = document.createElement("strong");
-                replyTitle.textContent = "Réponse de l’Admin · " + formatAdminMessageDate(message.adminReplyAt);
-                const replyCopy = document.createElement("p");
-                replyCopy.textContent = message.adminReply;
-                reply.append(replyTitle, replyCopy);
-                item.append(reply);
+            if (message.adminReply || message.adminLastReplyAt) {
+                const receipt = document.createElement("small");
+                receipt.className = "player-message-meta";
+                receipt.textContent = hasUnreadAdminReply(message)
+                    ? "Réponse non lue par le joueur"
+                    : "Réponse lue le " + formatAdminMessageDate(message.playerReplyReadAt);
+                item.append(receipt);
             }
 
-            if (status !== "envoyes") {
-                const replyForm = document.createElement("form");
-                replyForm.className = "admin-message-reply-form";
-                const replyLabel = document.createElement("label");
-                replyLabel.textContent = message.adminReply ? "Modifier ta réponse" : "Répondre au joueur";
-                const replyInput = document.createElement("textarea");
-                replyInput.maxLength = 2000;
-                replyInput.required = true;
-                replyInput.value = message.adminReply || "";
-                replyInput.placeholder = "Écris ta réponse…";
-                const replySubmit = document.createElement("button");
-                replySubmit.type = "submit";
-                replySubmit.className = "primary-button";
-                replySubmit.textContent = message.adminReply ? "Mettre à jour la réponse" : "Envoyer la réponse";
-                replyForm.append(replyLabel, replyInput, replySubmit);
-                replyForm.addEventListener("submit", async (event) => {
-                    event.preventDefault();
-                    const replyText = replyInput.value.trim();
-                    if (replyText.length < 3 || replyText.length > 2000) {
-                        adminMessagesStatus.textContent = "La réponse doit contenir entre 3 et 2 000 caractères.";
-                        return;
-                    }
-                    replySubmit.disabled = true;
-                    try {
-                        await updateDoc(doc(db, "messages", messageDoc.id), {
-                            adminReply: replyText,
-                            adminReplyAt: serverTimestamp(),
-                            adminReplyBy: auth.currentUser.uid
-                        });
-                        await loadAdminMessages(category, status);
-                    } catch (error) {
-                        console.error("Impossible d’envoyer la réponse au joueur :", error);
-                        adminMessagesStatus.textContent = error.code === "permission-denied"
-                            ? "Réponse refusée. Publie les règles Firestore mises à jour."
-                            : "La réponse n’a pas pu être envoyée. Réessaie.";
-                        replySubmit.disabled = false;
-                    }
-                });
-                item.append(replyForm);
-            }
+            const threadButton = document.createElement("button");
+            threadButton.type = "button";
+            threadButton.className = "player-message-thread-toggle";
+            threadButton.textContent = status === "envoyes" ? "Voir la conversation" : "Ouvrir / répondre";
+            const thread = document.createElement("div");
+            thread.className = "message-thread hidden";
+            threadButton.addEventListener("click", async () => {
+                const opening = thread.classList.contains("hidden");
+                thread.classList.toggle("hidden", !opening);
+                threadButton.textContent = opening ? "Fermer la conversation" : (status === "envoyes" ? "Voir la conversation" : "Ouvrir / répondre");
+                if (opening) await populateMessageThread(thread, messageDoc, message, "admin");
+            });
+            item.append(threadButton, thread);
+            const preview = document.createElement("p");
+            preview.className = "player-message-preview";
+            item.append(preview);
+            void loadMessageThread(messageDoc).then((replies) => {
+                const latest = replies[replies.length - 1];
+                const latestText = latest?.text || message.adminReply || "";
+                if (latestText) preview.textContent = `Dernier échange · ${formatAdminMessageDate(latest?.createdAt || message.adminReplyAt)} · ${latest?.senderPseudo || "Admin"} : ${latestText.slice(0, 130)}${latestText.length > 130 ? "…" : ""}`;
+            }).catch(() => {});
 
             const actions = document.createElement("div");
             actions.className = "admin-actions";
@@ -12052,6 +12196,8 @@ feedbackToggleButton.addEventListener("click", () => {
 });
 playerInboxOpenButton.addEventListener("click", () => { void openPlayerMessagingPage(); });
 playerInboxRefreshButton.addEventListener("click", () => { void loadPlayerInbox(); });
+playerInboxCategoryFilter.addEventListener("change", () => { void loadPlayerInbox(); });
+playerInboxStatusFilter.addEventListener("change", () => { void loadPlayerInbox(); });
 
 feedbackForm.addEventListener("submit", async (event) => {
     event.preventDefault();
