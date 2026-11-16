@@ -2354,7 +2354,18 @@ body {
 .exchange-ads-heading { margin-top: 27px; font-size: 19px; }
 .exchange-ads-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr)); gap: 13px; }
 .exchange-ad { position: relative; padding: 17px 18px 16px; border: 1px solid #b9aa87; border-radius: 5px; background: repeating-linear-gradient(0deg, rgba(116,93,54,.045) 0 1px, transparent 1px 4px), linear-gradient(135deg, #fffdf5, #eee6d2); color: #292b31; box-shadow: 0 8px 18px rgba(0,0,0,.24), inset 0 0 0 4px rgba(255,255,255,.48); }
-.exchange-ad-title { display: block; padding-bottom: 8px; margin-bottom: 11px; border-bottom: 1px dashed #a5987e; color: #163a70; font-family: Georgia, serif; font-size: 15px; font-weight: 900; }
+.exchange-ad-title { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding-bottom: 8px; border-bottom: 1px dashed #a5987e; color: #163a70; font-family: Georgia, serif; font-size: 15px; font-weight: 900; cursor: pointer; list-style: none; }
+.exchange-ad-title::-webkit-details-marker { display: none; }
+.exchange-ad-title::after { content: "⌄"; color: #94700c; font: 900 18px/1 system-ui, sans-serif; transition: transform .18s ease; }
+.exchange-ad[open] > .exchange-ad-title::after { transform: rotate(180deg); }
+.exchange-ad-title:focus-visible { outline: 2px solid #c89d2e; outline-offset: 3px; border-radius: 3px; }
+.exchange-player-name { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.exchange-possible-count { display: inline-flex; flex: 0 0 auto; align-items: center; gap: 4px; padding: 3px 7px; border: 1px solid #a8790b; border-radius: 999px; background: linear-gradient(135deg,#fff1b3,#f4d46e); color: #614700; font: 800 11px/1.1 system-ui,sans-serif; box-shadow: inset 0 1px rgba(255,255,255,.8),0 1px 3px rgba(0,0,0,.12); }
+.exchange-ad-details { padding-top: 7px; }
+.exchange-pending-section { margin-top: 12px; padding: 10px 11px; border: 1px solid #d1a72a; border-radius: 9px; background: rgba(255,246,209,.75); }
+.exchange-pending-section h4 { margin: 0 0 5px; color: #694d09; font: 900 13px/1.35 system-ui,sans-serif; }
+.exchange-pending-trade { margin: 5px 0 0; color: #44391f; font: 13px/1.45 system-ui,sans-serif; }
+.exchange-pending-trade strong { color: #173a70; }
 .exchange-ad p { margin: 6px 0 0; font-family: Georgia, serif; font-size: 15px; line-height: 1.55; }
 .exchange-ad-label { font-weight: 700; }
 .exchange-trade-button { display: block; min-width: 130px; margin: 14px 0 0 auto; padding: 9px 15px; border: 1px solid #d7a51e; border-radius: 9px; background: linear-gradient(135deg, #ffe17b, #edb52b); color: #10264a; font: inherit; font-size: 13px; font-weight: 900; cursor: pointer; box-shadow: 0 3px 0 #a8780b, 0 5px 9px rgba(0,0,0,.18); }
@@ -5196,6 +5207,7 @@ exchangeComposeSubmit.addEventListener("click", async () => {
     exchangeComposeStatus.textContent = "Envoi de la demande…";
     try {
         await callCreateExchangeOffer({ recipientId: exchangeOfferTarget.id, offeredNumber, offeredSeason, requestedNumber, requestedSeason });
+        const targetPlayerId = exchangeOfferTarget.id;
         const targetPseudo = exchangeOfferTarget.pseudo || "ce joueur";
         exchangeComposeStatus.textContent = `Demande envoyée à ${targetPseudo}. Il la recevra sur le site.`;
         exchangeAdsStatus.textContent = `Ta demande d’échange a été envoyée à ${targetPseudo}.`;
@@ -5204,6 +5216,7 @@ exchangeComposeSubmit.addEventListener("click", async () => {
             exchangeComposeModal.setAttribute("aria-hidden", "true");
             exchangeOfferTarget = null;
             exchangeComposeSubmit.disabled = false;
+            void showExchangePage(targetPlayerId);
         }, 1100);
     } catch (error) {
         console.error("Envoi de la demande d’échange impossible :", error);
@@ -5855,7 +5868,7 @@ function showHomePage() {
     leaderboardMenuButton.classList.remove("active");
 }
 
-async function showExchangePage() {
+async function showExchangePage(expandPlayerId = "") {
     if (!auth.currentUser) return;
     dropdownMenu.classList.add("hidden");
     document.querySelector(".app-content").classList.add("hidden");
@@ -5883,12 +5896,27 @@ async function showExchangePage() {
             : "Tu as déjà toutes les cartes échangeables actuellement disponibles.";
         const ads = Array.isArray(response.ads) ? response.ads : [];
         ads.forEach((ad) => {
-            const article = document.createElement("article");
+            const article = document.createElement("details");
             article.className = "exchange-ad";
-            const title = document.createElement("strong");
+            article.open = ad.id === expandPlayerId;
+            const title = document.createElement("summary");
             title.className = "exchange-ad-title";
-            title.textContent = ad.pseudo || "Joueur";
+            const playerName = document.createElement("span");
+            playerName.className = "exchange-player-name";
+            playerName.textContent = ad.pseudo || "Joueur";
+            title.append(playerName);
+            const possibleCount = Number(ad.possibleExchangeCount) || 0;
+            if (possibleCount > 0) {
+                const badge = document.createElement("span");
+                badge.className = "exchange-possible-count";
+                badge.textContent = "↔ " + possibleCount;
+                badge.title = possibleCount + " échange" + (possibleCount > 1 ? "s" : "") + " possible" + (possibleCount > 1 ? "s" : "") + " avec ce joueur";
+                badge.setAttribute("aria-label", badge.title);
+                title.append(badge);
+            }
             article.append(title);
+            const details = document.createElement("div");
+            details.className = "exchange-ad-details";
             const appendNumberLine = (label, cards, emptyMessage) => {
                 const paragraph = document.createElement("p");
                 const lineLabel = document.createElement("span");
@@ -5902,26 +5930,46 @@ async function showExchangePage() {
                         const number = document.createElement("span");
                         number.className = card.rarity === "rare" ? "exchange-rarity-rare"
                             : card.rarity === "legendaire" ? "exchange-rarity-legendary" : "exchange-rarity-common";
-                        number.textContent = `${Number(card.season) || 1}-${card.number}`;
-                        number.title = `Saison ${Number(card.season) || 1} · ` + (card.rarity === "rare" ? "Carte rare" : card.rarity === "legendaire" ? "Carte légendaire" : "Carte commune");
+                        number.textContent = (Number(card.season) || 1) + "-" + card.number;
+                        number.title = "Saison " + (Number(card.season) || 1) + " · " + (card.rarity === "rare" ? "Carte rare" : card.rarity === "legendaire" ? "Carte légendaire" : "Carte commune");
                         numbers.append(number);
                     });
                     paragraph.append(numbers);
                 } else {
                     paragraph.append(document.createTextNode(" " + emptyMessage));
                 }
-                article.append(paragraph);
+                details.append(paragraph);
             };
             appendNumberLine("Tu as celles qui l’intéressent :", Array.isArray(ad.sendableNumbers) ? ad.sendableNumbers : [], "aucune de tes cartes en double ne l’intéresse.");
             appendNumberLine("Il a celles qui t’intéressent :", Array.isArray(ad.offerNumbers) ? ad.offerNumbers : [], "aucune de ses cartes en double ne te manque.");
+            const pendingTrades = Array.isArray(ad.pendingTrades) ? ad.pendingTrades : [];
+            if (pendingTrades.length) {
+                const pendingSection = document.createElement("section");
+                pendingSection.className = "exchange-pending-section";
+                const pendingHeading = document.createElement("h4");
+                pendingHeading.textContent = "Échange en attente de réponse";
+                pendingSection.append(pendingHeading);
+                pendingTrades.forEach((trade) => {
+                    const line = document.createElement("p");
+                    line.className = "exchange-pending-trade";
+                    const offered = "Saison " + (Number(trade.offeredSeason) || 1) + " · n° " + (Number(trade.offeredNumber) || "?");
+                    const requested = "Saison " + (Number(trade.requestedSeason) || 1) + " · n° " + (Number(trade.requestedNumber) || "?");
+                    line.textContent = trade.direction === "sent"
+                        ? "Tu proposes " + offered + " contre " + requested + " ; sa réponse est attendue."
+                        : (ad.pseudo || "Ce joueur") + " propose " + offered + " contre ta carte " + requested + " ; ta réponse est attendue.";
+                    pendingSection.append(line);
+                });
+                details.append(pendingSection);
+            }
             if (Array.isArray(ad.sendableNumbers) && ad.sendableNumbers.length && Array.isArray(ad.offerNumbers) && ad.offerNumbers.length) {
                 const tradeButton = document.createElement("button");
                 tradeButton.type = "button";
                 tradeButton.className = "exchange-trade-button";
-                tradeButton.textContent = "Echanger";
+                tradeButton.textContent = "Échanger";
                 tradeButton.addEventListener("click", () => openExchangeComposer(ad));
-                article.append(tradeButton);
+                details.append(tradeButton);
             }
+            article.append(details);
             exchangeAdsList.append(article);
         });
         exchangeAdsStatus.textContent = ads.length
