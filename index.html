@@ -1850,6 +1850,13 @@ body {
 .profile-premium-badge img { display: block; width: 100%; height: 100%; object-fit: contain; }
 .profile-edit-toggle { margin-top: 12px; }
 .profile-badges { margin-top: 18px; padding: 14px; border: 1px solid rgba(243,191,56,.42); border-radius: 14px; background: rgba(251,250,245,.07); color: var(--theme-cream); }
+.profile-stats-disclosure { margin: 18px 0 0; overflow: hidden; border: 1px solid rgba(243,191,56,.42); border-radius: 14px; background: rgba(251,250,245,.07); color: var(--theme-cream); }
+.profile-stats-disclosure > summary { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 13px 15px; color: var(--theme-gold-light); font-weight: 850; cursor: pointer; list-style: none; }
+.profile-stats-disclosure > summary::-webkit-details-marker { display: none; }
+.profile-stats-disclosure > summary::after { content: "+"; color: var(--theme-gold-light); font-size: 21px; line-height: 1; }
+.profile-stats-disclosure[open] > summary::after { content: "−"; }
+.profile-stats-disclosure .profile-stats-grid { margin: 0; padding: 0 12px 12px; }
+.profile-stats-disclosure .profile-tracking-note { margin: 0; padding: 0 14px 13px; }
 .profile-badges h3 { margin: 0 0 10px; color: var(--theme-gold-light); font-size: 16px; }
 .profile-badges-empty { margin: 0; color: #c6d2e5; font-size: 13px; }
 .profile-badge-list { display: grid; gap: 9px; }
@@ -3744,7 +3751,9 @@ body:has(#appPage .app-content:not(.hidden)) {
                 </div>
                 <span id="profileXpCaption" class="profile-xp-caption">0 / 100 XP vers le niveau 2</span>
             </section>
-            <div class="profile-stats-grid" aria-label="Statistiques personnelles">
+            <details id="profileStatsDisclosure" class="profile-stats-disclosure">
+            <summary>📊 Statistiques</summary>
+            <div class="profile-stats-grid" aria-label="Statistiques du joueur">
                 <article id="profileTokensEarnedCard" class="profile-stat">
                     <span id="profileTokensEarned" class="profile-stat-value">0</span>
                     <span class="profile-stat-label">Jetons obtenus</span>
@@ -3762,7 +3771,12 @@ body:has(#appPage .app-content:not(.hidden)) {
                 <article class="profile-stat">
                     <span class="profile-stat-icon" aria-hidden="true">🃏</span>
                     <span id="profileCardsCollected" class="profile-stat-value">0</span>
-                    <span class="profile-stat-label">Cartes collectées</span>
+                    <span class="profile-stat-label">Cartes différentes possédées</span>
+                </article>
+                <article class="profile-stat">
+                    <span class="profile-stat-icon" aria-hidden="true">🎴</span>
+                    <span id="profileCardsDrawn" class="profile-stat-value">0</span>
+                    <span class="profile-stat-label">Cartes tirées</span>
                 </article>
                 <article class="profile-stat">
                     <span class="profile-stat-icon" aria-hidden="true">🤝</span>
@@ -3780,6 +3794,8 @@ body:has(#appPage .app-content:not(.hidden)) {
                     <span class="profile-stat-label">Dépensés en Premium</span>
                 </article>
             </div>
+            <p class="profile-tracking-note">Totaux cumulés, distincts des soldes disponibles. Les jetons reçus avant la mise en place du suivi peuvent manquer.</p>
+            </details>
             <section id="profileDashboard" class="profile-dashboard hidden" aria-labelledby="profileDashboardTitle">
                 <h3 id="profileDashboardTitle">Mon tableau de bord</h3>
                 <div class="profile-dashboard-collection-panel">
@@ -3795,7 +3811,6 @@ body:has(#appPage .app-content:not(.hidden)) {
                 <h3 id="profileFavoriteCardTitle">★ Carte favorite</h3>
                 <button id="profileFavoriteCardContent" class="profile-favorite-card-content" type="button" aria-label="Agrandir la carte favorite"></button>
             </section>
-            <p class="profile-tracking-note">Totaux cumulés, distincts des soldes disponibles. Les jetons reçus avant la mise en place du suivi peuvent manquer.</p>
             <details id="profileHistory" class="profile-history hidden">
                 <summary id="profileHistoryTitle">Mon historique</summary>
                 <div class="profile-history-content">
@@ -8738,6 +8753,8 @@ async function loadPersonalProfile(playerId = auth.currentUser?.uid) {
                 }
                 player.unlockedBadgeIds = badgeResponse.data.unlockedBadgeIds || [];
                 player.eventBadges = badgeResponse.data.eventBadges || [];
+                player.cartesTirees = Number(badgeResponse.data.cartesTirees) || 0;
+                player.cartesUniques = Number(badgeResponse.data.cartesUniques) || 0;
                 player.badgeEquipped = badgeResponse.data.badgeEquipped || "";
                 player.commonSeasonOneProgress = Number(badgeResponse.data.commonSeasonOneProgress) || 0;
                 player.rareSeasonOneProgress = Number(badgeResponse.data.rareSeasonOneProgress) || 0;
@@ -8765,6 +8782,8 @@ async function loadPersonalProfile(playerId = auth.currentUser?.uid) {
         }
         const createdAt = player.createdAt || player.accountCreatedAt || player.dateCreation;
         document.getElementById("profileExchangesCount").textContent = (Number(player.echangesEffectues) || 0).toLocaleString("fr-FR");
+        profileCardsCollected.textContent = Math.max(0, Number(player.cartesUniques) || 0).toLocaleString("fr-FR");
+        document.getElementById("profileCardsDrawn").textContent = Math.max(0, Number(player.cartesTirees) || 0).toLocaleString("fr-FR");
         document.getElementById("profileAccountDates").textContent = createdAt ? "Compte créé le " + formatProfileDate(createdAt) : "Date de création indisponible";
         profileServiceTime.textContent = formatServiceWorkDuration(player.serviceTimeMs ?? player.archivesTotalWorkMs ?? 0);
         profileDailyObjectivesCompleted.textContent = Math.max(0, Number(player.dailyObjectivesCompleted) || 0).toLocaleString("fr-FR");
