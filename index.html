@@ -3375,6 +3375,15 @@ body:has(#appPage .app-content:not(.hidden)):not(:has(#archivesPage:not(.hidden)
 .daily-objectives-page .daily-objective { padding:14px 15px; }
 .daily-objectives-page .daily-objective-top { min-height:0; align-items:center; font-size:14px; }
 .daily-objectives-page .daily-objective-track { height:11px; }
+.home-profile-button .avatar.premium-paid-this-month {
+  border:3px solid #d18aff !important;
+  box-shadow:0 0 0 3px rgba(186,91,242,.32),0 0 16px rgba(198,100,255,.72),0 0 28px rgba(170,75,230,.36);
+}
+.leaderboard-rank-avatar.premium-paid-this-month {
+  box-shadow:0 0 0 3px rgba(188,91,242,.35),0 0 0 6px rgba(209,138,255,.9),0 0 19px rgba(188,91,242,.62),0 4px 10px rgba(0,0,0,.25);
+}
+@media(min-width:601px) { .leaderboard-row { grid-template-columns:58px minmax(135px,1fr) minmax(280px,2fr); } }
+.leaderboard-standard-avatar { border-color:#70889b; --podium-color:#d7e4d7; }
 @media(max-width:600px) {
   .daily-objectives-page { padding:15px 12px 96px; }
   .daily-objectives-page .daily-objectives-card { padding:12px; }
@@ -5782,6 +5791,23 @@ function renderPlayerAvatar(avatarId) {
     playerAvatar.append(image);
 }
 
+function setPremiumPaidThisMonthAvatar(isPaid) {
+    playerAvatar.classList.toggle("premium-paid-this-month", isPaid === true);
+    playerAvatar.title = isPaid === true ? "Achat de jetons Premium effectué ce mois-ci" : "";
+}
+
+async function refreshPremiumPaidThisMonthAvatar(uid) {
+    if (!uid || !auth.currentUser || auth.currentUser.uid !== uid) return;
+    try {
+        const response = await callGetMyPremiumSpending();
+        if (!auth.currentUser || auth.currentUser.uid !== uid) return;
+        setPremiumPaidThisMonthAvatar(response.data?.hasPaidThisMonth === true);
+    } catch (error) {
+        console.warn("Statut des achats Premium du mois indisponible :", error);
+        setPremiumPaidThisMonthAvatar(false);
+    }
+}
+
 avatarChoices.forEach((choice) => {
     choice.addEventListener("click", () => {
         selectedSignupAvatar = choice.dataset.avatar;
@@ -6670,6 +6696,7 @@ onAuthStateChanged(
             dailyObjectivesHomeButton.classList.add("hidden");
             dailyObjectivesPage.classList.add("hidden");
             dailyObjectivesCompletedToday = 0;
+            setPremiumPaidThisMonthAvatar(false);
             dailyObjectivesList.replaceChildren();
             if (unreadMessageShowTimer) window.clearInterval(unreadMessageShowTimer);
             unreadMessageShowTimer = null;
@@ -6861,6 +6888,7 @@ onAuthStateChanged(
                     playerSnapshot.data();
 
                 renderPlayerAvatar(player.avatar);
+                void refreshPremiumPaidThisMonthAvatar(user.uid);
                 setDailyBoosterButton(player.boosterJournalierDate);
 
 
@@ -8923,6 +8951,7 @@ async function loadPersonalProfile(playerId = auth.currentUser?.uid) {
                 const spendingResponse = await callGetMyPremiumSpending();
                 const totalAmountCents = Number(spendingResponse.data.totalAmountCents) || 0;
                 player.hasPremiumBadge = spendingResponse.data.hasPremiumBadge === true;
+                if (auth.currentUser?.uid === playerId) setPremiumPaidThisMonthAvatar(spendingResponse.data.hasPaidThisMonth === true);
             player.badgeEquipped = player.badgeEquipped || "";
                 const badgeResponse = await callGetPublicPlayerProfile({ playerId });
                 player.serviceTimeMs = Number(badgeResponse.data.serviceTimeMs) || 0;
@@ -9339,24 +9368,21 @@ async function loadLeaderboard() {
             const row = document.createElement("article");
             row.className = "leaderboard-row";
             const rankNumber = Number(player.rang);
-            let rank;
-            if (rankNumber >= 1 && rankNumber <= 3) {
-                rank = document.createElement("div");
-                rank.className = "leaderboard-rank-avatar " + ["leaderboard-podium-gold", "leaderboard-podium-silver", "leaderboard-podium-bronze"][rankNumber - 1];
-                const avatar = document.createElement("img");
-                setPlayerAvatarImage(avatar, player.avatar);
-                avatar.alt = "Avatar de " + (player.pseudo || "Joueur");
-                avatar.loading = "lazy";
-                const podiumNumber = document.createElement("span");
-                podiumNumber.textContent = String(rankNumber);
-                podiumNumber.setAttribute("aria-hidden", "true");
-                rank.append(avatar, podiumNumber);
-                rank.setAttribute("aria-label", `${rankNumber}${rankNumber === 1 ? "er" : "e"} du classement : ${player.pseudo || "Joueur"}`);
-            } else {
-                rank = document.createElement("span");
-                rank.className = "leaderboard-rank";
-                rank.textContent = "#" + player.rang;
-            }
+            const rank = document.createElement("div");
+            rank.className = "leaderboard-rank-avatar " + (rankNumber >= 1 && rankNumber <= 3
+                ? ["leaderboard-podium-gold", "leaderboard-podium-silver", "leaderboard-podium-bronze"][rankNumber - 1]
+                : "leaderboard-standard-avatar");
+            if (player.premiumPaidThisMonth === true) rank.classList.add("premium-paid-this-month");
+            const avatar = document.createElement("img");
+            setPlayerAvatarImage(avatar, player.avatar);
+            avatar.alt = "Avatar de " + (player.pseudo || "Joueur");
+            avatar.loading = "lazy";
+            const podiumNumber = document.createElement("span");
+            podiumNumber.textContent = String(rankNumber);
+            podiumNumber.setAttribute("aria-hidden", "true");
+            rank.append(avatar, podiumNumber);
+            rank.setAttribute("aria-label", `${rankNumber}${rankNumber === 1 ? "er" : "e"} du classement : ${player.pseudo || "Joueur"}${player.premiumPaidThisMonth === true ? ", achat de jetons Premium ce mois-ci" : ""}`);
+            if (player.premiumPaidThisMonth === true) rank.title = "Achat de jetons Premium effectué ce mois-ci";
             const playerInfo = document.createElement("div");
             playerInfo.className = "leaderboard-player";
             const name = document.createElement("button");
