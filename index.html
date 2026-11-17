@@ -8879,8 +8879,9 @@ function renderProfileBadges(player, isOwnProfile) {
     (player.eventBadges || []).forEach((badge) => {
         if (badge?.id && badge?.name && badge?.imageUrl) badgeCatalog[badge.id] = { id: badge.id, label: badge.name, image: badge.imageUrl };
     });
-    const unlockedBadges = (player.unlockedBadgeIds || (player.hasPremiumBadge === true ? ["premium-10"] : []))
-        .map((badgeId) => badgeCatalog[badgeId]).filter(Boolean);
+    const unlockedBadgeIds = new Set(player.unlockedBadgeIds || (player.hasPremiumBadge === true ? ["premium-10"] : []));
+    if (Math.max(0, Number(player.echangesEffectues) || 0) >= 5) unlockedBadgeIds.add("exchange-5");
+    const unlockedBadges = [...unlockedBadgeIds].map((badgeId) => badgeCatalog[badgeId]).filter(Boolean);
     profileBadgesEmpty.classList.toggle("hidden", unlockedBadges.length > 0);
     profileBadgesEmpty.textContent = isOwnProfile
         ? "Aucun badge débloqué pour le moment. Saison 1 : " + (Number(player.commonSeasonOneProgress) || 0) + "/27 communes, " + (Number(player.rareSeasonOneProgress) || 0) + "/30 rares et " + (Number(player.legendarySeasonOneProgress) || 0) + "/17 légendaires. Saison 2 : " + (Number(player.commonSeasonTwoProgress) || 0) + "/55 communes, " + (Number(player.rareSeasonTwoProgress) || 0) + "/29 rares et " + (Number(player.legendarySeasonTwoProgress) || 0) + "/18 légendaires."
