@@ -1852,7 +1852,14 @@ body {
 .profile-badges { margin-top: 18px; padding: 14px; border: 1px solid rgba(243,191,56,.42); border-radius: 14px; background: rgba(251,250,245,.07); color: var(--theme-cream); }
 .profile-badges h3 { margin: 0 0 10px; color: var(--theme-gold-light); font-size: 16px; }
 .profile-badges-empty { margin: 0; color: #c6d2e5; font-size: 13px; }
-.profile-badge-list { display: flex; flex-wrap: wrap; gap: 10px; }
+.profile-badge-list { display: grid; gap: 9px; }
+.profile-badge-category { overflow: hidden; border: 1px solid rgba(243,191,56,.28); border-radius: 12px; background: rgba(16,38,74,.35); }
+.profile-badge-category summary { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 11px 13px; color: var(--theme-cream); font-weight: 800; cursor: pointer; list-style: none; }
+.profile-badge-category summary::-webkit-details-marker { display: none; }
+.profile-badge-category summary::after { content: "+"; color: var(--theme-gold-light); font-size: 20px; line-height: 1; }
+.profile-badge-category[open] summary::after { content: "−"; }
+.profile-badge-category-count { margin-left: auto; color: #c6d2e5; font-size: 12px; font-weight: 600; }
+.profile-badge-category-content { display: flex; flex-wrap: wrap; gap: 10px; padding: 0 10px 10px; }
 .profile-badge-option { display: flex; align-items: center; gap: 9px; padding: 8px 11px; border: 1px solid rgba(243,191,56,.45); border-radius: 12px; background: rgba(16,38,74,.7); color: var(--theme-cream); }
 .profile-badge-option.is-equipped { border-color: var(--theme-gold-light); box-shadow: 0 0 0 2px rgba(243,191,56,.2); }
 .profile-badge-option img { width: 40px; height: 40px; object-fit: contain; }
@@ -8820,6 +8827,7 @@ async function loadPersonalProfile(playerId = auth.currentUser?.uid) {
 function renderProfileBadges(player, isOwnProfile) {
     profileBadgesSection.classList.remove("hidden");
     profileBadgesSection.setAttribute("aria-hidden", "false");
+    const previouslyOpenCategories = new Set(Array.from(profileBadgeList.querySelectorAll("details[open]"), (category) => category.dataset.badgeCategory));
     profileBadgeList.replaceChildren();
     const badgeCatalog = {
         "premium-10": { id: "premium-10", label: "Premium 10 €", image: "./badge-premium-10.png" },
@@ -8853,7 +8861,40 @@ function renderProfileBadges(player, isOwnProfile) {
     profileBadgesEmpty.textContent = isOwnProfile
         ? "Aucun badge débloqué pour le moment. Saison 1 : " + (Number(player.commonSeasonOneProgress) || 0) + "/27 communes, " + (Number(player.rareSeasonOneProgress) || 0) + "/30 rares et " + (Number(player.legendarySeasonOneProgress) || 0) + "/17 légendaires. Saison 2 : " + (Number(player.commonSeasonTwoProgress) || 0) + "/55 communes, " + (Number(player.rareSeasonTwoProgress) || 0) + "/29 rares et " + (Number(player.legendarySeasonTwoProgress) || 0) + "/18 légendaires."
         : "Aucun badge débloqué pour le moment.";
+    const badgeCategoryForId = (id) => {
+        if (["common-season-1", "rare-season-1", "legendary-season-1", "season-1-complete"].includes(id)) return "Saison 1";
+        if (["common-season-2", "rare-season-2", "legendary-season-2", "season-2-complete"].includes(id)) return "Saison 2";
+        if (["service-50h", "service-200h", "service-500h"].includes(id)) return "Service";
+        if (id === "exchange-5") return "Échanges";
+        if (id.startsWith("classic-tokens-")) return "Jetons classiques";
+        if (id.startsWith("premium-")) return "Premium";
+        if (id.startsWith("level-")) return "Niveaux";
+        return "Événements et autres";
+    };
+    const badgeCategories = new Map();
     unlockedBadges.forEach((badge) => {
+        const categoryName = badgeCategoryForId(badge.id);
+        if (!badgeCategories.has(categoryName)) badgeCategories.set(categoryName, []);
+        badgeCategories.get(categoryName).push(badge);
+    });
+    const categoryOrder = ["Saison 1", "Saison 2", "Échanges", "Jetons classiques", "Premium", "Service", "Niveaux", "Événements et autres"];
+    categoryOrder.forEach((categoryName) => {
+        const badges = badgeCategories.get(categoryName);
+        if (!badges?.length) return;
+        const category = document.createElement("details");
+        category.className = "profile-badge-category";
+        category.dataset.badgeCategory = categoryName;
+        category.open = previouslyOpenCategories.has(categoryName);
+        const summary = document.createElement("summary");
+        const title = document.createElement("span");
+        title.textContent = categoryName;
+        const count = document.createElement("span");
+        count.className = "profile-badge-category-count";
+        count.textContent = badges.length + (badges.length > 1 ? " badges" : " badge");
+        summary.append(title, count);
+        const content = document.createElement("div");
+        content.className = "profile-badge-category-content";
+        badges.forEach((badge) => {
         const option = document.createElement("div");
         const isEquipped = player.badgeEquipped === badge.id;
         option.className = "profile-badge-option" + (isEquipped ? " is-equipped" : "");
@@ -8903,7 +8944,10 @@ function renderProfileBadges(player, isOwnProfile) {
             equipped.textContent = "Badge affiché";
             option.append(equipped);
         }
-        profileBadgeList.append(option);
+        content.append(option);
+        });
+        category.append(summary, content);
+        profileBadgeList.append(category);
     });
 }
 
