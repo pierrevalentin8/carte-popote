@@ -3130,6 +3130,48 @@ body:has(#appPage .app-content:not(.hidden)) {
   .leaderboard-page, #collectionPage, #recyclingPage { animation:none; }
   .leaderboard-row, .collection-season-toggle button, .album-card, .recycling-copy-option { transition:none; }
 }
+.bottom-nav {
+  position: fixed;
+  z-index: 180;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-evenly;
+  box-sizing: border-box;
+  height: calc(76px + env(safe-area-inset-bottom, 0px));
+  padding: 4px 8px env(safe-area-inset-bottom, 0px);
+  gap: 8px;
+  border-top: 1px solid rgba(40,117,61,.38);
+  border-radius: 16px 16px 0 0;
+  background: linear-gradient(180deg,rgba(250,255,248,.98),rgba(226,241,220,.99));
+  box-shadow: 0 -7px 22px rgba(24,75,38,.18), inset 0 1px #fff;
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+}
+.bottom-nav.hidden { display: flex !important; }
+.bottom-nav .nav-item {
+  color: #607967;
+  transition: color .16s ease, transform .16s ease, background .16s ease;
+}
+.bottom-nav .nav-item:hover { color: #174b2e; transform: translateY(-2px); }
+.bottom-nav .nav-item.active { color: #1c6a35; }
+.bottom-nav .nav-image-button {
+  flex: 0 0 54px;
+  width: 54px;
+  height: 54px;
+  border: 1px solid rgba(185,144,46,.88);
+  background: linear-gradient(145deg,#39884b,#174c2b);
+  box-shadow: 0 3px 0 #17472a, 0 7px 12px rgba(20,71,34,.2), inset 0 1px rgba(255,255,255,.35);
+}
+@media (min-width: 700px) {
+  .bottom-nav { right: auto; left: 50%; width: min(100%,700px); transform: translateX(-50%); }
+}
+@media (max-width: 380px) {
+  .bottom-nav { gap: 4px; padding-right: 5px; padding-left: 5px; }
+  .bottom-nav .nav-image-button { flex-basis: 50px; width: 50px; height: 50px; }
+}
 </style>
 
 </head>
