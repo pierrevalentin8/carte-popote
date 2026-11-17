@@ -1298,6 +1298,10 @@ body {
 .service-admin-grid label { display:grid; gap:4px; font-weight:600; }
 .service-admin-grid input,.service-admin-grid select,.service-admin-grid textarea,.service-filter { min-width:0; padding:7px; border:2px inset #eee; border-radius:0; background:#fff; color:#111; }
 .service-admin-list { display:grid; gap:8px; margin-top:14px; }
+.service-admin-toolbar { display:flex; align-items:end; justify-content:space-between; gap:12px; flex-wrap:wrap; margin:10px 0; }
+.service-admin-toolbar label { display:grid; gap:5px; min-width:min(100%,240px); font-weight:700; }
+.service-admin-toolbar .admin-field { margin:0; }
+.service-admin-archive-empty { grid-column:1/-1; padding:14px; border:1px dashed #888; background:#f5f5f5; text-align:center; }
 .service-admin-row { display:grid; grid-template-columns:minmax(0,1.3fr) minmax(0,1fr) minmax(60px,.5fr) minmax(0,1fr) minmax(60px,.5fr) minmax(60px,.45fr) minmax(0,2fr); gap:8px; align-items:center; padding:8px; border:1px solid #777; background:#eee; }
 .service-admin-header { font-weight:700; background:#b7c6df; }
 .service-row-actions { display:flex; flex-wrap:wrap; gap:4px; }
@@ -1312,6 +1316,7 @@ body {
 .service-active-countdown { margin:14px 0; padding:10px; border:2px inset #eee; background:#000080; color:#fff; font-size:20px; font-weight:bold; text-align:center; font-variant-numeric:tabular-nums; }
 .service-win-status { min-height:22px; margin:10px 0 0; }
 @media(max-width:760px){.service-admin-grid{grid-template-columns:1fr}.service-admin-header{display:none}.service-admin-row{grid-template-columns:1fr 1fr}.service-admin-row>*:first-child,.service-admin-row>*:last-child{grid-column:1/-1}.service-row-actions{display:flex;flex-wrap:wrap}}
+@media(max-width:520px){.service-admin-toolbar{align-items:stretch}.service-admin-toolbar label,.service-admin-toolbar button{width:100%}}
 @media (max-width: 600px) { .home-overview-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; } .home-overview-leaderboard, .home-overview-activity, .home-overview-sale { min-height: 78px; padding: 0; } .home-overview-leaderboard img, .home-overview-activity img, .home-overview-sale img { height: 70px; } }
 .home-site-note { display: grid; justify-items: center; gap: 7px; margin: 20px 0 88px; color: #c6d2e5; font-size: 11px; line-height: 1.45; text-align: center; }
 .home-site-note p { margin: 0; }
@@ -2808,7 +2813,25 @@ body:has(#appPage .app-content:not(.hidden)) {
 #appPage:has(.app-content:not(.hidden)) .home-overview-archive:hover { transform: translateY(-4px) scale(1.035); filter: drop-shadow(0 8px 8px rgba(27,76,39,.24)); }
 #appPage:has(.app-content:not(.hidden)) .home-overview-grid img { filter: drop-shadow(0 4px 3px rgba(22,57,32,.15)); }
 #appPage:has(.app-content:not(.hidden)) .daily-objectives-card { border-color: rgba(40,117,61,.45); background: linear-gradient(145deg, rgba(255,255,255,.96), rgba(231,244,225,.96)); box-shadow: 0 9px 22px rgba(27,76,39,.12), inset 0 1px #fff; }
+#appPage:has(.app-content:not(.hidden)) .daily-objectives-card { position:relative; overflow:hidden; padding:12px; border:1px solid #6f9c4a; border-radius:20px; background:radial-gradient(ellipse at 92% 4%,rgba(245,210,104,.2),transparent 32%),linear-gradient(145deg,#f8fff1,#e5f2dc 70%,#f6ffed); box-shadow:0 9px 0 rgba(37,94,48,.08),0 14px 25px rgba(24,75,38,.14),inset 0 1px #fff; }
+#appPage:has(.app-content:not(.hidden)) .daily-objectives-header { display:grid; grid-template-columns:minmax(0,1fr) auto auto; align-items:center; gap:8px; margin:0 0 11px; padding:11px 13px; border:1px solid rgba(255,228,151,.75); border-radius:13px; background:linear-gradient(110deg,#1b5631,#16432a 68%,#103b25); box-shadow:0 4px 0 rgba(12,53,29,.22),inset 0 1px rgba(255,255,255,.22); }
+#appPage:has(.app-content:not(.hidden)) .daily-objectives-header h3 { color:#fff3c6; font-size:16px; text-shadow:0 1px 4px rgba(0,0,0,.34); }
+#appPage:has(.app-content:not(.hidden)) .daily-objectives-header::after { color:#ffe18b; }
+#appPage:has(.app-content:not(.hidden)) .daily-objectives-date { padding:5px 8px; border:1px solid rgba(255,255,255,.18); border-radius:999px; background:rgba(255,255,255,.1); color:#e6f6e4; text-align:center; white-space:nowrap; }
+#appPage:has(.app-content:not(.hidden)) .daily-objectives-progress { padding:5px 8px; border:1px solid rgba(249,211,105,.55); border-radius:999px; background:rgba(255,215,105,.13); color:#ffe39c; font-size:11px; font-weight:900; white-space:nowrap; }
+#appPage:has(.app-content:not(.hidden)) .daily-objectives-progress.is-complete { border-color:#a6df88; background:linear-gradient(135deg,#d8f5c0,#a5df91); color:#174528; }
+@media(max-width:650px){#appPage:has(.app-content:not(.hidden)) .daily-objectives-header{grid-template-columns:minmax(0,1fr) auto;padding:10px}.daily-objectives-header h3{grid-column:1/-1}.daily-objectives-date{grid-column:1}.daily-objectives-progress{grid-column:2;grid-row:2}}
 #appPage:has(.app-content:not(.hidden)) .daily-objective { border-color: rgba(40,117,61,.2); box-shadow: 0 3px 9px rgba(27,76,39,.08), inset 0 1px #fff; }
+#appPage:has(.app-content:not(.hidden)) .daily-objective { padding:11px 12px; border-color:rgba(60,112,60,.24); border-radius:13px; background:linear-gradient(145deg,#fff,#f7fbf3); box-shadow:0 4px 10px rgba(25,69,34,.09),inset 0 1px #fff; transition:transform .16s ease,border-color .16s ease,box-shadow .16s ease; }
+#appPage:has(.app-content:not(.hidden)) .daily-objective:hover { transform:translateY(-2px); border-color:rgba(66,137,66,.48); box-shadow:0 7px 13px rgba(25,69,34,.13),inset 0 1px #fff; }
+#appPage:has(.app-content:not(.hidden)) .daily-objective-top { min-height:37px; color:#244b31; }
+#appPage:has(.app-content:not(.hidden)) .daily-objective-count { padding:3px 6px; border-radius:999px; background:#edf5e7; color:#2e6940; }
+#appPage:has(.app-content:not(.hidden)) .daily-objective-track { height:9px; margin-top:9px; background:linear-gradient(90deg,#dce8d5,#e8efdf); }
+#appPage:has(.app-content:not(.hidden)) .daily-objective-fill { background:linear-gradient(90deg,#84c95f,#2f914d 72%,#1e6e3c); box-shadow:0 0 8px rgba(47,145,77,.25); }
+#appPage:has(.app-content:not(.hidden)) .daily-objective.is-complete { border-color:#8dbd61; background:linear-gradient(145deg,#f8fff1,#e8f7dc); box-shadow:0 4px 12px rgba(47,117,55,.14),inset 0 0 0 1px rgba(142,190,96,.12); }
+#appPage:has(.app-content:not(.hidden)) .daily-objective.is-complete .daily-objective-count { background:#dff1d1; color:#205c32; }
+#appPage:has(.app-content:not(.hidden)) .daily-objectives-reward { margin:11px 0 0; padding:9px 12px; border:1px solid rgba(77,130,61,.22); border-radius:11px; background:linear-gradient(100deg,rgba(225,242,210,.75),rgba(246,251,239,.92)); color:#3c6543; font-size:12px; }
+#appPage:has(.app-content:not(.hidden)) .daily-objectives-reward.is-earned { border-color:#8cbd68; background:linear-gradient(100deg,#e0f4cd,#f5ffe8); color:#1d6132; box-shadow:inset 0 1px #fff,0 3px 9px rgba(41,115,51,.1); }
 #appPage:has(.app-content:not(.hidden)) .booster { border: 1px solid rgba(44,111,57,.34); border-radius: 20px; background: linear-gradient(145deg, rgba(255,255,255,.97), rgba(239,247,235,.96)); box-shadow: 0 9px 0 rgba(37,94,48,.08), 0 14px 26px rgba(24,75,38,.14), inset 0 1px #fff; transition: transform .18s ease, box-shadow .18s ease; }
 #appPage:has(.app-content:not(.hidden)) .booster:not(#cooperationCard):hover { transform: translateY(-3px); box-shadow: 0 11px 0 rgba(37,94,48,.07), 0 18px 30px rgba(24,75,38,.18), inset 0 1px #fff; }
 #appPage:has(.app-content:not(.hidden)) .booster-daily { background: linear-gradient(145deg, #fbfff9, #edf7e9); }
@@ -2835,6 +2858,8 @@ body:has(#appPage .app-content:not(.hidden)) {
 #appPage:has(.app-content:not(.hidden)) .booster button:disabled { border-color: #a7b3a4; background: linear-gradient(145deg,#d9e1d6,#c8d1c4); color: #667263; box-shadow: 0 2px 0 #a9b3a5; }
 #appPage:has(.app-content:not(.hidden)) .booster-season-two #openSeason2BoosterButton,
 #appPage:has(.app-content:not(.hidden)) .booster-season-two #buySeason2BoosterButton { border-color: #ac8425; background: linear-gradient(145deg,#f4d879,#c99423); color: #193e22; box-shadow: 0 4px 0 #8e6819, 0 7px 12px rgba(77,60,17,.18), inset 0 1px rgba(255,255,255,.62); }
+#appPage:has(.app-content:not(.hidden)) .booster-season-two #openSeason2BoosterButton { display:block; visibility:visible; }
+#appPage:has(.app-content:not(.hidden)) .booster-season-two #openSeason2BoosterButton:disabled { opacity:.78; }
 #appPage:has(.app-content:not(.hidden)) .section-title h3 { color: #174b2e; }
 #appPage:has(.app-content:not(.hidden)) .home-journal-summary { border-color: rgba(40,117,61,.5); background: linear-gradient(145deg,#2b7440,#17492b); box-shadow: 0 4px 0 #113a21, 0 8px 15px rgba(17,58,33,.2), inset 0 1px rgba(255,255,255,.25); }
 #appPage:has(.app-content:not(.hidden)) .home-journal-summary h3 { color: #fff1bd; }
@@ -3506,6 +3531,7 @@ body:has(#appPage .app-content:not(.hidden)) {
         <details id="dailyObjectivesCard" class="daily-objectives-card hidden" aria-labelledby="dailyObjectivesTitle">
             <summary class="daily-objectives-header">
                 <h3 id="dailyObjectivesTitle">🎯 Objectifs du jour</h3>
+                <span id="dailyObjectivesProgress" class="daily-objectives-progress">0 / 3 terminés</span>
                 <span id="dailyObjectivesDate" class="daily-objectives-date"></span>
             </summary>
             <div id="dailyObjectivesList" class="daily-objectives-list" aria-live="polite"></div>
@@ -4497,7 +4523,7 @@ body:has(#appPage .app-content:not(.hidden)) {
             <p id="gavTotalCards" class="admin-note">Cartes tirées par tous les joueurs : —</p>
         </div>
         <div id="adminServiceMissionsSection" class="admin-panel admin-section hidden" style="margin-bottom:16px">
-            <h3>📋 Gestion des missions du Service</h3><label for="serviceAdminFilter">Filtrer par type</label><select id="serviceAdminFilter" class="admin-field"><option value="all">Tous les services</option><option value="internal">Service interne</option><option value="external">Service externe</option></select>
+            <h3>📋 Gestion des missions du Service</h3><div class="service-admin-toolbar"><label for="serviceAdminFilter">Filtrer par type<select id="serviceAdminFilter" class="admin-field"><option value="all">Tous les services</option><option value="internal">Service interne</option><option value="external">Service externe</option></select></label><button id="serviceAdminArchiveToggle" class="service-button" type="button" aria-pressed="false">🗄️ Missions archivées</button></div>
             <div id="serviceAdminList" class="service-admin-list"><div class="service-admin-row service-admin-header"><span>Mission</span><span>Type</span><span>Durée</span><span>Récompense</span><span>Statut</span><span>Ordre</span><span>Actions</span></div></div><button id="serviceMissionCreateButton" class="service-button" type="button">+ Créer une mission</button><div id="serviceMissionEditor" class="hidden"><h4 id="serviceAdminFormTitle">Créer une mission</h4>
             <form id="serviceMissionForm"><div class="service-admin-grid">
                 <label>Nom (obligatoire)<input id="serviceMissionName" maxlength="80" required></label><label>Type de service<select id="serviceMissionType"><option value="internal">Interne</option><option value="external">Externe</option></select></label>
@@ -5702,6 +5728,7 @@ let serviceActiveMission = null;
 let serviceCountdownInterval = null;
 let adminServiceMissions = [];
 let adminServiceCards = [];
+let showArchivedServiceMissions = false;
 let editingServiceMissionId = "";
 let serviceMissionFormSource = null;
 let pendingServiceMission = null;
@@ -7117,6 +7144,13 @@ document.getElementById("serviceConfirmStart").addEventListener("click", async (
     if (mission) await launchSelectedServiceMission(mission);
 });
 document.getElementById("serviceAdminFilter").addEventListener("change", renderAdminServiceMissions);
+document.getElementById("serviceAdminArchiveToggle").addEventListener("click", () => {
+    showArchivedServiceMissions = !showArchivedServiceMissions;
+    const button = document.getElementById("serviceAdminArchiveToggle");
+    button.setAttribute("aria-pressed", String(showArchivedServiceMissions));
+    button.textContent = showArchivedServiceMissions ? "↩ Missions actives" : "🗄️ Missions archivées";
+    renderAdminServiceMissions();
+});
 document.getElementById("serviceMissionCreateButton").addEventListener("click", () => {
     document.getElementById("serviceMissionCancel").click(); document.getElementById("serviceMissionEditor").classList.remove("hidden");
     document.getElementById("serviceMissionName").focus();
@@ -10128,7 +10162,10 @@ function setOpenBoosterButton(count, season2Count) {
     document.getElementById("season2BoosterStockCount").textContent = season2BoosterStock.toLocaleString("fr-FR");
     openNormalBoosterButton.textContent = "Ouvrir un booster Saison 1";
     openNormalBoosterButton.disabled = available < 1;
+    openSeason2BoosterButton.hidden = false;
+    openSeason2BoosterButton.classList.remove("hidden");
     openSeason2BoosterButton.disabled = season2BoosterStock < 1;
+    openSeason2BoosterButton.title = season2BoosterStock < 1 ? "Aucun booster classique Saison 2 disponible" : "Ouvrir un booster classique Saison 2";
     const nextAvailable = nextNormalBoosterSeason === "Saison 2" ? season2BoosterStock > 0 : available > 0;
     openNextBoosterButton.textContent = `Ouvrir le booster suivant · ${nextNormalBoosterSeason}`;
     openNextBoosterButton.classList.toggle("hidden", !nextAvailable);
@@ -10161,6 +10198,7 @@ function getParisDateKey() {
 
 const dailyObjectivesCard = document.getElementById("dailyObjectivesCard");
 const dailyObjectivesDate = document.getElementById("dailyObjectivesDate");
+const dailyObjectivesProgress = document.getElementById("dailyObjectivesProgress");
 const dailyObjectivesList = document.getElementById("dailyObjectivesList");
 const dailyObjectivesReward = document.getElementById("dailyObjectivesReward");
 
@@ -10181,9 +10219,11 @@ async function loadDailyObjectives(uid) {
             const current = snapshot.exists() ? snapshot.data() : state;
             const progress = current.progress || {};
             dailyObjectivesList.replaceChildren();
+            let completedCount = 0;
             (state.objectives || []).forEach((objective) => {
                 const value = Math.max(0, Number(progress[objective.metric] || 0));
                 const ratio = Math.min(100, value / Number(objective.target || 1) * 100);
+                if (ratio >= 100) completedCount += 1;
                 const item = document.createElement("article");
                 item.className = `daily-objective${ratio >= 100 ? " is-complete" : ""}`;
                 const top = document.createElement("div");
@@ -10207,6 +10247,9 @@ async function loadDailyObjectives(uid) {
                 item.append(top, track);
                 dailyObjectivesList.append(item);
             });
+            const objectiveCount = (state.objectives || []).length;
+            dailyObjectivesProgress.textContent = `${completedCount} / ${objectiveCount} terminés`;
+            dailyObjectivesProgress.classList.toggle("is-complete", objectiveCount > 0 && completedCount === objectiveCount);
             const earned = current.rewardGranted === true;
             dailyObjectivesReward.textContent = earned
                 ? "🎉 Objectifs terminés : 1 booster classique Saison 2 ajouté à ton stock !"
@@ -12353,7 +12396,15 @@ function renderAdminServiceMissions() {
     const header = document.createElement("div"); header.className="service-admin-row service-admin-header";
     ["Mission","Type","Durée","Récompense","Statut","Ordre","Actions"].forEach((label)=>{const cell=document.createElement("span");cell.textContent=label;header.append(cell);}); list.append(header);
     const filter = document.getElementById("serviceAdminFilter").value;
-    adminServiceMissions.filter((m) => filter === "all" || m.serviceType === filter).forEach((mission) => {
+    const visibleMissions = adminServiceMissions.filter((mission) => Boolean(mission.archived) === showArchivedServiceMissions && (filter === "all" || mission.serviceType === filter));
+    if (!visibleMissions.length) {
+        const empty = document.createElement("p");
+        empty.className = "service-admin-archive-empty";
+        empty.textContent = showArchivedServiceMissions ? "Aucune mission archivée." : "Aucune mission ne correspond à ce filtre.";
+        list.append(empty);
+        return;
+    }
+    visibleMissions.forEach((mission) => {
         const row = document.createElement("article"); row.className = "service-admin-row";
         const name = document.createElement("strong"); name.textContent = mission.name;
         const type = document.createElement("span"); type.textContent = mission.serviceType === "external" ? "Service externe" : "Service interne";
@@ -12362,7 +12413,13 @@ function renderAdminServiceMissions() {
         const state = document.createElement("span"); state.textContent = mission.isLegacy ? "Ancienne mission" : mission.archived ? "Archivée" : mission.enabled ? "Active" : "Inactive";
         const order = document.createElement("span"); order.textContent = `Ordre ${mission.sortOrder || 0}`;
         const actions = document.createElement("div"); actions.className = "service-row-actions";
-        [["✏️ Modifier", () => fillServiceMissionForm(mission)], [mission.archived ? "Restaurer" : mission.enabled ? "Désactiver" : "Activer", () => saveServiceMissionState(mission, mission.archived ? { archived:false, enabled:true } : { enabled: !mission.enabled })], ["Dupliquer", () => fillServiceMissionForm({ ...mission, id: "", name: `${mission.name} (copie)` })], ["Supprimer", () => saveServiceMissionState(mission, { archived: true, enabled: false }, true)]].forEach(([label, fn]) => { const button = document.createElement("button"); button.className="service-button"; button.type="button"; button.textContent=label; button.addEventListener("click",fn); actions.append(button); });
+        const missionActions = [
+            ["✏️ Modifier", () => fillServiceMissionForm(mission)],
+            [mission.archived ? "Restaurer" : mission.enabled ? "Désactiver" : "Activer", () => saveServiceMissionState(mission, mission.archived ? { archived:false, enabled:true } : { enabled: !mission.enabled })],
+            ["Dupliquer", () => fillServiceMissionForm({ ...mission, id: "", name: `${mission.name} (copie)` })]
+        ];
+        if (!mission.archived && !mission.isLegacy) missionActions.push(["🗄️ Archiver", () => saveServiceMissionState(mission, { archived:true, enabled:false }, true)]);
+        missionActions.forEach(([label, fn]) => { const button = document.createElement("button"); button.className="service-button"; button.type="button"; button.textContent=label; button.addEventListener("click",fn); actions.append(button); });
         row.append(name,type,duration,reward,state,order,actions); list.append(row);
     });
 }
