@@ -3724,6 +3724,11 @@ body:has(#appPage .app-content:not(.hidden)) {
                     <span class="profile-stat-label">Boosters ouverts</span>
                 </article>
                 <article class="profile-stat">
+                    <span class="profile-stat-icon" aria-hidden="true">🎯</span>
+                    <span id="profileDailyObjectivesCompleted" class="profile-stat-value">0</span>
+                    <span class="profile-stat-label">Objectifs journaliers terminés</span>
+                </article>
+                <article class="profile-stat">
                     <span class="profile-stat-icon" aria-hidden="true">🃏</span>
                     <span id="profileCardsCollected" class="profile-stat-value">0</span>
                     <span class="profile-stat-label">Cartes collectées</span>
@@ -5614,6 +5619,7 @@ const profilePremiumSpending = document.getElementById("profilePremiumSpending")
 let viewedOtherPlayerId = null;
 const profileTokensEarned = document.getElementById("profileTokensEarned");
 const profileClassicBoostersOpened = document.getElementById("profileClassicBoostersOpened");
+const profileDailyObjectivesCompleted = document.getElementById("profileDailyObjectivesCompleted");
 const profileCardsCollected = document.getElementById("profileCardsCollected");
 const profileServiceTime = document.getElementById("profileServiceTime");
 const profileHistorySection = document.getElementById("profileHistory");
@@ -8685,6 +8691,7 @@ async function loadPersonalProfile(playerId = auth.currentUser?.uid) {
                 player.rareSeasonTwoProgress = Number(badgeResponse.data.rareSeasonTwoProgress) || 0;
                 player.legendarySeasonTwoProgress = Number(badgeResponse.data.legendarySeasonTwoProgress) || 0;
                 player.boosterJournalierStreak = Number(badgeResponse.data.boosterJournalierStreak) || 0;
+                player.dailyObjectivesCompleted = Number(badgeResponse.data.dailyObjectivesCompleted) || 0;
                 player.favoriteCard = badgeResponse.data.favoriteCard || null;
                 const formattedSpending = (totalAmountCents / 100).toLocaleString("fr-FR", { style: "currency", currency: "EUR" });
                 profilePremiumSpending.textContent = formattedSpending;
@@ -8705,6 +8712,7 @@ async function loadPersonalProfile(playerId = auth.currentUser?.uid) {
         document.getElementById("profileExchangesCount").textContent = (Number(player.echangesEffectues) || 0).toLocaleString("fr-FR");
         document.getElementById("profileAccountDates").textContent = createdAt ? "Compte créé le " + formatProfileDate(createdAt) : "Date de création indisponible";
         profileServiceTime.textContent = formatServiceWorkDuration(player.serviceTimeMs ?? player.archivesTotalWorkMs ?? 0);
+        profileDailyObjectivesCompleted.textContent = Math.max(0, Number(player.dailyObjectivesCompleted) || 0).toLocaleString("fr-FR");
         profileFavoriteCard = player.favoriteCard || null;
         renderProfileFavoriteCard(profileFavoriteCard);
         renderDailyStreakBadge(document.getElementById("profileDailyStreak"), Number(player.boosterJournalierStreak) || 0, "profileDailyStreakCount");
