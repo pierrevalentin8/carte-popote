@@ -3257,8 +3257,23 @@ body:has(#appPage .app-content:not(.hidden)):not(:has(#archivesPage:not(.hidden)
 #appPage:has(.app-content:not(.hidden)) {
   position: relative;
   z-index: 1;
-  background: transparent;
+  min-height: 100dvh;
+  background:
+    radial-gradient(ellipse at 12% 0%, rgba(39,112,62,.42), transparent 34rem),
+    radial-gradient(ellipse at 92% 38%, rgba(22,83,49,.38), transparent 32rem),
+    linear-gradient(155deg, #061e13 0%, var(--page-forest) 46%, #0b3821 100%);
 }
+#appPage:has(.app-content:not(.hidden)):not(:has(#archivesPage:not(.hidden)))::before {
+  content: "";
+  position: fixed;
+  z-index: 0;
+  inset: 0;
+  pointer-events: none;
+  background: url("./Logo.png") no-repeat right 5vw bottom 105px / min(30vw, 300px);
+  opacity: .035;
+  filter: grayscale(1) brightness(1.8);
+}
+#appPage:has(.app-content:not(.hidden)) .app-content { position: relative; z-index: 1; background: transparent; }
 #appPage:has(.app-content:not(.hidden)) .app-content { color: var(--page-ivory); }
 #appPage:has(.app-content:not(.hidden)) .app-header {
   background: linear-gradient(180deg, rgba(8,43,26,.98), rgba(7,35,21,.97));
@@ -3322,7 +3337,7 @@ body:has(#appPage .app-content:not(.hidden)):not(:has(#archivesPage:not(.hidden)
 .exchange-page .exchange-missing-panel h3, .exchange-page .exchange-ads-heading,
 .leaderboard-page .section-title h3 { color: #205c32; }
 @media (max-width: 600px) {
-  body:has(#appPage .app-content:not(.hidden)):not(:has(#archivesPage:not(.hidden)))::before {
+  #appPage:has(.app-content:not(.hidden)):not(:has(#archivesPage:not(.hidden)))::before {
     background-position: right -42px bottom 88px;
     background-size: 190px;
     opacity: .025;
