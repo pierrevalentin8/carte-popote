@@ -6924,8 +6924,8 @@ async function showExchangePage(expandPlayerId = "") {
             exchangeAdsList.append(article);
         });
         exchangeAdsStatus.textContent = ads.length
-            ? `${ads.length} petite${ads.length > 1 ? "s" : ""} annonce${ads.length > 1 ? "s" : ""} de joueurs affichée${ads.length > 1 ? "s" : "e"}. Le bouton Échanger apparaît lorsqu’un échange est possible.`
-            : "Aucun joueur n’a de carte échangeable manquante pour le moment.";
+            ? `${ads.length} joueur${ads.length > 1 ? "s" : ""} de niveau 5 ou plus affiché${ads.length > 1 ? "s" : ""}. Le bouton Échanger apparaît lorsqu’un échange est possible.`
+            : "Aucun autre joueur n’a encore atteint le niveau 5.";
     } catch (error) {
         console.error("Impossible de charger la page Échanges :", error);
         exchangeMissingStatus.textContent = "Impossible de charger les cartes manquantes. Vérifie que la fonction getExchangeBoard est déployée.";
