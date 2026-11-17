@@ -3614,7 +3614,7 @@ body:has(#appPage .app-content:not(.hidden)) {
                     <strong class="booster-stock-badge"><span id="season2BoosterStockCount">0</span> en stock</strong>
                 </span>
                 <button id="buySeason2BoosterButton" class="hidden" type="button">3 jetons</button>
-                <button id="openSeason2BoosterButton" type="button" disabled>Ouvrir un booster</button>
+                <button id="openSeason2BoosterButton" class="hidden" type="button" disabled>Ouvrir un booster</button>
             </article>
 
 
@@ -10252,9 +10252,9 @@ function setOpenBoosterButton(count, season2Count) {
     document.getElementById("season2BoosterStockCount").textContent = season2BoosterStock.toLocaleString("fr-FR");
     openNormalBoosterButton.textContent = "Ouvrir un booster Saison 1";
     openNormalBoosterButton.disabled = available < 1;
-    openSeason2BoosterButton.hidden = false;
-    openSeason2BoosterButton.classList.remove("hidden");
     openSeason2BoosterButton.disabled = season2BoosterStock < 1;
+    openSeason2BoosterButton.hidden = season2BoosterStock < 1;
+    openSeason2BoosterButton.classList.toggle("hidden", season2BoosterStock < 1);
     openSeason2BoosterButton.title = season2BoosterStock < 1 ? "Aucun booster classique Saison 2 disponible" : "Ouvrir un booster classique Saison 2";
     openSeason2BoosterButton.setAttribute("aria-label", season2BoosterStock < 1 ? "Ouvrir un booster Saison 2 — aucun booster disponible" : "Ouvrir un booster Saison 2");
     const nextAvailable = nextNormalBoosterSeason === "Saison 2" ? season2BoosterStock > 0 : available > 0;
