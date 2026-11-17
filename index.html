@@ -3224,6 +3224,110 @@ body:has(#appPage .app-content:not(.hidden)) {
   .bottom-nav { gap: 4px; padding-right: 5px; padding-left: 5px; }
   .bottom-nav .nav-image-button { flex-basis: 50px; width: 50px; height: 50px; }
 }
+
+/* Fond forêt : rappels discrets du logo Cartes & Popote et texte adapté au contraste. */
+:root {
+  --page-forest: #092d1b;
+  --page-forest-mid: #104326;
+  --page-forest-light: #1a5934;
+  --page-ivory: #f7f5e9;
+  --page-muted: #c3d4c4;
+}
+body:not(:has(#archivesPage:not(.hidden))) {
+  color: var(--page-ivory);
+  background:
+    radial-gradient(ellipse at 12% 0%, rgba(39,112,62,.42), transparent 34rem),
+    radial-gradient(ellipse at 92% 38%, rgba(22,83,49,.38), transparent 32rem),
+    linear-gradient(155deg, #061e13 0%, var(--page-forest) 46%, #0b3821 100%);
+  background-attachment: fixed;
+}
+body:has(#appPage .app-content:not(.hidden)):not(:has(#archivesPage:not(.hidden)))::before {
+  content: "";
+  position: fixed;
+  z-index: 0;
+  inset: 0;
+  pointer-events: none;
+  background-image: url("./Logo.png");
+  background-repeat: no-repeat;
+  background-position: right 5vw bottom 105px;
+  background-size: min(30vw, 300px);
+  opacity: .035;
+  filter: grayscale(1) brightness(1.8);
+}
+#appPage:has(.app-content:not(.hidden)) {
+  position: relative;
+  z-index: 1;
+  background: transparent;
+}
+#appPage:has(.app-content:not(.hidden)) .app-content { color: var(--page-ivory); }
+#appPage:has(.app-content:not(.hidden)) .app-header {
+  background: linear-gradient(180deg, rgba(8,43,26,.98), rgba(7,35,21,.97));
+  border-bottom: 1px solid rgba(229,190,78,.62);
+  box-shadow: 0 5px 20px rgba(0,0,0,.3), inset 0 1px rgba(255,255,255,.08);
+}
+#appPage:has(.app-content:not(.hidden)) .header-logo { color: var(--page-ivory); }
+#appPage:has(.app-content:not(.hidden)) .header-logo span { color: #f0ce68; }
+#appPage:has(.app-content:not(.hidden)) .home-player-summary {
+  border-color: rgba(240,206,104,.34);
+  background: linear-gradient(135deg, rgba(14,67,39,.82), rgba(8,45,27,.72));
+  box-shadow: 0 8px 20px rgba(0,0,0,.16), inset 0 1px rgba(255,255,255,.09);
+}
+#appPage:has(.app-content:not(.hidden)) .home-resource-tile strong { color: #fff0b4; text-shadow: 0 1px 3px rgba(0,0,0,.45); }
+#appPage:has(.app-content:not(.hidden)) .section-title h3,
+#appPage:has(.app-content:not(.hidden)) .home-site-note { color: var(--page-ivory); }
+#appPage:has(.app-content:not(.hidden)) .section-title span { color: var(--page-muted); }
+#appPage:has(.app-content:not(.hidden)) .home-overview-grid > button,
+#appPage:has(.app-content:not(.hidden)) .home-overview-archive { filter: drop-shadow(0 5px 9px rgba(0,0,0,.24)); }
+#appPage:has(.app-content:not(.hidden)) .home-archive-countdown { border-color: rgba(231,204,124,.46); background: #153d27; color: #fff0b4; }
+#appPage:has(.app-content:not(.hidden)) .bottom-nav {
+  border-top: 1px solid rgba(229,190,78,.58);
+  background: linear-gradient(180deg, rgba(11,54,32,.97), rgba(6,34,21,.99));
+  box-shadow: 0 -7px 22px rgba(0,0,0,.3), inset 0 1px rgba(255,255,255,.06);
+}
+#appPage:has(.app-content:not(.hidden)) .bottom-nav .nav-item { color: #d7e4d7; }
+#appPage:has(.app-content:not(.hidden)) .bottom-nav .nav-item:hover,
+#appPage:has(.app-content:not(.hidden)) .bottom-nav .nav-item.active { color: #ffe18a; }
+#appPage:has(.app-content:not(.hidden)) .bottom-nav .nav-image-button {
+  border-color: rgba(244,211,113,.78);
+  background: linear-gradient(145deg,#1c6639,#0d4026);
+}
+
+/* Les pages de consultation gardent leurs fiches claires et lisibles sur le fond sombre. */
+#appPage:has(.player-profile:not(.hidden)),
+#appPage:has(.exchange-page:not(.hidden)),
+#appPage:has(.activity-page:not(.hidden)),
+#appPage:has(.admin-page:not(.hidden)),
+#appPage:has(.leaderboard-page:not(.hidden)),
+#appPage:has(#collectionPage:not(.hidden)),
+#appPage:has(#recyclingPage:not(.hidden)) {
+  background:
+    radial-gradient(ellipse at 10% 0%, rgba(28,91,49,.28), transparent 32rem),
+    linear-gradient(155deg, #071f14, #0b2d1c 55%, #0c3821);
+}
+.player-profile, .exchange-page, .activity-page, .admin-page,
+.leaderboard-page, #collectionPage, #recyclingPage {
+  color: var(--page-ivory);
+  background: transparent;
+}
+.player-profile h2, .exchange-page h2, .activity-page h2, .admin-page h2,
+.leaderboard-page h2, #collectionPage h2, #recyclingPage h2 { color: #ffe18a; }
+.profile-page-intro, .profile-account-dates, .profile-roadmap-title,
+.profile-tracking-note, .exchange-intro, .exchange-status,
+.activity-toolbar p, .activity-status, .activity-tracking-note,
+.admin-page > .admin-note, .admin-page .admin-note, .admin-page .admin-status,
+.leaderboard-intro, .leaderboard-status, .collection-search-label,
+.collection-search-status, .recycling-rarity-filter, .recycle-duplicates-status {
+  color: var(--page-muted);
+}
+.exchange-page .exchange-missing-panel h3, .exchange-page .exchange-ads-heading,
+.leaderboard-page .section-title h3 { color: #205c32; }
+@media (max-width: 600px) {
+  body:has(#appPage .app-content:not(.hidden)):not(:has(#archivesPage:not(.hidden)))::before {
+    background-position: right -42px bottom 88px;
+    background-size: 190px;
+    opacity: .025;
+  }
+}
 </style>
 
 </head>
