@@ -2855,7 +2855,7 @@ body:has(#appPage .app-content:not(.hidden)) {
 #appPage:has(.app-content:not(.hidden)) .booster-season-two #openSeason2BoosterButton,
 #appPage:has(.app-content:not(.hidden)) .booster-season-two #buySeason2BoosterButton { border-color: #ac8425; background: linear-gradient(145deg,#f4d879,#c99423); color: #193e22; box-shadow: 0 4px 0 #8e6819, 0 7px 12px rgba(77,60,17,.18), inset 0 1px rgba(255,255,255,.62); }
 #appPage:has(.app-content:not(.hidden)) .booster-season-two #openSeason2BoosterButton { display:block; visibility:visible; }
-#appPage:has(.app-content:not(.hidden)) .booster-season-two #openSeason2BoosterButton:disabled { opacity:.78; }
+#appPage:has(.app-content:not(.hidden)) .booster-season-two #openSeason2BoosterButton:disabled { border-color:#9b741b; background:linear-gradient(145deg,#f4e4ae,#dec46f); color:#463710; box-shadow:0 4px 0 #ad8d37,0 7px 12px rgba(77,60,17,.16),inset 0 1px rgba(255,255,255,.7); opacity:1; cursor:not-allowed; }
 #appPage:has(.app-content:not(.hidden)) .section-title h3 { color: #174b2e; }
 #appPage:has(.app-content:not(.hidden)) .home-journal-summary { border-color: rgba(40,117,61,.5); background: linear-gradient(145deg,#2b7440,#17492b); box-shadow: 0 4px 0 #113a21, 0 8px 15px rgba(17,58,33,.2), inset 0 1px rgba(255,255,255,.25); }
 #appPage:has(.app-content:not(.hidden)) .home-journal-summary h3 { color: #fff1bd; }
@@ -10158,6 +10158,7 @@ function setOpenBoosterButton(count, season2Count) {
     openSeason2BoosterButton.classList.remove("hidden");
     openSeason2BoosterButton.disabled = season2BoosterStock < 1;
     openSeason2BoosterButton.title = season2BoosterStock < 1 ? "Aucun booster classique Saison 2 disponible" : "Ouvrir un booster classique Saison 2";
+    openSeason2BoosterButton.setAttribute("aria-label", season2BoosterStock < 1 ? "Ouvrir un booster Saison 2 — aucun booster disponible" : "Ouvrir un booster Saison 2");
     const nextAvailable = nextNormalBoosterSeason === "Saison 2" ? season2BoosterStock > 0 : available > 0;
     openNextBoosterButton.textContent = `Ouvrir le booster suivant · ${nextNormalBoosterSeason}`;
     openNextBoosterButton.classList.toggle("hidden", !nextAvailable);
