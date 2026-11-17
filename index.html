@@ -1,6 +1,3 @@
-Warning: truncated output (original token count: 229883)
-Total output lines: 14286
-
 <!DOCTYPE html>
 <html lang="fr">
 
@@ -5380,7 +5377,2144 @@ async function loadPendingExchangeOffers() {
         pendingExchangeOffers = Array.isArray(response.data?.offers) ? response.data.offers : [];
         renderNotificationCenter();
         if (activeExchangeOffer && pendingExchangeOffers.some((offer) => offer.id === activeExchangeOffer.id)) return;
-     …29883 tokens truncated…   { value: "premium", label: "Jetons Premium" },
+        if (activeExchangeOffer) {
+            exchangeOfferModal.classList.add("hidden");
+            exchangeOfferModal.setAttribute("aria-hidden", "true");
+            exchangeOfferActionBusy = false;
+        }
+        activeExchangeOffer = null;
+        tryShowPendingExchangeOffer();
+    } catch (error) {
+        console.warn("Impossible de charger les demandes d’échange en attente :", error);
+    } finally {
+        exchangeOfferPollInFlight = false;
+    }
+}
+
+async function answerExchangeOffer(accept) {
+    if (!activeExchangeOffer || exchangeOfferActionBusy) return;
+    exchangeOfferActionBusy = true;
+    exchangeOfferAccept.disabled = true;
+    exchangeOfferRefuse.disabled = true;
+    exchangeOfferStatus.textContent = accept ? "Validation de l’échange…" : "Enregistrement du refus…";
+    try {
+        if (accept) await callAcceptExchangeOffer({ offerId: activeExchangeOffer.id });
+        else await callRefuseExchangeOffer({ offerId: activeExchangeOffer.id });
+        const completedOffer = activeExchangeOffer;
+        pendingExchangeOffers = pendingExchangeOffers.filter((offer) => offer.id !== completedOffer.id);
+        exchangeOfferStatus.textContent = accept ? "Échange effectué ! Les deux cartes ont été transférées." : "Demande refusée.";
+        if (!exchangePage.classList.contains("hidden")) void showExchangePage();
+        window.setTimeout(() => {
+            exchangeOfferModal.classList.add("hidden");
+            exchangeOfferModal.setAttribute("aria-hidden", "true");
+            activeExchangeOffer = null;
+            exchangeOfferActionBusy = false;
+            if (accept) void loadPendingExchangeSuccessNotices();
+            void loadPendingExchangeOffers();
+        }, 900);
+    } catch (error) {
+        console.error("Traitement de la demande d’échange impossible :", error);
+        exchangeOfferStatus.textContent = error.code === "functions/failed-precondition"
+            ? (error.message || "Les cartes ne sont plus disponibles pour cet échange. Recharge la page.")
+            : "Impossible de traiter la demande. Vérifie ta connexion puis réessaie.";
+        exchangeOfferAccept.disabled = false;
+        exchangeOfferRefuse.disabled = false;
+        exchangeOfferActionBusy = false;
+    }
+}
+
+async function submitCurrentPollResponse(answer) {
+    if (!activePoll || pollSubmissionBusy) return;
+    pollSubmissionBusy = true;
+    [pollYesButton, pollNoButton, pollTextSubmitButton].forEach((button) => { button.disabled = true; });
+    pollPromptStatus.textContent = "Enregistrement de ta réponse…";
+    try {
+        await callSubmitPollResponse({ pollId: activePoll.id, answer });
+        pendingPolls = pendingPolls.filter((poll) => poll.id !== activePoll.id);
+        activePoll = null;
+        pollPromptModal.classList.add("hidden");
+        pollPromptModal.setAttribute("aria-hidden", "true");
+        continueStartupNoticesAfterPoll();
+    } catch (error) {
+        console.error("Enregistrement de la réponse au sondage impossible :", error);
+        pollPromptStatus.textContent = error.code === "functions/already-exists"
+            ? "Ta réponse est déjà enregistrée. Actualise la page pour continuer."
+            : "Impossible d’enregistrer la réponse. Vérifie ta connexion puis réessaie.";
+    } finally {
+        pollSubmissionBusy = false;
+        [pollYesButton, pollNoButton, pollTextSubmitButton].forEach((button) => { button.disabled = false; });
+    }
+}
+
+function closeSiteUpdates() {
+    const userId = auth.currentUser?.uid;
+    if (userId) markSiteUpdatesSeen(pendingSiteUpdateIds, userId);
+    siteUpdatesModal.classList.add("hidden");
+    siteUpdatesModal.setAttribute("aria-hidden", "true");
+    pendingSiteUpdateIds = [];
+    renderNotificationCenter();
+    if (serviceReadyModal.classList.contains("hidden")) tryShowPendingPoll();
+    tryShowPendingExchangeOffer();
+}
+
+function closeServiceReadyNotification() {
+    serviceReadyModal.classList.add("hidden");
+    serviceReadyModal.setAttribute("aria-hidden", "true");
+    if (announcementsWaitingForServiceModal.length) {
+        const announcements = announcementsWaitingForServiceModal;
+        announcementsWaitingForServiceModal = [];
+        showSiteUpdatesIfNeeded(announcements);
+        if (siteUpdatesModal.classList.contains("hidden")) tryShowPendingPoll();
+    } else {
+        archivesHomeButton.focus({ preventScroll: true });
+        tryShowPendingPoll();
+    }
+    tryShowPendingExchangeOffer();
+}
+
+function closeMysticPullReward() {
+    mysticRewardModal.classList.add("hidden");
+    mysticRewardModal.setAttribute("aria-hidden", "true");
+    tryShowPendingPoll();
+    tryShowPendingExchangeOffer();
+}
+
+function showPendingServiceReadyNotification() {
+    renderNotificationCenter();
+}
+
+function markSiteUpdatesSeen(ids, userId = auth.currentUser?.uid) {
+    if (!userId || !ids.length) return;
+    try {
+        const key = `cartes-popote-seen-updates:${userId}`;
+        let seen = [];
+        try { seen = JSON.parse(localStorage.getItem(key) || "[]"); } catch { seen = []; }
+        localStorage.setItem(key, JSON.stringify([...new Set([...(Array.isArray(seen) ? seen : []), ...ids])]));
+    } catch (error) { console.warn("Impossible de mémoriser les nouveautés vues.", error); }
+}
+
+function getSeenSiteUpdateIds(userId = auth.currentUser?.uid) {
+    if (!userId) return [];
+    try {
+        const value = JSON.parse(localStorage.getItem(`cartes-popote-seen-updates:${userId}`) || "[]");
+        return Array.isArray(value) ? value : [];
+    } catch { return []; }
+}
+
+function makeNotificationItem(type, title, dateValue, message) {
+    const item = document.createElement("article");
+    item.className = "notification-item";
+    item.dataset.notificationType = type;
+    const heading = document.createElement("div"); heading.className = "notification-item-heading";
+    const text = document.createElement("span"); text.textContent = title;
+    const date = document.createElement("time"); date.className = "notification-item-date";
+    date.textContent = dateValue ? formatAdminMessageDate(dateValue) : "";
+    heading.append(text, date); item.append(heading);
+    if (message) { const detail = document.createElement("p"); detail.textContent = message; item.append(detail); }
+    return item;
+}
+
+function closeNotificationsPanel() {
+    notificationsPanel.classList.add("hidden");
+    notificationsPanel.setAttribute("aria-hidden", "true");
+    notificationsBellButton.setAttribute("aria-expanded", "false");
+}
+
+function renderNotificationCenter() {
+    if (!notificationsList) return;
+    notificationsList.replaceChildren();
+    const updates = notificationUpdateAnnouncements.slice(0, 8);
+    const seen = new Set(getSeenSiteUpdateIds());
+    const serviceMission = pendingServiceReadyMission
+        && Date.parse(pendingServiceReadyMission.readyAt || "") <= Date.now() ? pendingServiceReadyMission : null;
+    const entries = [];
+    updates.forEach((update) => entries.push({ type:"update", date:timestampToMilliseconds(update.createdAt), update, unread:!seen.has(update.id) }));
+    pendingExchangeOffers.forEach((offer) => entries.push({ type:"offer", date:timestampToMilliseconds(offer.createdAt), offer, unread:true }));
+    pendingExchangeSuccessNotices.forEach((notice) => entries.push({ type:"success", date:timestampToMilliseconds(notice.createdAt), notice, unread:true }));
+    if (serviceMission) entries.push({ type:"service", date:Date.parse(serviceMission.readyAt) || Date.now(), mission:serviceMission, unread:true });
+    entries.sort((a,b) => b.date - a.date);
+
+    entries.forEach((entry) => {
+        if (entry.type === "update") {
+            const announcement = entry.update;
+            const item = makeNotificationItem("update", `📣 ${String(announcement.title || "Mise à jour").replace(/^MAJ\s*\|\s*/, "")}`, announcement.createdAt, announcement.message || "");
+            if (entry.unread) item.classList.add("is-unread");
+            const button = document.createElement("button"); button.type = "button"; button.textContent = "Lire l’annonce";
+            button.addEventListener("click", () => openSiteUpdateNotification(announcement)); item.append(button); notificationsList.append(item);
+            return;
+        }
+        if (entry.type === "offer") {
+            const offer = entry.offer;
+            const item = makeNotificationItem("offer", `🤝 Proposition de ${offer.senderPseudo || "un joueur"}`, offer.createdAt,
+                "Cartes proposées et demandées :");
+            item.classList.add("is-unread");
+            const cards = document.createElement("div"); cards.className = "notification-exchange-cards";
+            [
+                { direction: "Il propose", season: offer.offeredSeason, number: offer.offeredNumber, rarity: offer.offeredRarity },
+                { direction: "Tu donnes", season: offer.requestedSeason, number: offer.requestedNumber, rarity: offer.requestedRarity },
+            ].forEach((card, index) => {
+                if (index) { const arrow = document.createElement("span"); arrow.className = "notification-exchange-arrow"; arrow.textContent = "⇄"; cards.append(arrow); }
+                const face = document.createElement("div"); face.className = "notification-exchange-card";
+                const direction = document.createElement("strong"); direction.textContent = card.direction;
+                const number = document.createElement("span"); number.textContent = `Saison ${Number(card.season) || 1} · n° ${Number(card.number) || "?"}`;
+                const rarity = document.createElement("span");
+                const rarityKey = normalizeCardRarityKey(card.rarity);
+                const rarityStyle = rarityKey === "legendaire" ? "legendary" : rarityKey === "commune" ? "common" : rarityKey;
+                rarity.className = `notification-exchange-rarity exchange-rarity-${rarityStyle}`;
+                rarity.textContent = exchangeRarityLabel(card.rarity);
+                face.append(direction, number, rarity); cards.append(face);
+            });
+            item.append(cards);
+            const button = document.createElement("button"); button.type = "button"; button.textContent = "Répondre à la proposition";
+            button.addEventListener("click", () => { closeNotificationsPanel(); tryShowPendingExchangeOffer(offer); }); item.append(button); notificationsList.append(item);
+            return;
+        }
+        if (entry.type === "success") {
+            const notice = entry.notice;
+            const item = makeNotificationItem("success", `✅ Échange réussi avec ${notice.otherPseudo || "un joueur"}`, notice.createdAt, "Voici les cartes qui ont été échangées.");
+            item.classList.add("is-unread");
+            const cards = document.createElement("div"); cards.className = "notification-exchange-cards";
+            [["Tu as donné",notice.sentCard], ["Tu as reçu",notice.receivedCard]].forEach(([label,card],index) => {
+                if (index) { const arrow=document.createElement("span"); arrow.className="notification-exchange-arrow"; arrow.textContent="⇄"; cards.append(arrow); }
+                const face=document.createElement("div"); face.className="notification-exchange-card";
+                const image=document.createElement("img"); image.src=card?.imageUrl||"./Dos%20cartes.png"; image.alt=card?.name||"Carte échangée"; image.loading="lazy"; image.decoding="async";
+                image.addEventListener("error",()=>{image.src="./Dos%20cartes.png"},{once:true});
+                const direction=document.createElement("strong"); direction.textContent=label;
+                const name=document.createElement("span"); name.textContent=card?.name||`Carte n° ${Number(card?.number)||"?"}`;
+                const number=document.createElement("span"); number.textContent=`N° ${Number(card?.number)||"?"}`;
+                face.append(image,direction,name,number); cards.append(face);
+            });
+            item.append(cards);
+            const button=document.createElement("button"); button.type="button"; button.textContent="Marquer comme lu";
+            button.addEventListener("click",async()=>{
+                button.disabled=true;
+                try { await callAcknowledgeExchangeSuccessNotice({noticeId:notice.id}); pendingExchangeSuccessNotices=pendingExchangeSuccessNotices.filter((value)=>value.id!==notice.id); renderNotificationCenter(); }
+                catch(error){ console.error("Impossible d’archiver cette notification d’échange :",error); button.disabled=false; }
+            });
+            item.append(button); notificationsList.append(item); return;
+        }
+        const mission=entry.mission;
+        const item=makeNotificationItem("service",`✅ Mission Service terminée · ${mission.name||"Service"}`,mission.readyAt,
+            `Récompense : ${serviceRewardSummary(mission)}. Elle t’attend dans Service.`);
+        item.classList.add("is-unread");
+        if(mission.imageUrl){const image=document.createElement("img");image.className="notification-service-image";image.src=mission.imageUrl;image.alt=`Mission ${mission.name||"Service"}`;image.loading="lazy";image.decoding="async";item.append(image);}
+        const button=document.createElement("button");button.type="button";button.textContent="Voir ma récompense";
+        button.addEventListener("click",()=>{closeNotificationsPanel();void openArchivesPage();});item.append(button);notificationsList.append(item);
+    });
+    const unreadUpdates=updates.filter((item)=>!seen.has(item.id)).length;
+    const count=unreadUpdates+pendingExchangeOffers.length+pendingExchangeSuccessNotices.length+(serviceMission?1:0);
+    notificationCountBadge.textContent=count>9?"9+":String(count);
+    notificationCountBadge.classList.toggle("hidden",count===0);
+    notificationsBellButton.setAttribute("aria-label",count?`Ouvrir les notifications, ${count} non lue${count>1?"s":""}`:"Ouvrir les notifications");
+    notificationsEmpty.classList.toggle("hidden",entries.length>0);
+}
+
+function openSiteUpdateNotification(announcement) {
+    pendingSiteUpdateIds=[announcement.id];
+    activeSiteUpdateCommentContext={id:announcement.id,title:String(announcement.title||"Mise à jour").replace(/^MAJ\s*\|\s*/,"")};
+    siteUpdateCommentForm.reset(); siteUpdateCommentSubmit.disabled=false; siteUpdateCommentStatus.textContent="";
+    siteUpdatesList.replaceChildren();
+    const item=document.createElement("li"),heading=document.createElement("strong"),message=document.createElement("p");
+    heading.textContent=activeSiteUpdateCommentContext.title; message.textContent=announcement.message||""; message.style.cssText="margin:5px 0 0;white-space:pre-line";
+    item.append(heading,message);siteUpdatesList.append(item);
+    closeNotificationsPanel();siteUpdatesModal.classList.remove("hidden");siteUpdatesModal.setAttribute("aria-hidden","false");siteUpdatesCloseButton.focus();
+}
+
+notificationsBellButton.addEventListener("click",()=>{
+    const opening=notificationsPanel.classList.contains("hidden");
+    notificationsPanel.classList.toggle("hidden",!opening);
+    notificationsPanel.setAttribute("aria-hidden",String(!opening));
+    notificationsBellButton.setAttribute("aria-expanded",String(opening));
+    if(opening)renderNotificationCenter();
+});
+notificationsPanelClose.addEventListener("click",closeNotificationsPanel);
+document.addEventListener("click",(event)=>{
+    if(!notificationsPanel.classList.contains("hidden")&&!notificationsPanel.contains(event.target)&&!notificationsBellButton.contains(event.target))closeNotificationsPanel();
+});
+
+function showSiteUpdatesIfNeeded(updates) {
+    if (!auth.currentUser || !Array.isArray(updates)) return;
+    notificationUpdateAnnouncements=updates.slice().sort((a,b)=>timestampToMilliseconds(b.createdAt)-timestampToMilliseconds(a.createdAt));
+    renderNotificationCenter();
+}
+
+siteUpdatesCloseButton.addEventListener("click", closeSiteUpdates);
+siteUpdateCommentForm.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    const user = auth.currentUser;
+    const message = siteUpdateCommentText.value.trim();
+    const context = activeSiteUpdateCommentContext;
+    if (!user || !context?.id) {
+        siteUpdateCommentStatus.textContent = "Connecte-toi pour envoyer un commentaire.";
+        return;
+    }
+    if (message.length < 3 || message.length > 2000) {
+        siteUpdateCommentStatus.textContent = "Écris un commentaire de 3 à 2 000 caractères.";
+        return;
+    }
+    siteUpdateCommentSubmit.disabled = true;
+    siteUpdateCommentStatus.textContent = "Envoi du commentaire…";
+    try {
+        const playerSnapshot = await getDoc(doc(db, "players", user.uid));
+        if (!playerSnapshot.exists()) throw new Error("PLAYER_PROFILE_MISSING");
+        await addDoc(collection(db, "messages"), {
+            senderUid: user.uid,
+            senderPseudo: playerSnapshot.data().pseudo || "Joueur",
+            senderEmail: user.email || "",
+            category: "maj",
+            message,
+            announcementId: context.id,
+            announcementTitle: context.title,
+            status: "nouveau",
+            createdAt: serverTimestamp()
+        });
+        siteUpdateCommentText.value = "";
+        siteUpdateCommentStatus.textContent = "Commentaire envoyé à l’Admin. Tu le retrouveras aussi dans Ma messagerie.";
+    } catch (error) {
+        console.error("Erreur d’envoi du commentaire MAJ :", error);
+        siteUpdateCommentStatus.textContent = error.code === "permission-denied"
+            ? "Envoi refusé. Publie les règles Firestore mises à jour."
+            : "Le commentaire n’a pas pu être envoyé. Réessaie dans un instant.";
+        siteUpdateCommentSubmit.disabled = false;
+    }
+});
+mysticRewardCloseButton.addEventListener("click", closeMysticPullReward);
+serviceReadyLaterButton.addEventListener("click", closeServiceReadyNotification);
+serviceReadyOpenButton.addEventListener("click", async () => {
+    closeServiceReadyNotification();
+    await openArchivesPage();
+});
+
+pollYesButton.addEventListener("click", () => submitCurrentPollResponse("oui"));
+pollNoButton.addEventListener("click", () => submitCurrentPollResponse("non"));
+pollTextSubmitButton.addEventListener("click", () => {
+    const answer = pollPlayerAnswer.value.trim();
+    if (!answer) { pollPromptStatus.textContent = "Écris une réponse avant de l’envoyer."; return; }
+    submitCurrentPollResponse(answer);
+});
+
+
+
+/* ==================================================
+   ÉLÉMENTS
+   ================================================== */
+
+const loginPage =
+    document.getElementById(
+        "loginPage"
+    );
+
+
+const appPage =
+    document.getElementById(
+        "appPage"
+    );
+
+
+const loginForm =
+    document.getElementById(
+        "loginForm"
+    );
+
+
+const loginButton =
+    document.getElementById(
+        "loginButton"
+    );
+const forgotPasswordButton = document.getElementById("forgotPasswordButton");
+
+
+const loginMessage =
+    document.getElementById(
+        "loginMessage"
+    );
+
+const loginTitle = document.getElementById("loginTitle");
+const loginSubtitle = document.getElementById("loginSubtitle");
+const registerPseudoField = document.getElementById("registerPseudoField");
+const registerPseudo = document.getElementById("registerPseudo");
+const registerAvatarField = document.getElementById("registerAvatarField");
+const avatarChoices = Array.from(document.querySelectorAll(".avatar-choice[data-avatar]"));
+const playerAvatar = document.getElementById("playerAvatar");
+const playerProfileHomeButton = document.getElementById("playerProfileHomeButton");
+const PLAYER_AVATARS = {
+    "femme-blonde": "./avatar-femme-blonde.png",
+    "femme-brune": "./avatar-femme-brune.png",
+    "homme-blanc": "./avatar-homme-blanc.png",
+    "homme-noir": "./avatar-homme-noir.png",
+    "vieil-homme": "./avatar-vieil-homme.png",
+    "homme-chauve-barbu": "./avatar-homme-chauve-barbu.png",
+    "homme-vieux": "./avatar-homme-vieux.png",
+    "licorne": "./avatar-licorne.png"
+};
+const PLAYER_AVATAR_IMAGE_CANDIDATES = {
+    "homme-chauve-barbu": ["./avatar-homme-chauve-barbu.png", "./Images/Avatar/avatar-homme-chauve-barbu.png"],
+    "homme-vieux": ["./avatar-homme-vieux.png", "./homme-vieux.png", "./Images/Avatar/homme-vieux.png", "./Images/Avatar/Vieil%20homme%20blanc.png"],
+    "licorne": ["./avatar-licorne.png", "./Licorne.png", "./licorne.png", "./Images/Avatar/Licorne.png"]
+};
+
+function setPlayerAvatarImage(image, avatarId) {
+    const candidates = PLAYER_AVATAR_IMAGE_CANDIDATES[avatarId] || [PLAYER_AVATARS[avatarId]];
+    let nextCandidate = 1;
+    image.onerror = () => {
+        if (nextCandidate >= candidates.length) {
+            image.onerror = null;
+            image.style.visibility = "hidden";
+            return;
+        }
+        image.src = candidates[nextCandidate++];
+    };
+    image.src = candidates[0];
+}
+
+document.querySelectorAll(".avatar-choice img").forEach((image) => {
+    const choice = image.closest(".avatar-choice");
+    const avatarId = choice?.dataset.avatar || choice?.dataset.profileAvatar;
+    if (avatarId) setPlayerAvatarImage(image, avatarId);
+});
+let isRegisterMode = false;
+let pendingSignupPseudo = "";
+let pendingSignupAvatar = "";
+let selectedSignupAvatar = "femme-blonde";
+
+function renderPlayerAvatar(avatarId) {
+    playerAvatar.replaceChildren();
+    const imagePath = PLAYER_AVATARS[avatarId];
+    if (!imagePath) {
+        playerAvatar.textContent = "👤";
+        return;
+    }
+    const image = document.createElement("img");
+    setPlayerAvatarImage(image, avatarId);
+    image.alt = "";
+    image.onerror = () => { playerAvatar.textContent = "👤"; };
+    playerAvatar.append(image);
+}
+
+function setPremiumPaidThisMonthAvatar(isPaid) {
+    playerAvatar.classList.toggle("premium-paid-this-month", isPaid === true);
+    playerAvatar.title = isPaid === true ? "Achat de jetons Premium effectué ce mois-ci" : "";
+}
+
+async function refreshPremiumPaidThisMonthAvatar(uid) {
+    if (!uid || !auth.currentUser || auth.currentUser.uid !== uid) return;
+    try {
+        const response = await callGetMyPremiumSpending();
+        if (!auth.currentUser || auth.currentUser.uid !== uid) return;
+        setPremiumPaidThisMonthAvatar(hasPremiumPurchaseThisMonth(response.data));
+    } catch (error) {
+        console.warn("Statut des achats Premium du mois indisponible :", error);
+        setPremiumPaidThisMonthAvatar(false);
+    }
+}
+
+function hasPremiumPurchaseThisMonth(data) {
+    if (data?.hasPaidThisMonth === true) return true;
+    const monthParts = new Intl.DateTimeFormat("en", {
+        timeZone: "Europe/Paris",
+        year: "numeric",
+        month: "2-digit"
+    }).formatToParts(new Date());
+    const monthKey = `${monthParts.find((part) => part.type === "year")?.value}-${monthParts.find((part) => part.type === "month")?.value}`;
+    return Array.isArray(data?.months) && data.months.some((month) =>
+        month?.month === monthKey && Number(month.amountCents) > 0
+    );
+}
+
+avatarChoices.forEach((choice) => {
+    choice.addEventListener("click", () => {
+        selectedSignupAvatar = choice.dataset.avatar;
+        avatarChoices.forEach((option) => {
+            const selected = option === choice;
+            option.classList.toggle("is-selected", selected);
+            option.setAttribute("aria-pressed", String(selected));
+        });
+    });
+});
+
+
+const registerButton =
+    document.getElementById(
+        "registerButton"
+    );
+
+
+const menuButton =
+    document.getElementById(
+        "menuButton"
+    );
+const playerLogoutButton = document.getElementById("playerLogoutButton");
+
+
+const dropdownMenu =
+    document.getElementById(
+        "dropdownMenu"
+    );
+
+
+const logoutButton =
+    document.getElementById(
+        "logoutButton"
+    );
+
+const profilePage = document.getElementById("profilePage");
+const profileBackButton = document.getElementById("profileBackButton");
+const profilePageTitle = document.getElementById("profilePageTitle");
+const profilePageAvatar = document.getElementById("profilePageAvatar");
+const profileEditToggleButton = document.getElementById("profileEditToggleButton");
+const profileIdentityEditor = document.getElementById("profileIdentityEditor");
+const profilePseudoInput = document.getElementById("profilePseudoInput");
+const profileAvatarSelect = document.getElementById("profileAvatarSelect");
+const profileAvatarChoices = Array.from(document.querySelectorAll("[data-profile-avatar]"));
+const profileIdentitySaveButton = document.getElementById("profileIdentitySaveButton");
+const profileIdentityStatus = document.getElementById("profileIdentityStatus");
+const profileBadgeList = document.getElementById("profileBadgeList");
+const profileBadgesSection = document.getElementById("profileBadgesSection");
+const profileBadgesEmpty = document.getElementById("profileBadgesEmpty");
+const profileDashboard = document.getElementById("profileDashboard");
+const profileDashboardCollections = document.getElementById("profileDashboardCollections");
+const profileDashboardSeasonOneBadges = document.getElementById("profileDashboardSeasonOneBadges");
+const profileDashboardUpcoming = document.getElementById("profileDashboardUpcoming");
+let loadedProfileIdentity = { pseudo: "", avatar: "" };
+const profilePremiumSpendingCard = document.getElementById("profilePremiumSpendingCard");
+const profilePremiumSpending = document.getElementById("profilePremiumSpending");
+let viewedOtherPlayerId = null;
+const profileTokensEarned = document.getElementById("profileTokensEarned");
+const profileClassicBoostersOpened = document.getElementById("profileClassicBoostersOpened");
+const profileDailyObjectivesCompleted = document.getElementById("profileDailyObjectivesCompleted");
+const profileCardsCollected = document.getElementById("profileCardsCollected");
+const profileServiceTime = document.getElementById("profileServiceTime");
+const profileHistorySection = document.getElementById("profileHistory");
+const profileCalendarGrid = document.getElementById("profileCalendarGrid");
+const profileCalendarMonth = document.getElementById("profileCalendarMonth");
+const profileHistorySelected = document.getElementById("profileHistorySelected");
+const profileHistoryUndated = document.getElementById("profileHistoryUndated");
+const profileHistoryStatus = document.getElementById("profileHistoryStatus");
+let profileHistoryEvents = [];
+let profileHistoryMonth = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
+let profileHistorySelectedDate = new Intl.DateTimeFormat("en-CA", { timeZone: "Europe/Paris", year: "numeric", month: "2-digit", day: "2-digit" }).format(new Date());
+const profileCurrentLevel = document.getElementById("profileCurrentLevel");
+const profileTotalXp = document.getElementById("profileTotalXp");
+const profileXpTrack = document.getElementById("profileXpTrack");
+const profileXpFill = document.getElementById("profileXpFill");
+const profileXpCaption = document.getElementById("profileXpCaption");
+const profileLevelRoadmap = document.getElementById("profileLevelRoadmap");
+const leaderboardMenuButton = document.getElementById("leaderboardMenuButton");
+const leaderboardPage = document.getElementById("leaderboardPage");
+const leaderboardBackButton = document.getElementById("leaderboardBackButton");
+const leaderboardStatus = document.getElementById("leaderboardStatus");
+const leaderboardList = document.getElementById("leaderboardList");
+const activityHomeButton = document.getElementById("activityHomeButton");
+const activityPage = document.getElementById("activityPage");
+const activityBackButton = document.getElementById("activityBackButton");
+const activityMetricSelect = document.getElementById("activityMetricSelect");
+const activityWeekLabel = document.getElementById("activityWeekLabel");
+const activityStatus = document.getElementById("activityStatus");
+const activityList = document.getElementById("activityList");
+const statisticsMenuButton = document.getElementById("statisticsMenuButton");
+const statisticsPage = document.getElementById("statisticsPage");
+const statisticsBackButton = document.getElementById("statisticsBackButton");
+const statisticsStatus = document.getElementById("statisticsStatus");
+const statisticsTableBody = document.getElementById("statisticsTableBody");
+const drawnCardsPage = document.getElementById("drawnCardsPage");
+const drawnCardsBackButton = document.getElementById("drawnCardsBackButton");
+const drawnCardsTotal = document.getElementById("drawnCardsTotal");
+const financeMenuButton = document.getElementById("financeMenuButton");
+const financePage = document.getElementById("financePage");
+const financeBackButton = document.getElementById("financeBackButton");
+const financeTotal = document.getElementById("financeTotal");
+const financeStatus = document.getElementById("financeStatus");
+const financeTableBody = document.getElementById("financeTableBody");
+const financeTableHead = document.getElementById("financeTableHead");
+const financeHistoricalPaymentForm = document.getElementById("financeHistoricalPaymentForm");
+const financeHistoricalPlayer = document.getElementById("financeHistoricalPlayer");
+const financeHistoricalAmount = document.getElementById("financeHistoricalAmount");
+const financeHistoricalMonth = document.getElementById("financeHistoricalMonth");
+const financeHistoricalSubmit = document.getElementById("financeHistoricalSubmit");
+const financeHistoricalStatus = document.getElementById("financeHistoricalStatus");
+const termsPage = document.getElementById("termsPage");
+const termsLink = document.getElementById("termsLink");
+const termsBackButton = document.getElementById("termsBackButton");
+const archivesPage = document.getElementById("archivesPage");
+const archivesHomeButton = document.getElementById("archivesHomeButton");
+const archivesBackButton = document.getElementById("archivesBackButton");
+const sortArchivesButton = document.getElementById("sortArchivesButton");
+const archivesCountdown = document.getElementById("archivesCountdown");
+const archivesHomeCountdown = document.getElementById("archivesHomeCountdown");
+const archivesStatus = document.getElementById("archivesStatus");
+const archivesMiningSelect = document.getElementById("archivesMiningSelect");
+const archivesMiningDescription = document.getElementById("archivesMiningDescription");
+const archivesMiningImage = document.getElementById("archivesMiningImage");
+const serviceHomeView = document.getElementById("serviceHomeView");
+const serviceMissionsView = document.getElementById("serviceMissionsView");
+const serviceActiveView = document.getElementById("serviceActiveView");
+const serviceLegacyView = document.getElementById("archivesLegacyView");
+const serviceMissionsList = document.getElementById("serviceMissionsList");
+const serviceStatus = document.getElementById("serviceStatus");
+const serviceCollectiveValue = document.getElementById("serviceCollectiveValue");
+const serviceCollectiveTrack = document.getElementById("serviceCollectiveTrack");
+const serviceCollectiveFill = document.getElementById("serviceCollectiveFill");
+const serviceCollectiveCaption = document.getElementById("serviceCollectiveCaption");
+let serviceMissions = [];
+let serviceCollectiveWorkBaseMs = 0;
+let serviceCollectiveActiveTasks = [];
+let serviceCollectiveRefreshTimer = null;
+let selectedServiceMissionId = "";
+let serviceActiveMission = null;
+let serviceCountdownInterval = null;
+let adminServiceMissions = [];
+let adminServiceCards = [];
+let showArchivedServiceMissions = false;
+let editingServiceMissionId = "";
+let serviceMissionFormSource = null;
+let pendingServiceMission = null;
+let availableMinages = [];
+let archivesReadyAtMs = null;
+let archivesCountdownInterval = null;
+let archivesClaimInProgress = false;
+
+const adminButton = document.getElementById("adminButton");
+const adminHubOpenButton = document.getElementById("adminHubOpenButton");
+const adminHubPage = document.getElementById("adminHubPage");
+const adminHubBackButton = document.getElementById("adminHubBackButton");
+const pollsAdminPage = document.getElementById("pollsAdminPage");
+const pollsAdminBackButton = document.getElementById("pollsAdminBackButton");
+const effectifMenuButton = document.getElementById("effectifMenuButton");
+const effectifPage = document.getElementById("effectifPage");
+const effectifBackButton = document.getElementById("effectifBackButton");
+const eventBoostersMenuButton = document.getElementById("eventBoostersMenuButton");
+const eventBoostersAdminPage = document.getElementById("eventBoostersAdminPage");
+const eventBoostersBackButton = document.getElementById("eventBoostersBackButton");
+const adminMessagesMenuButton = document.getElementById("adminMessagesMenuButton");
+const playerPreviewToggle = document.getElementById("playerPreviewToggle");
+const playerPreviewBanner = document.getElementById("playerPreviewBanner");
+const playerPreviewExitButton = document.getElementById("playerPreviewExitButton");
+const premiumHomeButton = document.getElementById("premiumHomeButton");
+const premiumPage = document.getElementById("premiumPage");
+const premiumSettingsDisclosure = document.getElementById("premiumSettingsDisclosure");
+const premiumAdministrationDisclosure = document.getElementById("premiumAdministrationDisclosure");
+const premiumBackButton = document.getElementById("premiumBackButton");
+const premiumRulesText = document.getElementById("premiumRulesText");
+const premiumRulesEditButton = document.getElementById("premiumRulesEditButton");
+const premiumRulesEditor = document.getElementById("premiumRulesEditor");
+const premiumRulesInput = document.getElementById("premiumRulesInput");
+const premiumRulesSaveButton = document.getElementById("premiumRulesSaveButton");
+const premiumRulesStatus = document.getElementById("premiumRulesStatus");
+const premiumWheel = document.getElementById("premiumWheel");
+const premiumWheelWrap = document.querySelector(".premium-wheel-wrap");
+const premiumMachine = document.getElementById("premiumMachine");
+const premiumSpinButton = document.getElementById("premiumSpinButton");
+const premiumSoundToggle = document.getElementById("premiumSoundToggle");
+const premiumClaimPrizeButton = document.getElementById("premiumClaimPrizeButton");
+const premiumTestWheelButton = document.getElementById("premiumTestWheelButton");
+const premiumBalanceDisplay = document.getElementById("premiumBalanceDisplay");
+const premiumStatus = document.getElementById("premiumStatus");
+const premiumPrizeReveal = document.getElementById("premiumPrizeReveal");
+const premiumRevealIcon = document.getElementById("premiumRevealIcon");
+const premiumRevealHeading = document.getElementById("premiumRevealHeading");
+const premiumRevealName = document.getElementById("premiumRevealName");
+const premiumRevealDescription = document.getElementById("premiumRevealDescription");
+const premiumPrizeList = document.getElementById("premiumPrizeList");
+const premiumBoosterRarityChanceInputs = Array.from(document.querySelectorAll(".premium-booster-rarity-chance"));
+const premiumBoosterPriceInput = document.getElementById("premiumBoosterPriceInput");
+const premiumBoosterPriceDisplay = document.getElementById("premiumBoosterPriceDisplay");
+const premiumBoosterChanceTotal = document.getElementById("premiumBoosterChanceTotal");
+const premiumBoosterSettingsSave = document.getElementById("premiumBoosterSettingsSave");
+const premiumBoosterSettingsStatus = document.getElementById("premiumBoosterSettingsStatus");
+const openPremiumBoosterButton = document.getElementById("openPremiumBoosterButton");
+const premiumBoosterStatus = document.getElementById("premiumBoosterStatus");
+const premiumAdminPanel = document.getElementById("premiumAdminPanel");
+const premiumPrizeEditor = document.getElementById("premiumPrizeEditor");
+const premiumAddPrizeButton = document.getElementById("premiumAddPrizeButton");
+const premiumSavePrizesButton = document.getElementById("premiumSavePrizesButton");
+const premiumAdminStatus = document.getElementById("premiumAdminStatus");
+const premiumPlayersStatus = document.getElementById("premiumPlayersStatus");
+const premiumPlayerSelect = document.getElementById("premiumPlayerSelect");
+const premiumAdjustDirection = document.getElementById("premiumAdjustDirection");
+const premiumAdjustAmount = document.getElementById("premiumAdjustAmount");
+const premiumAdjustSubmit = document.getElementById("premiumAdjustSubmit");
+const premiumGiftAmount = document.getElementById("premiumGiftAmount");
+const premiumGiftPlayerSelect = document.getElementById("premiumGiftPlayerSelect");
+const premiumGiftSubmit = document.getElementById("premiumGiftSubmit");
+const premiumGiftStatus = document.getElementById("premiumGiftStatus");
+const premiumPlayersTableBody = document.getElementById("premiumPlayersTableBody");
+const premiumJournalStatus = document.getElementById("premiumJournalStatus");
+const premiumJournalList = document.getElementById("premiumJournalList");
+const messagingPage = document.getElementById("messagingPage");
+const messagingPageTitle = document.getElementById("messagingPageTitle");
+const playerInboxSection = document.getElementById("playerInboxSection");
+const playerInboxStatus = document.getElementById("playerInboxStatus");
+const playerInboxList = document.getElementById("playerInboxList");
+const playerInboxOpenButton = document.getElementById("playerInboxOpenButton");
+const playerInboxRefreshButton = document.getElementById("playerInboxRefreshButton");
+const playerInboxUnreadBadge = document.getElementById("playerInboxUnreadBadge");
+const playerInboxCategoryFilter = document.getElementById("playerInboxCategoryFilter");
+const playerInboxStatusFilter = document.getElementById("playerInboxStatusFilter");
+const adminMessagesSection = document.getElementById("adminMessagesSection");
+const adminMessagesOutboxButton = document.getElementById("adminMessagesOutboxButton");
+let playerMessagingView = false;
+const messagingBackButton = document.getElementById("messagingBackButton");
+const ADMIN_EMAIL = "pierre.valentin8@gmail.com";
+let isPlayerPreview = false;
+const cooperationCard = document.getElementById("cooperationCard");
+const cooperationRewardModal = document.getElementById("cooperationRewardModal");
+const cooperationRewardItems = document.getElementById("cooperationRewardItems");
+const cooperationRewardStatus = document.getElementById("cooperationRewardStatus");
+const cooperationRewardAcknowledgeButton = document.getElementById("cooperationRewardAcknowledgeButton");
+let cooperationAnnouncementQueue = [];
+let cooperationAnnouncementActive = null;
+let cooperationProgressRefreshTimer = null;
+const cooperationAdminList = document.getElementById("cooperationAdminList");
+const cooperationAdminStatus = document.getElementById("cooperationAdminStatus");
+const cooperationRewardAdminList = document.getElementById("cooperationRewardAdminList");
+const cooperationRewardsAdminStatus = document.getElementById("cooperationRewardsAdminStatus");
+const homeMaintenanceAdminToggle = document.getElementById("homeMaintenanceAdminToggle");
+const homeMaintenanceSwitch = homeMaintenanceAdminToggle;
+const homeMaintenanceNotice = document.getElementById("homeMaintenanceNotice");
+const cooperationGaugeDefinitions = [
+    { id:"recycling", label:"Recyclage", fieldLabel:"Recyclages collectifs", icon:"./Recyclage.png" },
+    { id:"cardsDrawn", label:"Cartes tirées", fieldLabel:"Cartes tirées collectivement", icon:"./Dos%20cartes.png" },
+    { id:"boostersOpened", label:"Boosters ouverts", fieldLabel:"Boosters ouverts collectivement", icon:"./Booster%20normal.png" }
+];
+let cooperationProgress = { gauges:{}, counters:{}, claims:{}, eligible:true, pendingAnnouncements:[] };
+let cooperationUnsubscribers = [];
+let homeMaintenanceRefreshInterval = null;
+let dailyBoosterLastOpenedDate = "";
+let dailyObjectivesUnsubscribe = null;
+let dailyObjectivesDayKey = "";
+let premiumAdminPlayers = [];
+let premiumRewardCards = [];
+const buyNormalBoosterButton = document.getElementById("buyNormalBoosterButton");
+const openNormalBoosterButton = document.getElementById("openNormalBoosterButton");
+const buySeason2BoosterButton = document.getElementById("buySeason2BoosterButton");
+const openSeason2BoosterButton = document.getElementById("openSeason2BoosterButton");
+const playerTokensDisplay = document.getElementById("playerTokens");
+let normalBoosterSettings = {
+    "Saison 1": { price: 3, rarityChances: { commune: 60, rare: 30, legendaire: 9, mystique: 1 } },
+    "Saison 2": { price: 3, rarityChances: { commune: 60, rare: 30, legendaire: 9, mystique: 1 } }
+};
+let season2BoosterStock = 0;
+let nextNormalBoosterSeason = "Saison 1";
+function hasNextNormalBoosterInStock() {
+    return nextNormalBoosterSeason === "Saison 2" ? season2BoosterStock > 0 : !openNormalBoosterButton.disabled;
+}
+function updateClassicBoosterPurchaseAvailability() {
+    const tokenDigits = (playerTokensDisplay.textContent || "").match(/^\s*[\d\s\u202f\u00a0.,]+/);
+    const tokenBalance = Number((tokenDigits?.[0] || "0").replace(/[^\d]/g, "")) || 0;
+    const canBuySeason1 = Boolean(auth.currentUser) && !isPlayerPreview && tokenBalance >= normalBoosterSettings["Saison 1"].price;
+    const canBuySeason2 = Boolean(auth.currentUser) && !isPlayerPreview && tokenBalance >= normalBoosterSettings["Saison 2"].price;
+    buyNormalBoosterButton.textContent = `Booster Saison 1 · ${Number(normalBoosterSettings["Saison 1"].price).toLocaleString("fr-FR")} jetons`;
+    buySeason2BoosterButton.textContent = `${Number(normalBoosterSettings["Saison 2"].price).toLocaleString("fr-FR")} jetons`;
+    buyNormalBoosterButton.classList.toggle("hidden", !canBuySeason1);
+    buyNormalBoosterButton.disabled = !canBuySeason1;
+    buySeason2BoosterButton.classList.toggle("hidden", !canBuySeason2);
+    buySeason2BoosterButton.disabled = !canBuySeason2;
+}
+new MutationObserver(updateClassicBoosterPurchaseAvailability).observe(playerTokensDisplay, { childList: true, characterData: true, subtree: true });
+const dailyBoosterArticle = document.getElementById("dailyBoosterArticle");
+const openDailyBoosterButton = document.getElementById("openDailyBoosterButton");
+const boosterPurchaseStatus = document.getElementById("boosterPurchaseStatus");
+const boosterResultModal = document.getElementById("boosterResultModal");
+const eventBoosterPromptModal = document.getElementById("eventBoosterPromptModal");
+const eventBoosterPromptTitle = document.getElementById("eventBoosterPromptTitle");
+const eventBoosterPromptImage = document.getElementById("eventBoosterPromptImage");
+const eventBoosterPromptDescription = document.getElementById("eventBoosterPromptDescription");
+const eventBoosterPromptStatus = document.getElementById("eventBoosterPromptStatus");
+const eventBoosterOpenButton = document.getElementById("eventBoosterOpenButton");
+const eventBoosterRetryButton = document.getElementById("eventBoosterRetryButton");
+const closeBoosterResultButton = document.getElementById("closeBoosterResultButton");
+const boosterResultGrid = document.getElementById("boosterResultGrid");
+const boosterCardStage = document.getElementById("boosterCardStage");
+const boosterStageCard = document.getElementById("boosterStageCard");
+const boosterRevealProgress = document.getElementById("boosterRevealProgress");
+const boosterNextCardButton = document.getElementById("boosterNextCardButton");
+const openNextBoosterButton = document.getElementById("openNextBoosterButton");
+const boosterPackReveal = document.getElementById("boosterPackReveal");
+const boosterRevealImage = document.getElementById("boosterRevealImage");
+const boosterRevealLabel = document.getElementById("boosterRevealLabel");
+const boosterResultTitle = document.getElementById("boosterResultTitle");
+const boosterResultDescription = document.getElementById("boosterResultDescription");
+const viewOwnedCardsButton = document.getElementById("viewOwnedCardsButton");
+let boosterRevealQueue = [];
+let boosterRevealIndex = 0;
+let boosterRevealBusy = false;
+let boosterSwipeStart = null;
+let ignoreBoosterCardClick = false;
+let mandatoryEventBoosterOpen = false;
+let pendingEventBoosterQueue = [];
+let activeEventBooster = null;
+let eventBoosterOpenBusy = false;
+let pendingEventBoosterUid = "";
+let eventBoosterPlayers = [];
+let eventBoosterRarities = [];
+let eventBoosterImageUrl = "";
+let editingEventBooster = null;
+let adminEventBoosters = [];
+const ownedCardsStatus = document.getElementById("ownedCardsStatus");
+const ownedPlayerCardGrid = document.getElementById("ownedPlayerCardGrid");
+const collectionPageIndicator = document.getElementById("collectionPageIndicator");
+const collectionPreviousPageButton = document.getElementById("collectionPreviousPageButton");
+const collectionNextPageButton = document.getElementById("collectionNextPageButton");
+const cardZoomModal = document.getElementById("cardZoomModal");
+const cardZoomCloseButton = document.getElementById("cardZoomCloseButton");
+const cardZoomTitle = document.getElementById("cardZoomTitle");
+const cardZoomImageContainer = document.getElementById("cardZoomImageContainer");
+const cardZoomRarity = document.getElementById("cardZoomRarity");
+const cardZoomFavoriteButton = document.getElementById("cardZoomFavoriteButton");
+const profileFavoriteCardSection = document.getElementById("profileFavoriteCardSection");
+const profileFavoriteCardContent = document.getElementById("profileFavoriteCardContent");
+let currentZoomCard = null;
+let profileFavoriteCard = null;
+const adminPage = document.getElementById("adminPage");
+const adminSectionHint = document.getElementById("adminSectionHint");
+const adminSections = {
+    journal: document.getElementById("adminJournalSection"),
+    updates: document.getElementById("adminUpdatesSection"),
+    rarities: document.getElementById("adminRaritiesSection"),
+    cards: document.getElementById("adminCardsSection"),
+    gav: document.getElementById("adminGavSection"),
+    serviceMissions: document.getElementById("adminServiceMissionsSection"),
+    cooperations: document.getElementById("adminCooperationsSection"),
+    normalBoosters: document.getElementById("adminNormalBoostersSection"),
+};
+const minageAdminSelect = document.getElementById("minageAdminSelect");
+const minageCreateButton = document.getElementById("minageCreateButton");
+const minageDeleteButton = document.getElementById("minageDeleteButton");
+const minageNameInput = document.getElementById("minageName");
+const minageDescriptionInput = document.getElementById("minageDescription");
+const minageImageFileInput = document.getElementById("minageImageFile");
+const minageImagePreview = document.getElementById("minageImagePreview");
+const minageImageStatus = document.getElementById("minageImageStatus");
+let adminMinages = [];
+let selectedAdminMinageId = "";
+const announcementsList = document.getElementById("announcementsList");
+const newPlayersList = document.getElementById("newPlayersList");
+const announcementForm = document.getElementById("announcementForm");
+const announcementTitle = document.getElementById("announcementTitle");
+const announcementMessage = document.getElementById("announcementMessage");
+const announcementSubmit = document.getElementById("announcementSubmit");
+const announcementStatus = document.getElementById("announcementStatus");
+const siteUpdateForm = document.getElementById("siteUpdateForm");
+const siteUpdateMessage = document.getElementById("siteUpdateMessage");
+const siteUpdateSubmit = document.getElementById("siteUpdateSubmit");
+const siteUpdateStatus = document.getElementById("siteUpdateStatus");
+const adminAnnouncementsStatus = document.getElementById("adminAnnouncementsStatus");
+const adminAnnouncementsList = document.getElementById("adminAnnouncementsList");
+const adminMessagesStatus = document.getElementById("adminMessagesStatus");
+const adminMessagesList = document.getElementById("adminMessagesList");
+const downloadPlayersBackupButton = document.getElementById("downloadPlayersBackupButton");
+const playersBackupStatus = document.getElementById("playersBackupStatus");
+const feedbackToggleButton = document.getElementById("feedbackToggleButton");
+const feedbackFormPanel = document.getElementById("feedbackFormPanel");
+const feedbackForm = document.getElementById("feedbackForm");
+const feedbackCategory = document.getElementById("feedbackCategory");
+const feedbackText = document.getElementById("feedbackText");
+const feedbackSubmitButton = document.getElementById("feedbackSubmitButton");
+const feedbackStatus = document.getElementById("feedbackStatus");
+const collectionPage = document.getElementById("collectionPage");
+const seasonOneShopPage = document.getElementById("seasonOneShopPage");
+const seasonOneShopBackButton = document.getElementById("seasonOneShopBackButton");
+const seasonOneShopNumber = document.getElementById("seasonOneShopNumber");
+const seasonOneShopPreviewImage = document.getElementById("seasonOneShopPreviewImage");
+const seasonOneShopPreviewName = document.getElementById("seasonOneShopPreviewName");
+const seasonOneShopPreviewDescription = document.getElementById("seasonOneShopPreviewDescription");
+const seasonOneShopPrice = document.getElementById("seasonOneShopPrice");
+const seasonOneShopBuyButton = document.getElementById("seasonOneShopBuyButton");
+const seasonOneShopStatus = document.getElementById("seasonOneShopStatus");
+const exchangePage = document.getElementById("exchangePage");
+const exchangeBackButton = document.getElementById("exchangeBackButton");
+const exchangeMissingNumbers = document.getElementById("exchangeMissingNumbers");
+const exchangeMissingStatus = document.getElementById("exchangeMissingStatus");
+const exchangeAdsStatus = document.getElementById("exchangeAdsStatus");
+const exchangeAdsList = document.getElementById("exchangeAdsList");
+const salePage = document.getElementById("salePage");
+const saleBackButton = document.getElementById("saleBackButton");
+const saleHomeButton = document.getElementById("saleMenuButton");
+const saleStatus = document.getElementById("saleStatus");
+const saleOfferListings = document.getElementById("saleOfferListings");
+const saleOfferInventory = document.getElementById("saleOfferInventory");
+const saleReceivedOffers = document.getElementById("saleReceivedOffers");
+const saleOwnListings = document.getElementById("saleOwnListings");
+const collectionBackButton = document.getElementById("collectionBackButton");
+const collectionSeasonOneButton = document.getElementById("collectionSeasonOneButton");
+const collectionSeasonTwoButton = document.getElementById("collectionSeasonTwoButton");
+const collectionServiceCardsButton = document.getElementById("collectionServiceCardsButton");
+const collectionMysticCardsButton = document.getElementById("collectionMysticCardsButton");
+const collectionSeasonContent = document.getElementById("collectionSeasonContent");
+const collectionSeasonComingSoon = document.getElementById("collectionSeasonComingSoon");
+const recyclingPage = document.getElementById("recyclingPage");
+const recyclingBackButton = document.getElementById("recyclingBackButton");
+const recyclingStatus = document.getElementById("recyclingStatus");
+const recyclingCardsList = document.getElementById("recyclingCardsList");
+const recyclingRarityFilter = document.getElementById("recyclingRarityFilter");
+const recycleSelectionCount = document.getElementById("recycleSelectionCount");
+const collectionSearchInput = document.getElementById("collectionSearchInput");
+const collectionRarityFilter = document.getElementById("collectionRarityFilter");
+const collectionClassicModeButton = document.getElementById("collectionClassicModeButton");
+const collectionDividerModeButton = document.getElementById("collectionDividerModeButton");
+const collectionDividers = document.getElementById("collectionDividers");
+const collectionSearchStatus = document.getElementById("collectionSearchStatus");
+const recyclableDuplicateCount = document.getElementById("recyclableDuplicateCount");
+const recycleDuplicatesButton = document.getElementById("recycleDuplicatesButton");
+const recycleDuplicatesStatus = document.getElementById("recycleDuplicatesStatus");
+const rulesPage = document.getElementById("rulesPage");
+const rulesBackButton = document.getElementById("rulesBackButton");
+const rulesLoadStatus = document.getElementById("rulesLoadStatus");
+const rulesViewer = document.getElementById("rulesViewer");
+const rulesAdminPanel = document.getElementById("rulesAdminPanel");
+const rulesEditor = document.getElementById("rulesEditor");
+const rulesSaveButton = document.getElementById("rulesSaveButton");
+const rulesSaveStatus = document.getElementById("rulesSaveStatus");
+const homeHeaderButton = document.getElementById("homeHeaderButton");
+const collectionNavButton = document.getElementById("collectionNavButton");
+const seasonOneShopNavButton = document.getElementById("seasonOneShopNavButton");
+const seasonOneShopMenuButton = document.getElementById("seasonOneShopMenuButton");
+const recyclingNavButton = document.getElementById("recyclingNavButton");
+let ownedAlbumCards = [];
+let allOwnedAlbumCards = [];
+let recyclableCardCopies = [];
+let recyclingRarityFilterValue = "";
+const selectedRecycleCopyIds = new Set();
+let collectionMaxCardNumber = 0;
+let collectionSeason = "Saison 1";
+let collectionSeasonMetadata = {};
+let collectionMysticCatalog = [];
+let collectionAlbumPage = 0;
+let collectionSearchQuery = "";
+let collectionRarityFilterValue = "";
+let collectionDisplayMode = "classique";
+let collectionCategories = [];
+let collectionCategoryByNumber = {};
+let collectionCategoryFilter = "";
+let collectionZoomCards = [];
+let collectionZoomIndex = -1;
+let cardZoomTouchStart = null;
+let activeMessageCategory = "idee";
+let activeMessageStatus = "nouveau";
+const messageArchivesButton = document.getElementById("messageArchivesButton");
+const adminBackButton = document.getElementById("adminBackButton");
+const rarityForm = document.getElementById("rarityForm");
+const rarityName = document.getElementById("rarityName");
+const rarityPercentage = document.getElementById("rarityPercentage");
+const raritySubmit = document.getElementById("raritySubmit");
+const rarityCancelEdit = document.getElementById("rarityCancelEdit");
+const rarityStatus = document.getElementById("rarityStatus");
+const raritiesList = document.getElementById("raritiesList");
+const cardForm = document.getElementById("cardForm");
+const cardEntryGrid = document.getElementById("cardEntryGrid");
+const cardName = document.getElementById("cardName");
+const cardCategory = document.getElementById("cardCategory");
+const cardNumber = document.getElementById("cardNumber");
+const cardRarity = document.getElementById("cardRarity");
+const cardImage = document.getElementById("cardImage");
+const cardImageFile = document.getElementById("cardImageFile");
+const cardImagePreview = document.getElementById("cardImagePreview");
+const cardPreviewUrls = new Map();
+const cardDescription = document.getElementById("cardDescription");
+const cardSubmit = document.getElementById("cardSubmit");
+const cardCancelEdit = document.getElementById("cardCancelEdit");
+const adminStatus = document.getElementById("adminStatus");
+const cardsList = document.getElementById("cardsList");
+const cardsCount = document.getElementById("cardsCount");
+const cardPdfSeason = document.getElementById("cardPdfSeason");
+const cardPdfSearch = document.getElementById("cardPdfSearch");
+const cardPdfOptions = document.getElementById("cardPdfOptions");
+const cardPdfSelectionCount = document.getElementById("cardPdfSelectionCount");
+const cardPdfGenerateButton = document.getElementById("cardPdfGenerateButton");
+const cardPdfStatus = document.getElementById("cardPdfStatus");
+let adminCardsForPdf = [];
+const selectedCardPdfIds = new Set();
+const bottomNav = document.querySelector(".bottom-nav");
+const exchangeNavButton = document.getElementById("exchangeNavButton");
+const exchangeUnlockNotice = document.getElementById("exchangeUnlockNotice");
+let exchangeNoticeTimeout = null;
+exchangeNavButton.addEventListener("click", async () => {
+    if (!auth.currentUser) return;
+    if (!isCurrentUserAdmin() || isPlayerPreview) {
+        try {
+            const playerSnapshot = await getDoc(doc(db, "players", auth.currentUser.uid));
+            if ((Number(playerSnapshot.data()?.niveau) || 1) < 5) {
+                exchangeUnlockNotice.classList.remove("hidden");
+                if (exchangeNoticeTimeout) clearTimeout(exchangeNoticeTimeout);
+                exchangeNoticeTimeout = setTimeout(() => exchangeUnlockNotice.classList.add("hidden"), 4000);
+                return;
+            }
+        } catch (error) {
+            console.error("Impossible de vérifier le niveau requis pour les échanges :", error);
+            exchangeUnlockNotice.classList.remove("hidden");
+            if (exchangeNoticeTimeout) clearTimeout(exchangeNoticeTimeout);
+            exchangeNoticeTimeout = setTimeout(() => exchangeUnlockNotice.classList.add("hidden"), 4000);
+            return;
+        }
+    }
+    await showExchangePage();
+});
+exchangeBackButton.addEventListener("click", showHomePage);
+exchangeComposeCancel.addEventListener("click", () => {
+    exchangeComposeModal.classList.add("hidden");
+    exchangeComposeModal.setAttribute("aria-hidden", "true");
+    exchangeOfferTarget = null;
+});
+exchangeOfferAccept.addEventListener("click", () => { void answerExchangeOffer(true); });
+exchangeOfferRefuse.addEventListener("click", () => { void answerExchangeOffer(false); });
+
+function openExchangeComposer(ad) {
+    if (!ad?.id || !Array.isArray(ad.sendableNumbers) || !ad.sendableNumbers.length || !Array.isArray(ad.offerNumbers) || !ad.offerNumbers.length) return;
+    exchangeOfferTarget = ad;
+    exchangeComposeIntro.textContent = `Choisis une carte en double à proposer à ${ad.pseudo}, puis une carte en double que tu souhaites recevoir.`;
+    const fillOptions = (select, cards) => {
+        select.replaceChildren();
+        cards.forEach((card) => {
+            const option = document.createElement("option");
+            option.value = `${Number(card.season) || 1}|${card.number}`;
+            const rarity = card.rarity === "rare" ? "Rare" : card.rarity === "legendaire" ? "Légendaire" : "Commune";
+            option.textContent = `Saison ${Number(card.season) || 1} · N° ${card.number} — ${rarity}`;
+            select.append(option);
+        });
+    };
+    // "Cherche" correspond aux cartes que le joueur connecté doit envoyer;
+    // "Donne" correspond aux doubles du propriétaire que le joueur recevra.
+    fillOptions(exchangeSendNumber, ad.sendableNumbers);
+    fillOptions(exchangeReceiveNumber, ad.offerNumbers);
+    exchangeComposeStatus.textContent = "";
+    exchangeComposeSubmit.disabled = false;
+    exchangeComposeModal.classList.remove("hidden");
+    exchangeComposeModal.setAttribute("aria-hidden", "false");
+}
+
+exchangeComposeSubmit.addEventListener("click", async () => {
+    if (!exchangeOfferTarget || !auth.currentUser) return;
+    const [offeredSeason, offeredNumberText] = exchangeSendNumber.value.split("|");
+    const [requestedSeason, requestedNumberText] = exchangeReceiveNumber.value.split("|");
+    const offeredNumber = Number(offeredNumberText);
+    const requestedNumber = Number(requestedNumberText);
+    if (!Number.isSafeInteger(offeredNumber) || !Number.isSafeInteger(requestedNumber)) {
+        exchangeComposeStatus.textContent = "Sélectionne les deux cartes avant d’envoyer la demande.";
+        return;
+    }
+    exchangeComposeSubmit.disabled = true;
+    exchangeComposeStatus.textContent = "Envoi de la demande…";
+    try {
+        await callCreateExchangeOffer({ recipientId: exchangeOfferTarget.id, offeredNumber, offeredSeason, requestedNumber, requestedSeason });
+        const targetPlayerId = exchangeOfferTarget.id;
+        const targetPseudo = exchangeOfferTarget.pseudo || "ce joueur";
+        exchangeComposeStatus.textContent = `Demande envoyée à ${targetPseudo}. Il la recevra sur le site.`;
+        exchangeAdsStatus.textContent = `Ta demande d’échange a été envoyée à ${targetPseudo}.`;
+        window.setTimeout(() => {
+            exchangeComposeModal.classList.add("hidden");
+            exchangeComposeModal.setAttribute("aria-hidden", "true");
+            exchangeOfferTarget = null;
+            exchangeComposeSubmit.disabled = false;
+            void showExchangePage(targetPlayerId);
+        }, 1100);
+    } catch (error) {
+        console.error("Envoi de la demande d’échange impossible :", error);
+        exchangeComposeStatus.textContent = error.code === "functions/failed-precondition"
+            ? (error.message || "Ton inventaire a changé depuis l’affichage des annonces. Recharge la page Échanges puis réessaie.")
+            : "Impossible d’envoyer la demande. Vérifie que les fonctions d’échange sont déployées.";
+        exchangeComposeSubmit.disabled = false;
+    }
+});
+let editingCardId = null;
+
+for (let index = 2; index <= 5; index += 1) {
+    const entry = cardEntryGrid.firstElementChild.cloneNode(true);
+    entry.querySelector("legend").textContent = "Carte " + index;
+    const idMap = new Map();
+    entry.querySelectorAll("[id]").forEach((element) => {
+        const oldId = element.id;
+        element.id = oldId + "-" + index;
+        idMap.set(oldId, element.id);
+    });
+    entry.querySelectorAll("label[for]").forEach((label) => {
+        if (idMap.has(label.htmlFor)) label.htmlFor = idMap.get(label.htmlFor);
+    });
+    entry.querySelectorAll("input, select, textarea").forEach((field) => {
+        if (field.type === "file") field.value = "";
+        else field.value = "";
+    });
+    entry.querySelector('[data-card-field="season"]').value = "Saison 1";
+    entry.querySelector("img").classList.add("hidden");
+    entry.querySelector("img").removeAttribute("src");
+    cardEntryGrid.append(entry);
+    syncCardRarityField(entry);
+}
+let editingRarityId = null;
+const RARITY_COLORS = {
+    "commune": "#9E9E9E",
+    "rare": "#2878D0",
+    "légendaire": "#D4AF37",
+    "mystique": "#C4A1E8"
+};
+
+function getRarityColor(name) {
+    return RARITY_COLORS[(name || "").trim().toLocaleLowerCase("fr")] || "#9E9E9E";
+}
+
+function normalizeCardCategory(value) {
+    return String(value || "").trim().toLocaleLowerCase("fr").normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+}
+
+function isMinageCategory(value) {
+    return normalizeCardCategory(value) === "minage";
+}
+
+function isCassosCategory(value) {
+    return normalizeCardCategory(value) === "cassos";
+}
+
+function isNoRarityCardCategory(value) {
+    return isMinageCategory(value) || isCassosCategory(value);
+}
+
+function normalizeCardRarityKey(value) {
+    return String(value || "").trim().toLocaleLowerCase("fr").normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/s$/, "");
+}
+
+function updateCardRarityChance(entry) {
+    if (!entry) return;
+    const note = entry.querySelector("[data-card-rarity-chance]");
+    const category = entry.querySelector('[data-card-field="category"]')?.value || "";
+    const season = entry.querySelector('[data-card-field="season"]')?.value || "Saison 1";
+    const rarityField = entry.querySelector('[data-card-field="rarity"]');
+    const rarity = rarityField?.value || "";
+    if (!note) return;
+    const seasonChances = normalBoosterSettings?.[season]?.rarityChances || {};
+    rarityField?.querySelectorAll("option").forEach((option) => {
+        if (!option.value) return;
+        const optionChance = seasonChances[normalizeCardRarityKey(option.value)];
+        option.textContent = Number.isFinite(Number(optionChance))
+            ? `${option.value} (${Number(optionChance).toLocaleString("fr-FR")} % · ${season})`
+            : `${option.value} (${season} : taux indisponible)`;
+    });
+    if (isNoRarityCardCategory(category)) {
+        note.textContent = `Les cartes ${isCassosCategory(category) ? "Cassos" : "Minage"} n’ont pas de rareté et ne sont pas incluses dans les boosters normaux.`;
+        return;
+    }
+    if (!rarity) {
+        note.textContent = `Choisis une rareté pour voir son taux dans le booster normal ${season}.`;
+        return;
+    }
+    const rarityKey = normalizeCardRarityKey(rarity);
+    const chance = normalBoosterSettings?.[season]?.rarityChances?.[rarityKey];
+    note.textContent = Number.isFinite(Number(chance))
+        ? `Taux de ${rarity} par carte dans le booster normal ${season} : ${Number(chance).toLocaleString("fr-FR")} %.`
+        : `Aucun taux configuré pour ${rarity} dans le booster normal ${season}.`;
+}
+
+function syncCardRarityField(entry) {
+    if (!entry) return;
+    const categoryField = entry.querySelector('[data-card-field="category"]');
+    const rarityField = entry.querySelector('[data-card-field="rarity"]');
+    if (!categoryField || !rarityField) return;
+    if (isNoRarityCardCategory(categoryField.value)) {
+        rarityField.value = "";
+        rarityField.disabled = true;
+        rarityField.options[0].textContent = isCassosCategory(categoryField.value) ? "Non requise pour Cassos" : "Non requise pour le minage";
+        rarityField.style.borderColor = "";
+        rarityField.style.boxShadow = "";
+        rarityField.setAttribute("aria-label", "Aucune rareté requise pour les cartes de minage");
+    } else {
+        rarityField.disabled = false;
+        rarityField.options[0].textContent = "Choisir une rareté";
+        rarityField.removeAttribute("aria-label");
+    }
+    updateCardRarityChance(entry);
+}
+
+function getCardRarityColor(card) {
+    const rarityKey = (card?.rarity || "").trim().toLocaleLowerCase("fr");
+    return RARITY_COLORS[rarityKey] || card?.rarityColor || getRarityColor(card?.rarity);
+}
+
+cardForm.addEventListener("change", (event) => {
+    if (event.target.matches('[data-card-field="category"]')) {
+        syncCardRarityField(event.target.closest(".card-entry"));
+        return;
+    }
+    if (event.target.matches('[data-card-field="season"]')) {
+        updateCardRarityChance(event.target.closest(".card-entry"));
+        return;
+    }
+    if (!event.target.matches('[data-card-field="rarity"]')) return;
+    const color = getRarityColor(event.target.value);
+    event.target.style.borderColor = color;
+    event.target.style.boxShadow = "0 0 0 2px " + color + "33";
+    updateCardRarityChance(event.target.closest(".card-entry"));
+});
+
+
+
+/* ==================================================
+   CONNEXION
+   ================================================== */
+
+loginForm.addEventListener(
+    "submit",
+    async function(event) {
+
+        event.preventDefault();
+
+
+        loginMessage.className =
+            "message";
+
+
+        const email =
+            document
+                .getElementById(
+                    "loginEmail"
+                )
+                .value
+                .trim();
+
+
+        const password =
+            document
+                .getElementById(
+                    "loginPassword"
+                )
+                .value;
+
+
+        loginButton.disabled =
+            true;
+
+
+        loginButton.textContent =
+            "Connexion...";
+
+
+        try {
+            if (isRegisterMode) {
+                const pseudo = registerPseudo.value.trim();
+                if (pseudo.length < 3) {
+                    throw new Error("Choisis un pseudonyme d’au moins 3 caractères.");
+                }
+                if (password.length < 6) {
+                    throw new Error("Le mot de passe doit contenir au moins 6 caractères.");
+                }
+                pendingSignupPseudo = pseudo;
+                pendingSignupAvatar = selectedSignupAvatar;
+                await createUserWithEmailAndPassword(auth, email, password);
+            } else {
+                await signInWithEmailAndPassword(auth, email, password);
+            }
+        }
+
+        catch (error) {
+            console.error(error);
+            const messages = {
+                "auth/email-already-in-use": "Cette adresse e-mail possède déjà un compte.",
+                "auth/invalid-email": "Cette adresse e-mail n’est pas valide.",
+                "auth/weak-password": "Choisis un mot de passe plus solide (6 caractères minimum).",
+                "auth/operation-not-allowed": "L’inscription par e-mail doit être activée dans Firebase Authentication."
+            };
+            loginMessage.textContent = error.message || messages[error.code] || "Connexion ou inscription impossible. Vérifie tes identifiants.";
+            loginMessage.className = "message error";
+            pendingSignupPseudo = "";
+            pendingSignupAvatar = "";
+        }
+
+
+        finally {
+
+            loginButton.disabled =
+                false;
+
+            loginButton.textContent = isRegisterMode ? "Créer mon compte" : "Se connecter";
+
+        }
+
+    }
+);
+
+
+
+/* ==================================================
+   INSCRIPTION
+   ================================================== */
+
+registerButton.addEventListener(
+    "click",
+    function() {
+        isRegisterMode = !isRegisterMode;
+        registerPseudoField.classList.toggle("hidden", !isRegisterMode);
+        registerAvatarField.classList.toggle("hidden", !isRegisterMode);
+        forgotPasswordButton.classList.toggle("hidden", isRegisterMode);
+        registerPseudo.required = isRegisterMode;
+        loginTitle.textContent = isRegisterMode ? "Créer un compte" : "Connexion";
+        loginSubtitle.textContent = isRegisterMode ? "Rejoins Cartes & Popote !" : "Heureux de vous revoir !";
+        loginButton.textContent = isRegisterMode ? "Créer mon compte" : "Se connecter";
+        registerButton.textContent = isRegisterMode ? "Déjà un compte ? Se connecter" : "Créer un compte";
+        loginMessage.textContent = "";
+        loginMessage.className = "message";
+    }
+);
+
+forgotPasswordButton.addEventListener("click", async () => {
+    const email = document.getElementById("loginEmail").value.trim();
+    loginMessage.className = "message";
+    if (!email) {
+        loginMessage.textContent = "Saisis ton adresse e-mail pour recevoir le lien de réinitialisation.";
+        loginMessage.className = "message error";
+        document.getElementById("loginEmail").focus();
+        return;
+    }
+
+    forgotPasswordButton.disabled = true;
+    forgotPasswordButton.textContent = "Envoi en cours…";
+    try {
+        await sendPasswordResetEmail(auth, email);
+        loginMessage.textContent = "Si un compte correspond à cette adresse, un e-mail de réinitialisation vient d’être envoyé.";
+        loginMessage.className = "message success";
+    } catch (error) {
+        console.error("Erreur d’envoi du lien de réinitialisation :", error);
+        const resetMessages = {
+            "auth/invalid-email": "Cette adresse e-mail n’est pas valide.",
+            "auth/too-many-requests": "Trop de demandes. Réessaie un peu plus tard.",
+            "auth/network-request-failed": "Connexion impossible. Vérifie ta connexion puis réessaie."
+        };
+        loginMessage.textContent = resetMessages[error.code] || "Impossible d’envoyer le lien. Vérifie l’adresse e-mail puis réessaie.";
+        loginMessage.className = "message error";
+    } finally {
+        forgotPasswordButton.disabled = false;
+        forgotPasswordButton.textContent = "Mot de passe oublié ?";
+    }
+});
+
+
+
+/* ==================================================
+   SURVEILLER L'UTILISATEUR
+   ================================================== */
+
+onAuthStateChanged(
+
+    auth,
+
+    async function(user) {
+        updateClassicBoosterPurchaseAvailability();
+
+
+        /* ==========================================
+           PAS CONNECTÉ
+           ========================================== */
+
+        if (!user) {
+            if (dailyObjectivesUnsubscribe) dailyObjectivesUnsubscribe();
+            dailyObjectivesUnsubscribe = null;
+            dailyObjectivesDayKey = "";
+            dailyObjectivesCard.classList.add("hidden");
+            dailyObjectivesHomeButton.classList.add("hidden");
+            dailyObjectivesPage.classList.add("hidden");
+            dailyObjectivesCompletedToday = 0;
+            setPremiumPaidThisMonthAvatar(false);
+            dailyObjectivesList.replaceChildren();
+            if (unreadMessageShowTimer) window.clearInterval(unreadMessageShowTimer);
+            unreadMessageShowTimer = null;
+            unreadMessageCount = 0;
+            updatePlayerInboxUnreadBadge(0);
+            unreadMessageNoticeDismissedThisSession = false;
+            unreadMessageSessionUid = "";
+            unreadMessagesModal.classList.add("hidden");
+            unreadMessagesModal.setAttribute("aria-hidden", "true");
+            if (serviceCollectiveRefreshTimer) window.clearInterval(serviceCollectiveRefreshTimer);
+            serviceCollectiveRefreshTimer = null;
+            serviceCollectiveActiveTasks = [];
+            serviceCollectiveWorkBaseMs = 0;
+            if (mysticRewardShowTimer) window.clearInterval(mysticRewardShowTimer);
+            mysticRewardShowTimer = null;
+            pendingMysticPullNotices = [];
+            mysticRewardModal.classList.add("hidden");
+            mysticRewardModal.setAttribute("aria-hidden", "true");
+            cooperationAnnouncementQueue = []; cooperationAnnouncementActive = null;
+            cooperationProgress = { gauges:{}, counters:{}, claims:{}, eligible:true, pendingAnnouncements:[] };
+            if (cooperationProgressRefreshTimer) window.clearTimeout(cooperationProgressRefreshTimer);
+            cooperationProgressRefreshTimer = null;
+            cooperationRewardModal.classList.add("hidden"); cooperationRewardModal.setAttribute("aria-hidden", "true");
+            stopCooperationListeners();
+            if (exchangeOfferPollTimer) window.clearInterval(exchangeOfferPollTimer);
+            exchangeOfferPollTimer = null;
+            pendingExchangeOffers = [];
+            notificationUpdateAnnouncements = [];
+            if (notificationAnnouncementsRefreshTimer) window.clearInterval(notificationAnnouncementsRefreshTimer);
+            notificationAnnouncementsRefreshTimer = null;
+            notificationsBellButton.classList.add("hidden");
+            closeNotificationsPanel();
+            notificationCountBadge.classList.add("hidden");
+            notificationsList.replaceChildren();
+            activeExchangeOffer = null;
+            exchangeOfferActionBusy = false;
+            if (exchangeSuccessPollTimer) window.clearInterval(exchangeSuccessPollTimer);
+            exchangeSuccessPollTimer = null;
+            pendingExchangeSuccessNotices = [];
+            activeExchangeSuccessNotice = null;
+            exchangeSuccessNoticeActionBusy = false;
+            exchangeSuccessModal.classList.add("hidden");
+            exchangeSuccessModal.setAttribute("aria-hidden", "true");
+            exchangeOfferModal.classList.add("hidden");
+            exchangeOfferModal.setAttribute("aria-hidden", "true");
+            exchangeComposeModal.classList.add("hidden");
+            exchangeComposeModal.setAttribute("aria-hidden", "true");
+            if (homeMaintenanceRefreshInterval) window.clearInterval(homeMaintenanceRefreshInterval);
+            homeMaintenanceRefreshInterval = null;
+            homeMaintenanceAdminToggle.classList.add("hidden");
+            homeMaintenanceSwitch.classList.remove("is-active");
+            homeMaintenanceSwitch.setAttribute("aria-pressed", "false");
+            homeMaintenanceNotice.classList.add("hidden");
+            profileFavoriteCard = null;
+            renderProfileFavoriteCard(null);
+            menuButton.classList.add("hidden");
+            dropdownMenu.classList.add("hidden");
+            playerLogoutButton.classList.add("hidden");
+            serviceReadyModal.classList.add("hidden");
+            serviceReadyModal.setAttribute("aria-hidden", "true");
+            pollPromptModal.classList.add("hidden");
+            pollPromptModal.setAttribute("aria-hidden", "true");
+            pendingPolls = [];
+            activePoll = null;
+            pollSubmissionBusy = false;
+            pendingServiceReadyMission = null;
+            announcementsWaitingForServiceModal = [];
+            lastNotifiedServiceTaskId = "";
+            clearArchivesCountdown();
+            archivesPage.classList.add("hidden");
+            isPlayerPreview = false;
+            adminButton.classList.add("hidden");
+            adminHubOpenButton.classList.add("hidden");
+            adminHubPage.classList.add("hidden");
+            pollsAdminPage.classList.add("hidden");
+            eventBoostersMenuButton.classList.add("hidden");
+            adminMessagesMenuButton.classList.add("hidden");
+            playerPreviewToggle.classList.add("hidden");
+            playerPreviewBanner.classList.add("hidden");
+            premiumHomeButton.classList.add("hidden");
+            premiumPage.classList.add("hidden");
+            messagingPage.classList.add("hidden");
+            rulesPage.classList.add("hidden");
+            profilePage.classList.add("hidden");
+    exchangePage.classList.add("hidden");
+    salePage.classList.add("hidden");
+            leaderboardPage.classList.add("hidden"); activityPage.classList.add("hidden");
+            statisticsPage.classList.add("hidden");
+            drawnCardsPage.classList.add("hidden");
+            collectionPage.classList.add("hidden");
+    recyclingPage.classList.add("hidden");
+            adminPage.classList.add("hidden");
+    effectifPage.classList.add("hidden");
+            eventBoostersAdminPage.classList.add("hidden");
+    effectifPage.classList.add("hidden");
+            eventBoosterPromptModal.classList.add("hidden");
+            eventBoosterPromptModal.setAttribute("aria-hidden", "true");
+            boosterResultModal.classList.add("hidden");
+            mandatoryEventBoosterOpen = false;
+            pendingEventBoosterQueue = [];
+            activeEventBooster = null;
+            pendingEventBoosterUid = "";
+
+            loginPage.classList.remove(
+                "hidden"
+            );
+
+            appPage.classList.add(
+                "hidden"
+            );
+
+            return;
+
+        }
+
+
+
+        /* ==========================================
+           CONNECTÉ
+           ========================================== */
+
+        loginPage.classList.add(
+            "hidden"
+        );
+
+        appPage.classList.remove(
+            "hidden"
+        );
+        startCooperationListeners();
+
+        // Affichage seulement : les règles Firestore protègent les données.
+        const isAdminAccount = (user.email || "").toLowerCase() === ADMIN_EMAIL;
+        if (!isAdminAccount) isPlayerPreview = false;
+        homeMaintenanceAdminToggle.classList.toggle("hidden", !isAdminAccount || isPlayerPreview);
+        menuButton.classList.remove("hidden");
+        adminHubOpenButton.classList.toggle("hidden", !isAdminAccount || isPlayerPreview);
+        dropdownMenu.classList.add("hidden");
+        playerLogoutButton.classList.toggle("hidden", isAdminAccount);
+        adminButton.classList.add("hidden");
+        effectifMenuButton.classList.add("hidden");
+        eventBoostersMenuButton.classList.add("hidden");
+        adminMessagesMenuButton.classList.add("hidden");
+        financeMenuButton.classList.add("hidden");
+        playerPreviewToggle.classList.toggle("hidden", !isAdminAccount);
+        playerPreviewToggle.textContent = isPlayerPreview ? "🛡️ Revenir au mode Admin" : "👤 Joueur normal";
+        playerPreviewBanner.classList.toggle("hidden", !isPlayerPreview);
+        premiumHomeButton.classList.remove("hidden");
+        notificationsBellButton.classList.remove("hidden");
+        premiumAdminPanel.classList.toggle("hidden", !isAdminAccount || isPlayerPreview);
+        if (!isAdminAccount) messagingPage.classList.add("hidden");
+        loadHomeAnnouncements();
+        if (notificationAnnouncementsRefreshTimer) window.clearInterval(notificationAnnouncementsRefreshTimer);
+        notificationAnnouncementsRefreshTimer = window.setInterval(() => { if (auth.currentUser) void loadHomeAnnouncements(); }, 60_000);
+        refreshHomeMaintenanceStatus();
+        if (homeMaintenanceRefreshInterval) window.clearInterval(homeMaintenanceRefreshInterval);
+        homeMaintenanceRefreshInterval = window.setInterval(refreshHomeMaintenanceStatus, 45_000);
+        loadArchivesTaskStatus();
+        syncServiceMissionHomeCountdown();
+
+
+
+        /* ==========================================
+           RÉCUPÉRER LE PROFIL
+           ========================================== */
+
+        try {
+
+
+            const playerRef =
+                doc(
+                    db,
+                    "players",
+                    user.uid
+                );
+
+
+            const playerSnapshot =
+                await getDoc(
+                    playerRef
+                );
+
+
+            if (
+                playerSnapshot.exists()
+            ) {
+
+
+                const player =
+                    playerSnapshot.data();
+
+                renderPlayerAvatar(player.avatar);
+                void refreshPremiumPaidThisMonthAvatar(user.uid);
+                setDailyBoosterButton(player.boosterJournalierDate);
+
+
+
+                /* PSEUDO */
+
+                document
+                    .getElementById(
+                        "playerPseudo"
+                    )
+                    .textContent =
+                        player.pseudo
+                        || "Joueur";
+                playerProfileHomeButton.setAttribute("aria-label", "Ouvrir le profil de " + (player.pseudo || "Joueur"));
+
+
+
+                /* NIVEAU */
+
+                const xp =
+                    player.xp
+                    || 0;
+                updatePlayerXpDisplay(xp);
+
+
+
+                /* TOKENS */
+
+                document
+                    .getElementById(
+                        "playerTokens"
+                    )
+                    .textContent =
+                        player.tokens
+                        || 0;
+
+
+
+                /* CARTES */
+
+                document
+                    .getElementById(
+                        "playerCards"
+                    )
+                    .textContent =
+                        player.cartesTirees
+                        || 0;
+
+
+
+                /* BOOSTERS */
+
+                document
+                    .getElementById(
+                        "playerBoosters"
+                    )
+                    .textContent =
+                        (Number(player.boostersDisponibles) || 0) + (Number(player.boostersSaison2Disponibles) || 0);
+                setOpenBoosterButton(player.boostersDisponibles || 0, player.boostersSaison2Disponibles || 0);
+
+
+
+            }
+            else {
+                const pseudo = pendingSignupPseudo
+                    || (user.email || "joueur").split("@")[0];
+                const newPlayer = {
+                    pseudo,
+                    avatar: pendingSignupAvatar || selectedSignupAvatar || "femme-blonde",
+                    email: user.email || "",
+                    niveau: 1,
+                    xp: 0,
+                    tokens: 0,
+                    jetonsGagnes: 0,
+                    cartesTirees: 0,
+                    boostersAchetes: 0,
+                    boostersDisponibles: 0,
+                    boostersSaison2Disponibles: 0,
+                    createdAt: new Date().toISOString()
+                };
+                await setDoc(playerRef, newPlayer);
+                renderPlayerAvatar(newPlayer.avatar);
+                setDailyBoosterButton(newPlayer.boosterJournalierDate);
+                document.getElementById("playerPseudo").textContent = pseudo;
+                playerProfileHomeButton.setAttribute("aria-label", "Ouvrir le profil de " + pseudo);
+                document.getElementById("playerTokens").textContent = "0";
+                document.getElementById("playerCards").textContent = "0";
+                document.getElementById("playerBoosters").textContent = "0";
+                setOpenBoosterButton(0, 0);
+                pendingSignupPseudo = "";
+                pendingSignupAvatar = "";
+            }
+
+        }
+
+        catch (error) {
+
+            console.error(
+                "Erreur profil :",
+                error
+            );
+
+        }
+
+        loadDailyObjectives(user.uid);
+
+        void loadNormalBoosterSettings(false);
+
+        await checkPendingEventBoosters(user.uid);
+        await loadPendingPolls();
+        await loadPendingExchangeOffers();
+        await loadPendingExchangeSuccessNotices();
+        await loadAndClaimMysticPullRewards();
+        await loadUnreadPlayerMessages();
+        if (!exchangeOfferPollTimer) {
+            exchangeOfferPollTimer = window.setInterval(() => { void loadPendingExchangeOffers(); }, 15000);
+        }
+        if (!exchangeSuccessPollTimer) {
+            exchangeSuccessPollTimer = window.setInterval(() => { void loadPendingExchangeSuccessNotices(); }, 15000);
+        }
+
+    }
+
+);
+
+
+
+async function buyNormalBooster(season, button) {
+    if (isPlayerPreview || !auth.currentUser) return;
+    dropdownMenu.classList.add("hidden");
+    button.disabled = true;
+    boosterPurchaseStatus.textContent = `Achat du booster ${season} en cours…`;
+    try {
+        const response = await callBuyClassicBooster({ season });
+        const result = response.data;
+        document.getElementById("playerTokens").textContent = Number(result.tokens).toLocaleString("fr-FR");
+        setOpenBoosterButton(result.boostersDisponibles, result.boostersSaison2Disponibles);
+        boosterPurchaseStatus.textContent = `Booster ${season} acheté et ajouté à ton stock.`;
+    } catch (error) {
+        console.error(`Erreur pendant l’achat du booster ${season} :`, error);
+        if (error.code === "functions/failed-precondition") {
+            boosterPurchaseStatus.textContent = error.message || `Tu n’as pas assez de jetons classiques pour acheter le booster ${season}.`;
+        } else if (error.code === "functions/not-found") {
+            boosterPurchaseStatus.textContent = "Profil joueur introuvable. Déconnecte-toi puis reconnecte-toi.";
+        } else {
+            boosterPurchaseStatus.textContent = "Achat refusé. Vérifie que la fonction Firebase buyClassicBooster est déployée.";
+        }
+    } finally {
+        updateClassicBoosterPurchaseAvailability();
+    }
+}
+buyNormalBoosterButton.addEventListener("click", () => buyNormalBooster("Saison 1", buyNormalBoosterButton));
+buySeason2BoosterButton.addEventListener("click", () => buyNormalBooster("Saison 2", buySeason2BoosterButton));
+
+function showHomePage() {
+    if (serviceCollectiveRefreshTimer) window.clearInterval(serviceCollectiveRefreshTimer);
+    serviceCollectiveRefreshTimer = null;
+    adminHubReturnPending = false;
+    document.querySelector(".app-content").classList.remove("hidden");
+    dailyObjectivesPage.classList.add("hidden");
+    adminHubPage.classList.add("hidden");
+    pollsAdminPage.classList.add("hidden");
+    termsPage.classList.add("hidden");
+    financePage.classList.add("hidden");
+    profilePage.classList.add("hidden");
+    exchangePage.classList.add("hidden");
+    salePage.classList.add("hidden");
+    leaderboardPage.classList.add("hidden"); activityPage.classList.add("hidden");
+    statisticsPage.classList.add("hidden");
+    drawnCardsPage.classList.add("hidden");
+    collectionPage.classList.add("hidden");
+    seasonOneShopPage.classList.add("hidden");
+    exchangePage.classList.add("hidden");
+    recyclingPage.classList.add("hidden");
+    adminPage.classList.add("hidden");
+    effectifPage.classList.add("hidden");
+    eventBoostersAdminPage.classList.add("hidden");
+    effectifPage.classList.add("hidden");
+    messagingPage.classList.add("hidden");
+    rulesPage.classList.add("hidden");
+    premiumPage.classList.add("hidden");
+    archivesPage.classList.add("hidden");
+    eventBoostersAdminPage.classList.add("hidden");
+    effectifPage.classList.add("hidden");
+    bottomNav.classList.remove("hidden");
+    collectionNavButton.classList.remove("active");
+    recyclingNavButton.classList.remove("active");
+    seasonOneShopNavButton.classList.remove("active");
+    leaderboardMenuButton.classList.remove("active");
+}
+
+async function showExchangePage(expandPlayerId = "") {
+    if (!auth.currentUser) return;
+    dropdownMenu.classList.add("hidden");
+    document.querySelector(".app-content").classList.add("hidden");
+    [termsPage, financePage, profilePage, leaderboardPage, activityPage, statisticsPage, drawnCardsPage, collectionPage, seasonOneShopPage, exchangePage, salePage, recyclingPage, adminPage, eventBoostersAdminPage, effectifPage, messagingPage, rulesPage, premiumPage, archivesPage, adminHubPage, pollsAdminPage].forEach((page) => page.classList.add("hidden"));
+    exchangePage.classList.remove("hidden");
+    bottomNav.classList.add("hidden");
+    exchangeMissingNumbers.replaceChildren();
+    exchangeMissingStatus.textContent = "Chargement des cartes manquantes…";
+    exchangeAdsList.replaceChildren();
+    exchangeAdsStatus.textContent = "Chargement des annonces…";
+    try {
+        const response = (await callGetExchangeBoard()).data || {};
+        const missingCards = Array.isArray(response.missingCards) ? response.missingCards : [];
+        missingCards.forEach((card) => {
+            const item = document.createElement("li");
+            const rarityClass = card.rarity === "rare" ? "exchange-rarity-rare"
+                : card.rarity === "legendaire" ? "exchange-rarity-legendary" : "exchange-rarity-common";
+            item.className = rarityClass;
+            item.textContent = String(card.number);
+            item.title = `Saison ${Number(card.season) || 1} · ` + (card.rarity === "rare" ? "Carte rare" : card.rarity === "legendaire" ? "Carte légendaire" : "Carte commune");
+            exchangeMissingNumbers.append(item);
+        });
+        exchangeMissingStatus.textContent = missingCards.length
+            ? `${missingCards.length} numéro${missingCards.length > 1 ? "s" : ""} manquant${missingCards.length > 1 ? "s" : ""} • les cartes mystiques sont exclues.`
+            : "Tu as déjà toutes les cartes échangeables actuellement disponibles.";
+        const ads = Array.isArray(response.ads) ? response.ads : [];
+        ads.forEach((ad) => {
+            const article = document.createElement("details");
+            article.className = "exchange-ad";
+            article.open = ad.id === expandPlayerId;
+            const title = document.createElement("summary");
+            title.className = "exchange-ad-title";
+            const playerName = document.createElement("span");
+            playerName.className = "exchange-player-name";
+            playerName.textContent = ad.pseudo || "Joueur";
+            title.append(playerName);
+            const possibleCount = Number(ad.possibleExchangeCount) || 0;
+            if (possibleCount > 0) {
+                const badge = document.createElement("span");
+                badge.className = "exchange-possible-count";
+                badge.textContent = `↔ ${possibleCount}`;
+                badge.title = `${possibleCount} échange${possibleCount > 1 ? "s" : ""} possible${possibleCount > 1 ? "s" : ""} avec ce joueur`;
+                badge.setAttribute("aria-label", badge.title);
+                title.append(badge);
+            }
+            article.append(title);
+            const details = document.createElement("div");
+            details.className = "exchange-ad-details";
+            const appendNumberLine = (label, cards, emptyMessage) => {
+                const paragraph = document.createElement("p");
+                const lineLabel = document.createElement("span");
+                lineLabel.className = "exchange-ad-label";
+                lineLabel.textContent = label;
+                paragraph.append(lineLabel);
+                if (cards.length) {
+                    const numbers = document.createElement("span");
+                    numbers.className = "exchange-ad-numbers";
+                    cards.forEach((card) => {
+                        const number = document.createElement("span");
+                        number.className = card.rarity === "rare" ? "exchange-rarity-rare"
+                            : card.rarity === "legendaire" ? "exchange-rarity-legendary" : "exchange-rarity-common";
+                        number.textContent = `${Number(card.season) || 1}-${card.number}`;
+                        number.title = `Saison ${Number(card.season) || 1} · ` + (card.rarity === "rare" ? "Carte rare" : card.rarity === "legendaire" ? "Carte légendaire" : "Carte commune");
+                        numbers.append(number);
+                    });
+                    paragraph.append(numbers);
+                } else {
+                    paragraph.append(document.createTextNode(" " + emptyMessage));
+                }
+                details.append(paragraph);
+            };
+            appendNumberLine("Tu as celles qui l’intéressent :", Array.isArray(ad.sendableNumbers) ? ad.sendableNumbers : [], "aucune de tes cartes en double ne l’intéresse.");
+            appendNumberLine("Il a celles qui t’intéressent :", Array.isArray(ad.offerNumbers) ? ad.offerNumbers : [], "aucune de ses cartes en double ne te manque.");
+            const pendingTrades = Array.isArray(ad.pendingTrades) ? ad.pendingTrades : [];
+            if (pendingTrades.length) {
+                const pendingSection = document.createElement("section");
+                pendingSection.className = "exchange-pending-section";
+                const pendingHeading = document.createElement("h4");
+                pendingHeading.textContent = "Échange en attente de réponse";
+                pendingSection.append(pendingHeading);
+                pendingTrades.forEach((trade) => {
+                    const line = document.createElement("p");
+                    line.className = "exchange-pending-trade";
+                    const offered = `Saison ${Number(trade.offeredSeason) || 1} · n° ${Number(trade.offeredNumber) || "?"}`;
+                    const requested = `Saison ${Number(trade.requestedSeason) || 1} · n° ${Number(trade.requestedNumber) || "?"}`;
+                    line.textContent = trade.direction === "sent"
+                        ? `Tu proposes ${offered} contre ${requested} ; sa réponse est attendue.`
+                        : `${ad.pseudo || "Ce joueur"} propose ${offered} contre ta carte ${requested} ; ta réponse est attendue.`;
+                    pendingSection.append(line);
+                });
+                details.append(pendingSection);
+            }
+            if (Array.isArray(ad.sendableNumbers) && ad.sendableNumbers.length && Array.isArray(ad.offerNumbers) && ad.offerNumbers.length) {
+                const tradeButton = document.createElement("button");
+                tradeButton.type = "button";
+                tradeButton.className = "exchange-trade-button";
+                tradeButton.textContent = "Échanger";
+                tradeButton.addEventListener("click", () => openExchangeComposer(ad));
+                details.append(tradeButton);
+            }
+            article.append(details);
+            exchangeAdsList.append(article);
+        });
+        exchangeAdsStatus.textContent = ads.length
+            ? `${ads.length} joueur${ads.length > 1 ? "s" : ""} de niveau 5 ou plus affiché${ads.length > 1 ? "s" : ""}. Le bouton Échanger apparaît lorsqu’un échange est possible.`
+            : "Aucun autre joueur n’a encore atteint le niveau 5.";
+    } catch (error) {
+        console.error("Impossible de charger la page Échanges :", error);
+        exchangeMissingStatus.textContent = "Impossible de charger les cartes manquantes. Vérifie que la fonction getExchangeBoard est déployée.";
+        exchangeAdsStatus.textContent = "Impossible de charger les petites annonces.";
+    }
+}
+
+async function showDrawnCardsPage() {
+    if (!auth.currentUser || (auth.currentUser.email || "").toLowerCase() !== ADMIN_EMAIL || isPlayerPreview) return;
+    dropdownMenu.classList.add("hidden");
+    document.querySelector(".app-content").classList.add("hidden");
+    [termsPage, financePage, profilePage, leaderboardPage, activityPage, statisticsPage, collectionPage, exchangePage, recyclingPage, adminPage, eventBoostersAdminPage, effectifPage, messagingPage, rulesPage, premiumPage, archivesPage].forEach((page) => page.classList.add("hidden"));
+    drawnCardsPage.classList.remove("hidden");
+    bottomNav.classList.add("hidden");
+    drawnCardsTotal.textContent = "Chargement du total…";
+    try {
+        const response = await callGetAdminGavSettings();
+        drawnCardsTotal.textContent = (Number(response.data?.totalCardsDrawn) || 0).toLocaleString("fr-FR");
+    } catch (error) {
+        console.error("Impossible de charger le total des cartes tirées :", error);
+        drawnCardsTotal.textContent = "Impossible de charger le total. Vérifie que les fonctions Firebase sont déployées.";
+    }
+}
+
+drawnCardsBackButton.addEventListener("click", returnToAdminHubOrHome);
+document.addEventListener("click", (event) => {
+    if (event.target.closest("button, a, [role='button']") && !event.target.closest("#drawnCardsPage") && !event.target.closest('[data-admin-hub-action="tirages"]')) {
+        drawnCardsPage.classList.add("hidden");
+    }
+}, true);
+
+function formatArchivesCountdown(milliseconds) {
+    const totalSeconds = Math.max(0, Math.ceil(milliseconds / 1000));
+    const hours = Math.floor(totalSeconds / 3600);
+    const minutes = Math.floor((totalSeconds % 3600) / 60);
+    const seconds = totalSeconds % 60;
+    return [hours, minutes, seconds].map((part) => String(part).padStart(2, "0")).join(":");
+}
+
+function clearArchivesCountdown() {
+    if (archivesCountdownInterval) clearInterval(archivesCountdownInterval);
+    archivesCountdownInterval = null;
+    archivesReadyAtMs = null;
+    archivesCountdown.classList.add("hidden");
+    archivesHomeCountdown.classList.add("hidden");
+    sortArchivesButton.disabled = false;
+    archivesMiningSelect.disabled = false;
+    sortArchivesButton.textContent = "Lancer le minage";
+}
+
+async function claimArchivesReward() {
+    if (archivesClaimInProgress || !auth.currentUser) return;
+    archivesClaimInProgress = true;
+    sortArchivesButton.disabled = true;
+    archivesStatus.textContent = "Le minage est terminé. Récupération de ta récompense…";
+    try {
+        const response = await callClaimArchivesSortingReward();
+        void refreshCooperationProgress();
+        const tokens = Number(response.data.tokens) || 0;
+        const tokenReward = Number(response.data.tokenReward) || 0;
+        document.getElementById("playerTokens").textContent = tokens.toLocaleString("fr-FR");
+        if (response.data.cartesTirees !== undefined) document.getElementById("playerCards").textContent = Number(response.data.cartesTirees || 0).toLocaleString("fr-FR");
+        if (!viewedOtherPlayerId && tokenReward > 0) {
+            profileTokensEarned.textContent = ((Number(profileTokensEarned.textContent.replace(/\D/g, "")) || 0) + tokenReward).toLocaleString("fr-FR");
+        }
+        clearArchivesCountdown();
+        archivesHomeCountdown.textContent = `+${tokenReward} jeton${tokenReward === 1 ? "" : "s"} classique${tokenReward === 1 ? "" : "s"}${response.data.cardRewarded ? " et une carte" : ""} trouvé${tokenReward === 1 ? "" : "s"} !`;
+        archivesHomeCountdown.classList.remove("hidden");
+        setTimeout(() => archivesHomeCountdown.classList.add("hidden"), 7000);
+        archivesStatus.textContent = "Minage terminé : " + tokenReward + " jeton(s) classique(s) gagné(s)" + (response.data.cardRewarded ? " et une carte." : ".") + " Tu peux en lancer un autre.";
+    } catch (error) {
+        console.error("Erreur lors de la récupération du jeton des archives :", error);
+        archivesStatus.textContent = error.code === "functions/failed-precondition"
+            ? "Le minage n’est pas encore terminé. Le compte à rebours continue."
+            : "Impossible de récupérer le jeton. Réessaie dans un instant.";
+        await loadArchivesTaskStatus(false);
+    } finally {
+        archivesClaimInProgress = false;
+        sortArchivesButton.disabled = archivesReadyAtMs !== null;
+    }
+}
+
+function updateArchivesCountdown() {
+    if (!Number.isFinite(archivesReadyAtMs)) return;
+    const remaining = Math.max(0, archivesReadyAtMs - Date.now());
+    const countdownText = formatArchivesCountdown(remaining);
+    archivesCountdown.textContent = countdownText;
+    archivesHomeCountdown.textContent = countdownText;
+    archivesCountdown.classList.remove("hidden");
+    archivesHomeCountdown.classList.remove("hidden");
+    sortArchivesButton.disabled = true;
+    sortArchivesButton.textContent = "Minage en cours";
+    if (remaining <= 0) {
+        if (archivesCountdownInterval) clearInterval(archivesCountdownInterval);
+        archivesCountdownInterval = null;
+        claimArchivesReward();
+    }
+}
+
+function setArchivesTask(readyAt) {
+    if (archivesCountdownInterval) clearInterval(archivesCountdownInterval);
+    const parsedReadyAt = typeof readyAt === "string" ? Date.parse(readyAt) : Number.NaN;
+    if (!Number.isFinite(parsedReadyAt)) {
+        clearArchivesCountdown();
+        return;
+    }
+    archivesReadyAtMs = parsedReadyAt;
+    updateArchivesCountdown();
+    if (archivesReadyAtMs !== null) archivesCountdownInterval = setInterval(updateArchivesCountdown, 1000);
+}
+
+async function loadArchivesTaskStatus(claimWhenReady = true) {
+    if (!auth.currentUser) return;
+    sortArchivesButton.disabled = true;
+    archivesStatus.textContent = "Vérification du tri des archives…";
+    try {
+        const response = await callGetArchivesTaskStatus();
+        const data = response.data || {};
+        availableMinages = Array.isArray(data.minages) ? data.minages : [];
+        if (data.readyAt) {
+            availableMinages = availableMinages.map((minage) => minage.id === data.minageId ? {
+                ...minage,
+                workDurationMs: Number(data.taskDurationMs) || minage.workDurationMs,
+                tokenReward: Number.isFinite(Number(data.tokenReward)) ? Number(data.tokenReward) : minage.tokenReward,
+                cardRewardId: data.taskCardRewardId || minage.cardRewardId,
+                cardRewardName: data.taskCardRewardName || minage.cardRewardName,
+            } : minage);
+        }
+        renderArchivesMinageOptions(data.readyAt ? (data.minageId || "") : "");
+        if (data.ready && claimWhenReady) {
+            archivesStatus.textContent = "Le tri est terminé. Récupération du jeton…";
+            await claimArchivesReward();
+            return;
+        }
+        if (data.readyAt) {
+            setArchivesTask(data.readyAt);
+            archivesStatus.textContent = data.ready ? "Ta récompense est prête à être récupérée." : (data.minageName || "Le minage") + " est en cours. Le compte à rebours est aussi affiché sur l’accueil.";
+        } else {
+            clearArchivesCountdown();
+            archivesStatus.textContent = "Choisis un minage puis lance-le.";
+        }
+    } catch (error) {
+        console.error("Impossible de charger le compte à rebours des archives :", error);
+        archivesStatus.textContent = "Impossible de charger la Salle archives. Vérifie que les fonctions Firebase correspondantes sont déployées.";
+        sortArchivesButton.disabled = false;
+    }
+}
+
+async function openArchivesPage() {
+    if (!auth.currentUser) return;
+    dropdownMenu.classList.add("hidden");
+    document.querySelector(".app-content").classList.add("hidden");
+    [termsPage, financePage, profilePage, leaderboardPage, activityPage, statisticsPage, collectionPage, exchangePage, recyclingPage, adminPage, eventBoostersAdminPage, effectifPage, messagingPage, rulesPage, premiumPage].forEach((page) => page.classList.add("hidden"));
+    bottomNav.classList.add("hidden");
+    archivesPage.classList.remove("hidden");
+    await loadServicePage();
+}
+
+archivesHomeButton.addEventListener("click", openArchivesPage);
+document.querySelectorAll("[data-service-type]").forEach((button) => button.addEventListener("click", () => {
+    renderServiceMissions(button.dataset.serviceType); setServiceView("missions");
+}));
+document.getElementById("serviceMissionsBack").addEventListener("click", () => setServiceView("home"));
+document.getElementById("serviceClaimButton").addEventListener("click", async () => {
+    const button = document.getElementById("serviceClaimButton"); button.disabled = true; serviceStatus.textContent = "Récupération de ta récompense…";
+    try {
+        const result = (await callClaimServiceMissionReward({ taskId: serviceActiveMission?.taskId })).data || {};
+        pendingServiceReadyMission = null;
+        renderNotificationCenter();
+        void refreshCooperationProgress();
+        const details = [`${result.tokenReward || 0} jeton(s)`];
+        if (result.cardDropChance > 0 && !result.cardDropSucceeded) details.push("aucune carte n’a été obtenue cette fois");
+        (result.cards || []).forEach((card) => details.push(card.name || "une carte"));
+        serviceStatus.textContent = `Mission terminée ! Récompenses : ${details.join(" et ")}.`;
+        serviceActiveMission = null; if (serviceCountdownInterval) clearInterval(serviceCountdownInterval); serviceCountdownInterval = null;
+        archivesHomeCountdown.classList.add("hidden"); setServiceView("home");
+    } catch (error) { serviceStatus.textContent = error.message || "Impossible de récupérer la récompense."; }
+    finally { button.disabled = false; }
+});
+document.getElementById("serviceConfirmCancel").addEventListener("click", () => { pendingServiceMission = null; document.getElementById("serviceMissionConfirm").classList.add("hidden"); });
+document.getElementById("serviceConfirmStart").addEventListener("click", async () => {
+    const mission = pendingServiceMission; pendingServiceMission = null; document.getElementById("serviceMissionConfirm").classList.add("hidden");
+    if (mission) await launchSelectedServiceMission(mission);
+});
+document.getElementById("serviceAdminFilter").addEventListener("change", renderAdminServiceMissions);
+document.getElementById("serviceAdminArchiveToggle").addEventListener("click", () => {
+    showArchivedServiceMissions = !showArchivedServiceMissions;
+    const button = document.getElementById("serviceAdminArchiveToggle");
+    button.setAttribute("aria-pressed", String(showArchivedServiceMissions));
+    button.textContent = showArchivedServiceMissions ? "↩ Missions actives" : "🗄️ Missions archivées";
+    renderAdminServiceMissions();
+});
+document.getElementById("serviceMissionCreateButton").addEventListener("click", () => {
+    document.getElementById("serviceMissionCancel").click(); document.getElementById("serviceMissionEditor").classList.remove("hidden");
+    document.getElementById("serviceMissionName").focus();
+});
+document.getElementById("serviceMissionCancel").addEventListener("click", () => {
+    editingServiceMissionId = ""; serviceMissionFormSource = null; document.getElementById("serviceMissionForm").reset();
+    document.getElementById("serviceMissionHours").value = "2"; document.getElementById("serviceMissionMinutes").value = "0";
+    document.getElementById("serviceMissionCardMode").dispatchEvent(new Event("change"));
+    document.getElementById("serviceMissionType").dispatchEvent(new Event("change"));
+    document.getElementById("serviceMissionSpecialCardImage").value = "";
+    setServiceMissionPreview(document.getElementById("serviceMissionSpecialCardPreview"), "", document.getElementById("serviceMissionSpecialCardImageStatus"), "");
+    setServiceMissionPreview(document.getElementById("serviceMissionImagePreview"), "", document.getElementById("serviceMissionImageStatus"), "");
+    document.getElementById("serviceAdminFormTitle").textContent = "Créer une mission";
+    document.getElementById("serviceMissionCancel").classList.add("hidden"); document.getElementById("serviceMissionSave").textContent = "Enregistrer la mission";
+    document.getElementById("serviceMissionEditor").classList.add("hidden");
+});
+document.getElementById("serviceMissionForm").addEventListener("submit", async (event) => {
+    event.preventDefault(); const button = document.getElementById("serviceMissionSave"); const status = document.getElementById("serviceAdminStatus"); button.disabled = true; status.textContent = "Enregistrement…";
+    try {
+        const id = editingServiceMissionId || (crypto.randomUUID ? crypto.randomUUID() : `mission-${Date.now()}`);
+        const existing = adminServiceMissions.find((item) => item.id === editingServiceMissionId) || serviceMissionFormSource;
+        const isExternalMission = document.getElementById("serviceMissionType").value === "external";
+        const rewardFile = document.getElementById("serviceMissionSpecialCardImage").files?.[0];
+        const specialName = document.getElementById("serviceMissionSpecialCardName").value.trim();
+        if (isExternalMission && Number(document.getElementById("serviceMissionChance").value) > 0
+            && (!specialName || !(rewardFile || existing?.specialRewardCard?.imageUrl))) {
+            throw new Error("Pour une probabilité supérieure à 0 %, renseigne le nom et le visuel de la carte spéciale.");
+        }
+        const data = { id, name: document.getElementById("serviceMissionName").value.trim(), description: document.getElementById("serviceMissionDescription").value.trim(),
+            serviceType: document.getElementById("serviceMissionType").value, durationMinutes: Number(document.getElementById("serviceMissionHours").value)*60+Number(document.getElementById("serviceMissionMinutes").value),
+            sortOrder: Number(document.getElementById("serviceMissionOrder").value)||0, tokenReward: isExternalMission ? 0 : Number(document.getElementById("serviceMissionTokens").value), dropChance: Number(document.getElementById("serviceMissionChance").value),
+            cardCount: document.getElementById("serviceMissionType").value === "external" ? 1 : Number(document.getElementById("serviceMissionCardCount").value),
+            cardMode: document.getElementById("serviceMissionType").value === "external" ? "special" : document.getElementById("serviceMissionCardMode").value,
+            eligibleCardCategories: document.getElementById("serviceMissionType").value === "external" ? [] : document.getElementById("serviceMissionCategories").value.split(",").map((v)=>v.trim()).filter(Boolean),
+            eligibleCardIds: document.getElementById("serviceMissionType").value === "external" ? [] : [...document.getElementById("serviceMissionCards").selectedOptions].map((option)=>option.value), enabled: document.getElementById("serviceMissionEnabled").checked,
+            archived: false, imageUrl: existing?.imageUrl||"", imagePath: existing?.imagePath||"",
+            specialRewardCard: document.getElementById("serviceMissionType").value === "external" ? { name: document.getElementById("serviceMissionSpecialCardName").value.trim(), imageUrl: existing?.specialRewardCard?.imageUrl || "", imagePath: existing?.specialRewardCard?.imagePath || "" } : null };
+        const file = document.getElementById("serviceMissionImage").files?.[0];
+        if (file) {
+            if (!/^image\/(png|jpeg|webp)$/.test(file.type)||file.size>5*1024*1024) throw new Error("L’image doit être PNG, JPG ou WebP et ne pas dépasser 5 Mo.");
+            const extension=file.type==="image/jpeg"?"jpg":file.type==="image/webp"?"webp":"png";
+            data.imagePath=`serviceMissions/${auth.currentUser.uid}/${id}-${Date.now()}.${extension}`;
+            const uploaded=await uploadBytes(ref(storage,data.imagePath),file,{contentType:file.type}); data.imageUrl=await getDownloadURL(uploaded.ref);
+        }
+        if (rewardFile && data.serviceType === "external") {
+            if (!/^image\/(png|jpeg|webp)$/.test(rewardFile.type)||rewardFile.size>5*1024*1024) throw new Error("Le visuel de la carte doit être PNG, JPG ou WebP et ne pas dépasser 5 Mo.");
+            const extension=rewardFile.type==="image/jpeg"?"jpg":rewardFile.type==="image/webp"?"webp":"png";
+            data.specialRewardCard.imagePath=`serviceMissions/${auth.currentUser.uid}/${id}-reward-${Date.now()}.${extension}`;
+            const uploaded=await uploadBytes(ref(storage,data.specialRewardCard.imagePath),rewardFile,{contentType:rewardFile.type}); data.specialRewardCard.imageUrl=await getDownloadURL(uploaded.ref);
+        }
+        await callSaveServiceMission(data); status.textContent="Mission enregistrée.";
+        document.getElementById("serviceMissionCancel").click(); await loadAdminServiceMissions();
+    } catch(error) { console.error("Enregistrement mission impossible :",error); status.textContent=error.message||"Impossible d’enregistrer la mission."; }
+    finally { button.disabled=false; }
+});
+document.getElementById("serviceMissionCardMode").addEventListener("change",(event)=>{
+    document.getElementById("serviceMissionCategories").closest("label").classList.toggle("hidden",event.target.value!=="categories");
+    document.getElementById("serviceMissionCards").closest("label").classList.toggle("hidden",event.target.value!=="cards");
+});
+function updateServiceMissionFormType() {
+    const external = document.getElementById("serviceMissionType").value === "external";
+    document.getElementById("serviceMissionSpecialCardFields").classList.toggle("hidden", !external);
+    ["serviceMissionTokensField","serviceMissionCardCountField","serviceMissionCardModeField","serviceMissionCategoriesField","serviceMissionCardsField"].forEach((id)=>document.getElementById(id).classList.toggle("hidden", external));
+    document.getElementById("serviceMissionChanceField").classList.remove("hidden");
+    document.getElementById("serviceMissionChanceLabel").textContent = external ? "Probabilité de gagner la carte spéciale (%)" : "Probabilité de gagner une carte (%)";
+    document.getElementById("serviceMissionChance").required = false;
+}
+document.getElementById("serviceMissionType").addEventListener("change", updateServiceMissionFormType);
+function handleServiceMissionImageSelection(event, previewId, statusId, existingUrl, existingLabel, emptyLabel) {
+    const file = event.target.files?.[0];
+    const preview = document.getElementById(previewId);
+    const status = document.getElementById(statusId);
+    if (!file) {
+        setServiceMissionPreview(preview, existingUrl, status, existingLabel || emptyLabel);
+        return;
+    }
+    if (!/^image\/(png|jpeg|webp)$/.test(file.type) || file.size > 5 * 1024 * 1024) {
+        event.target.value = "";
+        setServiceMissionPreview(preview, existingUrl, status, existingLabel || "Choisis une image PNG, JPG ou WebP de 5 Mo maximum.");
+        if (!existingUrl) status.textContent = "Choisis une image PNG, JPG ou WebP de 5 Mo maximum.";
+        return;
+    }
+    setServiceMissionPreview(preview, URL.createObjectURL(file), status, "Nouveau visuel prêt à être envoyé.");
+    preview.dataset.previewObjectUrl = preview.src;
+}
+document.getElementById("serviceMissionImage").addEventListener("change", (event) => {
+    handleServiceMissionImageSelection(event, "serviceMissionImagePreview", "serviceMissionImageStatus", serviceMissionFormSource?.imageUrl || "", "Illustration actuelle conservée si aucun nouveau fichier n’est choisi.", "Image facultative.");
+});
+document.getElementById("serviceMissionSpecialCardImage").addEventListener("change", (event) => {
+    handleServiceMissionImageSelection(event, "serviceMissionSpecialCardPreview", "serviceMissionSpecialCardImageStatus", serviceMissionFormSource?.specialRewardCard?.imageUrl || "", "Visuel actuel conservé si aucun nouveau fichier n’est choisi.", "Visuel facultatif.");
+});
+archivesBackButton.addEventListener("click", showHomePage);
+sortArchivesButton.addEventListener("click", async () => {
+    if (!auth.currentUser || sortArchivesButton.disabled) return;
+    sortArchivesButton.disabled = true;
+    archivesStatus.textContent = "Le minage commence…";
+    try {
+        const response = await callStartArchivesSorting({ minageId: archivesMiningSelect.value });
+        archivesMiningSelect.value = response.data.minageId || archivesMiningSelect.value;
+        archivesMiningSelect.disabled = true;
+        const activeMinage = availableMinages.find((item) => item.id === response.data.minageId);
+        if (activeMinage) showMinageDetails(activeMinage);
+        setArchivesTask(response.data.readyAt);
+        archivesStatus.textContent = "Le minage a commencé ! Reviens quand le compte à rebours sera terminé pour récupérer ta récompense.";
+    } catch (error) {
+        console.error("Impossible de lancer le tri des archives :", error);
+        archivesStatus.textContent = error.message || "Impossible de lancer le tri des archives.";
+        await loadArchivesTaskStatus();
+    }
+});
+
+termsLink.addEventListener("click", (event) => {
+    event.preventDefault();
+    document.querySelector(".app-content").classList.add("hidden");
+    archivesPage.classList.add("hidden");
+    termsPage.classList.remove("hidden");
+    bottomNav.classList.add("hidden");
+});
+termsBackButton.addEventListener("click", showHomePage);
+
+const PREMIUM_REWARD_TYPES = [
+    { value: "tokens", label: "Jetons classiques" },
+    { value: "premium", label: "Jetons Premium" },
     { value: "booster", label: "Booster classique · Saison 2" },
     { value: "premiumBooster", label: "Booster Premium (3 cartes)" },
     { value: "card", label: "Carte de la collection" }
@@ -12148,5 +14282,4 @@ if ("serviceWorker" in navigator) {
 </body>
 
 </html>
-
 
