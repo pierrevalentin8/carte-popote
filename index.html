@@ -1298,6 +1298,7 @@ body {
 .service-admin-grid label { display:grid; gap:4px; font-weight:600; }
 .service-admin-grid input,.service-admin-grid select,.service-admin-grid textarea,.service-filter { min-width:0; padding:7px; border:2px inset #eee; border-radius:0; background:#fff; color:#111; }
 .service-admin-list { display:grid; gap:8px; margin-top:14px; }
+.service-mission-image-preview { display:block; width:auto; max-width:min(220px,100%); max-height:240px; margin:8px 0 14px; padding:5px; border:1px solid #c7d2df; border-radius:10px; background:#fff; object-fit:contain; box-shadow:0 3px 10px rgba(20,38,65,.12); }
 .service-admin-toolbar { display:flex; align-items:end; justify-content:space-between; gap:12px; flex-wrap:wrap; margin:10px 0; }
 .service-admin-toolbar label { display:grid; gap:5px; min-width:min(100%,240px); font-weight:700; }
 .service-admin-toolbar .admin-field { margin:0; }
@@ -2631,10 +2632,12 @@ body {
 /* Homepage refresh for the launch of Season 2 */
 .app-content { max-width: 1160px; }
 .home-player-summary { display:flex; max-width:760px; align-items:center; justify-content:center; gap:18px; margin:14px auto 12px; padding:0; border:0; background:transparent; box-shadow:none; }
-.daily-objectives-header { list-style:none; cursor:pointer; }
+.daily-objectives-header { list-style:none; cursor:pointer; transition:filter .16s ease, transform .16s ease; }
 .daily-objectives-header::-webkit-details-marker { display:none; }
-.daily-objectives-header::after { content:"⌄"; flex:none; color:#397249; font-size:20px; line-height:1; transition:transform .18s ease; }
-.daily-objectives-card[open] .daily-objectives-header::after { transform:rotate(180deg); }
+.daily-objectives-header::after { content:none !important; display:none !important; }
+.daily-objectives-header:hover { filter:brightness(1.08); }
+.daily-objectives-header:active { transform:translateY(1px); }
+.daily-objectives-header:focus-visible { outline:3px solid #d5ac3c; outline-offset:3px; }
 .daily-objectives-card:not([open]) { padding-top:11px; padding-bottom:11px; }
 @media(max-width:380px){.home-player-summary{grid-template-columns:minmax(0,1fr) 68px}}
 .bottom-nav { display:flex; align-items:center; justify-content:space-evenly; gap:0; }
@@ -2812,7 +2815,7 @@ body:has(#appPage .app-content:not(.hidden)) {
 #appPage:has(.app-content:not(.hidden)) .daily-objectives-card { position:relative; overflow:hidden; padding:12px; border:1px solid #6f9c4a; border-radius:20px; background:radial-gradient(ellipse at 92% 4%,rgba(245,210,104,.2),transparent 32%),linear-gradient(145deg,#f8fff1,#e5f2dc 70%,#f6ffed); box-shadow:0 9px 0 rgba(37,94,48,.08),0 14px 25px rgba(24,75,38,.14),inset 0 1px #fff; }
 #appPage:has(.app-content:not(.hidden)) .daily-objectives-header { display:grid; grid-template-columns:minmax(0,1fr) auto auto; align-items:center; gap:8px; margin:0 0 11px; padding:11px 13px; border:1px solid rgba(255,228,151,.75); border-radius:13px; background:linear-gradient(110deg,#1b5631,#16432a 68%,#103b25); box-shadow:0 4px 0 rgba(12,53,29,.22),inset 0 1px rgba(255,255,255,.22); }
 #appPage:has(.app-content:not(.hidden)) .daily-objectives-header h3 { color:#fff3c6; font-size:16px; text-shadow:0 1px 4px rgba(0,0,0,.34); }
-#appPage:has(.app-content:not(.hidden)) .daily-objectives-header::after { color:#ffe18b; }
+#appPage:has(.app-content:not(.hidden)) .daily-objectives-header::after { content:none !important; display:none !important; }
 #appPage:has(.app-content:not(.hidden)) .daily-objectives-date { padding:5px 8px; border:1px solid rgba(255,255,255,.18); border-radius:999px; background:rgba(255,255,255,.1); color:#e6f6e4; text-align:center; white-space:nowrap; }
 #appPage:has(.app-content:not(.hidden)) .daily-objectives-progress { padding:5px 8px; border:1px solid rgba(249,211,105,.55); border-radius:999px; background:rgba(255,215,105,.13); color:#ffe39c; font-size:11px; font-weight:900; white-space:nowrap; }
 #appPage:has(.app-content:not(.hidden)) .daily-objectives-progress.is-complete { border-color:#a6df88; background:linear-gradient(135deg,#d8f5c0,#a5df91); color:#174528; }
@@ -4526,9 +4529,9 @@ body:has(#appPage .app-content:not(.hidden)) {
                 <label id="serviceMissionChanceField"><span id="serviceMissionChanceLabel">Probabilité de gagner une carte (%)</span><input id="serviceMissionChance" type="number" min="0" max="100" step="0.01" value="0"></label>
                 <label id="serviceMissionCardCountField">Nombre de cartes en cas de réussite<input id="serviceMissionCardCount" type="number" min="1" max="5" value="1"></label><label id="serviceMissionCardModeField">Cartes éligibles<select id="serviceMissionCardMode"><option value="all">Toutes les cartes distribuables</option><option value="categories">Catégories choisies</option><option value="cards">Cartes sélectionnées</option></select></label>
                 <label id="serviceMissionCategoriesField">Catégories (séparées par des virgules)<input id="serviceMissionCategories" placeholder="Ex. Cassos"><small>Pour attribuer les cartes Cassos, choisis une mission externe, « Catégories choisies », saisis Cassos et règle le pourcentage de réussite.</small></label><label id="serviceMissionCardsField">Cartes éligibles<select id="serviceMissionCards" multiple size="5"></select></label>
-                <div id="serviceMissionSpecialCardFields" class="hidden" style="grid-column:1/-1"><h5>Carte spéciale à gagner (hors saisons)</h5><p class="admin-note">Cette carte est propre à la mission et n’est pas choisie dans le catalogue des saisons. Sa probabilité est réglable ci-dessus.</p><div class="service-admin-grid"><label>Nom de la carte spéciale<input id="serviceMissionSpecialCardName" maxlength="100" placeholder="Nom de la carte"></label><label>Visuel de la carte (PNG/JPG/WebP, max 5 Mo)<input id="serviceMissionSpecialCardImage" type="file" accept="image/png,image/jpeg,image/webp"></label></div><p id="serviceMissionSpecialCardImageStatus" class="admin-note">Visuel requis si la probabilité est supérieure à 0 %.</p><img id="serviceMissionSpecialCardPreview" class="hidden" alt="Aperçu de la carte spéciale" style="max-width:150px;max-height:210px;object-fit:contain;border-radius:10px"></div>
+                <div id="serviceMissionSpecialCardFields" class="hidden" style="grid-column:1/-1"><h5>Carte spéciale à gagner (hors saisons)</h5><p class="admin-note">Cette carte est propre à la mission et n’est pas choisie dans le catalogue des saisons. Sa probabilité est réglable ci-dessus.</p><div class="service-admin-grid"><label>Nom de la carte spéciale<input id="serviceMissionSpecialCardName" maxlength="100" placeholder="Nom de la carte"></label><label>Visuel de la carte (PNG/JPG/WebP, max 5 Mo)<input id="serviceMissionSpecialCardImage" type="file" accept="image/png,image/jpeg,image/webp"></label></div><p id="serviceMissionSpecialCardImageStatus" class="admin-note">Visuel requis si la probabilité est supérieure à 0 %.</p><img id="serviceMissionSpecialCardPreview" class="hidden service-mission-image-preview" alt="Aperçu de la carte spéciale"></div>
                 <label>Illustration (PNG/JPG/WebP, max 5 Mo)<input id="serviceMissionImage" type="file" accept="image/png,image/jpeg,image/webp"></label><label>Activer la mission<input id="serviceMissionEnabled" type="checkbox" checked></label>
-            </div><p id="serviceMissionImageStatus" class="admin-note">Image facultative.</p><button id="serviceMissionSave" class="primary-button" type="submit">Enregistrer la mission</button><button id="serviceMissionCancel" class="secondary-button hidden" type="button">Annuler</button></form><p id="serviceAdminStatus" class="admin-status" role="status" aria-live="polite"></p></div>
+            </div><p id="serviceMissionImageStatus" class="admin-note">Image facultative.</p><img id="serviceMissionImagePreview" class="hidden service-mission-image-preview" alt="Aperçu de l’illustration de la mission"><button id="serviceMissionSave" class="primary-button" type="submit">Enregistrer la mission</button><button id="serviceMissionCancel" class="secondary-button hidden" type="button">Annuler</button></form><p id="serviceAdminStatus" class="admin-status" role="status" aria-live="polite"></p></div>
         </div>
         <div id="adminCooperationsSection" class="admin-panel admin-section hidden" style="margin-bottom:16px">
             <h3>🤝 Paramètres des coopérations</h3>
@@ -7154,8 +7157,8 @@ document.getElementById("serviceMissionCancel").addEventListener("click", () => 
     document.getElementById("serviceMissionCardMode").dispatchEvent(new Event("change"));
     document.getElementById("serviceMissionType").dispatchEvent(new Event("change"));
     document.getElementById("serviceMissionSpecialCardImage").value = "";
-    document.getElementById("serviceMissionSpecialCardPreview").classList.add("hidden");
-    document.getElementById("serviceMissionSpecialCardImageStatus").textContent = "Visuel facultatif.";
+    setServiceMissionPreview(document.getElementById("serviceMissionSpecialCardPreview"), "", document.getElementById("serviceMissionSpecialCardImageStatus"), "");
+    setServiceMissionPreview(document.getElementById("serviceMissionImagePreview"), "", document.getElementById("serviceMissionImageStatus"), "");
     document.getElementById("serviceAdminFormTitle").textContent = "Créer une mission";
     document.getElementById("serviceMissionCancel").classList.add("hidden"); document.getElementById("serviceMissionSave").textContent = "Enregistrer la mission";
     document.getElementById("serviceMissionEditor").classList.add("hidden");
@@ -7212,11 +7215,28 @@ function updateServiceMissionFormType() {
     document.getElementById("serviceMissionChance").required = false;
 }
 document.getElementById("serviceMissionType").addEventListener("change", updateServiceMissionFormType);
-document.getElementById("serviceMissionSpecialCardImage").addEventListener("change",(event)=>{
-    const file=event.target.files?.[0]; const preview=document.getElementById("serviceMissionSpecialCardPreview");
-    if(!file){preview.classList.add("hidden");return;}
-    if(!/^image\/(png|jpeg|webp)$/.test(file.type)||file.size>5*1024*1024){event.target.value="";document.getElementById("serviceMissionSpecialCardImageStatus").textContent="Choisis une image PNG, JPG ou WebP de 5 Mo maximum.";preview.classList.add("hidden");return;}
-    preview.src=URL.createObjectURL(file);preview.classList.remove("hidden");document.getElementById("serviceMissionSpecialCardImageStatus").textContent="Nouveau visuel prêt à être envoyé.";
+function handleServiceMissionImageSelection(event, previewId, statusId, existingUrl, existingLabel, emptyLabel) {
+    const file = event.target.files?.[0];
+    const preview = document.getElementById(previewId);
+    const status = document.getElementById(statusId);
+    if (!file) {
+        setServiceMissionPreview(preview, existingUrl, status, existingLabel || emptyLabel);
+        return;
+    }
+    if (!/^image\/(png|jpeg|webp)$/.test(file.type) || file.size > 5 * 1024 * 1024) {
+        event.target.value = "";
+        setServiceMissionPreview(preview, existingUrl, status, existingLabel || "Choisis une image PNG, JPG ou WebP de 5 Mo maximum.");
+        if (!existingUrl) status.textContent = "Choisis une image PNG, JPG ou WebP de 5 Mo maximum.";
+        return;
+    }
+    setServiceMissionPreview(preview, URL.createObjectURL(file), status, "Nouveau visuel prêt à être envoyé.");
+    preview.dataset.previewObjectUrl = preview.src;
+}
+document.getElementById("serviceMissionImage").addEventListener("change", (event) => {
+    handleServiceMissionImageSelection(event, "serviceMissionImagePreview", "serviceMissionImageStatus", serviceMissionFormSource?.imageUrl || "", "Illustration actuelle conservée si aucun nouveau fichier n’est choisi.", "Image facultative.");
+});
+document.getElementById("serviceMissionSpecialCardImage").addEventListener("change", (event) => {
+    handleServiceMissionImageSelection(event, "serviceMissionSpecialCardPreview", "serviceMissionSpecialCardImageStatus", serviceMissionFormSource?.specialRewardCard?.imageUrl || "", "Visuel actuel conservé si aucun nouveau fichier n’est choisi.", "Visuel facultatif.");
 });
 archivesBackButton.addEventListener("click", showHomePage);
 sortArchivesButton.addEventListener("click", async () => {
@@ -12416,10 +12436,28 @@ function renderAdminServiceMissions() {
     });
 }
 
+function setServiceMissionPreview(preview, imageUrl, status, message) {
+    if (preview.dataset.previewObjectUrl) {
+        URL.revokeObjectURL(preview.dataset.previewObjectUrl);
+        delete preview.dataset.previewObjectUrl;
+    }
+    if (imageUrl) {
+        preview.src = imageUrl;
+        preview.classList.remove("hidden");
+        status.textContent = message;
+    } else {
+        preview.removeAttribute("src");
+        preview.classList.add("hidden");
+        status.textContent = "Visuel facultatif.";
+    }
+}
+
 function fillServiceMissionForm(mission) {
     document.getElementById("serviceMissionEditor").classList.remove("hidden");
     serviceMissionFormSource = mission;
     editingServiceMissionId = mission.id || "";
+    document.getElementById("serviceMissionImage").value = "";
+    document.getElementById("serviceMissionSpecialCardImage").value = "";
     document.getElementById("serviceAdminFormTitle").textContent = editingServiceMissionId ? "Modifier la mission" : "Créer une mission";
     document.getElementById("serviceMissionName").value = mission.name || "";
     document.getElementById("serviceMissionDescription").value = mission.description || "";
@@ -12433,9 +12471,8 @@ function fillServiceMissionForm(mission) {
     document.getElementById("serviceMissionCards").closest("label").classList.toggle("hidden", (mission.cardMode || "all") !== "cards");
     document.getElementById("serviceMissionEnabled").checked = mission.enabled !== false;
     document.getElementById("serviceMissionSpecialCardName").value = mission.specialRewardCard?.name || "";
-    const specialPreview = document.getElementById("serviceMissionSpecialCardPreview");
-    if (mission.specialRewardCard?.imageUrl) { specialPreview.src = mission.specialRewardCard.imageUrl; specialPreview.classList.remove("hidden"); document.getElementById("serviceMissionSpecialCardImageStatus").textContent = "Visuel actuel conservé si aucun nouveau fichier n’est choisi."; }
-    else { specialPreview.classList.add("hidden"); document.getElementById("serviceMissionSpecialCardImageStatus").textContent = "Visuel facultatif."; }
+    setServiceMissionPreview(document.getElementById("serviceMissionSpecialCardPreview"), mission.specialRewardCard?.imageUrl, document.getElementById("serviceMissionSpecialCardImageStatus"), "Visuel actuel conservé si aucun nouveau fichier n’est choisi.");
+    setServiceMissionPreview(document.getElementById("serviceMissionImagePreview"), mission.imageUrl, document.getElementById("serviceMissionImageStatus"), "Illustration actuelle conservée si aucun nouveau fichier n’est choisi.");
     [...document.getElementById("serviceMissionCards").options].forEach((option) => { option.selected = (mission.eligibleCardIds || []).includes(option.value); });
     updateServiceMissionFormType();
     document.getElementById("serviceMissionCancel").classList.remove("hidden"); document.getElementById("serviceMissionSave").textContent = "Enregistrer les modifications";
