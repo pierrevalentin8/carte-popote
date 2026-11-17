@@ -8811,6 +8811,7 @@ async function loadPersonalProfile(playerId = auth.currentUser?.uid) {
             "exchange-5": { image: "./badge-echanges-5.png", label: "5 échanges effectués" },
             "exchange-50": { image: "./badge-echanges-50.png", label: "50 échanges effectués" },
             "exchange-100": { image: "./badge-echanges-100.png", label: "100 échanges effectués" },
+            "exchange-1000": { image: "./badge-echanges-1000.png", label: "1 000 échanges effectués" },
             "classic-tokens-100": { image: "./badge-jetons-classiques-100.png", label: "100 jetons gagnés" },
             "classic-tokens-300": { image: "./badge-jetons-classiques-300.png", label: "300 jetons classiques gagnés" },
             "classic-tokens-500": { image: "./badge-jetons-classiques-500.png", label: "500 jetons classiques gagnés" },
@@ -8870,6 +8871,7 @@ function renderProfileBadges(player, isOwnProfile) {
         "exchange-5": { id: "exchange-5", label: "5 échanges effectués", image: "./badge-echanges-5.png" },
         "exchange-50": { id: "exchange-50", label: "50 échanges effectués", image: "./badge-echanges-50.png" },
         "exchange-100": { id: "exchange-100", label: "100 échanges effectués", image: "./badge-echanges-100.png" },
+        "exchange-1000": { id: "exchange-1000", label: "1 000 échanges effectués", image: "./badge-echanges-1000.png" },
         "classic-tokens-100": { id: "classic-tokens-100", label: "100 jetons gagnés", image: "./badge-jetons-classiques-100.png" },
         "classic-tokens-300": { id: "classic-tokens-300", label: "300 jetons classiques gagnés", image: "./badge-jetons-classiques-300.png" },
         "classic-tokens-500": { id: "classic-tokens-500", label: "500 jetons classiques gagnés", image: "./badge-jetons-classiques-500.png" },
@@ -8888,6 +8890,7 @@ function renderProfileBadges(player, isOwnProfile) {
     if (completedExchanges >= 5) unlockedBadgeIds.add("exchange-5");
     if (completedExchanges >= 50) unlockedBadgeIds.add("exchange-50");
     if (completedExchanges >= 100) unlockedBadgeIds.add("exchange-100");
+    if (completedExchanges >= 1000) unlockedBadgeIds.add("exchange-1000");
     const unlockedBadges = [...unlockedBadgeIds].map((badgeId) => badgeCatalog[badgeId]).filter(Boolean);
     profileBadgesEmpty.classList.toggle("hidden", unlockedBadges.length > 0);
     profileBadgesEmpty.textContent = isOwnProfile
@@ -8897,7 +8900,7 @@ function renderProfileBadges(player, isOwnProfile) {
         if (["common-season-1", "rare-season-1", "legendary-season-1", "season-1-complete"].includes(id)) return "Saison 1";
         if (["common-season-2", "rare-season-2", "legendary-season-2", "season-2-complete"].includes(id)) return "Saison 2";
         if (["service-50h", "service-200h", "service-500h"].includes(id)) return "Service";
-        if (["exchange-5", "exchange-50", "exchange-100"].includes(id)) return "Échanges";
+        if (["exchange-5", "exchange-50", "exchange-100", "exchange-1000"].includes(id)) return "Échanges";
         if (id.startsWith("classic-tokens-")) return "Jetons classiques";
         if (id.startsWith("premium-")) return "Premium";
         if (id.startsWith("level-")) return "Niveaux";
@@ -9196,7 +9199,7 @@ async function loadLeaderboard() {
             level.textContent = "Niveau " + (Number(player.niveau) || 1);
             nameLine.append(name);
             const eventBadge = (player.eventBadges || []).find((badge) => badge.id === player.badgeEquipped);
-            if (["premium-10", "premium-50", "premium-100", "common-season-1", "rare-season-1", "legendary-season-1", "common-season-2", "rare-season-2", "legendary-season-2", "season-1-complete", "season-2-complete", "exchange-5", "exchange-50", "exchange-100", "classic-tokens-100", "classic-tokens-300", "classic-tokens-500", "service-50h", "service-200h", "service-500h", "level-5", "level-10", "level-15"].includes(player.badgeEquipped) || eventBadge) {
+            if (["premium-10", "premium-50", "premium-100", "common-season-1", "rare-season-1", "legendary-season-1", "common-season-2", "rare-season-2", "legendary-season-2", "season-1-complete", "season-2-complete", "exchange-5", "exchange-50", "exchange-100", "exchange-1000", "classic-tokens-100", "classic-tokens-300", "classic-tokens-500", "service-50h", "service-200h", "service-500h", "level-5", "level-10", "level-15"].includes(player.badgeEquipped) || eventBadge) {
                 const badge = document.createElement("img");
                 badge.className = "leaderboard-badge";
                 const badgeImage = eventBadge?.imageUrl || (player.badgeEquipped === "premium-50" ? "./premium%2050.png"
@@ -9206,6 +9209,7 @@ async function loadLeaderboard() {
                     : player.badgeEquipped === "exchange-5" ? "./badge-echanges-5.png"
                         : player.badgeEquipped === "exchange-50" ? "./badge-echanges-50.png"
                             : player.badgeEquipped === "exchange-100" ? "./badge-echanges-100.png"
+                                : player.badgeEquipped === "exchange-1000" ? "./badge-echanges-1000.png"
                     : player.badgeEquipped === "common-season-1"
                     ? "./badge-communes-27.png"
                     : player.badgeEquipped === "rare-season-1" ? "./Cartes%20rares.png"
@@ -9230,6 +9234,7 @@ async function loadLeaderboard() {
                     : player.badgeEquipped === "exchange-5" ? "Badge bronze : 5 échanges effectués"
                         : player.badgeEquipped === "exchange-50" ? "Badge argenté : 50 échanges effectués"
                             : player.badgeEquipped === "exchange-100" ? "Badge doré : 100 échanges effectués"
+                                : player.badgeEquipped === "exchange-1000" ? "Badge diamant : 1 000 échanges effectués"
                     : player.badgeEquipped === "common-season-1"
                     ? "Badge 27 cartes communes"
                     : player.badgeEquipped === "rare-season-1" ? "Badge 30 cartes rares • Saison 1"
