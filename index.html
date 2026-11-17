@@ -1949,8 +1949,10 @@ body {
 .card-zoom-favorite-button:focus-visible { outline:3px solid #ffe17b; outline-offset:3px; }
 .profile-favorite-card { margin:18px 0 0; padding:14px; border:1px solid rgba(231,193,91,.55); border-radius:14px; background:linear-gradient(145deg,rgba(7,22,45,.88),rgba(16,43,79,.92)); }
 .profile-favorite-card h3 { margin:0 0 10px; color:#ffdc69; font-size:14px; }
-.profile-favorite-card-content { display:flex; align-items:center; gap:12px; min-height:66px; }
-.profile-favorite-card-content img { width:56px; height:78px; object-fit:cover; border:1px solid rgba(255,220,105,.7); border-radius:7px; background:#0b1b36; }
+.profile-favorite-card-content { display:flex; width:100%; align-items:center; gap:12px; min-height:66px; padding:0; border:0; background:transparent; color:inherit; font:inherit; text-align:left; cursor:zoom-in; }
+.profile-favorite-card-content:hover img { transform:translateY(-2px) scale(1.04); box-shadow:0 6px 14px rgba(0,0,0,.3); }
+.profile-favorite-card-content:focus-visible { outline:3px solid #ffe17b; outline-offset:4px; border-radius:8px; }
+.profile-favorite-card-content img { width:56px; height:78px; object-fit:cover; border:1px solid rgba(255,220,105,.7); border-radius:7px; background:#0b1b36; transition:transform .16s ease,box-shadow .16s ease; }
 .profile-favorite-card-copy { display:grid; gap:4px; }
 .profile-favorite-card-copy strong { color:#fff4d0; }
 .profile-favorite-card-copy span { color:#c4d0e2; font-size:12px; }
@@ -3784,7 +3786,7 @@ body:has(#appPage .app-content:not(.hidden)) {
             </section>
             <section id="profileFavoriteCardSection" class="profile-favorite-card hidden" aria-labelledby="profileFavoriteCardTitle">
                 <h3 id="profileFavoriteCardTitle">★ Carte favorite</h3>
-                <div id="profileFavoriteCardContent" class="profile-favorite-card-content"></div>
+                <button id="profileFavoriteCardContent" class="profile-favorite-card-content" type="button" aria-label="Agrandir la carte favorite"></button>
             </section>
             <p class="profile-tracking-note">Totaux cumulés, distincts des soldes disponibles. Les jetons reçus avant la mise en place du suivi peuvent manquer.</p>
             <details id="profileHistory" class="profile-history hidden">
@@ -10081,6 +10083,10 @@ function renderProfileFavoriteCard(card) {
     copy.append(name, details);
     profileFavoriteCardContent.append(copy);
 }
+
+profileFavoriteCardContent.addEventListener("click", () => {
+    if (profileFavoriteCard) openCardZoom(profileFavoriteCard);
+});
 
 function renderCardZoom(card) {
     currentZoomCard = card;
