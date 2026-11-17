@@ -460,6 +460,7 @@ body {
 .notification-exchange-card { display:grid; min-width:0; gap:3px; justify-items:center; color:#354c3b; font-size:10px; text-align:center; }
 .notification-exchange-card img { width:46px; height:62px; object-fit:contain; border-radius:5px; background:#edf3e9; }
 .notification-exchange-card strong { color:#27623a; font-size:9px; }
+.notification-exchange-rarity { font-size:10px; font-weight:900; }
 .notification-exchange-arrow { color:#367f42; font-size:18px; font-weight:900; }
 .notification-service-image { width:72px; max-height:76px; object-fit:contain; border-radius:8px; }
 .notifications-empty { margin:10px 4px 5px; color:#68806b; font-size:12px; text-align:center; }
@@ -5055,13 +5056,18 @@ function tryShowPendingExchangeOffer(offerFromNotification = null) {
     exchangeOfferMessage.textContent = `${activeExchangeOffer.senderPseudo || "Un joueur"} te propose un échange.`;
     const offeredSeason = Number(activeExchangeOffer.offeredSeason) || 1;
     const requestedSeason = Number(activeExchangeOffer.requestedSeason) || 1;
-    exchangeOfferDetails.textContent = `${activeExchangeOffer.senderPseudo || "Un joueur"} te propose sa carte Saison ${offeredSeason} · n° ${activeExchangeOffer.offeredNumber} contre ta carte Saison ${requestedSeason} · n° ${activeExchangeOffer.requestedNumber}.`;
+    exchangeOfferDetails.textContent = `${activeExchangeOffer.senderPseudo || "Un joueur"} te propose sa carte Saison ${offeredSeason} · n° ${activeExchangeOffer.offeredNumber} (${exchangeRarityLabel(activeExchangeOffer.offeredRarity)}) contre ta carte Saison ${requestedSeason} · n° ${activeExchangeOffer.requestedNumber} (${exchangeRarityLabel(activeExchangeOffer.requestedRarity)}).`;
     exchangeOfferStatus.textContent = "";
     exchangeOfferAccept.disabled = false;
     exchangeOfferRefuse.disabled = false;
     exchangeOfferModal.classList.remove("hidden");
     exchangeOfferModal.setAttribute("aria-hidden", "false");
     exchangeOfferAccept.focus();
+}
+
+function exchangeRarityLabel(value) {
+    const key = normalizeCardRarityKey(value);
+    return ({ commune: "Commune", rare: "Rare", legendaire: "Légendaire" })[key] || "Rareté inconnue";
 }
 
 function appendExchangeSuccessCard(label, card) {
@@ -5289,8 +5295,25 @@ function renderNotificationCenter() {
         if (entry.type === "offer") {
             const offer = entry.offer;
             const item = makeNotificationItem("offer", `🤝 Proposition de ${offer.senderPseudo || "un joueur"}`, offer.createdAt,
-                `Saison ${Number(offer.offeredSeason) || 1} · n° ${offer.offeredNumber} contre ta carte Saison ${Number(offer.requestedSeason) || 1} · n° ${offer.requestedNumber}.`);
+                "Cartes proposées et demandées :");
             item.classList.add("is-unread");
+            const cards = document.createElement("div"); cards.className = "notification-exchange-cards";
+            [
+                { direction: "Il propose", season: offer.offeredSeason, number: offer.offeredNumber, rarity: offer.offeredRarity },
+                { direction: "Tu donnes", season: offer.requestedSeason, number: offer.requestedNumber, rarity: offer.requestedRarity },
+            ].forEach((card, index) => {
+                if (index) { const arrow = document.createElement("span"); arrow.className = "notification-exchange-arrow"; arrow.textContent = "⇄"; cards.append(arrow); }
+                const face = document.createElement("div"); face.className = "notification-exchange-card";
+                const direction = document.createElement("strong"); direction.textContent = card.direction;
+                const number = document.createElement("span"); number.textContent = `Saison ${Number(card.season) || 1} · n° ${Number(card.number) || "?"}`;
+                const rarity = document.createElement("span");
+                const rarityKey = normalizeCardRarityKey(card.rarity);
+                const rarityStyle = rarityKey === "legendaire" ? "legendary" : rarityKey === "commune" ? "common" : rarityKey;
+                rarity.className = `notification-exchange-rarity exchange-rarity-${rarityStyle}`;
+                rarity.textContent = exchangeRarityLabel(card.rarity);
+                face.append(direction, number, rarity); cards.append(face);
+            });
+            item.append(cards);
             const button = document.createElement("button"); button.type = "button"; button.textContent = "Répondre à la proposition";
             button.addEventListener("click", () => { closeNotificationsPanel(); tryShowPendingExchangeOffer(offer); }); item.append(button); notificationsList.append(item);
             return;
