@@ -525,12 +525,10 @@ body {
     #appPage:has(#adminHubOpenButton:not(.hidden)) .header-logo { width:30vw; }
     #appPage:has(#adminHubOpenButton:not(.hidden)) .admin-hub-open-button { width:58px; }
 }
-.home-maintenance-admin-toggle { position:absolute; top:50%; left:14px; display:flex; align-items:center; gap:7px; padding:7px 9px; border:1px solid rgba(243,191,56,.65); border-radius:999px; background:linear-gradient(135deg,#17365c,#0b1b36); color:#fff4d3; font-size:11px; font-weight:800; cursor:pointer; transform:translateY(-50%); box-shadow:0 3px 9px rgba(0,0,0,.24),inset 0 1px rgba(255,255,255,.18); }
-.home-maintenance-admin-toggle input { appearance:none; position:relative; width:31px; height:17px; flex:0 0 31px; border:1px solid #8c99a8; border-radius:999px; background:#596678; cursor:pointer; transition:background .2s ease,border-color .2s ease; }
-.home-maintenance-admin-toggle input::after { position:absolute; top:2px; left:2px; width:11px; height:11px; border-radius:50%; background:#fff; content:""; transition:transform .2s ease; }
-.home-maintenance-admin-toggle input:checked { border-color:#f4cd63; background:#ba7d11; }
-.home-maintenance-admin-toggle input:checked::after { transform:translateX(14px); }
-.home-maintenance-admin-toggle:focus-within { outline:3px solid #f7d46b; outline-offset:2px; }
+.home-maintenance-admin-toggle { position:absolute; top:50%; left:14px; display:grid; width:42px; height:42px; place-items:center; padding:0; border:1px solid #76d89a; border-radius:13px; background:linear-gradient(145deg,#3bcc72,#168343 62%,#0b5d35); color:#fff; font-size:23px; line-height:1; cursor:pointer; transform:translateY(-50%); box-shadow:0 4px 0 #084a29,0 7px 13px rgba(0,0,0,.3),inset 0 1px rgba(255,255,255,.42); transition:filter .16s ease,transform .16s ease,background .2s ease,border-color .2s ease; }
+.home-maintenance-admin-toggle:hover { filter:brightness(1.12); transform:translateY(calc(-50% - 1px)); }
+.home-maintenance-admin-toggle.is-active { border-color:#ffb2a8; background:linear-gradient(145deg,#ff7167,#d62e35 62%,#941c28); box-shadow:0 4px 0 #72151c,0 7px 13px rgba(0,0,0,.3),inset 0 1px rgba(255,255,255,.42); }
+.home-maintenance-admin-toggle:focus-visible { outline:3px solid #f7d46b; outline-offset:3px; }
 .home-maintenance-notice { margin:0 0 12px; padding:7px 12px; border-left:3px solid #e0b344; border-radius:0 8px 8px 0; background:rgba(16,38,74,.08); color:#596b80; font-size:12px; font-weight:700; letter-spacing:.04em; }
 .admin-hub-page { max-width: 1050px; }
 .admin-hub-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 15px; margin-top: 20px; }
@@ -1940,6 +1938,19 @@ body {
 .booster-modal { position: fixed; inset: 0; z-index: 500; display: grid; place-items: center; padding: 16px; background: rgba(15, 42, 58, .68); }
 .card-zoom-modal { position: fixed; inset: 0; z-index: 600; display: grid; place-items: center; padding: 18px; background: rgba(3, 11, 25, .86); }
 .card-zoom-content { position: relative; width: min(100%, 420px); max-height: 94dvh; overflow: auto; padding: 18px; border: 1px solid rgba(243,191,56,.8); border-radius: 20px; background: var(--theme-cream, #fff); text-align: center; box-shadow: 0 18px 55px rgba(0,0,0,.45); touch-action: pan-y; }
+.card-zoom-image-wrap { position:relative; width:min(100%,360px); margin:12px auto; }
+.card-zoom-image-wrap .card-zoom-image { margin:0; }
+.card-zoom-favorite-button { position:absolute; z-index:2; top:9px; right:9px; display:grid; width:42px; height:42px; place-items:center; border:1px solid rgba(243,191,56,.9); border-radius:50%; background:rgba(8,23,47,.88); color:#ffe17b; font-size:27px; line-height:1; cursor:pointer; box-shadow:0 3px 11px rgba(0,0,0,.38),inset 0 1px rgba(255,255,255,.22); transition:transform .16s ease,filter .16s ease; }
+.card-zoom-favorite-button:hover { transform:scale(1.08); filter:brightness(1.15); }
+.card-zoom-favorite-button[aria-pressed="true"] { background:linear-gradient(145deg,#ffe996,#e5a915); color:#17213a; }
+.card-zoom-favorite-button:focus-visible { outline:3px solid #ffe17b; outline-offset:3px; }
+.profile-favorite-card { margin:18px 0 0; padding:14px; border:1px solid rgba(231,193,91,.55); border-radius:14px; background:linear-gradient(145deg,rgba(7,22,45,.88),rgba(16,43,79,.92)); }
+.profile-favorite-card h3 { margin:0 0 10px; color:#ffdc69; font-size:14px; }
+.profile-favorite-card-content { display:flex; align-items:center; gap:12px; min-height:66px; }
+.profile-favorite-card-content img { width:56px; height:78px; object-fit:cover; border:1px solid rgba(255,220,105,.7); border-radius:7px; background:#0b1b36; }
+.profile-favorite-card-copy { display:grid; gap:4px; }
+.profile-favorite-card-copy strong { color:#fff4d0; }
+.profile-favorite-card-copy span { color:#c4d0e2; font-size:12px; }
 .card-zoom-close { position: absolute; z-index: 2; top: 8px; right: 8px; width: 40px; height: 40px; border: 0; border-radius: 50%; background: #10264a; color: #fff; font-size: 25px; line-height: 1; cursor: pointer; }
 .card-zoom-image { display: block; width: min(100%, 360px); max-height: 76dvh; aspect-ratio: 2 / 3; object-fit: contain; margin: 12px auto; border-radius: 12px; }
 .card-zoom-placeholder { display: grid; place-items: center; width: min(100%, 360px); aspect-ratio: 2 / 3; margin: 12px auto; border-radius: 12px; background: #e8e1d2; font-size: 72px; }
@@ -3352,10 +3363,7 @@ body:has(#appPage .app-content:not(.hidden)) {
         <button id="adminHubOpenButton" class="admin-hub-open-button hidden" type="button" aria-label="Ouvrir le menu Admin" title="Admin">
             <img src="./Admin.png" alt="Admin">
         </button>
-        <label id="homeMaintenanceAdminToggle" class="home-maintenance-admin-toggle hidden" title="Afficher la mention Travaux sur l’accueil">
-            <span>Travaux</span>
-            <input id="homeMaintenanceSwitch" type="checkbox" aria-label="Afficher la mention Travaux sur l’accueil">
-        </label>
+        <button id="homeMaintenanceAdminToggle" class="home-maintenance-admin-toggle hidden" type="button" aria-label="Activer les travaux sur le site" aria-pressed="false" title="Activer les travaux sur le site">🔨</button>
 
         <button id="playerLogoutButton" class="player-logout-button hidden" type="button" aria-label="Déconnexion" title="Déconnexion">↪</button>
 
@@ -3747,6 +3755,10 @@ body:has(#appPage .app-content:not(.hidden)) {
                 <h4 class="profile-dashboard-subtitle">Prochains paliers</h4>
                 <div id="profileDashboardUpcoming" class="profile-dashboard-upcoming"></div>
             </section>
+            <section id="profileFavoriteCardSection" class="profile-favorite-card hidden" aria-labelledby="profileFavoriteCardTitle">
+                <h3 id="profileFavoriteCardTitle">★ Carte favorite</h3>
+                <div id="profileFavoriteCardContent" class="profile-favorite-card-content"></div>
+            </section>
             <p class="profile-tracking-note">Totaux cumulés, distincts des soldes disponibles. Les jetons reçus avant la mise en place du suivi peuvent manquer.</p>
             <details id="profileHistory" class="profile-history hidden">
                 <summary id="profileHistoryTitle">Mon historique</summary>
@@ -3876,6 +3888,7 @@ body:has(#appPage .app-content:not(.hidden)) {
             <button id="collectionSeasonOneButton" class="collection-season-card-button" type="button" aria-label="Afficher la collection de la saison 1" title="Saison 1" aria-pressed="true"><img src="./Dos cartes.png" alt=""></button>
             <button id="collectionSeasonTwoButton" class="collection-season-card-button" type="button" aria-label="Afficher la collection de la saison 2" title="Saison 2" aria-pressed="false"><img src="./Dos de carte (saison 2).png" alt=""></button>
             <button id="collectionServiceCardsButton" class="collection-service-cards-button" type="button" aria-pressed="false">🃏 Cartes de mission</button>
+            <button id="collectionMysticCardsButton" class="collection-service-cards-button" type="button" aria-pressed="false">✨ Mystiques</button>
         </div>
         <p id="collectionSeasonComingSoon" class="collection-season-notice hidden" role="status">En cours de création</p>
         <div id="collectionSeasonContent">
@@ -3884,8 +3897,8 @@ body:has(#appPage .app-content:not(.hidden)) {
             <button id="collectionClassicModeButton" type="button" aria-pressed="true">Affichage classique</button>
             <button id="collectionDividerModeButton" type="button" aria-pressed="false">Intercalaires</button>
         </div>
-        <label class="collection-search-label" for="collectionSearchInput">Rechercher une carte par son nom</label>
-        <input id="collectionSearchInput" class="collection-search" type="search" maxlength="80" placeholder="Rechercher une carte découverte…" autocomplete="off">
+        <label class="collection-search-label" for="collectionSearchInput">Rechercher une carte par son nom ou son numéro</label>
+        <input id="collectionSearchInput" class="collection-search" type="search" maxlength="80" placeholder="Nom ou numéro de carte…" autocomplete="off">
         <label class="collection-search-label" for="collectionRarityFilter">Filtrer par rareté</label>
         <select id="collectionRarityFilter" class="collection-rarity-filter"><option value="">Toutes les raretés</option><option value="commune">Communes</option><option value="rare">Rares</option><option value="legendaire">Légendaires</option><option value="mystique">Mystiques</option></select>
         <p id="collectionSearchStatus" class="collection-search-status" role="status" aria-live="polite"></p>
@@ -4144,7 +4157,7 @@ body:has(#appPage .app-content:not(.hidden)) {
         <div class="card-zoom-content">
             <button id="cardZoomCloseButton" class="card-zoom-close" type="button" aria-label="Fermer l’aperçu">×</button>
             <h2 id="cardZoomTitle" class="card-zoom-title"></h2>
-            <div id="cardZoomImageContainer"></div>
+            <div id="cardZoomImageContainer"><button id="cardZoomFavoriteButton" class="card-zoom-favorite-button hidden" type="button" aria-label="Ajouter aux favoris" aria-pressed="false" title="Ajouter aux favoris">☆</button></div>
             <p id="cardZoomRarity" class="card-zoom-rarity"></p>
         </div>
     </section>
@@ -4740,6 +4753,7 @@ const callClaimServiceMissionReward = httpsCallable(functions, "claimServiceMiss
 const callGetAdminGavSettings = httpsCallable(functions, "getAdminGavSettings");
 const callSaveAdminGavSettings = httpsCallable(functions, "saveAdminGavSettings");
 const callGetOwnedCardNumbers = httpsCallable(functions, "getOwnedCardNumbers");
+const callSetMyFavoriteCard = httpsCallable(functions, "setMyFavoriteCard");
 const callGetSeasonOneShopCards = httpsCallable(functions, "getSeasonOneShopCards");
 const callPurchaseSeasonOneCard = httpsCallable(functions, "purchaseSeasonOneCard");
 const callGetExchangeBoard = httpsCallable(functions, "getExchangeBoard");
@@ -5786,7 +5800,7 @@ const cooperationAdminStatus = document.getElementById("cooperationAdminStatus")
 const cooperationRewardAdminList = document.getElementById("cooperationRewardAdminList");
 const cooperationRewardsAdminStatus = document.getElementById("cooperationRewardsAdminStatus");
 const homeMaintenanceAdminToggle = document.getElementById("homeMaintenanceAdminToggle");
-const homeMaintenanceSwitch = document.getElementById("homeMaintenanceSwitch");
+const homeMaintenanceSwitch = homeMaintenanceAdminToggle;
 const homeMaintenanceNotice = document.getElementById("homeMaintenanceNotice");
 const cooperationGaugeDefinitions = [
     { id:"recycling", label:"Recyclage", fieldLabel:"Recyclages collectifs", icon:"./Recyclage.png" },
@@ -5877,6 +5891,11 @@ const cardZoomCloseButton = document.getElementById("cardZoomCloseButton");
 const cardZoomTitle = document.getElementById("cardZoomTitle");
 const cardZoomImageContainer = document.getElementById("cardZoomImageContainer");
 const cardZoomRarity = document.getElementById("cardZoomRarity");
+const cardZoomFavoriteButton = document.getElementById("cardZoomFavoriteButton");
+const profileFavoriteCardSection = document.getElementById("profileFavoriteCardSection");
+const profileFavoriteCardContent = document.getElementById("profileFavoriteCardContent");
+let currentZoomCard = null;
+let profileFavoriteCard = null;
 const adminPage = document.getElementById("adminPage");
 const adminSectionHint = document.getElementById("adminSectionHint");
 const adminSections = {
@@ -5951,6 +5970,7 @@ const collectionBackButton = document.getElementById("collectionBackButton");
 const collectionSeasonOneButton = document.getElementById("collectionSeasonOneButton");
 const collectionSeasonTwoButton = document.getElementById("collectionSeasonTwoButton");
 const collectionServiceCardsButton = document.getElementById("collectionServiceCardsButton");
+const collectionMysticCardsButton = document.getElementById("collectionMysticCardsButton");
 const collectionSeasonContent = document.getElementById("collectionSeasonContent");
 const collectionSeasonComingSoon = document.getElementById("collectionSeasonComingSoon");
 const recyclingPage = document.getElementById("recyclingPage");
@@ -5989,6 +6009,7 @@ const selectedRecycleCopyIds = new Set();
 let collectionMaxCardNumber = 0;
 let collectionSeason = "Saison 1";
 let collectionSeasonMetadata = {};
+let collectionMysticCatalog = [];
 let collectionAlbumPage = 0;
 let collectionSearchQuery = "";
 let collectionRarityFilterValue = "";
@@ -6467,8 +6488,11 @@ onAuthStateChanged(
             if (homeMaintenanceRefreshInterval) window.clearInterval(homeMaintenanceRefreshInterval);
             homeMaintenanceRefreshInterval = null;
             homeMaintenanceAdminToggle.classList.add("hidden");
-            homeMaintenanceSwitch.checked = false;
+            homeMaintenanceSwitch.classList.remove("is-active");
+            homeMaintenanceSwitch.setAttribute("aria-pressed", "false");
             homeMaintenanceNotice.classList.add("hidden");
+            profileFavoriteCard = null;
+            renderProfileFavoriteCard(null);
             menuButton.classList.add("hidden");
             dropdownMenu.classList.add("hidden");
             playerLogoutButton.classList.add("hidden");
@@ -6552,11 +6576,11 @@ onAuthStateChanged(
         adminHubOpenButton.classList.toggle("hidden", !isAdminAccount || isPlayerPreview);
         dropdownMenu.classList.add("hidden");
         playerLogoutButton.classList.toggle("hidden", isAdminAccount);
-        adminButton.classList.toggle("hidden", !isAdminAccount || isPlayerPreview);
-        effectifMenuButton.classList.toggle("hidden", !isAdminAccount || isPlayerPreview);
-        eventBoostersMenuButton.classList.toggle("hidden", !isAdminAccount || isPlayerPreview);
-        adminMessagesMenuButton.classList.toggle("hidden", !isAdminAccount || isPlayerPreview);
-        financeMenuButton.classList.toggle("hidden", !isAdminAccount || isPlayerPreview);
+        adminButton.classList.add("hidden");
+        effectifMenuButton.classList.add("hidden");
+        eventBoostersMenuButton.classList.add("hidden");
+        adminMessagesMenuButton.classList.add("hidden");
+        financeMenuButton.classList.add("hidden");
         playerPreviewToggle.classList.toggle("hidden", !isAdminAccount);
         playerPreviewToggle.textContent = isPlayerPreview ? "🛡️ Revenir au mode Admin" : "👤 Joueur normal";
         playerPreviewBanner.classList.toggle("hidden", !isPlayerPreview);
@@ -8293,11 +8317,11 @@ function setPlayerPreview(enabled) {
     adminHubOpenButton.classList.toggle("hidden", enabled);
     homeMaintenanceAdminToggle.classList.toggle("hidden", enabled);
     dropdownMenu.classList.add("hidden");
-    adminButton.classList.toggle("hidden", enabled);
-    effectifMenuButton.classList.toggle("hidden", enabled);
-    eventBoostersMenuButton.classList.toggle("hidden", enabled);
-    adminMessagesMenuButton.classList.toggle("hidden", enabled);
-    financeMenuButton.classList.toggle("hidden", enabled);
+    adminButton.classList.add("hidden");
+    effectifMenuButton.classList.add("hidden");
+    eventBoostersMenuButton.classList.add("hidden");
+    adminMessagesMenuButton.classList.add("hidden");
+    financeMenuButton.classList.add("hidden");
     premiumAdminPanel.classList.toggle("hidden", enabled);
     playerPreviewBanner.classList.toggle("hidden", !enabled);
     playerPreviewToggle.textContent = enabled ? "🛡️ Revenir au mode Admin" : "👤 Joueur normal";
@@ -8661,6 +8685,7 @@ async function loadPersonalProfile(playerId = auth.currentUser?.uid) {
                 player.rareSeasonTwoProgress = Number(badgeResponse.data.rareSeasonTwoProgress) || 0;
                 player.legendarySeasonTwoProgress = Number(badgeResponse.data.legendarySeasonTwoProgress) || 0;
                 player.boosterJournalierStreak = Number(badgeResponse.data.boosterJournalierStreak) || 0;
+                player.favoriteCard = badgeResponse.data.favoriteCard || null;
                 const formattedSpending = (totalAmountCents / 100).toLocaleString("fr-FR", { style: "currency", currency: "EUR" });
                 profilePremiumSpending.textContent = formattedSpending;
             } catch (spendingError) {
@@ -8680,6 +8705,8 @@ async function loadPersonalProfile(playerId = auth.currentUser?.uid) {
         document.getElementById("profileExchangesCount").textContent = (Number(player.echangesEffectues) || 0).toLocaleString("fr-FR");
         document.getElementById("profileAccountDates").textContent = createdAt ? "Compte créé le " + formatProfileDate(createdAt) : "Date de création indisponible";
         profileServiceTime.textContent = formatServiceWorkDuration(player.serviceTimeMs ?? player.archivesTotalWorkMs ?? 0);
+        profileFavoriteCard = player.favoriteCard || null;
+        renderProfileFavoriteCard(profileFavoriteCard);
         renderDailyStreakBadge(document.getElementById("profileDailyStreak"), Number(player.boosterJournalierStreak) || 0, "profileDailyStreakCount");
         profilePageAvatar.replaceChildren();
         const badgeDetails = {
@@ -9350,6 +9377,7 @@ async function loadOwnedPlayerCards() {
         ]);
         const cardNumbers = numberResponse.data.cardNumbers || {};
         const cardSeasons = numberResponse.data.cardSeasons && typeof numberResponse.data.cardSeasons === "object" ? numberResponse.data.cardSeasons : {};
+        collectionMysticCatalog = Array.isArray(numberResponse.data.mysticCards) ? numberResponse.data.mysticCards : [];
         collectionSeasonMetadata = numberResponse.data.seasonData && typeof numberResponse.data.seasonData === "object" ? numberResponse.data.seasonData : {};
         const currentSeasonData = collectionSeasonMetadata[collectionSeason] || {};
         collectionCategories = Array.isArray(currentSeasonData.categories) ? currentSeasonData.categories
@@ -9413,6 +9441,17 @@ function applyCollectionSeasonData() {
             : "Aucune carte spéciale de mission obtenue pour le moment.";
         collectionDividers.replaceChildren(); renderCollectionAlbum(); return;
     }
+    if (collectionSeason === "Mystiques") {
+        collectionMaxCardNumber = collectionMysticCatalog.length;
+        collectionCategories = []; collectionCategoryByNumber = {}; collectionCategoryFilter = "";
+        ownedAlbumCards = collectionMysticCatalog.map((entry) => {
+            const owned = allOwnedAlbumCards.find((card) => card.cardId === entry.id);
+            return owned ? { ...entry, ...owned, season: entry.season, cardNumber: entry.cardNumber, rarity: "Mystique", isMissing: false } : { ...entry, rarity: "Mystique", isMissing: true };
+        }).sort((a, b) => Number(a.season.match(/\d+/)?.[0] || 1) - Number(b.season.match(/\d+/)?.[0] || 1) || Number(a.cardNumber) - Number(b.cardNumber));
+        const mysticsOwned = ownedAlbumCards.filter((card) => !card.isMissing).length;
+        ownedCardsStatus.textContent = `${mysticsOwned} / ${ownedAlbumCards.length} carte${ownedAlbumCards.length === 1 ? "" : "s"} mystique${ownedAlbumCards.length === 1 ? "" : "s"} collectée${ownedAlbumCards.length === 1 ? "" : "s"}.`;
+        collectionDividers.replaceChildren(); renderCollectionAlbum(); return;
+    }
     const seasonData = collectionSeasonMetadata[collectionSeason] || {};
     if (Number.isSafeInteger(Number(seasonData.maxCardNumber))) collectionMaxCardNumber = Math.max(0, Number(seasonData.maxCardNumber));
     if (Array.isArray(seasonData.categories)) collectionCategories = seasonData.categories;
@@ -9430,8 +9469,8 @@ function applyCollectionSeasonData() {
 }
 
 function setCollectionSeason(season) {
-    collectionSeason = ["Saison 2", "Missions"].includes(season) ? season : "Saison 1";
-    if (collectionSeason === "Missions") {
+    collectionSeason = ["Saison 2", "Missions", "Mystiques"].includes(season) ? season : "Saison 1";
+    if (["Missions", "Mystiques"].includes(collectionSeason)) {
         collectionDisplayMode = "classique";
         collectionClassicModeButton.setAttribute("aria-pressed", "true");
         collectionDividerModeButton.setAttribute("aria-pressed", "false");
@@ -9440,8 +9479,9 @@ function setCollectionSeason(season) {
     collectionSeasonOneButton.setAttribute("aria-pressed", String(collectionSeason === "Saison 1"));
     collectionSeasonTwoButton.setAttribute("aria-pressed", String(isSeasonTwo));
     collectionServiceCardsButton.setAttribute("aria-pressed", String(collectionSeason === "Missions"));
-    document.querySelector(".collection-display-toggle").classList.toggle("hidden", collectionSeason === "Missions");
-    document.getElementById("collectionRarityFilter").classList.toggle("hidden", collectionSeason === "Missions");
+    collectionMysticCardsButton.setAttribute("aria-pressed", String(collectionSeason === "Mystiques"));
+    document.querySelector(".collection-display-toggle").classList.toggle("hidden", ["Missions", "Mystiques"].includes(collectionSeason));
+    document.getElementById("collectionRarityFilter").classList.toggle("hidden", ["Missions", "Mystiques"].includes(collectionSeason));
     collectionSeasonContent.classList.remove("hidden");
     collectionSeasonComingSoon.classList.add("hidden");
     collectionSearchInput.value = "";
@@ -9454,7 +9494,49 @@ function setCollectionSeason(season) {
 
 function renderCollectionAlbum() {
     const normalizedQuery = collectionSearchQuery.trim().toLocaleLowerCase("fr");
+    const numberQuery = normalizedQuery.match(/^(?:n[°o]?\s*)?(\d+)$/i);
+    const searchedNumber = numberQuery ? Number(numberQuery[1]) : null;
     const selectedRarity = collectionRarityFilterValue.trim().toLocaleLowerCase("fr").normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/s$/, "");
+    if (collectionSeason === "Mystiques") {
+        let entries = ownedAlbumCards;
+        if (numberQuery) entries = entries.filter((card) => Number(card.cardNumber) === searchedNumber);
+        else if (normalizedQuery) entries = entries.filter((card) => !card.isMissing && String(card.name || "").toLocaleLowerCase("fr").includes(normalizedQuery));
+        const totalPages = Math.max(1, Math.ceil(entries.length / 9));
+        collectionAlbumPage = Math.min(Math.max(0, collectionAlbumPage), totalPages - 1);
+        collectionZoomCards = entries.filter((card) => !card.isMissing);
+        ownedPlayerCardGrid.replaceChildren();
+        collectionSearchStatus.textContent = entries.length
+            ? (numberQuery ? `${entries.length} carte${entries.length > 1 ? "s" : ""} mystique${entries.length > 1 ? "s" : ""} au numéro ${searchedNumber}.` : normalizedQuery ? `${entries.length} carte${entries.length > 1 ? "s" : ""} mystique${entries.length > 1 ? "s" : ""} découverte${entries.length > 1 ? "s" : ""} trouvée${entries.length > 1 ? "s" : ""}.` : "Les cartes manquantes affichent leur numéro, sans leur nom.")
+            : "Aucune carte mystique ne correspond à cette recherche.";
+        const visible = entries.slice(collectionAlbumPage * 9, collectionAlbumPage * 9 + 9);
+        for (let index = 0; index < 9; index += 1) {
+            const card = visible[index];
+            if (!card) { ownedPlayerCardGrid.append(createEmptyAlbumSlot()); continue; }
+            if (card.isMissing) {
+                const slot = createEmptyAlbumSlot(card.cardNumber);
+                slot.title = card.season;
+                slot.setAttribute("aria-label", `Carte mystique numéro ${card.cardNumber} manquante · ${card.season}`);
+                ownedPlayerCardGrid.append(slot);
+            } else ownedPlayerCardGrid.append(createAlbumCardElement(card));
+        }
+        collectionPageIndicator.textContent = (numberQuery || normalizedQuery ? "Résultats " : "Page ") + (collectionAlbumPage + 1) + " / " + totalPages;
+        collectionPreviousPageButton.disabled = collectionAlbumPage === 0;
+        collectionNextPageButton.disabled = collectionAlbumPage >= totalPages - 1;
+        return;
+    }
+    if (numberQuery && collectionSeason !== "Missions") {
+        const card = ownedAlbumCards.find((item) => Number(item.cardNumber) === searchedNumber);
+        const exists = searchedNumber > 0 && (collectionSeasonMetadata[collectionSeason]?.numbers || []).includes(searchedNumber);
+        ownedPlayerCardGrid.replaceChildren();
+        if (exists) ownedPlayerCardGrid.append(card ? createAlbumCardElement(card) : createEmptyAlbumSlot(searchedNumber));
+        else ownedPlayerCardGrid.append(createEmptyAlbumSlot());
+        collectionZoomCards = card ? [card] : [];
+        collectionSearchStatus.textContent = exists ? `Carte numéro ${searchedNumber}${card ? " découverte" : " encore manquante"}.` : "Aucune carte ne porte ce numéro dans cette saison.";
+        collectionPageIndicator.textContent = "Résultats 1 / 1";
+        collectionPreviousPageButton.disabled = true;
+        collectionNextPageButton.disabled = true;
+        return;
+    }
     const categoryNumbers = collectionDisplayMode === "intercalaires"
         ? Object.entries(collectionCategoryByNumber)
             .filter(([, category]) => category === collectionCategoryFilter)
@@ -9923,10 +10005,43 @@ function openCardZoom(card, collectionCards = null) {
     cardZoomCloseButton.focus();
 }
 
+function renderProfileFavoriteCard(card) {
+    profileFavoriteCardSection.classList.toggle("hidden", !card);
+    profileFavoriteCardContent.replaceChildren();
+    if (!card) return;
+    if (/^https:\/\//i.test(card.imageUrl || "")) {
+        const image = document.createElement("img");
+        image.src = card.imageUrl;
+        image.alt = "Illustration de " + (card.name || "la carte favorite");
+        image.loading = "lazy";
+        image.decoding = "async";
+        profileFavoriteCardContent.append(image);
+    }
+    const copy = document.createElement("div");
+    copy.className = "profile-favorite-card-copy";
+    const name = document.createElement("strong");
+    name.textContent = card.name || "Carte favorite";
+    const details = document.createElement("span");
+    const number = Number.isSafeInteger(Number(card.cardNumber)) && Number(card.cardNumber) > 0 ? ` · n° ${card.cardNumber}` : "";
+    details.textContent = [card.rarity, card.season].filter(Boolean).join(" · ") + number;
+    copy.append(name, details);
+    profileFavoriteCardContent.append(copy);
+}
+
 function renderCardZoom(card) {
+    currentZoomCard = card;
     cardZoomTitle.textContent = card.name || "Carte sans nom";
     cardZoomRarity.textContent = card.rarity || "Sans rareté";
     cardZoomImageContainer.replaceChildren();
+    cardZoomImageContainer.classList.add("card-zoom-image-wrap");
+    const ownedCardId = typeof card.cardId === "string" ? card.cardId : "";
+    const canFavorite = Boolean(auth.currentUser && !isPlayerPreview && ownedCardId);
+    const isFavorite = canFavorite && profileFavoriteCard?.cardId === ownedCardId;
+    cardZoomFavoriteButton.classList.toggle("hidden", !canFavorite);
+    cardZoomFavoriteButton.textContent = isFavorite ? "★" : "☆";
+    cardZoomFavoriteButton.setAttribute("aria-pressed", String(isFavorite));
+    cardZoomFavoriteButton.setAttribute("aria-label", isFavorite ? "Retirer des favoris" : "Choisir comme carte favorite");
+    cardZoomFavoriteButton.title = isFavorite ? "Retirer des favoris" : "Choisir comme carte favorite";
     if (/^https?:\/\//i.test(card.imageUrl || "")) {
         const image = document.createElement("img");
         image.className = "card-zoom-image";
@@ -9938,14 +10053,32 @@ function renderCardZoom(card) {
             placeholder.textContent = "🃏";
             image.replaceWith(placeholder);
         };
-        cardZoomImageContainer.append(image);
+        cardZoomImageContainer.append(image, cardZoomFavoriteButton);
     } else {
         const placeholder = document.createElement("div");
         placeholder.className = "card-zoom-placeholder";
         placeholder.textContent = "🃏";
-        cardZoomImageContainer.append(placeholder);
+        cardZoomImageContainer.append(placeholder, cardZoomFavoriteButton);
     }
 }
+
+cardZoomFavoriteButton.addEventListener("click", async () => {
+    const cardId = typeof currentZoomCard?.cardId === "string" ? currentZoomCard.cardId : "";
+    if (!cardId || !auth.currentUser || isPlayerPreview || cardZoomFavoriteButton.disabled) return;
+    const nextCardId = profileFavoriteCard?.cardId === cardId ? "" : cardId;
+    cardZoomFavoriteButton.disabled = true;
+    try {
+        const response = await callSetMyFavoriteCard({ cardId: nextCardId });
+        profileFavoriteCard = response.data.favoriteCard || null;
+        renderProfileFavoriteCard(profileFavoriteCard);
+        renderCardZoom(currentZoomCard);
+    } catch (error) {
+        console.error("Impossible d’enregistrer la carte favorite :", error);
+        window.alert(error.message || "Impossible d’enregistrer cette carte favorite.");
+    } finally {
+        cardZoomFavoriteButton.disabled = false;
+    }
+});
 
 function moveCardZoom(direction) {
     if (collectionZoomIndex < 0) return;
@@ -10340,20 +10473,28 @@ async function refreshHomeMaintenanceStatus() {
     try {
         const response = await callGetHomeMaintenanceStatus();
         const active = response.data?.active === true;
-        homeMaintenanceSwitch.checked = active;
+        homeMaintenanceSwitch.classList.toggle("is-active", active);
+        homeMaintenanceSwitch.setAttribute("aria-pressed", String(active));
+        homeMaintenanceSwitch.setAttribute("aria-label", active ? "Désactiver les travaux sur le site" : "Activer les travaux sur le site");
+        homeMaintenanceSwitch.title = active ? "Désactiver les travaux sur le site" : "Activer les travaux sur le site";
         homeMaintenanceNotice.classList.toggle("hidden", !active);
     } catch (error) {
         console.warn("Impossible de récupérer l’état Travaux de l’accueil :", error);
     }
 }
 
-homeMaintenanceSwitch.addEventListener("change", async () => {
-    if (!isCurrentUserAdmin() || isPlayerPreview) { homeMaintenanceSwitch.checked = false; return; }
-    const nextActive = homeMaintenanceSwitch.checked;
+homeMaintenanceSwitch.addEventListener("click", async () => {
+    if (!isCurrentUserAdmin() || isPlayerPreview) { homeMaintenanceSwitch.classList.remove("is-active"); homeMaintenanceSwitch.setAttribute("aria-pressed", "false"); return; }
+    const nextActive = homeMaintenanceSwitch.getAttribute("aria-pressed") !== "true";
     homeMaintenanceSwitch.disabled = true;
     try {
         const response = await callSetHomeMaintenanceStatus({ active: nextActive });
-        homeMaintenanceNotice.classList.toggle("hidden", response.data?.active !== true);
+        const active = response.data?.active === true;
+        homeMaintenanceSwitch.classList.toggle("is-active", active);
+        homeMaintenanceSwitch.setAttribute("aria-pressed", String(active));
+        homeMaintenanceSwitch.setAttribute("aria-label", active ? "Désactiver les travaux sur le site" : "Activer les travaux sur le site");
+        homeMaintenanceSwitch.title = active ? "Désactiver les travaux sur le site" : "Activer les travaux sur le site";
+        homeMaintenanceNotice.classList.toggle("hidden", !active);
     } catch (error) {
         console.error("Impossible de modifier le mode Travaux :", error);
         await refreshHomeMaintenanceStatus();
@@ -10883,6 +11024,7 @@ collectionBackButton.addEventListener("click", showHomePage);
 collectionSeasonOneButton.addEventListener("click", () => setCollectionSeason("Saison 1"));
 collectionSeasonTwoButton.addEventListener("click", () => setCollectionSeason("Saison 2"));
 collectionServiceCardsButton.addEventListener("click", () => setCollectionSeason("Missions"));
+collectionMysticCardsButton.addEventListener("click", () => setCollectionSeason("Mystiques"));
 rulesBackButton.addEventListener("click", showHomePage);
 collectionSearchInput.addEventListener("input", () => {
     collectionSearchQuery = collectionSearchInput.value;
@@ -13753,5 +13895,4 @@ if ("serviceWorker" in navigator) {
 </body>
 
 </html>
-
 
