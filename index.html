@@ -3336,6 +3336,52 @@ body:has(#appPage .app-content:not(.hidden)):not(:has(#archivesPage:not(.hidden)
 }
 .exchange-page .exchange-missing-panel h3, .exchange-page .exchange-ads-heading,
 .leaderboard-page .section-title h3 { color: #205c32; }
+.daily-objectives-home-button {
+  display:grid;
+  width:146px;
+  height:146px;
+  grid-template-rows:auto auto auto auto;
+  align-content:center;
+  justify-items:center;
+  gap:7px;
+  margin:2px auto 16px;
+  padding:11px;
+  border:1px solid rgba(255,224,137,.86);
+  border-radius:0;
+  background:linear-gradient(150deg,#1b5631,#16432a 68%,#103b25);
+  color:#fff3c6;
+  text-align:center;
+  cursor:pointer;
+  box-shadow:0 5px 0 rgba(5,31,17,.34),0 10px 18px rgba(0,0,0,.22),inset 0 1px rgba(255,255,255,.2);
+  transition:transform .16s ease,filter .16s ease,box-shadow .16s ease;
+}
+.daily-objectives-home-button:hover { transform:translateY(-3px); filter:brightness(1.08); box-shadow:0 8px 0 rgba(5,31,17,.3),0 14px 22px rgba(0,0,0,.26),inset 0 1px rgba(255,255,255,.25); }
+.daily-objectives-home-button:active { transform:translateY(1px); }
+.daily-objectives-home-icon { font-size:29px; filter:drop-shadow(0 2px 4px rgba(0,0,0,.35)); }
+.daily-objectives-home-button strong { color:#fff3c6; font-size:13px; }
+.daily-objectives-home-progress { color:#ffe18a; font-size:12px; font-weight:900; }
+.daily-objectives-home-open { color:#d7e4d7; font-size:10px; }
+.daily-objectives-page { width:100%; max-width:900px; min-height:calc(100dvh - 70px); margin:auto; padding:22px 16px 105px; color:var(--page-ivory); }
+.daily-objectives-page h2 { margin:20px 0 6px; color:#ffe18a; font-size:clamp(23px,5vw,30px); text-align:center; }
+.daily-objectives-page .daily-objectives-date { margin:0 0 18px; color:var(--page-muted); font-size:14px; font-weight:750; text-align:center; }
+.daily-objectives-history-card { display:flex; max-width:460px; align-items:center; justify-content:center; gap:13px; margin:0 auto 18px; padding:13px 18px; border:1px solid rgba(229,190,78,.57); border-radius:14px; background:linear-gradient(145deg,#15452a,#0d3822); color:#f7f5e9; box-shadow:0 8px 18px rgba(0,0,0,.22),inset 0 1px rgba(255,255,255,.1); }
+.daily-objectives-history-icon { font-size:27px; }
+.daily-objectives-history-card > div { display:flex; align-items:baseline; flex-wrap:wrap; justify-content:center; gap:6px; }
+.daily-objectives-history-card strong { color:#ffe18a; font-size:23px; font-variant-numeric:tabular-nums; }
+.daily-objectives-history-card span:last-child { color:#d8e3d6; font-size:13px; }
+.daily-objectives-page .daily-objectives-card { max-width:800px; margin:0 auto; padding:18px; }
+.daily-objectives-page-progress { display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:13px; color:#245331; font-weight:850; }
+.daily-objectives-page .daily-objectives-list { grid-template-columns:1fr; gap:10px; }
+.daily-objectives-page .daily-objective { padding:14px 15px; }
+.daily-objectives-page .daily-objective-top { min-height:0; align-items:center; font-size:14px; }
+.daily-objectives-page .daily-objective-track { height:11px; }
+@media(max-width:600px) {
+  .daily-objectives-page { padding:15px 12px 96px; }
+  .daily-objectives-page .daily-objectives-card { padding:12px; }
+  .daily-objectives-history-card { justify-content:flex-start; }
+  .daily-objectives-history-card > div { justify-content:flex-start; }
+  .daily-objectives-page-progress { align-items:flex-start; flex-direction:column; gap:6px; }
+}
 @media (max-width: 600px) {
   #appPage:has(.app-content:not(.hidden)):not(:has(#archivesPage:not(.hidden)))::before {
     background-position: right -42px bottom 88px;
@@ -3662,15 +3708,12 @@ body:has(#appPage .app-content:not(.hidden)):not(:has(#archivesPage:not(.hidden)
             </button>
         </section>
 
-        <details id="dailyObjectivesCard" class="daily-objectives-card hidden" aria-labelledby="dailyObjectivesTitle">
-            <summary class="daily-objectives-header">
-                <h3 id="dailyObjectivesTitle">🎯 Objectifs du jour</h3>
-                <span id="dailyObjectivesProgress" class="daily-objectives-progress">0 / 3 terminés</span>
-                <span id="dailyObjectivesDate" class="daily-objectives-date"></span>
-            </summary>
-            <div id="dailyObjectivesList" class="daily-objectives-list" aria-live="polite"></div>
-            <p id="dailyObjectivesReward" class="daily-objectives-reward">Complète les 3 objectifs pour gagner 1 booster classique Saison 2.</p>
-        </details>
+        <button id="dailyObjectivesHomeButton" class="daily-objectives-home-button hidden" type="button" aria-label="Voir les objectifs du jour">
+            <span class="daily-objectives-home-icon" aria-hidden="true">🎯</span>
+            <strong>Objectifs du jour</strong>
+            <span id="dailyObjectivesHomeProgress" class="daily-objectives-home-progress">0 / 3 terminés</span>
+            <span class="daily-objectives-home-open">Voir les objectifs</span>
+        </button>
 
 
         <!-- BOOSTERS -->
@@ -3794,6 +3837,21 @@ body:has(#appPage .app-content:not(.hidden)):not(:has(#archivesPage:not(.hidden)
 
     </main>
 
+
+    <section id="dailyObjectivesPage" class="daily-objectives-page hidden" aria-labelledby="dailyObjectivesPageTitle">
+        <button id="dailyObjectivesBackButton" class="admin-back" type="button">← Retour à l’accueil</button>
+        <h2 id="dailyObjectivesPageTitle">🎯 Objectifs du jour</h2>
+        <p id="dailyObjectivesDate" class="daily-objectives-date"></p>
+        <article class="daily-objectives-history-card">
+            <span class="daily-objectives-history-icon" aria-hidden="true">🏅</span>
+            <div><strong id="dailyObjectivesHistoricalCount">—</strong><span>objectifs terminés les jours précédents</span></div>
+        </article>
+        <section id="dailyObjectivesCard" class="daily-objectives-card" aria-label="Progression des objectifs">
+            <div class="daily-objectives-page-progress"><span>Progression du jour</span><strong id="dailyObjectivesProgress" class="daily-objectives-progress">0 / 3 terminés</strong></div>
+            <div id="dailyObjectivesList" class="daily-objectives-list" aria-live="polite"></div>
+            <p id="dailyObjectivesReward" class="daily-objectives-reward">Complète les 3 objectifs pour gagner 1 booster classique Saison 2.</p>
+        </section>
+    </section>
 
     <section id="termsPage" class="terms-page hidden" aria-labelledby="termsTitle">
         <button id="termsBackButton" class="admin-back" type="button">← Retour à l’accueil</button>
@@ -6608,8 +6666,10 @@ onAuthStateChanged(
             if (dailyObjectivesUnsubscribe) dailyObjectivesUnsubscribe();
             dailyObjectivesUnsubscribe = null;
             dailyObjectivesDayKey = "";
-            dailyObjectivesCard.open = false;
             dailyObjectivesCard.classList.add("hidden");
+            dailyObjectivesHomeButton.classList.add("hidden");
+            dailyObjectivesPage.classList.add("hidden");
+            dailyObjectivesCompletedToday = 0;
             dailyObjectivesList.replaceChildren();
             if (unreadMessageShowTimer) window.clearInterval(unreadMessageShowTimer);
             unreadMessageShowTimer = null;
@@ -6960,6 +7020,7 @@ function showHomePage() {
     serviceCollectiveRefreshTimer = null;
     adminHubReturnPending = false;
     document.querySelector(".app-content").classList.remove("hidden");
+    dailyObjectivesPage.classList.add("hidden");
     adminHubPage.classList.add("hidden");
     pollsAdminPage.classList.add("hidden");
     termsPage.classList.add("hidden");
@@ -10424,10 +10485,45 @@ function getParisDateKey() {
 }
 
 const dailyObjectivesCard = document.getElementById("dailyObjectivesCard");
+const dailyObjectivesPage = document.getElementById("dailyObjectivesPage");
+const dailyObjectivesHomeButton = document.getElementById("dailyObjectivesHomeButton");
+const dailyObjectivesHomeProgress = document.getElementById("dailyObjectivesHomeProgress");
+const dailyObjectivesHistoricalCount = document.getElementById("dailyObjectivesHistoricalCount");
 const dailyObjectivesDate = document.getElementById("dailyObjectivesDate");
 const dailyObjectivesProgress = document.getElementById("dailyObjectivesProgress");
 const dailyObjectivesList = document.getElementById("dailyObjectivesList");
 const dailyObjectivesReward = document.getElementById("dailyObjectivesReward");
+let dailyObjectivesCompletedToday = 0;
+
+async function refreshDailyObjectivesHistory(uid) {
+    if (!uid || !auth.currentUser || auth.currentUser.uid !== uid) return;
+    dailyObjectivesHistoricalCount.textContent = "Chargement…";
+    try {
+        const response = await callGetPublicPlayerProfile({ playerId: uid });
+        if (!auth.currentUser || auth.currentUser.uid !== uid) return;
+        const completed = Math.max(0, Number(response.data?.dailyObjectivesCompleted) || 0);
+        dailyObjectivesHistoricalCount.textContent = Math.max(0, completed - dailyObjectivesCompletedToday).toLocaleString("fr-FR");
+    } catch (error) {
+        console.error("Impossible de charger le total des objectifs déjà terminés :", error);
+        dailyObjectivesHistoricalCount.textContent = "—";
+    }
+}
+
+async function openDailyObjectivesPage() {
+    if (!auth.currentUser) return;
+    dropdownMenu.classList.add("hidden");
+    document.querySelector(".app-content").classList.add("hidden");
+    [dailyObjectivesPage, termsPage, financePage, profilePage, leaderboardPage, activityPage, statisticsPage,
+        drawnCardsPage, collectionPage, seasonOneShopPage, exchangePage, salePage, recyclingPage, adminPage,
+        eventBoostersAdminPage, effectifPage, messagingPage, rulesPage, premiumPage, archivesPage,
+        adminHubPage, pollsAdminPage].forEach((page) => page.classList.add("hidden"));
+    dailyObjectivesPage.classList.remove("hidden");
+    bottomNav.classList.add("hidden");
+    await refreshDailyObjectivesHistory(auth.currentUser.uid);
+}
+
+dailyObjectivesHomeButton.addEventListener("click", openDailyObjectivesPage);
+document.getElementById("dailyObjectivesBackButton").addEventListener("click", showHomePage);
 
 async function loadDailyObjectives(uid) {
     if (!uid || !auth.currentUser || auth.currentUser.uid !== uid) return;
@@ -10438,7 +10534,6 @@ async function loadDailyObjectives(uid) {
         if (!auth.currentUser || auth.currentUser.uid !== uid) return;
         const state = response.data || {};
         dailyObjectivesDayKey = state.dayKey || getParisDateKey();
-        dailyObjectivesCard.open = false;
         const date = new Date(`${dailyObjectivesDayKey}T12:00:00+01:00`);
         dailyObjectivesDate.textContent = new Intl.DateTimeFormat("fr-FR", { weekday:"long", day:"numeric", month:"long" }).format(date);
         const progressRef = doc(db, "players", uid, "dailyObjectives", dailyObjectivesDayKey);
@@ -10475,7 +10570,9 @@ async function loadDailyObjectives(uid) {
                 dailyObjectivesList.append(item);
             });
             const objectiveCount = (state.objectives || []).length;
+            dailyObjectivesCompletedToday = completedCount;
             dailyObjectivesProgress.textContent = `${completedCount} / ${objectiveCount} terminés`;
+            dailyObjectivesHomeProgress.textContent = `${completedCount} / ${objectiveCount} terminés`;
             dailyObjectivesProgress.classList.toggle("is-complete", objectiveCount > 0 && completedCount === objectiveCount);
             const earned = current.rewardGranted === true;
             dailyObjectivesReward.textContent = earned
@@ -10483,6 +10580,8 @@ async function loadDailyObjectives(uid) {
                 : "Complète les 3 objectifs pour gagner 1 booster classique Saison 2.";
             dailyObjectivesReward.classList.toggle("is-earned", earned);
             dailyObjectivesCard.classList.remove("hidden");
+            dailyObjectivesHomeButton.classList.remove("hidden");
+            if (earned && !dailyObjectivesPage.classList.contains("hidden")) void refreshDailyObjectivesHistory(uid);
             if (current.rewardGranted === true) getDoc(doc(db, "players", uid)).then((playerSnapshot) => {
                 if (!playerSnapshot.exists() || !auth.currentUser || auth.currentUser.uid !== uid) return;
                 const player = playerSnapshot.data();
@@ -10492,11 +10591,13 @@ async function loadDailyObjectives(uid) {
             console.error("Impossible de suivre les objectifs du jour :", error);
             dailyObjectivesList.textContent = "Les objectifs du jour sont momentanément indisponibles.";
             dailyObjectivesCard.classList.remove("hidden");
+            dailyObjectivesHomeButton.classList.remove("hidden");
         });
     } catch (error) {
         console.error("Impossible de charger les objectifs du jour :", error);
         dailyObjectivesList.textContent = "Les objectifs du jour sont momentanément indisponibles.";
         dailyObjectivesCard.classList.remove("hidden");
+        dailyObjectivesHomeButton.classList.remove("hidden");
     }
 }
 
