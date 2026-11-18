@@ -5504,9 +5504,23 @@ async function answerExchangeOffer(accept) {
     exchangeOfferRefuse.disabled = true;
     exchangeOfferStatus.textContent = accept ? "Validation de l’échange…" : "Enregistrement du refus…";
     try {
-        if (accept) await callAcceptExchangeOffer({ offerId: activeExchangeOffer.id });
-        else await callRefuseExchangeOffer({ offerId: activeExchangeOffer.id });
+        const response = accept
+            ? await callAcceptExchangeOffer({ offerId: activeExchangeOffer.id })
+            : await callRefuseExchangeOffer({ offerId: activeExchangeOffer.id });
         const completedOffer = activeExchangeOffer;
+        if (accept && response.data?.stale) {
+            pendingExchangeOffers = pendingExchangeOffers.filter((offer) => offer.id !== completedOffer.id);
+            exchangeOfferStatus.textContent = "Cet échange n’est plus possible : les cartes ont changé. La demande a été retirée.";
+            if (!exchangePage.classList.contains("hidden")) void showExchangePage();
+            window.setTimeout(() => {
+                exchangeOfferModal.classList.add("hidden");
+                exchangeOfferModal.setAttribute("aria-hidden", "true");
+                activeExchangeOffer = null;
+                exchangeOfferActionBusy = false;
+                void loadPendingExchangeOffers();
+            }, 1400);
+            return;
+        }
         pendingExchangeOffers = pendingExchangeOffers.filter((offer) => offer.id !== completedOffer.id);
         exchangeOfferStatus.textContent = accept ? "Échange effectué ! Les deux cartes ont été transférées." : "Demande refusée.";
         if (!exchangePage.classList.contains("hidden")) void showExchangePage();
@@ -10732,19 +10746,9 @@ async function refreshDailyObjectivesHistory(uid) {
     if (!uid || !auth.currentUser || auth.currentUser.uid !== uid) return;
     dailyObjectivesHistoricalCount.textContent = "Chargement…";
     try {
-        const snapshot = await getDocs(collection(db, "players", uid, "dailyObjectives"));
+        const response = await callGetDailyObjectives();
         if (!auth.currentUser || auth.currentUser.uid !== uid) return;
-        const todayKey = getParisDateKey();
-        let completedBeforeToday = 0;
-        snapshot.docs.forEach((daySnapshot) => {
-            const dayKey = daySnapshot.id;
-            if (!/^\d{4}-\d{2}-\d{2}$/.test(dayKey) || dayKey >= todayKey) return;
-            const progress = daySnapshot.data()?.progress || {};
-            getDailyObjectiveIdsForDate(dayKey).forEach((id) => {
-                const objective = DAILY_OBJECTIVE_COUNTERS[id];
-                if (Number(progress[objective.metric] || 0) >= objective.target) completedBeforeToday += 1;
-            });
-        });
+        const completedBeforeToday = Math.max(0, Number(response.data?.completedHistoricalObjectives) || 0);
         dailyObjectivesHistoricalCount.textContent = completedBeforeToday.toLocaleString("fr-FR");
     } catch (error) {
         console.error("Impossible de charger le total des objectifs déjà terminés :", error);
