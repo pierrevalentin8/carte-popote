@@ -3424,6 +3424,19 @@ body:has(#appPage .app-content:not(.hidden)):not(:has(#archivesPage:not(.hidden)
   box-shadow: 0 7px 16px rgba(0,0,0,.24), inset 0 1px rgba(255,255,255,.15);
 }
 
+/* Notification bell: icon only, no surrounding tile. */
+#appPage .app-header .notifications-bell,
+#appPage:has(.app-content:not(.hidden)) .app-header .notifications-bell {
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  color: #f0ce68;
+}
+#appPage:has(.app-content:not(.hidden)) .app-header .notifications-bell:hover {
+  box-shadow: none;
+}
+
 /* Desktop: align Service, Classement, Activité and Objectifs du jour. */
 @media (min-width: 761px) {
   .home-overview-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); align-items: stretch; }
