@@ -3398,6 +3398,14 @@ body:has(#appPage .app-content:not(.hidden)):not(:has(#archivesPage:not(.hidden)
     opacity: .025;
   }
 }
+
+/* iPhone / iPad: keep the top navigation below the system status bar. */
+@supports (padding-top: env(safe-area-inset-top)) {
+  #appPage > .app-header {
+    height: calc(64px + env(safe-area-inset-top, 0px));
+    padding-top: env(safe-area-inset-top, 0px);
+  }
+}
 </style>
 
 </head>
