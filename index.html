@@ -3398,6 +3398,30 @@ body:has(#appPage .app-content:not(.hidden)):not(:has(#archivesPage:not(.hidden)
     opacity: .025;
   }
 }
+
+/* En-tête saison 2 : bande verte, cloche seule sans encart. */
+#appPage .app-header {
+  background: linear-gradient(180deg, #0b4228, #07351f) !important;
+  border-bottom: 1px solid rgba(229,190,78,.68) !important;
+  box-shadow: 0 5px 20px rgba(0,0,0,.28), inset 0 1px rgba(255,255,255,.08) !important;
+}
+#appPage .app-header .notifications-bell {
+  width: 44px;
+  height: 44px;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  color: #ffe18a !important;
+  box-shadow: none !important;
+  font-size: 27px;
+  filter: drop-shadow(0 1px 3px rgba(0,0,0,.38));
+}
+#appPage .app-header .notifications-bell:hover {
+  border: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  filter: drop-shadow(0 0 6px rgba(255,225,138,.72));
+}
 </style>
 
 </head>
