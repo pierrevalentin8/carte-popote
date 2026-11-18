@@ -3407,6 +3407,15 @@ body:has(#appPage .app-content:not(.hidden)):not(:has(#archivesPage:not(.hidden)
   }
 }
 
+/* Saison 2: keep the same green top bar on every in-app page. */
+#appPage > .app-header {
+  background: linear-gradient(180deg, rgba(8,43,26,.98), rgba(7,35,21,.97));
+  border-bottom: 1px solid rgba(229,190,78,.62);
+  box-shadow: 0 5px 20px rgba(0,0,0,.3), inset 0 1px rgba(255,255,255,.08);
+}
+#appPage > .app-header .header-logo { color: #f6f1df; }
+#appPage > .app-header .header-logo span { color: #f0ce68; }
+
 /* Desktop: align Service, Classement, Activité and Objectifs du jour. */
 @media (min-width: 761px) {
   .home-overview-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); align-items: stretch; }
