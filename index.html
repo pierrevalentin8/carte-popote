@@ -448,6 +448,9 @@ body {
 .notifications-panel-header { position:sticky; top:-12px; z-index:2; display:flex; align-items:center; justify-content:space-between; gap:10px; margin:-12px -12px 9px; padding:11px 13px; border-bottom:1px solid #d8e9d4; border-radius:16px 16px 0 0; background:#f4fbf1; }
 .notifications-panel-header h2 { margin:0; color:#174b2e; font-size:16px; }
 .notifications-panel-header button { width:30px; height:30px; border:0; border-radius:9px; background:#e4f0e0; color:#234a31; font-size:22px; cursor:pointer; }
+.notifications-mark-all-read { display:block; width:100%; min-height:34px; margin:0 0 9px; padding:7px 10px; border:1px solid #c59b36; border-radius:9px; background:linear-gradient(135deg,#fff8df,#f4e4ad); color:#4d3b10; font:inherit; font-size:12px; font-weight:850; cursor:pointer; }
+.notifications-mark-all-read:hover:not(:disabled) { background:linear-gradient(135deg,#fffdf2,#f1d889); }
+.notifications-mark-all-read:disabled { opacity:.55; cursor:default; }
 .notifications-list { display:grid; gap:8px; }
 .notification-item { display:grid; gap:7px; padding:10px; border:1px solid #d7e4d3; border-radius:12px; background:#fff; box-shadow:0 2px 6px rgba(27,72,37,.06); }
 .notification-item.is-unread { border-left:4px solid #2b8d42; background:#f8fff5; }
@@ -3605,6 +3608,7 @@ body:has(#appPage .app-content:not(.hidden)):not(:has(#archivesPage:not(.hidden)
                 <h2>Notifications</h2>
                 <button id="notificationsPanelClose" type="button" aria-label="Fermer les notifications">×</button>
             </div>
+            <button id="notificationsMarkAllReadButton" class="notifications-mark-all-read" type="button" disabled>Marquer comme lu</button>
             <div id="notificationsList" class="notifications-list" aria-live="polite"></div>
             <p id="notificationsEmpty" class="notifications-empty hidden">Aucune notification pour le moment.</p>
         </section>
@@ -5096,6 +5100,7 @@ const callSubmitPollResponse = httpsCallable(functions, "submitPollResponse");
 const callGetPendingExchangeOffers = httpsCallable(functions, "getPendingExchangeOffers");
 const callGetPendingExchangeSuccessNotices = httpsCallable(functions, "getPendingExchangeSuccessNotices");
 const callAcknowledgeExchangeSuccessNotice = httpsCallable(functions, "acknowledgeExchangeSuccessNotice");
+const callMarkAllNotificationsRead = httpsCallable(functions, "markAllNotificationsRead");
 const callCreateExchangeOffer = httpsCallable(functions, "createExchangeOffer");
 const callAcceptExchangeOffer = httpsCallable(functions, "acceptExchangeOffer");
 const callRefuseExchangeOffer = httpsCallable(functions, "refuseExchangeOffer");
@@ -5105,6 +5110,7 @@ const notificationsBellButton = document.getElementById("notificationsBellButton
 const notificationCountBadge = document.getElementById("notificationCountBadge");
 const notificationsPanel = document.getElementById("notificationsPanel");
 const notificationsPanelClose = document.getElementById("notificationsPanelClose");
+const notificationsMarkAllReadButton = document.getElementById("notificationsMarkAllReadButton");
 const notificationsList = document.getElementById("notificationsList");
 const notificationsEmpty = document.getElementById("notificationsEmpty");
 const siteUpdatesList = document.getElementById("siteUpdatesList");
@@ -5167,6 +5173,8 @@ let notificationUpdateAnnouncements = [];
 let notificationAnnouncementsRefreshTimer = null;
 let activeSiteUpdateCommentContext = null;
 let pendingServiceReadyMission = null;
+let serviceMissionNotificationSeenTaskId = "";
+let markAllNotificationsBusy = false;
 let announcementsWaitingForServiceModal = [];
 let lastNotifiedServiceTaskId = "";
 let pendingPolls = [];
@@ -5578,9 +5586,10 @@ function renderNotificationCenter() {
         && Date.parse(pendingServiceReadyMission.readyAt || "") <= Date.now() ? pendingServiceReadyMission : null;
     const entries = [];
     updates.forEach((update) => entries.push({ type:"update", date:timestampToMilliseconds(update.createdAt), update, unread:!seen.has(update.id) }));
-    pendingExchangeOffers.forEach((offer) => entries.push({ type:"offer", date:timestampToMilliseconds(offer.createdAt), offer, unread:true }));
+    pendingExchangeOffers.forEach((offer) => entries.push({ type:"offer", date:timestampToMilliseconds(offer.createdAt), offer, unread:!offer.recipientReadAt }));
     pendingExchangeSuccessNotices.forEach((notice) => entries.push({ type:"success", date:timestampToMilliseconds(notice.createdAt), notice, unread:true }));
-    if (serviceMission) entries.push({ type:"service", date:Date.parse(serviceMission.readyAt) || Date.now(), mission:serviceMission, unread:true });
+    const serviceTaskId = serviceMission ? (serviceMission.taskId || `${serviceMission.id || "service"}-${serviceMission.readyAt}`) : "";
+    if (serviceMission) entries.push({ type:"service", date:Date.parse(serviceMission.readyAt) || Date.now(), mission:serviceMission, unread:serviceTaskId !== serviceMissionNotificationSeenTaskId });
     entries.sort((a,b) => b.date - a.date);
 
     entries.forEach((entry) => {
@@ -5596,7 +5605,7 @@ function renderNotificationCenter() {
             const offer = entry.offer;
             const item = makeNotificationItem("offer", `🤝 Proposition de ${offer.senderPseudo || "un joueur"}`, offer.createdAt,
                 "Cartes proposées et demandées :");
-            item.classList.add("is-unread");
+            if (entry.unread) item.classList.add("is-unread");
             const cards = document.createElement("div"); cards.className = "notification-exchange-cards";
             [
                 { direction: "Il propose", season: offer.offeredSeason, number: offer.offeredNumber, rarity: offer.offeredRarity },
@@ -5621,7 +5630,7 @@ function renderNotificationCenter() {
         if (entry.type === "success") {
             const notice = entry.notice;
             const item = makeNotificationItem("success", `✅ Échange réussi avec ${notice.otherPseudo || "un joueur"}`, notice.createdAt, "Voici les cartes qui ont été échangées.");
-            item.classList.add("is-unread");
+            if (entry.unread) item.classList.add("is-unread");
             const cards = document.createElement("div"); cards.className = "notification-exchange-cards";
             [["Tu as donné",notice.sentCard], ["Tu as reçu",notice.receivedCard]].forEach(([label,card],index) => {
                 if (index) { const arrow=document.createElement("span"); arrow.className="notification-exchange-arrow"; arrow.textContent="⇄"; cards.append(arrow); }
@@ -5645,17 +5654,47 @@ function renderNotificationCenter() {
         const mission=entry.mission;
         const item=makeNotificationItem("service",`✅ Mission Service terminée · ${mission.name||"Service"}`,mission.readyAt,
             `Récompense : ${serviceRewardSummary(mission)}. Elle t’attend dans Service.`);
-        item.classList.add("is-unread");
+        if (entry.unread) item.classList.add("is-unread");
         if(mission.imageUrl){const image=document.createElement("img");image.className="notification-service-image";image.src=mission.imageUrl;image.alt=`Mission ${mission.name||"Service"}`;image.loading="lazy";image.decoding="async";item.append(image);}
         const button=document.createElement("button");button.type="button";button.textContent="Voir ma récompense";
         button.addEventListener("click",()=>{closeNotificationsPanel();void openArchivesPage();});item.append(button);notificationsList.append(item);
     });
     const unreadUpdates=updates.filter((item)=>!seen.has(item.id)).length;
-    const count=unreadUpdates+pendingExchangeOffers.length+pendingExchangeSuccessNotices.length+(serviceMission?1:0);
+    const unreadOffers=pendingExchangeOffers.filter((offer)=>!offer.recipientReadAt).length;
+    const unreadService=serviceMission && serviceTaskId !== serviceMissionNotificationSeenTaskId ? 1 : 0;
+    const count=unreadUpdates+unreadOffers+pendingExchangeSuccessNotices.length+unreadService;
+    notificationsMarkAllReadButton.disabled = count === 0 || markAllNotificationsBusy;
+    notificationsMarkAllReadButton.textContent = markAllNotificationsBusy ? "Marquage en cours…" : "Marquer comme lu";
     notificationCountBadge.textContent=count>9?"9+":String(count);
     notificationCountBadge.classList.toggle("hidden",count===0);
     notificationsBellButton.setAttribute("aria-label",count?`Ouvrir les notifications, ${count} non lue${count>1?"s":""}`:"Ouvrir les notifications");
     notificationsEmpty.classList.toggle("hidden",entries.length>0);
+}
+
+async function markAllNotificationsRead() {
+    if (!auth.currentUser || markAllNotificationsBusy) return;
+    const seen = new Set(getSeenSiteUpdateIds());
+    const unreadUpdateIds = notificationUpdateAnnouncements.filter((item) => !seen.has(item.id)).map((item) => item.id);
+    markAllNotificationsBusy = true;
+    renderNotificationCenter();
+    try {
+        const response = await callMarkAllNotificationsRead();
+        const serverSeenTaskId = String(response.data?.serviceTaskId || "");
+        if (serverSeenTaskId) serviceMissionNotificationSeenTaskId = serverSeenTaskId;
+        const activeService = pendingServiceReadyMission || serviceActiveMission;
+        if (activeService && Date.parse(activeService.readyAt || "") <= Date.now()) {
+            serviceMissionNotificationSeenTaskId = activeService.taskId || `${activeService.id || "service"}-${activeService.readyAt}`;
+        }
+        markSiteUpdatesSeen(unreadUpdateIds);
+        pendingExchangeOffers = pendingExchangeOffers.map((offer) => ({ ...offer, recipientReadAt: offer.recipientReadAt || true }));
+        pendingExchangeSuccessNotices = [];
+    } catch (error) {
+        console.error("Impossible de marquer toutes les notifications comme lues :", error);
+        notificationsMarkAllReadButton.title = "Impossible d’enregistrer. Vérifie ta connexion puis réessaie.";
+    } finally {
+        markAllNotificationsBusy = false;
+        renderNotificationCenter();
+    }
 }
 
 function openSiteUpdateNotification(announcement) {
@@ -5677,6 +5716,7 @@ notificationsBellButton.addEventListener("click",()=>{
     if(opening)renderNotificationCenter();
 });
 notificationsPanelClose.addEventListener("click",closeNotificationsPanel);
+notificationsMarkAllReadButton.addEventListener("click",markAllNotificationsRead);
 document.addEventListener("click",(event)=>{
     if(!notificationsPanel.classList.contains("hidden")&&!notificationsPanel.contains(event.target)&&!notificationsBellButton.contains(event.target))closeNotificationsPanel();
 });
@@ -6826,6 +6866,7 @@ onAuthStateChanged(
             activePoll = null;
             pollSubmissionBusy = false;
             pendingServiceReadyMission = null;
+            serviceMissionNotificationSeenTaskId = "";
             announcementsWaitingForServiceModal = [];
             lastNotifiedServiceTaskId = "";
             clearArchivesCountdown();
@@ -12761,6 +12802,7 @@ async function syncServiceMissionHomeCountdown() {
     if (!auth.currentUser) return;
     try {
         const response = await callGetServiceMissions();
+        serviceMissionNotificationSeenTaskId = String(response.data?.serviceNotificationSeenTaskId || "");
         if (!response.data?.active) return;
         serviceActiveMission = response.data.active;
         updateServiceMissionCountdown();
@@ -12781,6 +12823,7 @@ async function loadServicePage() {
     setServiceView("home"); serviceStatus.textContent = "Chargement des missions…";
     try {
         const [response, oldResponse] = await Promise.all([callGetServiceMissions(), callGetArchivesTaskStatus()]);
+        serviceMissionNotificationSeenTaskId = String(response.data?.serviceNotificationSeenTaskId || "");
         serviceMissions = Array.isArray(response.data?.missions) ? response.data.missions : [];
         serviceCollectiveActiveTasks = Array.isArray(response.data?.collectiveServiceActiveTasks) ? response.data.collectiveServiceActiveTasks : [];
         const responseNow = Date.now();
