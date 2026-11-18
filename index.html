@@ -10,7 +10,7 @@
     content="width=device-width, initial-scale=1.0, viewport-fit=cover"
 >
 
-<meta name="theme-color" content="#08172f">
+<meta name="theme-color" content="#08361d">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -6709,7 +6709,6 @@ onAuthStateChanged(
             dailyObjectivesHomeButton.classList.add("hidden");
             dailyObjectivesPage.classList.add("hidden");
             dailyObjectivesCompletedToday = 0;
-            dailyObjectivesTotalCompleted = null;
             dailyObjectivesHistoricalCount.textContent = "—";
             setPremiumPaidThisMonthAvatar(false);
             dailyObjectivesList.replaceChildren();
@@ -10535,22 +10534,50 @@ const dailyObjectivesProgress = document.getElementById("dailyObjectivesProgress
 const dailyObjectivesList = document.getElementById("dailyObjectivesList");
 const dailyObjectivesReward = document.getElementById("dailyObjectivesReward");
 let dailyObjectivesCompletedToday = 0;
-let dailyObjectivesTotalCompleted = null;
+const DAILY_OBJECTIVE_COUNTERS = Object.freeze({
+    dailyBooster: { metric: "dailyBoosterOpened", target: 1 },
+    season2Booster: { metric: "season2BoosterOpened", target: 1 },
+    cards5: { metric: "cardsDrawn", target: 5 },
+    cards10: { metric: "cardsDrawn", target: 10 },
+    rareCards3: { metric: "rareCardsDrawn", target: 3 },
+    commonCards2: { metric: "commonCardsDrawn", target: 2 },
+    recycling: { metric: "recycling", target: 1 },
+    exchange: { metric: "exchange", target: 1 },
+    serviceMission: { metric: "serviceMission", target: 1 }
+});
 
-function renderDailyObjectivesHistoricalCount() {
-    if (!Number.isFinite(dailyObjectivesTotalCompleted)) return;
-    const previousDaysCount = Math.max(0, dailyObjectivesTotalCompleted - dailyObjectivesCompletedToday);
-    dailyObjectivesHistoricalCount.textContent = previousDaysCount.toLocaleString("fr-FR");
+function getDailyObjectiveIdsForDate(dayKey) {
+    let seed = 2166136261;
+    for (const character of dayKey) seed = Math.imul(seed ^ character.charCodeAt(0), 16777619) >>> 0;
+    const values = Object.keys(DAILY_OBJECTIVE_COUNTERS);
+    for (let index = values.length - 1; index > 0; index--) {
+        seed = (Math.imul(seed, 1664525) + 1013904223) >>> 0;
+        const swapIndex = seed % (index + 1);
+        [values[index], values[swapIndex]] = [values[swapIndex], values[index]];
+    }
+    let chosen = values.slice(0, 3);
+    if (chosen.includes("cards5") && chosen.includes("cards10")) chosen = [...chosen.filter((id) => id !== "cards5"), values[3]];
+    return chosen;
 }
 
 async function refreshDailyObjectivesHistory(uid) {
     if (!uid || !auth.currentUser || auth.currentUser.uid !== uid) return;
     dailyObjectivesHistoricalCount.textContent = "Chargement…";
     try {
-        const response = await callGetPublicPlayerProfile({ playerId: uid });
+        const snapshot = await getDocs(collection(db, "players", uid, "dailyObjectives"));
         if (!auth.currentUser || auth.currentUser.uid !== uid) return;
-        dailyObjectivesTotalCompleted = Math.max(0, Number(response.data?.dailyObjectivesCompleted) || 0);
-        renderDailyObjectivesHistoricalCount();
+        const todayKey = getParisDateKey();
+        let completedBeforeToday = 0;
+        snapshot.docs.forEach((daySnapshot) => {
+            const dayKey = daySnapshot.id;
+            if (!/^\d{4}-\d{2}-\d{2}$/.test(dayKey) || dayKey >= todayKey) return;
+            const progress = daySnapshot.data()?.progress || {};
+            getDailyObjectiveIdsForDate(dayKey).forEach((id) => {
+                const objective = DAILY_OBJECTIVE_COUNTERS[id];
+                if (Number(progress[objective.metric] || 0) >= objective.target) completedBeforeToday += 1;
+            });
+        });
+        dailyObjectivesHistoricalCount.textContent = completedBeforeToday.toLocaleString("fr-FR");
     } catch (error) {
         console.error("Impossible de charger le total des objectifs déjà terminés :", error);
         dailyObjectivesHistoricalCount.textContent = "—";
@@ -10619,7 +10646,6 @@ async function loadDailyObjectives(uid) {
             });
             const objectiveCount = (state.objectives || []).length;
             dailyObjectivesCompletedToday = completedCount;
-            renderDailyObjectivesHistoricalCount();
             dailyObjectivesProgress.textContent = `${completedCount} / ${objectiveCount} terminés`;
             dailyObjectivesHomeProgress.textContent = `${completedCount} / ${objectiveCount} terminés`;
             dailyObjectivesProgress.classList.toggle("is-complete", objectiveCount > 0 && completedCount === objectiveCount);
