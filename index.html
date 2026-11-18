@@ -10,7 +10,7 @@
     content="width=device-width, initial-scale=1.0, viewport-fit=cover"
 >
 
-<meta name="theme-color" content="#16432a">
+<meta name="theme-color" content="#08172f">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -3398,53 +3398,6 @@ body:has(#appPage .app-content:not(.hidden)):not(:has(#archivesPage:not(.hidden)
     opacity: .025;
   }
 }
-
-/* iPhone / iPad: keep the top navigation below the system status bar. */
-@supports (padding-top: env(safe-area-inset-top)) {
-  #appPage > .app-header {
-    height: calc(64px + env(safe-area-inset-top, 0px));
-    padding-top: env(safe-area-inset-top, 0px);
-  }
-}
-
-/* Saison 2: keep the same green top bar on every in-app page. */
-#appPage > .app-header {
-  background: linear-gradient(180deg, rgba(8,43,26,.98), rgba(7,35,21,.97));
-  border-bottom: 1px solid rgba(229,190,78,.62);
-  box-shadow: 0 5px 20px rgba(0,0,0,.3), inset 0 1px rgba(255,255,255,.08);
-}
-#appPage > .app-header .header-logo { color: #f6f1df; }
-#appPage > .app-header .header-logo span { color: #f0ce68; }
-
-/* Override the higher-specificity white home-tile rule for the Saison 2 objectives tile. */
-#appPage:has(.app-content:not(.hidden)) .home-overview-grid > #dailyObjectivesHomeButton {
-  background: linear-gradient(150deg, #1b5631, #16432a 68%, #103b25);
-  color: #fff3c6;
-  border: 2px solid #329447;
-  box-shadow: 0 7px 16px rgba(0,0,0,.24), inset 0 1px rgba(255,255,255,.15);
-}
-
-/* Notification bell: icon only, no surrounding tile. */
-#appPage .app-header .notifications-bell,
-#appPage:has(.app-content:not(.hidden)) .app-header .notifications-bell {
-  background: transparent;
-  border: 0;
-  border-radius: 0;
-  box-shadow: none;
-  color: #f0ce68;
-}
-#appPage:has(.app-content:not(.hidden)) .app-header .notifications-bell:hover {
-  box-shadow: none;
-}
-
-/* Desktop: align Service, Classement, Activité and Objectifs du jour. */
-@media (min-width: 761px) {
-  .home-overview-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); align-items: stretch; }
-  .home-overview-grid > .daily-objectives-home-button { width: 100%; height: 100%; min-height: 126px; margin: 0; border-radius: 17px; background: linear-gradient(150deg, #1b5631, #16432a 68%, #103b25); color: #fff3c6; }
-}
-@media (max-width: 760px) {
-  .home-overview-grid > .daily-objectives-home-button { width: 100%; max-width: 146px; margin: 0 auto; }
-}
 </style>
 
 </head>
@@ -3762,15 +3715,14 @@ body:has(#appPage .app-content:not(.hidden)):not(:has(#archivesPage:not(.hidden)
             <button id="activityHomeButton" class="home-overview-activity" type="button" aria-label="Ouvrir la page Activité" title="Activité">
                 <img loading="lazy" decoding="async" src="./Activité.png" alt="Activité">
             </button>
+        </section>
+
         <button id="dailyObjectivesHomeButton" class="daily-objectives-home-button hidden" type="button" aria-label="Voir les objectifs du jour">
             <span class="daily-objectives-home-icon" aria-hidden="true">🎯</span>
             <strong>Objectifs du jour</strong>
             <span id="dailyObjectivesHomeProgress" class="daily-objectives-home-progress">0 / 3 terminés</span>
             <span class="daily-objectives-home-open">Voir les objectifs</span>
         </button>
-        </section>
-
-
 
 
         <!-- BOOSTERS -->
@@ -6757,6 +6709,8 @@ onAuthStateChanged(
             dailyObjectivesHomeButton.classList.add("hidden");
             dailyObjectivesPage.classList.add("hidden");
             dailyObjectivesCompletedToday = 0;
+            dailyObjectivesTotalCompleted = null;
+            dailyObjectivesHistoricalCount.textContent = "—";
             setPremiumPaidThisMonthAvatar(false);
             dailyObjectivesList.replaceChildren();
             if (unreadMessageShowTimer) window.clearInterval(unreadMessageShowTimer);
@@ -10581,6 +10535,13 @@ const dailyObjectivesProgress = document.getElementById("dailyObjectivesProgress
 const dailyObjectivesList = document.getElementById("dailyObjectivesList");
 const dailyObjectivesReward = document.getElementById("dailyObjectivesReward");
 let dailyObjectivesCompletedToday = 0;
+let dailyObjectivesTotalCompleted = null;
+
+function renderDailyObjectivesHistoricalCount() {
+    if (!Number.isFinite(dailyObjectivesTotalCompleted)) return;
+    const previousDaysCount = Math.max(0, dailyObjectivesTotalCompleted - dailyObjectivesCompletedToday);
+    dailyObjectivesHistoricalCount.textContent = previousDaysCount.toLocaleString("fr-FR");
+}
 
 async function refreshDailyObjectivesHistory(uid) {
     if (!uid || !auth.currentUser || auth.currentUser.uid !== uid) return;
@@ -10588,8 +10549,8 @@ async function refreshDailyObjectivesHistory(uid) {
     try {
         const response = await callGetPublicPlayerProfile({ playerId: uid });
         if (!auth.currentUser || auth.currentUser.uid !== uid) return;
-        const completed = Math.max(0, Number(response.data?.dailyObjectivesCompleted) || 0);
-        dailyObjectivesHistoricalCount.textContent = Math.max(0, completed - dailyObjectivesCompletedToday).toLocaleString("fr-FR");
+        dailyObjectivesTotalCompleted = Math.max(0, Number(response.data?.dailyObjectivesCompleted) || 0);
+        renderDailyObjectivesHistoricalCount();
     } catch (error) {
         console.error("Impossible de charger le total des objectifs déjà terminés :", error);
         dailyObjectivesHistoricalCount.textContent = "—";
@@ -10658,6 +10619,7 @@ async function loadDailyObjectives(uid) {
             });
             const objectiveCount = (state.objectives || []).length;
             dailyObjectivesCompletedToday = completedCount;
+            renderDailyObjectivesHistoricalCount();
             dailyObjectivesProgress.textContent = `${completedCount} / ${objectiveCount} terminés`;
             dailyObjectivesHomeProgress.textContent = `${completedCount} / ${objectiveCount} terminés`;
             dailyObjectivesProgress.classList.toggle("is-complete", objectiveCount > 0 && completedCount === objectiveCount);
