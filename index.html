@@ -3470,6 +3470,15 @@ body:has(#appPage .app-content:not(.hidden)):not(:has(#archivesPage:not(.hidden)
 .daily-objectives-home-button strong { font-size:12px; line-height:1.15; }
 .daily-objectives-home-progress { font-size:11px; }
 .daily-objectives-home-open { font-size:9px; }
+#appPage:has(.app-content:not(.hidden)) .home-overview-grid > .daily-objectives-home-button {
+  border:1px solid rgba(255,224,137,.9) !important;
+  background:linear-gradient(150deg,#1b5631,#16432a 68%,#103b25) !important;
+  box-shadow:0 5px 0 rgba(5,31,17,.34),0 10px 18px rgba(0,0,0,.22),inset 0 1px rgba(255,255,255,.2) !important;
+}
+#appPage:has(.app-content:not(.hidden)) .home-overview-grid > .daily-objectives-home-button:hover {
+  background:linear-gradient(150deg,#236a3d,#185234 68%,#12452d) !important;
+  box-shadow:0 8px 0 rgba(5,31,17,.3),0 14px 22px rgba(0,0,0,.26),inset 0 1px rgba(255,255,255,.25) !important;
+}
 @media(max-width:600px) {
   #appPage:has(.app-content:not(.hidden)) .home-player-summary { grid-template-columns:minmax(0,1fr) 68px minmax(0,1fr); }
   #appPage:has(.app-content:not(.hidden)) .home-profile-button,
