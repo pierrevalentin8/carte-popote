@@ -3427,7 +3427,7 @@ body:has(#appPage .app-content:not(.hidden)):not(:has(#archivesPage:not(.hidden)
 }
 #appPage:has(.app-content:not(.hidden)) .home-player-summary {
   display: grid;
-  grid-template-columns: minmax(0,1fr) 78px 48px;
+  grid-template-columns: minmax(0,1fr) 78px minmax(0,1fr);
   width: min(100%,520px);
   margin: 4px auto 15px;
   padding: 0;
@@ -3441,10 +3441,33 @@ body:has(#appPage .app-content:not(.hidden)):not(:has(#archivesPage:not(.hidden)
   background: transparent !important;
   box-shadow: none !important;
 }
-.home-inbox-button { position:relative; display:grid; width:46px; height:46px; place-items:center; justify-self:center; padding:3px; border:0; border-radius:0; background:transparent; box-shadow:none; cursor:pointer; }
-.home-inbox-button img { display:block; width:38px; height:38px; object-fit:contain; }
+.home-inbox-button { position:relative; display:grid; width:78px; height:78px; place-items:center; justify-self:center; padding:4px; border:0; border-radius:0; background:transparent; box-shadow:none; cursor:pointer; }
+.home-inbox-button img { display:block; width:60px; height:60px; object-fit:contain; }
 .home-inbox-button:focus-visible { outline:3px solid #f7d46b; outline-offset:3px; border-radius:10px; }
 .home-inbox-button .inbox-unread-badge { top:-2px; right:-5px; }
+.daily-objectives-home-button {
+  width:min(100%,120px);
+  height:120px;
+  min-width:0;
+  margin:0 auto;
+  padding:8px;
+  gap:5px;
+}
+.daily-objectives-home-icon { font-size:25px; }
+.daily-objectives-home-button strong { font-size:12px; line-height:1.15; }
+.daily-objectives-home-progress { font-size:11px; }
+.daily-objectives-home-open { font-size:9px; }
+@media(max-width:600px) {
+  #appPage:has(.app-content:not(.hidden)) .home-player-summary { grid-template-columns:minmax(0,1fr) 68px minmax(0,1fr); }
+  #appPage:has(.app-content:not(.hidden)) .home-profile-button,
+  #appPage:has(.app-content:not(.hidden)) .home-inbox-button { width:68px; height:68px; min-height:68px; }
+  #appPage:has(.app-content:not(.hidden)) .home-inbox-button img { width:54px; height:54px; }
+  #appPage:has(.app-content:not(.hidden)) .daily-objectives-home-button { width:min(100%,104px); height:104px; padding:6px; gap:3px; }
+  #appPage:has(.app-content:not(.hidden)) .daily-objectives-home-icon { font-size:21px; }
+  #appPage:has(.app-content:not(.hidden)) .daily-objectives-home-button strong { font-size:10px; }
+  #appPage:has(.app-content:not(.hidden)) .daily-objectives-home-progress { font-size:9px; }
+  #appPage:has(.app-content:not(.hidden)) .daily-objectives-home-open { font-size:8px; }
+}
 @media(min-width:761px) {
   #appPage:has(.app-content:not(.hidden)) .booster-season-two { display:flex; flex-direction:column; align-items:center; justify-content:center; gap:10px; }
   #appPage:has(.app-content:not(.hidden)) .booster-season-two .booster-visual { width:min(100%,280px); max-width:280px; margin:0 auto; }
@@ -3773,14 +3796,13 @@ body:has(#appPage .app-content:not(.hidden)):not(:has(#archivesPage:not(.hidden)
             <button id="activityHomeButton" class="home-overview-activity" type="button" aria-label="Ouvrir la page Activité" title="Activité">
                 <img loading="lazy" decoding="async" src="./Activité.png" alt="Activité">
             </button>
+            <button id="dailyObjectivesHomeButton" class="daily-objectives-home-button hidden" type="button" aria-label="Voir les objectifs du jour">
+                <span class="daily-objectives-home-icon" aria-hidden="true">🎯</span>
+                <strong>Objectifs du jour</strong>
+                <span id="dailyObjectivesHomeProgress" class="daily-objectives-home-progress">0 / 3 terminés</span>
+                <span class="daily-objectives-home-open">Voir les objectifs</span>
+            </button>
         </section>
-
-        <button id="dailyObjectivesHomeButton" class="daily-objectives-home-button hidden" type="button" aria-label="Voir les objectifs du jour">
-            <span class="daily-objectives-home-icon" aria-hidden="true">🎯</span>
-            <strong>Objectifs du jour</strong>
-            <span id="dailyObjectivesHomeProgress" class="daily-objectives-home-progress">0 / 3 terminés</span>
-            <span class="daily-objectives-home-open">Voir les objectifs</span>
-        </button>
 
 
         <!-- BOOSTERS -->
