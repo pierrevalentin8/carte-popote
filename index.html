@@ -2490,6 +2490,19 @@ body {
 .activity-track { height:16px; overflow:hidden; border:1px solid #b7c6db; border-radius:999px; background:linear-gradient(180deg,#e6edf5,#cbd6e3); box-shadow:inset 0 2px 4px #10264a22; }
 .activity-fill { height:100%; min-width:0; border-radius:inherit; background:linear-gradient(90deg,#28a6ee,#2460d5); box-shadow:inset 0 1px 2px #ffffff99,0 0 8px #2589e766; transition:width .35s ease; }
 .activity-value { color:#173e72; font-size:14px; font-weight:900; text-align:right; font-variant-numeric:tabular-nums; }
+.activity-history { margin:28px 0 12px; }
+.activity-history h3 { margin:0 0 6px; color:#ffe18a; font-size:20px; }
+.activity-history-intro { margin:0 0 13px; color:#d2e1d2; font-size:13px; line-height:1.5; }
+.activity-history-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%,230px),1fr)); gap:12px; }
+.activity-history-card { min-width:0; padding:14px; border:1px solid rgba(229,190,78,.58); border-radius:15px; background:linear-gradient(145deg,#15452a,#0d3822 75%,#092b1b); color:#f7f4e9; box-shadow:0 8px 19px rgba(0,0,0,.23),inset 0 1px rgba(255,255,255,.1); }
+.activity-history-card h4 { margin:0 0 4px; color:#ffe18a; font-size:15px; }
+.activity-history-card > p { margin:0 0 10px; color:#cfddce; font-size:11px; }
+.activity-history-rankings { display:grid; gap:6px; margin:0; padding:0; list-style:none; }
+.activity-history-rankings li { display:grid; grid-template-columns:25px minmax(0,1fr) auto; align-items:center; gap:7px; padding:7px 8px; border:1px solid rgba(255,255,255,.1); border-radius:9px; background:rgba(255,255,255,.06); }
+.activity-history-rank { color:#ffe18a; font-size:12px; font-weight:900; text-align:center; }
+.activity-history-player { overflow:hidden; color:#fffdf4; font-size:12px; font-weight:800; text-overflow:ellipsis; white-space:nowrap; }
+.activity-history-wins { color:#ffe18a; font-size:11px; font-weight:900; white-space:nowrap; }
+.activity-history-empty { margin:0; color:#d2e1d2; font-size:12px; }
 @media (max-width:600px) { .activity-page { padding:18px 11px 92px; } .activity-row { grid-template-columns:minmax(80px,125px) 14px minmax(48px,1fr) 34px; gap:6px; padding:10px 8px; } .activity-player { font-size:12px; } .activity-value { font-size:11px; } .activity-track { height:14px; } }
 .exchange-page { width: 100%; max-width: 980px; min-height: calc(100dvh - 70px); margin: auto; padding: 24px 16px 100px; color: var(--theme-cream); }
 .exchange-page h2 { margin: 20px 0 8px; color: var(--theme-gold-light); font-size: 25px; }
@@ -4159,6 +4172,11 @@ body:has(#appPage .app-content:not(.hidden)):not(:has(#archivesPage:not(.hidden)
         </div>
         <p id="activityStatus" class="activity-status" role="status" aria-live="polite">Chargement de l’activité…</p>
         <div id="activityList" class="activity-list" aria-label="Comparaison des joueurs"></div>
+        <section class="activity-history" aria-labelledby="activityHistoryTitle">
+            <h3 id="activityHistoryTitle">🏆 Premières places hebdomadaires</h3>
+            <p id="activityHistoryIntro" class="activity-history-intro">Historique des semaines terminées. En cas d’égalité, chaque joueur à la première place est comptabilisé.</p>
+            <div id="activityHistoricalLeaders" class="activity-history-grid" aria-live="polite"></div>
+        </section>
     </section>
 
     <section id="statisticsPage" class="statistics-page hidden" aria-labelledby="statisticsTitle">
@@ -6022,6 +6040,7 @@ const activityMetricSelect = document.getElementById("activityMetricSelect");
 const activityWeekLabel = document.getElementById("activityWeekLabel");
 const activityStatus = document.getElementById("activityStatus");
 const activityList = document.getElementById("activityList");
+const activityHistoricalLeaders = document.getElementById("activityHistoricalLeaders");
 const statisticsMenuButton = document.getElementById("statisticsMenuButton");
 const statisticsPage = document.getElementById("statisticsPage");
 const statisticsBackButton = document.getElementById("statisticsBackButton");
@@ -9729,6 +9748,33 @@ leaderboardMenuButton.addEventListener("click", async () => {
 leaderboardBackButton.addEventListener("click", showHomePage);
 
 const activityMetricLabels = { recycling: "Recyclages", cardsDrawn: "Cartes tirées", boostersOpened: "Boosters ouverts" };
+const activityHistoryLabels = { cardsDrawn: "Cartes tirées", boostersOpened: "Boosters ouverts", recycling: "Recyclages" };
+function renderActivityHistoricalLeaders(leaders, weeksCount) {
+    activityHistoricalLeaders.replaceChildren();
+    Object.entries(activityHistoryLabels).forEach(([metric, label]) => {
+        const card = document.createElement("article"); card.className = "activity-history-card";
+        const title = document.createElement("h4"); title.textContent = label;
+        const count = Math.max(0, Number(weeksCount?.[metric]) || 0);
+        const note = document.createElement("p"); note.textContent = `${count.toLocaleString("fr-FR")} semaine${count === 1 ? "" : "s"} terminée${count === 1 ? "" : "s"} avec de l’activité`;
+        card.append(title, note);
+        const ranking = Array.isArray(leaders?.[metric]) ? leaders[metric] : [];
+        if (!ranking.length) {
+            const empty = document.createElement("p"); empty.className = "activity-history-empty"; empty.textContent = "Aucune première place enregistrée pour le moment."; card.append(empty);
+        } else {
+            const list = document.createElement("ol"); list.className = "activity-history-rankings";
+            ranking.forEach((player, index) => {
+                const row = document.createElement("li");
+                const rank = document.createElement("span"); rank.className = "activity-history-rank"; rank.textContent = `${index + 1}.`;
+                const pseudo = document.createElement("span"); pseudo.className = "activity-history-player"; pseudo.textContent = player.pseudo || "Joueur";
+                const wins = document.createElement("span"); wins.className = "activity-history-wins";
+                const firstPlaces = Math.max(0, Number(player.firstPlaces) || 0); wins.textContent = `${firstPlaces} 1re place${firstPlaces === 1 ? "" : "s"}`;
+                row.append(rank, pseudo, wins); list.append(row);
+            });
+            card.append(list);
+        }
+        activityHistoricalLeaders.append(card);
+    });
+}
 function formatActivityDate(value) {
     const date = new Date(`${value}T00:00:00Z`);
     return Number.isFinite(date.getTime()) ? new Intl.DateTimeFormat("fr-FR", { day: "numeric", month: "long", timeZone: "UTC" }).format(date) : value;
@@ -9741,6 +9787,7 @@ async function loadWeeklyActivity() {
     try {
         const metric = activityMetricSelect.value;
         const response = (await callGetWeeklyActivity({ metric })).data || {};
+        renderActivityHistoricalLeaders(response.historicalLeaders, response.historicalWeeksCount);
         const players = Array.isArray(response.players) ? response.players : [];
         if (response.weekStart && response.weekEnd) activityWeekLabel.textContent = `Semaine du ${formatActivityDate(response.weekStart)} au ${formatActivityDate(response.weekEnd)} · ${activityMetricLabels[metric] || "Activité"}`;
         const maxValue = Math.max(0, ...players.map((player) => Number(player.value) || 0));
