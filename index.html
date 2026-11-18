@@ -5171,6 +5171,8 @@ const callGetPendingExchangeOffers = httpsCallable(functions, "getPendingExchang
 const callGetPendingExchangeSuccessNotices = httpsCallable(functions, "getPendingExchangeSuccessNotices");
 const callAcknowledgeExchangeSuccessNotice = httpsCallable(functions, "acknowledgeExchangeSuccessNotice");
 const callMarkAllNotificationsRead = httpsCallable(functions, "markAllNotificationsRead");
+const callGetPlayerGrantNotifications = httpsCallable(functions, "getPlayerGrantNotifications");
+const callAcknowledgeAdminGrantNotification = httpsCallable(functions, "acknowledgeAdminGrantNotification");
 const callCreateExchangeOffer = httpsCallable(functions, "createExchangeOffer");
 const callAcceptExchangeOffer = httpsCallable(functions, "acceptExchangeOffer");
 const callRefuseExchangeOffer = httpsCallable(functions, "refuseExchangeOffer");
@@ -5240,6 +5242,7 @@ const mysticRewardList = document.getElementById("mysticRewardList");
 const mysticRewardCloseButton = document.getElementById("mysticRewardCloseButton");
 let pendingSiteUpdateIds = [];
 let notificationUpdateAnnouncements = [];
+let pendingAdminGrantNotifications = [];
 let notificationAnnouncementsRefreshTimer = null;
 let activeSiteUpdateCommentContext = null;
 let pendingServiceReadyMission = null;
@@ -5672,6 +5675,7 @@ function renderNotificationCenter() {
     updates.forEach((update) => entries.push({ type:"update", date:timestampToMilliseconds(update.createdAt), update, unread:!seen.has(update.id) }));
     pendingExchangeOffers.forEach((offer) => entries.push({ type:"offer", date:timestampToMilliseconds(offer.createdAt), offer, unread:!offer.recipientReadAt }));
     pendingExchangeSuccessNotices.forEach((notice) => entries.push({ type:"success", date:timestampToMilliseconds(notice.createdAt), notice, unread:true }));
+    pendingAdminGrantNotifications.forEach((notice) => entries.push({ type:"grant", date:timestampToMilliseconds(notice.createdAt), notice, unread:notice.seen !== true }));
     const serviceTaskId = serviceMission ? (serviceMission.taskId || `${serviceMission.id || "service"}-${serviceMission.readyAt}`) : "";
     if (serviceMission) entries.push({ type:"service", date:Date.parse(serviceMission.readyAt) || Date.now(), mission:serviceMission, unread:serviceTaskId !== serviceMissionNotificationSeenTaskId });
     entries.sort((a,b) => b.date - a.date);
@@ -5735,6 +5739,23 @@ function renderNotificationCenter() {
             });
             item.append(button); notificationsList.append(item); return;
         }
+        if (entry.type === "grant") {
+            const notice = entry.notice;
+            const item = makeNotificationItem("grant", `🎁 ${notice.title}`, notice.createdAt, notice.message);
+            if (entry.unread) item.classList.add("is-unread");
+            const button = document.createElement("button"); button.type = "button";
+            button.textContent = notice.seen ? "Attribution reçue" : "Marquer comme lu";
+            button.disabled = notice.seen === true;
+            button.addEventListener("click", async () => {
+                button.disabled = true;
+                try {
+                    await callAcknowledgeAdminGrantNotification({ notificationId: notice.id });
+                    notice.seen = true;
+                    renderNotificationCenter();
+                } catch (error) { console.error("Impossible de marquer cette attribution comme lue :", error); button.disabled = false; }
+            });
+            item.append(button); notificationsList.append(item); return;
+        }
         const mission=entry.mission;
         const item=makeNotificationItem("service",`✅ Mission Service terminée · ${mission.name||"Service"}`,mission.readyAt,
             `Récompense : ${serviceRewardSummary(mission)}. Elle t’attend dans Service.`);
@@ -5746,7 +5767,8 @@ function renderNotificationCenter() {
     const unreadUpdates=updates.filter((item)=>!seen.has(item.id)).length;
     const unreadOffers=pendingExchangeOffers.filter((offer)=>!offer.recipientReadAt).length;
     const unreadService=serviceMission && serviceTaskId !== serviceMissionNotificationSeenTaskId ? 1 : 0;
-    const count=unreadUpdates+unreadOffers+pendingExchangeSuccessNotices.length+unreadService;
+    const unreadGrants=pendingAdminGrantNotifications.filter((notice)=>notice.seen!==true).length;
+    const count=unreadUpdates+unreadOffers+pendingExchangeSuccessNotices.length+unreadService+unreadGrants;
     notificationsMarkAllReadButton.disabled = count === 0 || markAllNotificationsBusy;
     notificationsMarkAllReadButton.textContent = markAllNotificationsBusy ? "Marquage en cours…" : "Marquer comme lu";
     notificationCountBadge.textContent=count>9?"9+":String(count);
@@ -5772,6 +5794,7 @@ async function markAllNotificationsRead() {
         markSiteUpdatesSeen(unreadUpdateIds);
         pendingExchangeOffers = pendingExchangeOffers.map((offer) => ({ ...offer, recipientReadAt: offer.recipientReadAt || true }));
         pendingExchangeSuccessNotices = [];
+        pendingAdminGrantNotifications = pendingAdminGrantNotifications.map((notice) => ({ ...notice, seen: true }));
     } catch (error) {
         console.error("Impossible de marquer toutes les notifications comme lues :", error);
         notificationsMarkAllReadButton.title = "Impossible d’enregistrer. Vérifie ta connexion puis réessaie.";
@@ -5779,6 +5802,15 @@ async function markAllNotificationsRead() {
         markAllNotificationsBusy = false;
         renderNotificationCenter();
     }
+}
+
+async function loadAdminGrantNotifications() {
+    if (!auth.currentUser) { pendingAdminGrantNotifications = []; return; }
+    try {
+        const response = await callGetPlayerGrantNotifications();
+        pendingAdminGrantNotifications = Array.isArray(response.data?.notifications) ? response.data.notifications : [];
+        renderNotificationCenter();
+    } catch (error) { console.warn("Impossible de charger les notifications d’attribution :", error); }
 }
 
 function openSiteUpdateNotification(announcement) {
@@ -6919,6 +6951,7 @@ onAuthStateChanged(
             if (exchangeOfferPollTimer) window.clearInterval(exchangeOfferPollTimer);
             exchangeOfferPollTimer = null;
             pendingExchangeOffers = [];
+            pendingAdminGrantNotifications = [];
             notificationUpdateAnnouncements = [];
             if (notificationAnnouncementsRefreshTimer) window.clearInterval(notificationAnnouncementsRefreshTimer);
             notificationAnnouncementsRefreshTimer = null;
@@ -7045,7 +7078,8 @@ onAuthStateChanged(
         if (!isAdminAccount) messagingPage.classList.add("hidden");
         loadHomeAnnouncements();
         if (notificationAnnouncementsRefreshTimer) window.clearInterval(notificationAnnouncementsRefreshTimer);
-        notificationAnnouncementsRefreshTimer = window.setInterval(() => { if (auth.currentUser) void loadHomeAnnouncements(); }, 60_000);
+        void loadAdminGrantNotifications();
+        notificationAnnouncementsRefreshTimer = window.setInterval(() => { if (auth.currentUser) { void loadHomeAnnouncements(); void loadAdminGrantNotifications(); } }, 60_000);
         refreshHomeMaintenanceStatus();
         if (homeMaintenanceRefreshInterval) window.clearInterval(homeMaintenanceRefreshInterval);
         homeMaintenanceRefreshInterval = window.setInterval(refreshHomeMaintenanceStatus, 45_000);
@@ -13324,7 +13358,8 @@ minageDeleteButton.addEventListener("click", async () => {
 function timestampToMilliseconds(value) {
     if (value && typeof value.toMillis === "function") return value.toMillis();
     if (value && typeof value.toDate === "function") return value.toDate().getTime();
-    return 0;
+    const parsed = typeof value === "string" || typeof value === "number" ? Date.parse(value) : NaN;
+    return Number.isFinite(parsed) ? parsed : 0;
 }
 
 function makeAnnouncementItem(announcement) {
@@ -13514,7 +13549,9 @@ siteUpdateForm.addEventListener("submit", async (event) => {
 });
 
 function formatAdminMessageDate(value) {
-    const date = value && typeof value.toDate === "function" ? value.toDate() : null;
+    const date = value && typeof value.toDate === "function" ? value.toDate()
+        : value instanceof Date ? value
+        : typeof value === "string" || typeof value === "number" ? new Date(value) : null;
     if (!date || Number.isNaN(date.getTime())) return "Date inconnue";
     return new Intl.DateTimeFormat("fr-FR", {
         dateStyle: "medium",
@@ -13639,6 +13676,7 @@ async function loadPlayerInbox() {
         const statusFilter = playerInboxStatusFilter.value;
         for (const messageDoc of messages) {
             const message = messageDoc.data();
+            if (message.playerDeleted === true) continue;
             if (categoryFilter !== "all" && message.category !== categoryFilter) continue;
             if (statusFilter === "archived" ? message.playerArchived !== true : message.playerArchived === true) continue;
             if (statusFilter === "unread" && !hasUnreadAdminReply(message)) continue;
@@ -13700,8 +13738,24 @@ async function loadPlayerInbox() {
                     archiveButton.disabled = false;
                 }
             });
+            const deleteButton = document.createElement("button");
+            deleteButton.type = "button";
+            deleteButton.className = "secondary-button message-delete-button";
+            deleteButton.textContent = "Supprimer";
+            deleteButton.addEventListener("click", async () => {
+                if (!window.confirm("Supprimer ce message de ta messagerie ?")) return;
+                deleteButton.disabled = true;
+                try {
+                    await updateDoc(messageDoc.ref, { playerDeleted: true, playerDeletedAt: serverTimestamp() });
+                    await loadPlayerInbox();
+                } catch (error) {
+                    console.error("Impossible de supprimer le message :", error);
+                    playerInboxStatus.textContent = "Suppression impossible. Mets à jour les règles Firestore puis réessaie.";
+                    deleteButton.disabled = false;
+                }
+            });
             const actions = document.createElement("div");
-            actions.append(threadButton, archiveButton);
+            actions.append(threadButton, archiveButton, deleteButton);
             article.append(actions, thread);
             const preview = document.createElement("p");
             preview.className = "player-message-preview";
@@ -13713,7 +13767,10 @@ async function loadPlayerInbox() {
             }).catch(() => {});
             playerInboxList.append(article);
         }
-        unreadMessageCount = messages.filter((messageDoc) => hasUnreadAdminReply(messageDoc.data())).length;
+        unreadMessageCount = messages.filter((messageDoc) => {
+            const message = messageDoc.data();
+            return message.playerDeleted !== true && message.playerArchived !== true && hasUnreadAdminReply(message);
+        }).length;
         updatePlayerInboxUnreadBadge(unreadMessageCount);
         playerInboxStatus.textContent = visibleCount
             ? `${visibleCount} conversation${visibleCount > 1 ? "s" : ""} affichée${visibleCount > 1 ? "s" : ""}.`
