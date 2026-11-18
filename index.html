@@ -3417,10 +3417,17 @@ body:has(#appPage .app-content:not(.hidden)):not(:has(#archivesPage:not(.hidden)
 
 /* En-tête saison 2 : bande verte, cloche seule sans encart. */
 #appPage .app-header {
+  position: fixed !important;
+  inset: 0 0 auto;
+  width: 100%;
+  height: calc(64px + env(safe-area-inset-top, 0px));
+  padding-top: env(safe-area-inset-top, 0px);
+  z-index: 1400;
   background: linear-gradient(180deg, #0b4228, #07351f) !important;
   border-bottom: 1px solid rgba(229,190,78,.68) !important;
   box-shadow: 0 5px 20px rgba(0,0,0,.28), inset 0 1px rgba(255,255,255,.08) !important;
 }
+#appPage { padding-top: calc(64px + env(safe-area-inset-top, 0px)); }
 #appPage .app-header .notifications-bell {
   width: 44px;
   height: 44px;
@@ -3744,6 +3751,7 @@ body:has(#appPage .app-content:not(.hidden)):not(:has(#archivesPage:not(.hidden)
             <button class="admin-hub-card" type="button" data-admin-hub-action="tirages"><span class="admin-hub-card-icon">🃏</span><span><strong>Cartes tirées</strong><small>Total tiré par les joueurs</small></span></button>
             <button class="admin-hub-card" type="button" data-admin-hub-action="effectif"><span class="admin-hub-card-icon">👥</span><span><strong>Effectif</strong><small>Suivi mensuel des joueurs</small></span></button>
             <button class="admin-hub-card" type="button" data-admin-hub-action="boosters"><span class="admin-hub-card-icon">🎁</span><span><strong>Boosters évènementiels</strong><small>Programmation et attribution</small></span></button>
+            <button class="admin-hub-card" type="button" data-admin-hub-action="classicBoosterGrant"><span class="admin-hub-card-icon">🎴</span><span><strong>Donner un booster classique</strong><small>Attribuer un booster Saison 1 ou 2</small></span></button>
             <button class="admin-hub-card" type="button" data-admin-hub-action="messagerie"><span class="admin-hub-card-icon">💬</span><span><strong>Messagerie</strong><small>Idées, problèmes et archives</small></span></button>
             <button class="admin-hub-card" type="button" data-admin-hub-action="polls"><span class="admin-hub-card-icon">🗳️</span><span><strong>Sondage</strong><small>Poser une question et consulter les réponses</small></span></button>
             <button class="admin-hub-card" type="button" data-admin-hub-action="statistiques"><span class="admin-hub-card-icon">📊</span><span><strong>Statistiques</strong><small>Activité des joueurs</small></span></button>
@@ -4544,6 +4552,18 @@ body:has(#appPage .app-content:not(.hidden)):not(:has(#archivesPage:not(.hidden)
         </div>
     </section>
 
+    <section id="classicBoosterGrantModal" class="site-updates-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="classicBoosterGrantTitle" aria-hidden="true">
+        <div class="site-updates-card">
+            <h2 id="classicBoosterGrantTitle">🎴 Donner un booster classique</h2>
+            <p>Le stock sera ajouté directement au joueur, sans paiement ni ouverture automatique.</p>
+            <label class="exchange-modal-field" for="classicBoosterGrantPlayer">Joueur<select id="classicBoosterGrantPlayer" class="admin-field"><option value="">Chargement des joueurs…</option></select></label>
+            <label class="exchange-modal-field" for="classicBoosterGrantSeason">Saison<select id="classicBoosterGrantSeason" class="admin-field"><option value="Saison 1">Booster classique Saison 1</option><option value="Saison 2">Booster classique Saison 2</option></select></label>
+            <label class="exchange-modal-field" for="classicBoosterGrantAmount">Quantité<input id="classicBoosterGrantAmount" class="admin-field" type="number" min="1" max="1000" step="1" value="1"></label>
+            <p id="classicBoosterGrantStatus" role="status" aria-live="polite"></p>
+            <div class="exchange-modal-actions"><button id="classicBoosterGrantCancel" class="secondary-button" type="button">Fermer</button><button id="classicBoosterGrantSubmit" class="primary-button" type="button">Attribuer</button></div>
+        </div>
+    </section>
+
     <section id="boosterResultModal" class="booster-modal hidden" role="dialog" aria-modal="true" aria-labelledby="boosterResultTitle">
         <div class="booster-modal-content">
             <h2 id="boosterResultTitle">🎉 Booster ouvert !</h2>
@@ -5123,6 +5143,7 @@ const callOpenPremiumBooster = httpsCallable(functions, "openPremiumBooster");
 const callTestPremiumWheel = httpsCallable(functions, "testPremiumWheel");
 const callAdjustPlayerPremiumTokens = httpsCallable(functions, "adjustPlayerPremiumTokens");
 const callGrantPremiumTokens = httpsCallable(functions, "grantPremiumTokens");
+const callGrantClassicBooster = httpsCallable(functions, "grantClassicBooster");
 const callInitializePremiumAssignedTokens = httpsCallable(functions, "initializePremiumAssignedTokens");
 const callGetPremiumWheelJournal = httpsCallable(functions, "getPremiumWheelJournal");
 const callGetPremiumRewardCards = httpsCallable(functions, "getPremiumRewardCards");
@@ -6269,6 +6290,13 @@ const openDailyBoosterButton = document.getElementById("openDailyBoosterButton")
 const boosterPurchaseStatus = document.getElementById("boosterPurchaseStatus");
 const boosterResultModal = document.getElementById("boosterResultModal");
 const eventBoosterPromptModal = document.getElementById("eventBoosterPromptModal");
+const classicBoosterGrantModal = document.getElementById("classicBoosterGrantModal");
+const classicBoosterGrantPlayer = document.getElementById("classicBoosterGrantPlayer");
+const classicBoosterGrantSeason = document.getElementById("classicBoosterGrantSeason");
+const classicBoosterGrantAmount = document.getElementById("classicBoosterGrantAmount");
+const classicBoosterGrantStatus = document.getElementById("classicBoosterGrantStatus");
+const classicBoosterGrantSubmit = document.getElementById("classicBoosterGrantSubmit");
+const classicBoosterGrantCancel = document.getElementById("classicBoosterGrantCancel");
 const eventBoosterPromptTitle = document.getElementById("eventBoosterPromptTitle");
 const eventBoosterPromptImage = document.getElementById("eventBoosterPromptImage");
 const eventBoosterPromptDescription = document.getElementById("eventBoosterPromptDescription");
@@ -14154,6 +14182,73 @@ function returnToAdminHubOrHome() {
     showHomePage();
 }
 
+async function openClassicBoosterGrant() {
+    if (!isCurrentUserAdmin() || isPlayerPreview) return;
+    dropdownMenu.classList.add("hidden");
+    adminHubPage.classList.add("hidden");
+    classicBoosterGrantModal.classList.remove("hidden");
+    classicBoosterGrantModal.setAttribute("aria-hidden", "false");
+    classicBoosterGrantStatus.textContent = "Chargement des joueurs…";
+    classicBoosterGrantSubmit.disabled = true;
+    adminHubReturnPending = true;
+    try {
+        const response = await callGetAdminPlayers();
+        const players = Array.isArray(response.data?.players) ? response.data.players : [];
+        classicBoosterGrantPlayer.replaceChildren();
+        const placeholder = document.createElement("option");
+        placeholder.value = "";
+        placeholder.textContent = players.length ? "Choisir un joueur" : "Aucun joueur inscrit";
+        classicBoosterGrantPlayer.append(placeholder);
+        players.sort((left, right) => (left.pseudo || "").localeCompare(right.pseudo || "", "fr", { sensitivity: "base" }))
+            .forEach((player) => {
+                const option = document.createElement("option");
+                option.value = player.id;
+                option.textContent = player.pseudo || "Joueur";
+                classicBoosterGrantPlayer.append(option);
+            });
+        classicBoosterGrantStatus.textContent = players.length ? "Choisis un joueur, une saison et une quantité." : "Aucun joueur disponible.";
+        classicBoosterGrantSubmit.disabled = !players.length;
+    } catch (error) {
+        console.error("Impossible de charger les joueurs pour leur attribuer un booster :", error);
+        classicBoosterGrantStatus.textContent = error.message || "Impossible de charger la liste des joueurs.";
+    }
+}
+
+function closeClassicBoosterGrant() {
+    classicBoosterGrantModal.classList.add("hidden");
+    classicBoosterGrantModal.setAttribute("aria-hidden", "true");
+    if (adminHubReturnPending && isCurrentUserAdmin() && !isPlayerPreview) openAdminHub();
+}
+
+classicBoosterGrantCancel.addEventListener("click", closeClassicBoosterGrant);
+classicBoosterGrantModal.addEventListener("click", (event) => {
+    if (event.target === classicBoosterGrantModal) closeClassicBoosterGrant();
+});
+classicBoosterGrantSubmit.addEventListener("click", async () => {
+    const playerId = classicBoosterGrantPlayer.value;
+    const season = classicBoosterGrantSeason.value;
+    const amount = Number(classicBoosterGrantAmount.value);
+    if (!playerId || !["Saison 1", "Saison 2"].includes(season) || !Number.isSafeInteger(amount) || amount < 1 || amount > 1000) {
+        classicBoosterGrantStatus.textContent = "Sélectionne un joueur et une quantité entière entre 1 et 1 000.";
+        return;
+    }
+    classicBoosterGrantSubmit.disabled = true;
+    classicBoosterGrantStatus.textContent = "Attribution en cours…";
+    try {
+        const response = await callGrantClassicBooster({ playerId, season, amount });
+        const playerName = classicBoosterGrantPlayer.selectedOptions[0]?.textContent || "Joueur";
+        const granted = amount.toLocaleString("fr-FR");
+        const stock = Number(response.data?.stock || 0).toLocaleString("fr-FR");
+        classicBoosterGrantStatus.textContent = granted + " booster" + (amount === 1 ? "" : "s") + " classique " + season + " attribué" + (amount === 1 ? "" : "s") + " à " + playerName + ". Stock après attribution : " + stock + ".";
+        classicBoosterGrantAmount.value = "1";
+    } catch (error) {
+        console.error("Attribution du booster classique impossible :", error);
+        classicBoosterGrantStatus.textContent = error.message || "Impossible d’attribuer les boosters.";
+    } finally {
+        classicBoosterGrantSubmit.disabled = false;
+    }
+});
+
 adminHubOpenButton.addEventListener("click", openAdminHub);
 adminHubBackButton.addEventListener("click", showHomePage);
 pollsAdminBackButton.addEventListener("click", openAdminHub);
@@ -14163,6 +14258,7 @@ document.querySelectorAll("[data-admin-hub-action]").forEach((button) => {
         if (action === "preview") { playerPreviewToggle.click(); return; }
         if (action === "logout") { logoutButton.click(); return; }
         if (action === "polls") { void openPollAdminPage(); return; }
+        if (action === "classicBoosterGrant") { void openClassicBoosterGrant(); return; }
         if (action === "tirages") { adminHubReturnPending = true; adminHubPage.classList.add("hidden"); void showDrawnCardsPage(); return; }
         const destination = {
             effectif: effectifMenuButton,
