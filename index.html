@@ -3422,6 +3422,32 @@ body:has(#appPage .app-content:not(.hidden)):not(:has(#archivesPage:not(.hidden)
   box-shadow: none !important;
   filter: drop-shadow(0 0 6px rgba(255,225,138,.72));
 }
+#appPage:has(.app-content:not(.hidden)) .home-player-summary {
+  display: grid;
+  grid-template-columns: minmax(0,1fr) 78px 48px;
+  width: min(100%,520px);
+  margin: 4px auto 15px;
+  padding: 0;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+#appPage:has(.app-content:not(.hidden)) .home-profile-button {
+  border: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+.home-inbox-button { position:relative; display:grid; width:46px; height:46px; place-items:center; justify-self:center; padding:3px; border:0; border-radius:0; background:transparent; box-shadow:none; cursor:pointer; }
+.home-inbox-button img { display:block; width:38px; height:38px; object-fit:contain; }
+.home-inbox-button:focus-visible { outline:3px solid #f7d46b; outline-offset:3px; border-radius:10px; }
+.home-inbox-button .inbox-unread-badge { top:-2px; right:-5px; }
+@media(min-width:761px) {
+  #appPage:has(.app-content:not(.hidden)) .booster-season-two { display:flex; flex-direction:column; align-items:center; justify-content:center; gap:10px; }
+  #appPage:has(.app-content:not(.hidden)) .booster-season-two .booster-visual { width:min(100%,280px); max-width:280px; margin:0 auto; }
+  #appPage:has(.app-content:not(.hidden)) .booster-season-two #buySeason2BoosterButton,
+  #appPage:has(.app-content:not(.hidden)) .booster-season-two #openSeason2BoosterButton { width:min(100%,360px); margin:0 auto; }
+}
 </style>
 
 </head>
@@ -3719,6 +3745,10 @@ body:has(#appPage .app-content:not(.hidden)):not(:has(#archivesPage:not(.hidden)
             <button id="playerProfileHomeButton" class="home-profile-button" type="button" aria-label="Ouvrir le profil">
                 <span class="avatar" id="playerAvatar" aria-hidden="true">👤</span>
             </button>
+            <button id="playerInboxOpenButton" class="home-inbox-button" type="button" aria-label="Ouvrir ma boîte de réception" title="Messagerie">
+                <img loading="lazy" decoding="async" src="./enveloppe.png" alt="">
+                <span id="playerInboxUnreadBadge" class="inbox-unread-badge hidden" aria-live="polite"></span>
+            </button>
             <span id="playerPseudo" class="hidden">Joueur</span>
             <span id="playerBoosters" class="hidden">0</span>
             <span id="playerLevel" class="hidden">Niveau 1 • 0 XP</span>
@@ -3838,11 +3868,6 @@ body:has(#appPage .app-content:not(.hidden)):not(:has(#archivesPage:not(.hidden)
         </details>
 
         <div class="message-compose-card">
-            <button id="playerInboxOpenButton" class="message-compose-toggle" type="button" aria-label="Ouvrir ma boîte de réception">
-                <img loading="lazy" decoding="async" src="./enveloppe.png" alt="">
-                <span>Ma messagerie</span>
-                <span id="playerInboxUnreadBadge" class="inbox-unread-badge hidden" aria-live="polite"></span>
-            </button>
             <button id="feedbackToggleButton" class="message-compose-toggle" type="button" aria-expanded="false" aria-controls="feedbackFormPanel" aria-label="Envoyer un message à l’Admin">
                 <img loading="lazy" decoding="async" src="./enveloppe.png" alt="">
                 <span>Envoyer un message</span>
