@@ -3406,6 +3406,15 @@ body:has(#appPage .app-content:not(.hidden)):not(:has(#archivesPage:not(.hidden)
     padding-top: env(safe-area-inset-top, 0px);
   }
 }
+
+/* Desktop: align Service, Classement, Activité and Objectifs du jour. */
+@media (min-width: 761px) {
+  .home-overview-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); align-items: stretch; }
+  .home-overview-grid > .daily-objectives-home-button { width: 100%; height: 100%; min-height: 126px; margin: 0; border-radius: 17px; }
+}
+@media (max-width: 760px) {
+  .home-overview-grid > .daily-objectives-home-button { width: 100%; max-width: 146px; margin: 0 auto; }
+}
 </style>
 
 </head>
@@ -3723,14 +3732,15 @@ body:has(#appPage .app-content:not(.hidden)):not(:has(#archivesPage:not(.hidden)
             <button id="activityHomeButton" class="home-overview-activity" type="button" aria-label="Ouvrir la page Activité" title="Activité">
                 <img loading="lazy" decoding="async" src="./Activité.png" alt="Activité">
             </button>
-        </section>
-
         <button id="dailyObjectivesHomeButton" class="daily-objectives-home-button hidden" type="button" aria-label="Voir les objectifs du jour">
             <span class="daily-objectives-home-icon" aria-hidden="true">🎯</span>
             <strong>Objectifs du jour</strong>
             <span id="dailyObjectivesHomeProgress" class="daily-objectives-home-progress">0 / 3 terminés</span>
             <span class="daily-objectives-home-open">Voir les objectifs</span>
         </button>
+        </section>
+
+
 
 
         <!-- BOOSTERS -->
