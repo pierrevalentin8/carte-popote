@@ -2627,6 +2627,31 @@ body {
 .card-number-badge { background: #183c72; border-color: var(--theme-gold-light); }
 .booster-modal { background: rgba(3, 11, 25, .78); }
 .booster-modal-content { color: var(--theme-ink); }
+.booster-modal.classic-booster-result { padding:clamp(8px,2.5vw,24px); background:radial-gradient(ellipse at 50% 8%,rgba(230,190,74,.2),transparent 40%),rgba(2,10,21,.86); backdrop-filter:blur(9px); }
+.classic-booster-result .booster-modal-content { position:relative; width:min(100%,900px); max-height:94dvh; padding:clamp(15px,3vw,28px); overflow:auto; border:2px solid rgba(239,202,105,.9); border-radius:26px; background:radial-gradient(ellipse at 50% 0%,rgba(34,91,59,.4),transparent 43%),linear-gradient(155deg,#102d32,#071b2b 64%,#081b29); color:#f8f2df; box-shadow:0 24px 70px rgba(0,0,0,.58),0 0 0 5px rgba(235,194,83,.09),inset 0 1px rgba(255,255,255,.14); }
+.classic-booster-result .booster-modal-content h2 { margin:0; color:#ffe18a; font-size:clamp(22px,4vw,30px); line-height:1.15; text-align:center; text-shadow:0 2px 13px rgba(255,203,75,.25); }
+.classic-booster-result #boosterResultDescription { max-width:650px; margin:8px auto 15px; color:#d9e9d9; font-size:14px; line-height:1.45; text-align:center; }
+.classic-booster-result .booster-pack-reveal { min-height:clamp(180px,34vh,300px); margin:0; border:1px solid rgba(244,208,117,.42); border-radius:20px; background:radial-gradient(ellipse at 50% 42%,rgba(232,186,70,.25),transparent 42%),linear-gradient(145deg,#113a35,#091e2b 74%); box-shadow:inset 0 0 32px rgba(81,191,105,.1),0 10px 30px rgba(0,0,0,.24); }
+.classic-booster-result .booster-pack-reveal::after { position:absolute; inset:9px; border:1px solid rgba(255,224,143,.18); border-radius:14px; content:""; pointer-events:none; }
+.classic-booster-result .booster-pack-reveal img { width:clamp(112px,28vw,184px); max-height:clamp(150px,27vh,245px); filter:drop-shadow(0 13px 19px rgba(0,0,0,.52)) drop-shadow(0 0 14px rgba(255,207,83,.22)); }
+.classic-booster-result .booster-pack-reveal p { color:#fff3cc; font-size:14px; letter-spacing:.02em; }
+.classic-booster-result .booster-pack-reveal.is-opening::before { background:#ffe281; box-shadow:0 0 60px 30px rgba(255,213,91,.45); }
+.classic-booster-result .booster-card-stage { min-height:clamp(285px,50vh,440px); margin:10px 0 8px; border:1px solid rgba(242,205,108,.4); background:radial-gradient(ellipse at 50% 42%,rgba(50,113,75,.58),transparent 48%),linear-gradient(145deg,#102b37,#071827 76%); box-shadow:inset 0 0 42px rgba(0,0,0,.28); }
+.classic-booster-result .booster-card-stage-card .player-card { border-color:#e4bd58; box-shadow:0 16px 35px rgba(0,0,0,.5),0 0 20px rgba(238,193,77,.17); }
+.classic-booster-result .booster-reveal-progress { width:max-content; max-width:100%; margin:8px auto 0; padding:8px 14px; border:1px solid rgba(243,208,120,.38); border-radius:999px; background:rgba(4,18,28,.76); color:#f7e8bb; }
+.classic-booster-result .booster-next-card-button { min-height:46px; margin:10px auto 0; padding:10px 20px; border:1px solid #ead078; border-radius:12px; background:linear-gradient(145deg,#39874b,#1d6033); color:#fff8dc; box-shadow:0 4px 0 #123d26,0 9px 18px rgba(0,0,0,.27),inset 0 1px rgba(255,255,255,.25); font-weight:900; }
+.classic-booster-result .booster-next-card-button:hover:not(:disabled) { filter:brightness(1.1); transform:translateY(-2px); }
+.classic-booster-result .booster-next-card-button:disabled { border-color:#ad8c42; background:#76643a; color:#f2e4be; opacity:.82; }
+.classic-booster-result .booster-result-grid { margin-top:12px; }
+.classic-booster-result .booster-result-grid .player-card { overflow:hidden; border-color:#d9b64e; box-shadow:0 8px 20px rgba(0,0,0,.38),0 0 12px rgba(236,194,70,.11); }
+.classic-booster-result .booster-modal-actions { gap:12px; margin-top:18px; }
+.classic-booster-result .booster-modal-actions .primary-button,
+.classic-booster-result .booster-modal-actions .secondary-button { min-height:44px; border:1px solid #e2c56d; border-radius:12px; background:linear-gradient(145deg,#39874b,#1d6033); color:#fff8dc; box-shadow:0 4px 0 #123d26,0 8px 15px rgba(0,0,0,.22),inset 0 1px rgba(255,255,255,.2); font-weight:900; }
+.classic-booster-result .booster-modal-actions .secondary-button { background:linear-gradient(145deg,#314a56,#1a303b); color:#f6e8bf; }
+.classic-booster-result .booster-modal-actions button:hover:not(:disabled) { filter:brightness(1.08); transform:translateY(-1px); }
+.classic-booster-result.season-two-booster-result .booster-pack-reveal { background:radial-gradient(ellipse at 50% 42%,rgba(44,207,77,.3),transparent 43%),linear-gradient(145deg,#12472d,#071e27 76%); box-shadow:inset 0 0 34px rgba(52,229,73,.15),0 10px 30px rgba(0,0,0,.24); }
+.classic-booster-result.season-two-booster-result .booster-card-stage { background:radial-gradient(ellipse at 50% 42%,rgba(39,139,66,.6),transparent 48%),linear-gradient(145deg,#103626,#071b25 76%); }
+@media(max-width:600px){.booster-modal.classic-booster-result{padding:max(7px,env(safe-area-inset-top)) 8px max(7px,env(safe-area-inset-bottom))}.classic-booster-result .booster-modal-content{max-height:95dvh;padding:13px 11px;border-radius:20px}.classic-booster-result #boosterResultDescription{margin:6px auto 10px;font-size:12px}.classic-booster-result .booster-pack-reveal{min-height:clamp(155px,27vh,220px);border-radius:15px}.classic-booster-result .booster-pack-reveal img{max-height:clamp(125px,22vh,175px)}.classic-booster-result .booster-card-stage{min-height:clamp(260px,43vh,350px);padding:9px}.classic-booster-result .booster-modal-actions{gap:8px;margin-top:12px}.classic-booster-result .booster-modal-actions button{min-height:42px;padding:8px 10px;font-size:13px}}
 .bottom-nav {
     background: #ffffff;
     border-top: 1px solid #e2e8f0;
@@ -11443,6 +11468,9 @@ function wait(milliseconds) {
 async function showBoosterResults(cards, boostersOfferts = 0, boosterType = "classique", options = {}) {
     mandatoryEventBoosterOpen = options.mandatory === true;
     boosterResultModal.classList.toggle("event-booster-mandatory", mandatoryEventBoosterOpen);
+    const isClassicBooster = boosterType === "classique";
+    boosterResultModal.classList.toggle("classic-booster-result", isClassicBooster);
+    boosterResultModal.classList.toggle("season-two-booster-result", isClassicBooster && /saison\s*2/i.test(options.name || ""));
     closeBoosterResultButton.classList.toggle("hidden", mandatoryEventBoosterOpen);
     openNextBoosterButton.classList.add("hidden");
     const cardRarityRank = (card) => {
