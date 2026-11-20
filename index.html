@@ -4216,6 +4216,7 @@ body:has(#appPage .app-content:not(.hidden)):not(:has(#archivesPage:not(.hidden)
                     <option value="cardsDrawn">Cartes tirées</option>
                     <option value="recycling">Recyclage</option>
                     <option value="boostersOpened">Boosters ouverts</option>
+                    <option value="bureauClicks">Clics du Bureau du CB</option>
                 </select>
             </label>
         </div>
@@ -5159,6 +5160,7 @@ const callRecordHistoricalPremiumPayment = httpsCallable(functions, "recordHisto
 const callAdjustPlayerTokens = httpsCallable(functions, "adjustPlayerTokens");
 const callGetLeaderboard = httpsCallable(functions, "getLeaderboard");
 const callGetWeeklyActivity = httpsCallable(functions, "getWeeklyActivity");
+const callGetBureauCbLeaderboard = httpsCallable(functions, "getBureauCbLeaderboard");
 const callClaimMysticPullRewards = httpsCallable(functions, "claimMysticPullRewards");
 const callBuyClassicBooster = httpsCallable(functions, "buyClassicBooster");
 const callGetNormalBoosterSettings = httpsCallable(functions, "getNormalBoosterSettings");
@@ -6146,6 +6148,7 @@ const activityPage = document.getElementById("activityPage");
 const activityBackButton = document.getElementById("activityBackButton");
 const activityMetricSelect = document.getElementById("activityMetricSelect");
 const activityWeekLabel = document.getElementById("activityWeekLabel");
+const activityTitle = document.getElementById("activityTitle");
 const activityStatus = document.getElementById("activityStatus");
 const activityList = document.getElementById("activityList");
 const activityHistoricalLeaders = document.getElementById("activityHistoricalLeaders");
@@ -9869,7 +9872,7 @@ leaderboardMenuButton.addEventListener("click", async () => {
 
 leaderboardBackButton.addEventListener("click", showHomePage);
 
-const activityMetricLabels = { recycling: "Recyclages", cardsDrawn: "Cartes tirées", boostersOpened: "Boosters ouverts" };
+const activityMetricLabels = { recycling: "Recyclages", cardsDrawn: "Cartes tirées", boostersOpened: "Boosters ouverts", bureauClicks: "Clics du Bureau du CB" };
 const activityHistoryLabels = { cardsDrawn: "Cartes tirées", boostersOpened: "Boosters ouverts", recycling: "Recyclages" };
 function renderActivityHistoricalLeaders(leaders, weeksCount) {
     activityHistoricalLeaders.replaceChildren();
@@ -9908,13 +9911,20 @@ async function loadWeeklyActivity() {
     activityList.replaceChildren();
     try {
         const metric = activityMetricSelect.value;
-        const response = (await callGetWeeklyActivity({ metric })).data || {};
-        renderActivityHistoricalLeaders(response.historicalLeaders, response.historicalWeeksCount);
+        const isBureauClicks = metric === "bureauClicks";
+        const response = isBureauClicks
+            ? (await callGetBureauCbLeaderboard()).data || {}
+            : (await callGetWeeklyActivity({ metric })).data || {};
+        const historicalSection = activityHistoricalLeaders.closest(".activity-history");
+        if (historicalSection) historicalSection.classList.toggle("hidden", isBureauClicks);
+        if (!isBureauClicks) renderActivityHistoricalLeaders(response.historicalLeaders, response.historicalWeeksCount);
         const players = Array.isArray(response.players) ? response.players : [];
-        if (response.weekStart && response.weekEnd) activityWeekLabel.textContent = `Semaine du ${formatActivityDate(response.weekStart)} au ${formatActivityDate(response.weekEnd)} · ${activityMetricLabels[metric] || "Activité"}`;
-        const maxValue = Math.max(0, ...players.map((player) => Number(player.value) || 0));
+        if (isBureauClicks) activityWeekLabel.textContent = "Classement général · clics cumulés";
+        else if (response.weekStart && response.weekEnd) activityWeekLabel.textContent = `Semaine du ${formatActivityDate(response.weekStart)} au ${formatActivityDate(response.weekEnd)} · ${activityMetricLabels[metric] || "Activité"}`;
+        activityTitle.textContent = isBureauClicks ? "🏆 Bureau du CB · Classement" : "📈 Activité hebdomadaire";
+        const maxValue = Math.max(0, ...players.map((player) => Number(isBureauClicks ? player.totalClicks : player.value) || 0));
         players.forEach((player) => {
-            const value = Math.max(0, Number(player.value) || 0);
+            const value = Math.max(0, Number(isBureauClicks ? player.totalClicks : player.value) || 0);
             const row = document.createElement("article"); row.className = "activity-row";
             const name = document.createElement("span"); name.className = "activity-player"; name.textContent = player.pseudo || "Joueur";
             const zero = document.createElement("span"); zero.className = "activity-zero"; zero.textContent = "0"; zero.setAttribute("aria-hidden", "true");
@@ -9925,7 +9935,9 @@ async function loadWeeklyActivity() {
             const count = document.createElement("span"); count.className = "activity-value"; count.textContent = value.toLocaleString("fr-FR");
             row.append(name, zero, track, count); activityList.append(row);
         });
-        activityStatus.textContent = players.length ? `${players.length} joueur${players.length === 1 ? "" : "s"} · classés du plus actif au moins actif.` : "Aucun joueur inscrit.";
+        activityStatus.textContent = players.length ? (isBureauClicks
+            ? `${players.length} joueur${players.length === 1 ? "" : "s"} · classés selon le nombre total de clics réussis.`
+            : `${players.length} joueur${players.length === 1 ? "" : "s"} · classés du plus actif au moins actif.`) : "Aucun joueur inscrit.";
     } catch (error) {
         console.error("Impossible de charger l’activité hebdomadaire :", error);
         activityStatus.textContent = error.message || "Impossible de charger l’activité hebdomadaire. Vérifie que la fonction Firebase est déployée.";

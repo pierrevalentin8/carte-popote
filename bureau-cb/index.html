@@ -33,6 +33,8 @@
     .result-card h2 { margin: 0; color: #fff1c9; font-size: 1.6rem; }
     .result-score { margin: 0; color: #fff; font-size: 1.2rem; }
     .result-score strong { display: block; margin-top: 6px; color: #ffd66d; font-size: 3rem; font-variant-numeric: tabular-nums; }
+    .reward-result { margin: 0; color: #ffe7a5; font-weight: 800; }
+    .reward-rules { max-width: 440px; margin: 0; padding: 8px 13px; border: 1px solid rgba(255,226,154,.35); border-radius: 12px; background: rgba(5,22,39,.78); color: #fff1c9; font-size: .86rem; text-align: center; }
     .ok-button { min-width: 130px; min-height: 48px; padding: 10px 24px; border: 1px solid #fff0bd; border-radius: 12px; background: linear-gradient(180deg, #f4c95d, #b87c1f); color: #1e2530; font: inherit; font-weight: 900; cursor: pointer; box-shadow: 0 4px 0 #704711, 0 8px 18px rgba(0,0,0,.3); }
     .ok-button:hover { filter: brightness(1.08); }
     .ok-button:focus-visible { outline: 3px solid #fff; outline-offset: 4px; }
@@ -52,8 +54,9 @@
     <section class="controls" aria-label="Mini-jeu de démonstration">
       <div class="timer" id="timer" aria-live="polite">Prêt ?</div>
       <p class="click-count" id="clickCount" aria-live="polite">Clics : 0</p>
-      <p class="click-count" id="remainingAttempts">Tentatives restantes : 5/5</p>
+      <p class="click-count" id="remainingAttempts">Tentatives restantes : connexion…</p>
       <button class="flip-button" id="flipButton" type="button">↻&nbsp; Retourner le bureau du CB</button>
+      <p class="reward-rules">41 clics ou plus : 1 jeton classique · 51 clics ou plus : 2 jetons classiques</p>
       <p class="status" id="status" aria-live="polite">Le compte à rebours démarrera au premier clic.</p>
     </section>
   </main>
@@ -61,13 +64,24 @@
     <section class="result-card">
       <h2 id="resultTitle">Temps écoulé !</h2>
       <p class="result-score">Ton score<strong id="resultScore">0</strong></p>
+      <p class="reward-result" id="resultReward" aria-live="polite"></p>
       <div class="result-actions">
         <button class="ok-button" id="replayButton" type="button">Rejouer · 5/5</button>
         <a class="home-button" href="https://pierrevalentin8.github.io/carte-popote/">Accueil</a>
       </div>
     </section>
   </div>
-  <script>
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-auth.js";
+    import { getFunctions, httpsCallable } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-functions.js";
+    const firebaseConfig = { apiKey: "AIzaSyCbm2aLX62NjJmO5nc__vaDiAt43arpfGY", authDomain: "cartes-et-popote.firebaseapp.com", projectId: "cartes-et-popote", storageBucket: "cartes-et-popote.firebasestorage.app", messagingSenderId: "1060360191291", appId: "1:1060360191291:web:96e35d7177d5d511220b1e" };
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const functions = getFunctions(app, "europe-west1");
+    const callStartAttempt = httpsCallable(functions, "startBureauCbAttempt");
+    const callFinishAttempt = httpsCallable(functions, "finishBureauCbAttempt");
+    const callGetLeaderboard = httpsCallable(functions, "getBureauCbLeaderboard");
     const room = document.getElementById("room");
     const button = document.getElementById("flipButton");
     const status = document.getElementById("status");
@@ -75,42 +89,19 @@
     const clickCount = document.getElementById("clickCount");
     const resultModal = document.getElementById("resultModal");
     const resultScore = document.getElementById("resultScore");
+    const resultReward = document.getElementById("resultReward");
     const replayButton = document.getElementById("replayButton");
     const remainingAttemptsLabel = document.getElementById("remainingAttempts");
     const maxAttempts = 5;
-    const attemptsStorageKey = "bureau-cb-attempts-v1";
-    const parisDayKey = () => {
-      const parts = new Intl.DateTimeFormat("en-CA", { timeZone: "Europe/Paris", year: "numeric", month: "2-digit", day: "2-digit" }).formatToParts(new Date());
-      const get = (type) => parts.find((part) => part.type === type)?.value || "";
-      return `${get("year")}-${get("month")}-${get("day")}`;
-    };
-    function getAttemptState() {
-      const day = parisDayKey();
-      try {
-        const stored = JSON.parse(localStorage.getItem(attemptsStorageKey) || "null");
-        if (stored?.day === day && Number.isInteger(stored.used) && stored.used >= 0) return stored;
-      } catch {}
-      const fresh = { day, used: 0 };
-      try { localStorage.setItem(attemptsStorageKey, JSON.stringify(fresh)); } catch {}
-      return fresh;
-    }
-    function remainingAttempts() { return Math.max(0, maxAttempts - getAttemptState().used); }
+    let attemptsRemaining = 0;
+    let activeAttemptId = "";
     function renderAttempts() {
-      const remaining = remainingAttempts();
-      remainingAttemptsLabel.textContent = `Tentatives restantes : ${remaining}/${maxAttempts}`;
-      if (phase === "ready" && remaining === 0) {
+      remainingAttemptsLabel.textContent = `Tentatives restantes : ${attemptsRemaining}/${maxAttempts}`;
+      if (phase === "ready" && attemptsRemaining === 0) {
         button.disabled = true;
         status.textContent = "Tu as utilisé tes 5 tentatives du jour. Reviens demain !";
-      }
-      return remaining;
-    }
-    function consumeAttempt() {
-      const state = getAttemptState();
-      if (state.used >= maxAttempts) return false;
-      state.used += 1;
-      try { localStorage.setItem(attemptsStorageKey, JSON.stringify(state)); } catch {}
-      renderAttempts();
-      return true;
+      } else if (phase === "ready") button.disabled = false;
+      return attemptsRemaining;
     }
     let clicks = 0;
     let phase = "ready";
@@ -124,7 +115,22 @@
       room.classList.add("shaking");
     }
 
-    function startRound() {
+    async function startRound() {
+      try {
+        const response = (await callStartAttempt()).data || {};
+        activeAttemptId = String(response.attemptId || "");
+        attemptsRemaining = Math.max(0, Number(response.remainingAttempts) || 0);
+        renderAttempts();
+        if (!activeAttemptId) throw new Error("Impossible de démarrer cette tentative.");
+      } catch (error) {
+        phase = "ready";
+        if (String(error?.code || "").includes("resource-exhausted")) attemptsRemaining = 0;
+        room.classList.remove("panicking");
+        button.textContent = "↻ Retourner le bureau du CB";
+        renderAttempts();
+        status.textContent = error?.message || "Impossible d’enregistrer ta tentative. Réessaie.";
+        return;
+      }
       phase = "running";
       room.classList.add("panicking");
       clicks = 0;
@@ -145,17 +151,34 @@
           button.textContent = "↻ Rejouer";
           status.textContent = `Temps écoulé ! Tu as fait ${clicks} clic${clicks === 1 ? "" : "s"}.`;
           resultScore.textContent = String(clicks);
-          const remaining = renderAttempts();
-          replayButton.textContent = `Rejouer · ${remaining}/${maxAttempts}`;
-          replayButton.disabled = remaining === 0;
           resultModal.hidden = false;
-          replayButton.focus();
+          resultReward.textContent = "Enregistrement du score et de la récompense…";
+          replayButton.textContent = "Enregistrement…";
+          replayButton.disabled = true;
+          (async () => {
+            try {
+              let result;
+              try { result = (await callFinishAttempt({ attemptId: activeAttemptId, clicks })).data || {}; }
+              catch { result = (await callFinishAttempt({ attemptId: activeAttemptId, clicks })).data || {}; }
+              attemptsRemaining = Math.max(0, Number(result.remainingAttempts) || 0);
+              renderAttempts();
+              const reward = Math.max(0, Number(result.tokensAwarded) || 0);
+              resultReward.textContent = reward ? `Récompense : +${reward} jeton${reward === 1 ? "" : "s"} classique${reward === 1 ? "" : "s"} !` : "Pas de jeton cette fois. Reviens tenter ta chance !";
+              replayButton.textContent = `Rejouer · ${attemptsRemaining}/${maxAttempts}`;
+              replayButton.disabled = attemptsRemaining === 0;
+            } catch (error) {
+              resultReward.textContent = error?.message || "Le résultat n’a pas pu être enregistré. Recharge la page pour vérifier.";
+              replayButton.textContent = "Rejouer · résultat à vérifier";
+              replayButton.disabled = true;
+            }
+            replayButton.focus();
+          })();
         }
       }, 100);
     }
 
     function beginAttempt() {
-      if (!consumeAttempt()) { renderAttempts(); return; }
+      if (attemptsRemaining <= 0) { renderAttempts(); return; }
       resultModal.hidden = true;
       phase = "countdown";
       room.classList.remove("panicking");
@@ -185,7 +208,25 @@
       shakeRoom();
     });
     replayButton.addEventListener("click", beginAttempt);
-    renderAttempts();
+    button.disabled = true;
+    status.textContent = "Vérification de ton compte…";
+    const currentUser = await new Promise((resolve) => {
+      let unsubscribe = () => {};
+      unsubscribe = onAuthStateChanged(auth, (user) => { unsubscribe(); resolve(user); }, () => { unsubscribe(); resolve(null); });
+    });
+    if (!currentUser) {
+      status.textContent = "Connecte-toi sur Cartes & Popote pour jouer et recevoir tes jetons.";
+      remainingAttemptsLabel.textContent = "Tentatives disponibles après connexion";
+    } else {
+      try {
+        const state = (await callGetLeaderboard()).data || {};
+        attemptsRemaining = Math.max(0, Number(state.remainingAttempts) || 0);
+        renderAttempts();
+        if (attemptsRemaining) status.textContent = "Le compte à rebours démarrera au premier clic.";
+      } catch (error) {
+        status.textContent = error?.message || "Impossible de vérifier tes tentatives. Recharge la page.";
+      }
+    }
     room.addEventListener("animationend", (event) => {
       if (event.animationName === "desk-shake") room.classList.remove("shaking");
     });
