@@ -48,7 +48,7 @@
 </head>
 <body>
   <main class="room" id="room">
-    <img class="room-background" id="roomBackground" src="./bureau-cb.png?v=20261120" alt="" aria-hidden="true">
+    <img class="room-background" id="roomBackground" src="../Vieil%20employ%C3%A9%20grognon%20au%20bureau.png?v=20261120" alt="" aria-hidden="true">
     <h1 class="title">Bureau du CB</h1>
     <a class="home-link" href="../" aria-label="Retourner à la page d'accueil">← Accueil</a>
     <section class="controls" aria-label="Mini-jeu de démonstration">
@@ -126,7 +126,7 @@
       } catch (error) {
         phase = "ready";
         if (String(error?.code || "").includes("resource-exhausted")) attemptsRemaining = 0;
-        roomBackground.src = "./bureau-cb.png?v=20261120";
+        roomBackground.src = "../Vieil%20employ%C3%A9%20grognon%20au%20bureau.png?v=20261120";
         room.classList.remove("panicking");
         button.textContent = "↻ Retourner le bureau du CB";
         renderAttempts();
@@ -134,7 +134,7 @@
         return;
       }
       phase = "running";
-      roomBackground.src = "./panique-bureau.png?v=20261120";
+      roomBackground.src = "../Panique%20au%20bureau%20de%20la%20gendarmerie.png?v=20261120";
       room.classList.add("panicking");
       clicks = 0;
       clickCount.textContent = "Clics : 0";
@@ -184,7 +184,7 @@
       if (attemptsRemaining <= 0) { renderAttempts(); return; }
       resultModal.hidden = true;
       phase = "countdown";
-      roomBackground.src = "./bureau-cb.png?v=20261120";
+      roomBackground.src = "../Vieil%20employ%C3%A9%20grognon%20au%20bureau.png?v=20261120";
       room.classList.remove("panicking");
       button.disabled = true;
       button.textContent = "⏳ Prépare-toi…";
