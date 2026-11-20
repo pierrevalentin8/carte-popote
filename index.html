@@ -2697,16 +2697,15 @@ body {
 .home-overview-archive button { height:100%; }
 .home-overview-archive img { width:min(100%,190px); max-height:106px; }
 .home-service-menu { position:relative; z-index:4; display:grid; width:100%; height:100%; place-items:center; }
+.home-overview-archive:has(.home-service-menu[open]) { position:relative; z-index:40; }
+.home-service-menu[open] { z-index:40; }
 .home-service-menu > summary { list-style:none; }
 .home-service-menu > summary::-webkit-details-marker { display:none; }
-.home-service-menu-toggle { display:flex; width:100%; height:100%; min-height:100px; flex-direction:column; align-items:center; justify-content:center; gap:5px; padding:8px; border-radius:14px; color:#fff4cf; cursor:pointer; user-select:none; }
+.home-service-menu-toggle { display:flex; width:100%; height:100%; min-height:100px; align-items:center; justify-content:center; padding:8px; border-radius:14px; color:#fff4cf; cursor:pointer; user-select:none; }
 .home-service-menu-toggle:hover { filter:brightness(1.1); }
 .home-service-menu-toggle:focus-visible { outline:3px solid #ffe181; outline-offset:3px; }
-.home-service-menu-icon { font-size:32px; line-height:1; filter:drop-shadow(0 2px 2px rgba(0,0,0,.3)); }
-.home-service-menu-toggle strong { font-size:13px; }
-.home-service-menu-chevron { position:absolute; right:12px; bottom:9px; font-size:18px; transition:transform .18s ease; }
-.home-service-menu[open] .home-service-menu-chevron { transform:rotate(180deg); }
-.home-service-menu-options { position:absolute; top:calc(100% + 10px); left:50%; z-index:20; display:grid; width:min(310px,calc(100vw - 28px)); gap:10px; padding:12px; border:1px solid rgba(245,215,139,.8); border-radius:18px; background:linear-gradient(145deg,#123d2a,#082618); box-shadow:0 16px 36px rgba(0,0,0,.42),inset 0 1px rgba(255,255,255,.16); transform:translateX(-50%); }
+.home-service-menu-icon { display:grid; width:74px; height:74px; place-items:center; border:2px solid rgba(255,225,129,.92); border-radius:20px; background:linear-gradient(145deg,#174c2e,#0b2d1d); box-shadow:0 7px 18px rgba(0,0,0,.35),inset 0 1px rgba(255,255,255,.16); color:#ffe181; font-size:62px; font-weight:700; line-height:1; text-shadow:0 2px 8px rgba(0,0,0,.55); }
+.home-service-menu-options { position:absolute; top:auto; bottom:calc(100% + 10px); left:50%; z-index:50; display:grid; width:min(310px,calc(100vw - 28px)); gap:10px; padding:12px; border:1px solid rgba(245,215,139,.9); border-radius:18px; background-color:#082618; background-image:linear-gradient(145deg,#123d2a,#082618); opacity:1; box-shadow:0 16px 36px rgba(0,0,0,.52),inset 0 1px rgba(255,255,255,.16); transform:translateX(-50%); }
 .home-overview-archive .home-service-menu-option { display:flex; width:100%; height:auto; min-height:62px; flex-direction:row; align-items:center; justify-content:flex-start; gap:12px; padding:9px 12px; border:1px solid rgba(241,206,112,.45); border-radius:13px; background:linear-gradient(145deg,rgba(21,60,42,.96),rgba(7,32,23,.98)); color:#fff6d8; box-shadow:0 4px 10px rgba(0,0,0,.2),inset 0 1px rgba(255,255,255,.12); font:inherit; font-weight:900; cursor:pointer; text-align:left; }
 .home-service-menu-option:hover { transform:translateY(-1px); filter:brightness(1.1); }
 .home-service-menu-option:focus-visible { outline:3px solid #ffe181; outline-offset:2px; }
@@ -3836,9 +3835,7 @@ body:has(#appPage .app-content:not(.hidden)):not(:has(#archivesPage:not(.hidden)
             <div class="home-overview-archive home-service-menu-cell">
                 <details class="home-service-menu" id="homeServiceMenu">
                     <summary class="home-service-menu-toggle" aria-label="Dérouler le menu Service et Bureau du CB">
-                        <span class="home-service-menu-icon" aria-hidden="true">🏢</span>
-                        <strong>Services</strong>
-                        <span class="home-service-menu-chevron" aria-hidden="true">⌄</span>
+                        <span class="home-service-menu-icon" aria-hidden="true">+</span>
                     </summary>
                     <div class="home-service-menu-options">
                         <button id="archivesHomeButton" class="home-service-menu-option home-service-option" type="button" aria-label="Ouvrir Service" title="Service">
