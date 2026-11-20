@@ -2342,12 +2342,14 @@ body {
 @media (max-width:600px) { .event-booster-form-grid,.event-booster-badge-fields { grid-template-columns:1fr; } .event-booster-form-grid .full-width,.event-booster-badge-fields .full-width { grid-column:auto; } }
 .admin-page > .admin-note, .player-collection .admin-note, .player-collection .admin-status { color: #c6d2e5; }
 .admin-panel h3 { color: var(--theme-ink); }
-.admin-panel .secondary-button, .booster-modal-actions .secondary-button, .admin-back {
+.admin-panel .secondary-button, .booster-modal-actions .secondary-button {
     border-color: #18345e;
     background: #10264a;
     color: #fff;
     box-shadow: 0 5px 12px rgba(7, 22, 45, .2);
 }
+.admin-back { border:1px solid #2b713d; border-radius:11px; background:linear-gradient(145deg,#39874b,#1d6033); color:#fff; box-shadow:0 4px 0 #17492a,0 7px 12px rgba(20,71,34,.18),inset 0 1px rgba(255,255,255,.28); transition:transform .14s ease,box-shadow .14s ease,filter .14s ease; }
+.admin-back:hover:not(:disabled) { transform:translateY(-2px); filter:brightness(1.07); box-shadow:0 6px 0 #17492a,0 10px 15px rgba(20,71,34,.22),inset 0 1px rgba(255,255,255,.34); }
 .admin-field, .player-token-input { border-color: #d8c99f; background: #fffefa; color: var(--theme-ink); }
 .admin-card-row { border-color: #e8dfca; }
 .admin-card-thumb, .admin-card-preview { border-color: #dfc879; background: #f3ead2; }
@@ -2537,6 +2539,12 @@ body {
 .exchange-pending-section h4 { margin: 0 0 5px; color: #694d09; font: 900 13px/1.35 system-ui,sans-serif; }
 .exchange-pending-trade { margin: 5px 0 0; color: #44391f; font: 13px/1.45 system-ui,sans-serif; }
 .exchange-pending-trade strong { color: #173a70; }
+.exchange-pending-item { display:flex; align-items:center; justify-content:space-between; gap:10px; padding:6px 0; border-top:1px solid rgba(155,119,32,.2); }
+.exchange-pending-item .exchange-pending-trade { min-width:0; flex:1 1 auto; }
+.exchange-pending-item:first-of-type { border-top:0; }
+.exchange-cancel-button { flex:0 0 auto; padding:6px 10px; border:1px solid #a33d34; border-radius:8px; background:linear-gradient(145deg,#c95b4e,#a63830); color:#fff; font:800 12px system-ui,sans-serif; cursor:pointer; box-shadow:0 2px 0 #7a2924; }
+.exchange-cancel-button:hover:not(:disabled) { filter:brightness(1.08); transform:translateY(-1px); }
+.exchange-cancel-button:disabled { cursor:wait; opacity:.7; }
 .exchange-ad p { margin: 6px 0 0; font-family: Georgia, serif; font-size: 15px; line-height: 1.55; }
 .exchange-ad-label { font-weight: 700; }
 .exchange-trade-button { display: block; min-width: 130px; margin: 14px 0 0 auto; padding: 9px 15px; border: 1px solid #d7a51e; border-radius: 9px; background: linear-gradient(135deg, #ffe17b, #edb52b); color: #10264a; font: inherit; font-size: 13px; font-weight: 900; cursor: pointer; box-shadow: 0 3px 0 #a8780b, 0 5px 9px rgba(0,0,0,.18); }
@@ -5224,6 +5232,7 @@ const callAcknowledgeAdminGrantNotification = httpsCallable(functions, "acknowle
 const callCreateExchangeOffer = httpsCallable(functions, "createExchangeOffer");
 const callAcceptExchangeOffer = httpsCallable(functions, "acceptExchangeOffer");
 const callRefuseExchangeOffer = httpsCallable(functions, "refuseExchangeOffer");
+const callCancelExchangeOffer = httpsCallable(functions, "cancelExchangeOffer");
 
 const siteUpdatesModal = document.getElementById("siteUpdatesModal");
 const notificationsBellButton = document.getElementById("notificationsBellButton");
@@ -7445,6 +7454,8 @@ async function showExchangePage(expandPlayerId = "") {
                 pendingHeading.textContent = "Échange en attente de réponse";
                 pendingSection.append(pendingHeading);
                 pendingTrades.forEach((trade) => {
+                    const row = document.createElement("div");
+                    row.className = "exchange-pending-item";
                     const line = document.createElement("p");
                     line.className = "exchange-pending-trade";
                     const offered = `Saison ${Number(trade.offeredSeason) || 1} · n° ${Number(trade.offeredNumber) || "?"}`;
@@ -7452,7 +7463,32 @@ async function showExchangePage(expandPlayerId = "") {
                     line.textContent = trade.direction === "sent"
                         ? `Tu proposes ${offered} contre ${requested} ; sa réponse est attendue.`
                         : `${ad.pseudo || "Ce joueur"} propose ${offered} contre ta carte ${requested} ; ta réponse est attendue.`;
-                    pendingSection.append(line);
+                    row.append(line);
+                    if (trade.direction === "sent" && trade.id) {
+                        const cancelButton = document.createElement("button");
+                        cancelButton.type = "button";
+                        cancelButton.className = "exchange-cancel-button";
+                        cancelButton.textContent = "Annuler";
+                        cancelButton.setAttribute("aria-label", `Annuler l’échange en attente avec ${ad.pseudo || "ce joueur"}`);
+                        cancelButton.addEventListener("click", async () => {
+                            cancelButton.disabled = true;
+                            cancelButton.textContent = "Annulation…";
+                            try {
+                                await callCancelExchangeOffer({ offerId: trade.id });
+                                await showExchangePage(ad.id);
+                                exchangeAdsStatus.textContent = `La proposition d’échange avec ${ad.pseudo || "ce joueur"} a été annulée.`;
+                            } catch (error) {
+                                console.error("Annulation de l’échange impossible :", error);
+                                exchangeAdsStatus.textContent = error.code === "functions/failed-precondition" || error.code === "functions/permission-denied"
+                                    ? (error.message || "Cet échange ne peut plus être annulé.")
+                                    : "Impossible d’annuler l’échange. Vérifie que la fonction cancelExchangeOffer est déployée.";
+                                cancelButton.disabled = false;
+                                cancelButton.textContent = "Annuler";
+                            }
+                        });
+                        row.append(cancelButton);
+                    }
+                    pendingSection.append(row);
                 });
                 details.append(pendingSection);
             }
