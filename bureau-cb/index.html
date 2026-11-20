@@ -1,4 +1,3 @@
-Warning: fs was declared with const; use let for reassignable variables.
 <!doctype html>
 <html lang="fr">
 <head>
@@ -11,12 +10,15 @@ Warning: fs was declared with const; use let for reassignable variables.
     * { box-sizing: border-box; }
     html, body { width: 100%; min-height: 100%; margin: 0; }
     body { min-height: 100svh; overflow: hidden; background: #09233d; color: #fff; }
-    .room { position: relative; display: grid; min-height: 100svh; place-items: center; isolation: isolate; overflow: hidden; }
-    .room::before { position: absolute; z-index: -2; inset: 0; content: ""; background: url("./bureau-cb.png") center center / cover no-repeat; transform-origin: center; }
+    .room { position: relative; display: grid; min-height: 100svh; place-items: center; isolation: isolate; overflow: hidden; background: #09233d; }
+    .room::before { position: absolute; z-index: 0; inset: 0; content: ""; background: #09233d url("./bureau-cb.png") center center / cover no-repeat; transform-origin: center; }
     .room.panicking::before { background-image: url("./panique-bureau.png"); }
-    .room::after { position: absolute; z-index: -1; inset: 0; content: ""; background: linear-gradient(180deg, rgba(4, 17, 32, .48), transparent 25%, transparent 64%, rgba(4, 17, 32, .48)); pointer-events: none; }
-    .title { position: absolute; top: max(22px, env(safe-area-inset-top)); left: max(22px, env(safe-area-inset-left)); margin: 0; padding: 12px 18px; border: 1px solid rgba(255, 211, 106, .8); border-radius: 14px; background: rgba(6, 29, 53, .8); box-shadow: 0 8px 24px rgba(0,0,0,.28), inset 0 0 0 1px rgba(255,255,255,.08); color: #fff3ce; font-size: clamp(1.2rem, 3vw, 1.8rem); letter-spacing: .02em; }
-    .controls { position: absolute; bottom: max(26px, env(safe-area-inset-bottom)); left: 50%; display: grid; justify-items: center; gap: 10px; width: min(92vw, 440px); transform: translateX(-50%); }
+    .room::after { position: absolute; z-index: 1; inset: 0; content: ""; background: linear-gradient(180deg, rgba(4, 17, 32, .48), transparent 25%, transparent 64%, rgba(4, 17, 32, .48)); pointer-events: none; }
+    .title { position: absolute; z-index: 2; top: max(22px, env(safe-area-inset-top)); left: max(22px, env(safe-area-inset-left)); margin: 0; padding: 12px 18px; border: 1px solid rgba(255, 211, 106, .8); border-radius: 14px; background: rgba(6, 29, 53, .8); box-shadow: 0 8px 24px rgba(0,0,0,.28), inset 0 0 0 1px rgba(255,255,255,.08); color: #fff3ce; font-size: clamp(1.2rem, 3vw, 1.8rem); letter-spacing: .02em; }
+    .home-link { position: absolute; z-index: 2; top: max(22px, env(safe-area-inset-top)); right: max(22px, env(safe-area-inset-right)); display: inline-flex; min-height: 46px; align-items: center; justify-content: center; gap: 7px; padding: 10px 16px; border: 1px solid rgba(255, 211, 106, .85); border-radius: 13px; background: rgba(6, 29, 53, .88); box-shadow: 0 6px 18px rgba(0,0,0,.3), inset 0 1px rgba(255,255,255,.14); color: #fff3ce; font-weight: 800; text-decoration: none; }
+    .home-link:hover { filter: brightness(1.15); transform: translateY(-1px); }
+    .home-link:focus-visible { outline: 3px solid #fff; outline-offset: 3px; }
+    .controls { position: absolute; z-index: 2; bottom: max(26px, env(safe-area-inset-bottom)); left: 50%; display: grid; justify-items: center; gap: 10px; width: min(92vw, 440px); transform: translateX(-50%); }
     .flip-button { min-height: 62px; width: 100%; padding: 14px 24px; border: 2px solid #ffe29a; border-radius: 16px; background: linear-gradient(180deg, #174e7e, #092c50); box-shadow: 0 7px 0 #051b32, 0 12px 28px rgba(0,0,0,.4), inset 0 1px 0 rgba(255,255,255,.32); color: #fff7df; font: inherit; font-size: clamp(1.05rem, 3vw, 1.3rem); font-weight: 800; cursor: pointer; touch-action: manipulation; transition: filter .15s ease, transform .15s ease, box-shadow .15s ease; }
     .flip-button:hover { filter: brightness(1.13); transform: translateY(-2px); }
     .flip-button:active { transform: translateY(4px); box-shadow: 0 3px 0 #051b32, 0 7px 16px rgba(0,0,0,.38); }
@@ -39,13 +41,14 @@ Warning: fs was declared with const; use let for reassignable variables.
     .ok-button:disabled { cursor: not-allowed; filter: grayscale(.65); opacity: .65; }
     .room.shaking::before { animation: desk-shake .44s cubic-bezier(.36,.07,.19,.97) both; }
     @keyframes desk-shake { 10%, 90% { transform: translate3d(-2px, 1px, 0) rotate(-.15deg); } 20%, 80% { transform: translate3d(4px, -2px, 0) rotate(.22deg); } 30%, 50%, 70% { transform: translate3d(-7px, 3px, 0) rotate(-.32deg); } 40%, 60% { transform: translate3d(7px, -3px, 0) rotate(.3deg); } }
-    @media (max-width: 640px) { .room::before { background-position: center center; } .title { top: max(14px, env(safe-area-inset-top)); left: max(14px, env(safe-area-inset-left)); padding: 9px 13px; } .controls { bottom: max(18px, env(safe-area-inset-bottom)); width: calc(100% - 32px); } .flip-button { min-height: 58px; } }
+    @media (max-width: 640px) { .room::before { background-position: center center; } .title { top: max(14px, env(safe-area-inset-top)); left: max(14px, env(safe-area-inset-left)); padding: 9px 13px; } .home-link { top: max(14px, env(safe-area-inset-top)); right: max(14px, env(safe-area-inset-right)); min-height: 42px; padding: 8px 12px; font-size: .9rem; } .controls { bottom: max(18px, env(safe-area-inset-bottom)); width: calc(100% - 32px); } .flip-button { min-height: 58px; } }
     @media (prefers-reduced-motion: reduce) { *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; } .room.shaking::before { animation-duration: .12s; } }
   </style>
 </head>
 <body>
   <main class="room" id="room">
     <h1 class="title">Bureau du CB</h1>
+    <a class="home-link" href="../" aria-label="Retourner à la page d'accueil">← Accueil</a>
     <section class="controls" aria-label="Mini-jeu de démonstration">
       <div class="timer" id="timer" aria-live="polite">Prêt ?</div>
       <p class="click-count" id="clickCount" aria-live="polite">Clics : 0</p>
