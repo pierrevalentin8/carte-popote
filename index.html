@@ -2565,6 +2565,8 @@ body {
 .sale-card { min-width:0; padding:10px; border:1px solid rgba(243,191,56,.55); border-radius:12px; background:linear-gradient(145deg,#0c1b35,#16335d); color:#fff7df; text-align:center; box-shadow:0 5px 13px rgba(0,0,0,.22); }
 .sale-card strong,.sale-card span { display:block; overflow-wrap:anywhere; }
 .sale-card span { margin:4px 0; color:#d5deed; font-size:12px; }
+.sale-card .sale-countdown { color:#ffe29a; font-size:12px; font-weight:900; }
+.sale-card .sale-countdown.is-ending { color:#ffb6a8; }
 .sale-card .sale-card-identity { margin:4px 0 9px; color:var(--sale-rarity-color,#fff1bd); font-size:17px; font-weight:950; line-height:1.35; text-shadow:0 1px 2px #000; }
 .sale-card-identity[data-rarity="commune"] { --sale-rarity-color:#c1c8d2; }
 .sale-card-identity[data-rarity="rare"] { --sale-rarity-color:#64b8ff; }
@@ -10047,7 +10049,7 @@ activityHomeButton.addEventListener("click", openActivityPage);
 activityBackButton.addEventListener("click", showHomePage);
 activityMetricSelect.addEventListener("change", loadWeeklyActivity);
 
-function makeSaleCard(card, detail, buttonLabel, onAction, secondary = false) {
+function makeSaleCard(card, detail, buttonLabel, onAction, secondary = false, expiresAt = null) {
     const article = document.createElement("article"); article.className = "sale-card";
     const identity = document.createElement("strong"); identity.className = "sale-card-identity";
     const rarity = isCassosCategory(card?.category) ? "cassos" : String(card?.rarity || "").toLocaleLowerCase("fr").normalize("NFD").replace(/[\u0300-\u036f]/g, "");
@@ -10055,11 +10057,38 @@ function makeSaleCard(card, detail, buttonLabel, onAction, secondary = false) {
     identity.textContent = `${card?.name || "Carte"} · n° ${card?.number || "?"}`;
     const info = document.createElement("span"); info.textContent = detail;
     article.append(identity, info);
+    if (expiresAt) {
+        const countdown = document.createElement("span");
+        countdown.className = "sale-countdown";
+        countdown.dataset.expiresAt = String(Date.parse(expiresAt) || 0);
+        article.append(countdown);
+    }
     if (buttonLabel && onAction) { const button = document.createElement("button"); button.type = "button"; button.textContent = buttonLabel; if (secondary) button.classList.add("secondary"); button.addEventListener("click", onAction); article.append(button); }
     return article;
 }
 
+let saleCountdownInterval = null;
+function refreshSaleCountdowns() {
+    document.querySelectorAll(".sale-countdown").forEach((countdown) => {
+        const remaining = Number(countdown.dataset.expiresAt) - Date.now();
+        if (!Number.isFinite(remaining) || remaining <= 0) {
+            countdown.textContent = "⏳ Expiration imminente";
+            countdown.classList.add("is-ending");
+            return;
+        }
+        const totalMinutes = Math.ceil(remaining / 60000);
+        const hours = Math.floor(totalMinutes / 60);
+        const minutes = totalMinutes % 60;
+        countdown.textContent = hours > 0
+            ? "⏳ Expire dans " + hours + " h " + String(minutes).padStart(2, "0") + " min"
+            : "⏳ Expire dans " + minutes + " min";
+        countdown.classList.toggle("is-ending", remaining < 60 * 60 * 1000);
+    });
+}
+
 async function loadSaleMarket() {
+    if (saleCountdownInterval) clearInterval(saleCountdownInterval);
+    saleCountdownInterval = null;
     [saleOfferListings, saleOfferInventory, saleReceivedOffers, saleOwnListings].forEach((node) => node.replaceChildren());
     saleStatus.textContent = "Chargement du marché…";
     try {
@@ -10069,7 +10098,7 @@ async function loadSaleMarket() {
         const offers = Array.isArray(result.offers) ? result.offers : [];
         const run = async (action, successText) => { try { await action(); saleStatus.textContent = successText; await loadSaleMarket(); } catch (error) { console.error("Action du marché impossible :", error); saleStatus.textContent = error.message || "Action impossible. Réessaie."; } };
         listings.filter((listing) => listing.mode === "offer" && !listing.own).forEach((listing) => {
-            const article = makeSaleCard(listing.card, `Prix demandé : ${listing.price} jeton${listing.price > 1 ? "s" : ""} · ${listing.sellerPseudo}`, null, null);
+            const article = makeSaleCard(listing.card, `Prix demandé : ${listing.price} jeton${listing.price > 1 ? "s" : ""} · ${listing.sellerPseudo}`, null, null, false, listing.expiresAt);
             const buy = document.createElement("button"); buy.type = "button"; buy.textContent = `Acheter · ${listing.price} jeton${listing.price > 1 ? "s" : ""}`; buy.addEventListener("click", () => void run(() => callBuySaleListing({ listingId: listing.id }), "Achat effectué !"));
             const form = document.createElement("form"); form.className = "sale-form"; const input = document.createElement("input"); input.type = "number"; input.min = "1"; input.max = "100000"; input.step = "1"; input.required = true; input.value = String(listing.price); input.setAttribute("aria-label", "Ta proposition en jetons"); const propose = document.createElement("button"); propose.type = "submit"; propose.className = "secondary"; propose.textContent = "Proposer ce prix";
             form.append(input, propose); form.addEventListener("submit", (event) => { event.preventDefault(); void run(() => callProposeSalePrice({ listingId: listing.id, price: Number(input.value) }), "Proposition envoyée au vendeur."); }); article.append(buy, form); saleOfferListings.append(article);
@@ -10086,12 +10115,14 @@ async function loadSaleMarket() {
         listings.filter((listing) => listing.own).forEach((listing) => {
             const legacyDirect = listing.mode !== "offer";
             const description = legacyDirect ? "Ancienne vente directe · à retirer" : `Mise aux enchères · prix demandé : ${listing.price} jeton${listing.price > 1 ? "s" : ""}`;
-            saleOwnListings.append(makeSaleCard(listing.card, description, "Retirer l’annonce", () => void run(() => callCancelSaleListing({ listingId: listing.id }), "Annonce retirée."), true));
+            saleOwnListings.append(makeSaleCard(listing.card, description, "Retirer l’annonce", () => void run(() => callCancelSaleListing({ listingId: listing.id }), "Annonce retirée."), true, listing.expiresAt));
         });
         if (!saleOfferListings.childElementCount) saleOfferListings.innerHTML = '<p class="sale-intro">Aucune mise aux enchères pour le moment.</p>';
         if (!saleOfferInventory.childElementCount) saleOfferInventory.innerHTML = '<p class="sale-intro">Tu n’as pas de carte en double vendable.</p>';
         if (!saleReceivedOffers.childElementCount) saleReceivedOffers.innerHTML = '<p class="sale-intro">Aucune proposition reçue.</p>';
         if (!saleOwnListings.childElementCount) saleOwnListings.innerHTML = '<p class="sale-intro">Tu n’as aucune annonce active.</p>';
+        refreshSaleCountdowns();
+        saleCountdownInterval = setInterval(refreshSaleCountdowns, 30000);
         saleStatus.textContent = `Solde : ${Number(result.tokens) || 0} jeton${Number(result.tokens) === 1 ? "" : "s"} classique${Number(result.tokens) === 1 ? "" : "s"}. Les cartes proposées sont réservées jusqu’au retrait ou à la vente.`;
     } catch (error) {
         console.error("Impossible de charger le marché :", error);
