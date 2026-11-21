@@ -2564,6 +2564,10 @@ body {
 .sale-section { margin:18px 0; padding:18px; border:1px solid rgba(229,190,91,.7); border-radius:17px; background:radial-gradient(ellipse at 100% 0,rgba(98,158,89,.13),transparent 42%),linear-gradient(145deg,#17442d,#10331f 75%); box-shadow:0 9px 22px rgba(0,0,0,.23),inset 0 1px rgba(255,255,255,.08); }
 .sale-section h3 { display:flex; align-items:center; gap:8px; margin:0 0 8px; color:#ffe6a0; font-size:18px; }
 .sale-section > .sale-intro { margin:0 0 14px; color:#d9e8d7; }
+.sale-toolbar { display:grid; grid-template-columns:repeat(3,minmax(145px,1fr)) minmax(125px,auto); align-items:end; gap:10px; margin:0 0 15px; padding:12px; border:1px solid rgba(196,222,178,.25); border-radius:13px; background:rgba(5,34,21,.38); }
+.sale-filter { display:grid; gap:5px; color:#e6efdc; font-size:11px; font-weight:850; }
+.sale-filter select { width:100%; min-height:39px; padding:8px 30px 8px 10px; border:1px solid #afc99d; border-radius:9px; background:#f9fbf3; color:#173b28; font:inherit; font-size:12px; font-weight:750; }
+.sale-filter-count { padding:0 3px 10px; color:#f4df9d; font-size:12px; font-weight:850; text-align:right; }
 .sale-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:12px; }
 .sale-card { min-width:0; padding:14px; border:1px solid #d8c68f; border-radius:14px; background:linear-gradient(155deg,#fffdf4,#edf4e8); color:#173b28; text-align:left; box-shadow:0 6px 15px rgba(0,0,0,.19),inset 0 1px #fff; transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease; }
 .sale-card:hover { transform:translateY(-2px); border-color:#e6bd50; box-shadow:0 10px 20px rgba(0,0,0,.24),0 0 0 2px rgba(231,193,90,.12); }
@@ -2583,7 +2587,7 @@ body {
 .sale-form input { width:90px; min-height:40px; padding:7px; border:1px solid #9eb398; border-radius:9px; background:#fff; color:#173b28; text-align:center; font:inherit; font-weight:750; }
 .sale-inventory { margin-top:18px; padding-top:15px; border-top:1px solid rgba(217,195,125,.35); }
 .sale-inventory h4 { margin:0 0 11px; color:#f3d98c; font-size:15px; }
-@media(max-width:620px){.sale-page{padding:16px 11px 96px}.sale-page > h2{padding:14px 15px;border-radius:15px}.sale-section{margin:14px 0;padding:13px;border-radius:14px}.sale-section h3{font-size:17px}.sale-grid{grid-template-columns:1fr;gap:9px}.sale-card{padding:13px}.sale-form input{flex:1 1 78px}.sale-card button{min-height:42px}}
+@media(max-width:620px){.sale-page{padding:16px 11px 96px}.sale-page > h2{padding:14px 15px;border-radius:15px}.sale-section{margin:14px 0;padding:13px;border-radius:14px}.sale-section h3{font-size:17px}.sale-toolbar{grid-template-columns:1fr 1fr;gap:8px;padding:10px}.sale-filter:last-of-type{grid-column:1 / -1}.sale-filter-count{grid-column:1 / -1;padding:0;text-align:left}.sale-grid{grid-template-columns:1fr;gap:9px}.sale-card{padding:13px}.sale-form input{flex:1 1 78px}.sale-card button{min-height:42px}}
 @media (max-width: 620px) { .exchange-page { padding: 18px 11px 92px; } .exchange-ad p { font-size: 15px; } .exchange-modal-actions > button { flex: 1 1 100%; } }
 .statistics-page { width: 100%; max-width: 1200px; min-height: calc(100dvh - 70px); margin: auto; padding: 24px 16px 100px; color: var(--theme-cream); }
 .statistics-page h2 { margin-top: 20px; color: var(--theme-gold-light); font-size: 24px; }
@@ -4377,7 +4381,22 @@ body:has(#appPage .app-content:not(.hidden)):not(:has(#archivesPage:not(.hidden)
         <h2 id="saleTitle">🛒 Vente entre joueurs</h2>
         <p class="sale-intro">Vends tes cartes en double contre des jetons classiques. Les cartes Cassos sont vendables dans les annonces à prix libre; les cartes mystiques ne sont pas vendables.</p>
         <p id="saleStatus" class="sale-status" role="status" aria-live="polite">Chargement du marché…</p>
-        <section class="sale-section" aria-labelledby="saleOffersTitle"><h3 id="saleOffersTitle">🛒 Annonces disponibles</h3><p class="sale-intro">Achète au prix affiché ou propose un autre montant. Pour vendre un double, choisis ton prix dans la zone ci-dessous.</p><div id="saleOfferListings" class="sale-grid"></div><div class="sale-inventory"><h4>＋ Mettre un double aux enchères</h4><div id="saleOfferInventory" class="sale-grid"></div></div></section>
+        <section class="sale-section" aria-labelledby="saleOffersTitle"><h3 id="saleOffersTitle">🛒 Annonces disponibles</h3><p class="sale-intro">Achète au prix affiché ou propose un autre montant. Pour vendre un double, choisis ton prix dans la zone ci-dessous.</p>
+            <div class="sale-toolbar" role="group" aria-label="Filtrer et trier les annonces">
+                <label class="sale-filter" for="saleRarityFilter">Rareté
+                    <select id="saleRarityFilter"><option value="">Toutes</option><option value="commune">Commune</option><option value="rare">Rare</option><option value="legendaire">Légendaire</option><option value="cassos">Cassos</option></select>
+                </label>
+                <label class="sale-filter" for="saleSeasonFilter">Saison
+                    <select id="saleSeasonFilter"><option value="">Toutes</option><option value="1">Saison 1</option><option value="2">Saison 2</option></select>
+                </label>
+                <label class="sale-filter" for="saleSortSelect">Trier par
+                    <select id="saleSortSelect"><option value="recent">Plus récentes</option><option value="price-asc">Prix croissant</option><option value="price-desc">Prix décroissant</option><option value="ending">Expiration proche</option></select>
+                </label>
+                <span id="saleFilterCount" class="sale-filter-count" aria-live="polite"></span>
+            </div>
+            <div id="saleOfferListings" class="sale-grid"></div>
+            <div class="sale-inventory"><h4>＋ Mettre un double aux enchères</h4><div id="saleOfferInventory" class="sale-grid"></div></div>
+        </section>
         <section class="sale-section" aria-labelledby="saleReceivedTitle"><h3 id="saleReceivedTitle">📨 Propositions reçues</h3><div id="saleReceivedOffers" class="sale-grid"></div></section>
         <section class="sale-section" aria-labelledby="saleOwnTitle"><h3 id="saleOwnTitle">📌 Mes annonces</h3><div id="saleOwnListings" class="sale-grid"></div></section>
     </section>
@@ -6539,6 +6558,10 @@ const saleBackButton = document.getElementById("saleBackButton");
 const saleHomeButton = document.getElementById("saleMenuButton");
 const saleStatus = document.getElementById("saleStatus");
 const saleOfferListings = document.getElementById("saleOfferListings");
+const saleRarityFilter = document.getElementById("saleRarityFilter");
+const saleSeasonFilter = document.getElementById("saleSeasonFilter");
+const saleSortSelect = document.getElementById("saleSortSelect");
+const saleFilterCount = document.getElementById("saleFilterCount");
 const saleOfferInventory = document.getElementById("saleOfferInventory");
 const saleReceivedOffers = document.getElementById("saleReceivedOffers");
 const saleOwnListings = document.getElementById("saleOwnListings");
@@ -10074,6 +10097,17 @@ function makeSaleCard(card, detail, buttonLabel, onAction, secondary = false, ex
 }
 
 let saleCountdownInterval = null;
+let saleVisibleListingRenderer = null;
+function saleCardRarityKey(card) {
+    if (isCassosCategory(card?.category)) return "cassos";
+    return String(card?.rarity || "").toLocaleLowerCase("fr").normalize("NFD").replace(/[\\u0300-\\u036f]/g, "");
+}
+function saleCreatedAtMilliseconds(value) {
+    return timestampToMilliseconds(value);
+}
+saleRarityFilter.addEventListener("change", () => saleVisibleListingRenderer?.());
+saleSeasonFilter.addEventListener("change", () => saleVisibleListingRenderer?.());
+saleSortSelect.addEventListener("change", () => saleVisibleListingRenderer?.());
 function refreshSaleCountdowns() {
     document.querySelectorAll(".sale-countdown").forEach((countdown) => {
         const remaining = Number(countdown.dataset.expiresAt) - Date.now();
@@ -10095,6 +10129,7 @@ function refreshSaleCountdowns() {
 async function loadSaleMarket() {
     if (saleCountdownInterval) clearInterval(saleCountdownInterval);
     saleCountdownInterval = null;
+    saleVisibleListingRenderer = null;
     [saleOfferListings, saleOfferInventory, saleReceivedOffers, saleOwnListings].forEach((node) => node.replaceChildren());
     saleStatus.textContent = "Chargement du marché…";
     try {
@@ -10103,12 +10138,32 @@ async function loadSaleMarket() {
         const inventory = Array.isArray(result.inventory) ? result.inventory : [];
         const offers = Array.isArray(result.offers) ? result.offers : [];
         const run = async (action, successText) => { try { await action(); saleStatus.textContent = successText; await loadSaleMarket(); } catch (error) { console.error("Action du marché impossible :", error); saleStatus.textContent = error.message || "Action impossible. Réessaie."; } };
-        listings.filter((listing) => listing.mode === "offer" && !listing.own).forEach((listing) => {
-            const article = makeSaleCard(listing.card, `Prix demandé : ${listing.price} jeton${listing.price > 1 ? "s" : ""} · ${listing.sellerPseudo}`, null, null, false, listing.expiresAt);
-            const buy = document.createElement("button"); buy.type = "button"; buy.textContent = `Acheter · ${listing.price} jeton${listing.price > 1 ? "s" : ""}`; buy.addEventListener("click", () => void run(() => callBuySaleListing({ listingId: listing.id }), "Achat effectué !"));
-            const form = document.createElement("form"); form.className = "sale-form"; const input = document.createElement("input"); input.type = "number"; input.min = "1"; input.max = "100000"; input.step = "1"; input.required = true; input.value = String(listing.price); input.setAttribute("aria-label", "Ta proposition en jetons"); const propose = document.createElement("button"); propose.type = "submit"; propose.className = "secondary"; propose.textContent = "Proposer ce prix";
-            form.append(input, propose); form.addEventListener("submit", (event) => { event.preventDefault(); void run(() => callProposeSalePrice({ listingId: listing.id, price: Number(input.value) }), "Proposition envoyée au vendeur."); }); article.append(buy, form); saleOfferListings.append(article);
-        });
+        const renderVisibleListings = () => {
+            saleOfferListings.replaceChildren();
+            const availableListings = listings.filter((listing) => listing.mode === "offer" && !listing.own);
+            let visibleListings = availableListings.slice();
+            const rarityFilter = saleRarityFilter.value;
+            const seasonFilter = saleSeasonFilter.value;
+            if (rarityFilter) visibleListings = visibleListings.filter((listing) => saleCardRarityKey(listing.card) === rarityFilter);
+            if (seasonFilter) visibleListings = visibleListings.filter((listing) => !isCassosCategory(listing.card?.category) && String(Number(listing.card?.season) || 1) === seasonFilter);
+            const sortMode = saleSortSelect.value;
+            visibleListings.sort((left, right) => {
+                if (sortMode === "price-asc") return Number(left.price) - Number(right.price);
+                if (sortMode === "price-desc") return Number(right.price) - Number(left.price);
+                if (sortMode === "ending") return (Date.parse(left.expiresAt || "") || Number.MAX_SAFE_INTEGER) - (Date.parse(right.expiresAt || "") || Number.MAX_SAFE_INTEGER);
+                return saleCreatedAtMilliseconds(right.createdAt) - saleCreatedAtMilliseconds(left.createdAt);
+            });
+            visibleListings.forEach((listing) => {
+                const article = makeSaleCard(listing.card, `Prix demandé : ${listing.price} jeton${listing.price > 1 ? "s" : ""} · ${listing.sellerPseudo}`, null, null, false, listing.expiresAt);
+                const buy = document.createElement("button"); buy.type = "button"; buy.textContent = `Acheter · ${listing.price} jeton${listing.price > 1 ? "s" : ""}`; buy.addEventListener("click", () => void run(() => callBuySaleListing({ listingId: listing.id }), "Achat effectué !"));
+                const form = document.createElement("form"); form.className = "sale-form"; const input = document.createElement("input"); input.type = "number"; input.min = "1"; input.max = "100000"; input.step = "1"; input.required = true; input.value = String(listing.price); input.setAttribute("aria-label", "Ta proposition en jetons"); const propose = document.createElement("button"); propose.type = "submit"; propose.className = "secondary"; propose.textContent = "Proposer ce prix";
+                form.append(input, propose); form.addEventListener("submit", (event) => { event.preventDefault(); void run(() => callProposeSalePrice({ listingId: listing.id, price: Number(input.value) }), "Proposition envoyée au vendeur."); }); article.append(buy, form); saleOfferListings.append(article);
+            });
+            saleFilterCount.textContent = `${visibleListings.length} annonce${visibleListings.length === 1 ? "" : "s"}`;
+            if (!visibleListings.length) saleOfferListings.innerHTML = `<p class="sale-intro">${availableListings.length ? "Aucune annonce ne correspond à ces filtres." : "Aucune annonce aux enchères pour le moment."}</p>`;
+        };
+        saleVisibleListingRenderer = renderVisibleListings;
+        renderVisibleListings();
         inventory.forEach((card) => {
             const article = makeSaleCard(card, `${card.category || card.rarity || "Carte"} · ${card.count} exemplaires`, null, null);
             const form = document.createElement("form"); form.className = "sale-form"; const input = document.createElement("input"); input.type = "number"; input.min = "1"; input.max = "100000"; input.step = "1"; input.required = true; input.placeholder = "Prix"; input.setAttribute("aria-label", "Prix demandé en jetons"); const button = document.createElement("button"); button.type = "submit"; button.textContent = "Publier"; form.append(input, button); form.addEventListener("submit", (event) => { event.preventDefault(); void run(() => callCreateSaleListing({ copyId: card.copyId, mode: "offer", price: Number(input.value) }), "Annonce publiée."); }); article.append(form); saleOfferInventory.append(article);
@@ -10123,7 +10178,6 @@ async function loadSaleMarket() {
             const description = legacyDirect ? "Ancienne vente directe · à retirer" : `Mise aux enchères · prix demandé : ${listing.price} jeton${listing.price > 1 ? "s" : ""}`;
             saleOwnListings.append(makeSaleCard(listing.card, description, "Retirer l’annonce", () => void run(() => callCancelSaleListing({ listingId: listing.id }), "Annonce retirée."), true, listing.expiresAt));
         });
-        if (!saleOfferListings.childElementCount) saleOfferListings.innerHTML = '<p class="sale-intro">Aucune mise aux enchères pour le moment.</p>';
         if (!saleOfferInventory.childElementCount) saleOfferInventory.innerHTML = '<p class="sale-intro">Tu n’as pas de carte en double vendable.</p>';
         if (!saleReceivedOffers.childElementCount) saleReceivedOffers.innerHTML = '<p class="sale-intro">Aucune proposition reçue.</p>';
         if (!saleOwnListings.childElementCount) saleOwnListings.innerHTML = '<p class="sale-intro">Tu n’as aucune annonce active.</p>';
