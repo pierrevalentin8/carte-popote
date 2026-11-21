@@ -2556,28 +2556,34 @@ body {
 .exchange-ad-numbers { display: inline-flex; flex-wrap: wrap; gap: 5px; margin: 7px 4px; vertical-align: middle; }
 .exchange-ad-numbers span { padding: 2px 6px; border: 1px solid currentColor; border-radius: 4px; background: rgba(255,255,255,.7); font-family: system-ui, sans-serif; font-size: 12px; font-weight: 900; }
 .exchange-status { margin: 12px 0; color: #c6d2e5; font-size: 13px; line-height: 1.5; }
-.sale-page { width:100%; max-width:1100px; min-height:calc(100dvh - 70px); margin:auto; padding:24px 16px 100px; color:var(--theme-cream); }
-.sale-page h2 { margin:20px 0 8px; color:var(--theme-gold-light); font-size:25px; }
-.sale-intro,.sale-status { color:#c6d2e5; font-size:13px; line-height:1.5; }
-.sale-section { margin:22px 0; padding:16px; border:1px solid rgba(243,191,56,.68); border-radius:15px; background:linear-gradient(145deg,#183766,#10264a); box-shadow:0 8px 20px rgba(0,0,0,.22),inset 0 1px rgba(255,255,255,.08); }
-.sale-section h3 { margin:0 0 12px; color:var(--theme-gold-light); }
-.sale-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(145px,1fr)); gap:12px; }
-.sale-card { min-width:0; padding:10px; border:1px solid rgba(243,191,56,.55); border-radius:12px; background:linear-gradient(145deg,#0c1b35,#16335d); color:#fff7df; text-align:center; box-shadow:0 5px 13px rgba(0,0,0,.22); }
+.sale-page { width:100%; max-width:1120px; min-height:calc(100dvh - 70px); margin:auto; padding:24px 16px 100px; color:var(--theme-cream); }
+.sale-page > h2 { margin:16px 0 10px; padding:17px 20px; border:1px solid rgba(241,202,104,.78); border-radius:18px; background:radial-gradient(ellipse at 50% 0,rgba(85,163,103,.3),transparent 62%),linear-gradient(145deg,#174a31,#0b2d1d); color:#ffe9a7; font-size:clamp(22px,3vw,30px); text-shadow:0 2px 8px rgba(0,0,0,.32); box-shadow:0 10px 25px rgba(0,0,0,.24),inset 0 1px rgba(255,255,255,.12); }
+.sale-intro,.sale-status { color:#e4efdf; font-size:13px; line-height:1.55; }
+.sale-page > .sale-intro { max-width:850px; margin:0 2px 14px; }
+.sale-status { width:fit-content; max-width:100%; margin:12px 0 18px; padding:9px 13px; border:1px solid rgba(186,218,170,.45); border-radius:11px; background:rgba(13,52,33,.82); color:#f4f7e8; box-shadow:inset 0 1px rgba(255,255,255,.06); }
+.sale-section { margin:18px 0; padding:18px; border:1px solid rgba(229,190,91,.7); border-radius:17px; background:radial-gradient(ellipse at 100% 0,rgba(98,158,89,.13),transparent 42%),linear-gradient(145deg,#17442d,#10331f 75%); box-shadow:0 9px 22px rgba(0,0,0,.23),inset 0 1px rgba(255,255,255,.08); }
+.sale-section h3 { display:flex; align-items:center; gap:8px; margin:0 0 8px; color:#ffe6a0; font-size:18px; }
+.sale-section > .sale-intro { margin:0 0 14px; color:#d9e8d7; }
+.sale-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:12px; }
+.sale-card { min-width:0; padding:14px; border:1px solid #d8c68f; border-radius:14px; background:linear-gradient(155deg,#fffdf4,#edf4e8); color:#173b28; text-align:left; box-shadow:0 6px 15px rgba(0,0,0,.19),inset 0 1px #fff; transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease; }
+.sale-card:hover { transform:translateY(-2px); border-color:#e6bd50; box-shadow:0 10px 20px rgba(0,0,0,.24),0 0 0 2px rgba(231,193,90,.12); }
 .sale-card strong,.sale-card span { display:block; overflow-wrap:anywhere; }
-.sale-card span { margin:4px 0; color:#d5deed; font-size:12px; }
-.sale-card .sale-countdown { color:#ffe29a; font-size:12px; font-weight:900; }
-.sale-card .sale-countdown.is-ending { color:#ffb6a8; }
-.sale-card .sale-card-identity { margin:4px 0 9px; color:var(--sale-rarity-color,#fff1bd); font-size:17px; font-weight:950; line-height:1.35; text-shadow:0 1px 2px #000; }
-.sale-card-identity[data-rarity="commune"] { --sale-rarity-color:#c1c8d2; }
-.sale-card-identity[data-rarity="rare"] { --sale-rarity-color:#64b8ff; }
-.sale-card-identity[data-rarity="legendaire"] { --sale-rarity-color:#ffd54f; }
-.sale-card-identity[data-rarity="cassos"] { --sale-rarity-color:#e7a2ff; }
-.sale-card button { width:100%; min-height:36px; margin-top:6px; padding:7px; border:1px solid #e8bf45; border-radius:8px; background:linear-gradient(135deg,#ffe17b,#edb52b); color:#10264a; font:inherit; font-size:12px; font-weight:900; cursor:pointer; box-shadow:0 3px 0 #a8780b; }
-.sale-card button.secondary { background:linear-gradient(135deg,#eaf2ff,#b9cce8); border-color:#8fa8ca; box-shadow:0 3px 0 #617a9e; }
-.sale-form { display:flex; flex-wrap:wrap; justify-content:center; align-items:center; gap:6px; margin-top:6px; }
-.sale-form input { width:74px; min-height:34px; padding:5px; border:1px solid #9baec7; border-radius:7px; text-align:center; font:inherit; }
-.sale-inventory { margin-top:15px; padding-top:12px; border-top:1px solid rgba(255,255,255,.15); }
-@media(max-width:620px){.sale-page{padding:18px 11px 92px}.sale-section{padding:12px}.sale-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.sale-card{padding:8px}}
+.sale-card span { margin:5px 0; color:#4b6251; font-size:12px; }
+.sale-card .sale-countdown { width:fit-content; margin:9px 0; padding:5px 9px; border:1px solid #c5d8b5; border-radius:999px; background:#e8f2df; color:#245834; font-size:11px; font-weight:900; }
+.sale-card .sale-countdown.is-ending { border-color:#e9b0a3; background:#fff0eb; color:#982e20; }
+.sale-card .sale-card-identity { margin:0 0 8px; color:var(--sale-rarity-color,#243d2b); font-size:17px; font-weight:950; line-height:1.35; }
+.sale-card-identity[data-rarity="commune"] { --sale-rarity-color:#596575; }
+.sale-card-identity[data-rarity="rare"] { --sale-rarity-color:#1267a6; }
+.sale-card-identity[data-rarity="legendaire"] { --sale-rarity-color:#986100; }
+.sale-card-identity[data-rarity="cassos"] { --sale-rarity-color:#783b92; }
+.sale-card button { width:100%; min-height:40px; margin-top:7px; padding:8px 10px; border:1px solid #d8ad41; border-radius:10px; background:linear-gradient(135deg,#ffedaa,#edbd4d); color:#243a22; font:inherit; font-size:13px; font-weight:900; cursor:pointer; box-shadow:0 3px 0 #a77c22,0 5px 9px rgba(54,47,19,.12); transition:filter .16s ease,transform .16s ease; }
+.sale-card button:hover { filter:brightness(1.04); transform:translateY(-1px); }
+.sale-card button.secondary { background:linear-gradient(135deg,#e4f1e1,#c8dfc2); border-color:#9cbd94; color:#214b2d; box-shadow:0 3px 0 #78986f; }
+.sale-form { display:flex; flex-wrap:wrap; justify-content:center; align-items:center; gap:7px; margin-top:8px; }
+.sale-form input { width:90px; min-height:40px; padding:7px; border:1px solid #9eb398; border-radius:9px; background:#fff; color:#173b28; text-align:center; font:inherit; font-weight:750; }
+.sale-inventory { margin-top:18px; padding-top:15px; border-top:1px solid rgba(217,195,125,.35); }
+.sale-inventory h4 { margin:0 0 11px; color:#f3d98c; font-size:15px; }
+@media(max-width:620px){.sale-page{padding:16px 11px 96px}.sale-page > h2{padding:14px 15px;border-radius:15px}.sale-section{margin:14px 0;padding:13px;border-radius:14px}.sale-section h3{font-size:17px}.sale-grid{grid-template-columns:1fr;gap:9px}.sale-card{padding:13px}.sale-form input{flex:1 1 78px}.sale-card button{min-height:42px}}
 @media (max-width: 620px) { .exchange-page { padding: 18px 11px 92px; } .exchange-ad p { font-size: 15px; } .exchange-modal-actions > button { flex: 1 1 100%; } }
 .statistics-page { width: 100%; max-width: 1200px; min-height: calc(100dvh - 70px); margin: auto; padding: 24px 16px 100px; color: var(--theme-cream); }
 .statistics-page h2 { margin-top: 20px; color: var(--theme-gold-light); font-size: 24px; }
@@ -4371,9 +4377,9 @@ body:has(#appPage .app-content:not(.hidden)):not(:has(#archivesPage:not(.hidden)
         <h2 id="saleTitle">🛒 Vente entre joueurs</h2>
         <p class="sale-intro">Vends tes cartes en double contre des jetons classiques. Les cartes Cassos sont vendables dans les annonces à prix libre; les cartes mystiques ne sont pas vendables.</p>
         <p id="saleStatus" class="sale-status" role="status" aria-live="polite">Chargement du marché…</p>
-        <section class="sale-section" aria-labelledby="saleOffersTitle"><h3 id="saleOffersTitle">Mises aux enchères</h3><p class="sale-intro">Publie un double au prix de ton choix. Les autres joueurs peuvent acheter au prix affiché ou te proposer un autre montant.</p><div id="saleOfferListings" class="sale-grid"></div><div class="sale-inventory"><h4>Mettre un double aux enchères</h4><div id="saleOfferInventory" class="sale-grid"></div></div></section>
-        <section class="sale-section" aria-labelledby="saleReceivedTitle"><h3 id="saleReceivedTitle">Propositions reçues</h3><div id="saleReceivedOffers" class="sale-grid"></div></section>
-        <section class="sale-section" aria-labelledby="saleOwnTitle"><h3 id="saleOwnTitle">Mes annonces</h3><div id="saleOwnListings" class="sale-grid"></div></section>
+        <section class="sale-section" aria-labelledby="saleOffersTitle"><h3 id="saleOffersTitle">🛒 Annonces disponibles</h3><p class="sale-intro">Achète au prix affiché ou propose un autre montant. Pour vendre un double, choisis ton prix dans la zone ci-dessous.</p><div id="saleOfferListings" class="sale-grid"></div><div class="sale-inventory"><h4>＋ Mettre un double aux enchères</h4><div id="saleOfferInventory" class="sale-grid"></div></div></section>
+        <section class="sale-section" aria-labelledby="saleReceivedTitle"><h3 id="saleReceivedTitle">📨 Propositions reçues</h3><div id="saleReceivedOffers" class="sale-grid"></div></section>
+        <section class="sale-section" aria-labelledby="saleOwnTitle"><h3 id="saleOwnTitle">📌 Mes annonces</h3><div id="saleOwnListings" class="sale-grid"></div></section>
     </section>
 
     <section id="recyclingPage" class="player-collection hidden" aria-labelledby="recyclingTitle">
